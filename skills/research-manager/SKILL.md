@@ -155,18 +155,9 @@ researcher to triage — the manager does not auto-discard.
 
 ### Stage 4 — Logic Layer Reconciliation
 
-The logic layer (`ara/logic/`) is the **current best understanding** of the project — a
-clean specification of what we currently believe, not an archaeological record. Stage 4
-reconciles it with this turn's events so it stays internally consistent and faithful to
-present evidence.
-
-The trace layer (`ara/trace/`, `ara/staging/`) is append-only and immutable. All history
-of how the logic layer evolved — prior statements, status transitions, revision reasons —
-lives there. The logic file itself carries only the current snapshot plus a `Last revised`
-pointer back to the trace.
-
-This stage operates only on **already-crystallized** entries in `logic/`. Staged
-observations belong to Stage 3.
+Reconcile `logic/` (the current best understanding) with this turn's events so it stays
+internally consistent and faithful to present evidence. Operates only on **already-crystallized**
+entries — staged observations belong to Stage 3. (History lives in the trace; see Layer Mutability.)
 
 #### What Stage 4 may do
 
@@ -281,28 +272,13 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
 ## Per-Turn Procedure
 
 ```
-1. Read existing ara/ files for current state (next IDs, claims, tree, staging).
-2. Stage 1 — Context Harvester: scan this turn → list of candidate events.
-3. Stage 2 — Event Router: for each candidate, per references/event-taxonomy.md:
-     classify type, assign provenance, distill payload
-     direct-route → write to target layer immediately
-     staged-route → append to staging/observations.yaml
-4. Stage 3 — Maturity Tracker:
-     for each staged observation: check closure signals → crystallize if fired
-     for each entry: check contradictions with this turn's events → flag if found
-     for long-staged observations (3+ days idle): mark stale: true
-5. Stage 4 — Logic Layer Reconciliation:
-     for each crystallized entry in logic/ (claims, heuristics, concepts):
-       check status signals → edit Status line if fired
-       check content signals → rewrite Statement / Rationale / definition if reconciliation demanded
-       check structural signals → split, merge, repair dependencies, fix terminology drift
-     run cross-reference consistency pass (broken refs, renamed ids, terminology mismatch)
-     record before/after of every change in today's session record (the logic file does not retain history)
-     log near-miss signals (considered but rejected) to pm_reasoning_log.yaml
-6. Append turn events to today's session record.
-7. Update or append today's entry in trace/sessions/session_index.yaml.
-8. Append a brief reasoning entry to trace/pm_reasoning_log.yaml (self-continuity).
-9. Print one-line summary, e.g.:
+1. Read existing ara/ files (current state, next IDs).
+2. Stage 1 — harvest this turn's candidate events.
+3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; interpretive events staged to staging/observations.yaml.
+4. Stage 3 — crystallize staged observations whose closure signal fired; flag contradictions; mark 3+-day-idle observations stale.
+5. Stage 4 — for each crystallized logic/ entry, apply status/content/structural edits when a signal fires; run the cross-ref consistency pass; record before/after in the session record; log near-misses.
+6. Append turn events to today's session record; update session_index.yaml; append a line to pm_reasoning_log.yaml.
+7. Print one-line summary, e.g.:
      [PM] Turn captured: 1 decision (direct), 2 observations staged, 1 claim crystallized via affirmation, C03 testing→supported, C07 revised (scope narrowed).
    Or, for empty turns:
      [PM] Turn skipped: no research events.
@@ -314,20 +290,9 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
 ara/
   PAPER.md                          # Root manifest + layer index
   logic/                            # MUTABLE — current best understanding (Stage 4 reconciles)
-    problem.md
-    claims.md                       #   Falsifiable assertions + proof refs (current snapshot only)
-    concepts.md
-    experiments.md
-    solution/
-      architecture.md
-      algorithm.md
-      constraints.md
-      heuristics.md                 #   Tricks + rationale + sensitivity
-    related_work.md
-  src/                              # How (code artifacts)
-    configs/
-    kernel/
-    environment.md
+    claims.md  problem.md  concepts.md  experiments.md  related_work.md
+    solution/                       #   constraints.md + method files per the compiler's domain profile
+  src/                              # How (artifacts) — configs/code/data per domain profile; always environment.md
   trace/                            # APPEND-ONLY — the journey, never rewritten
     exploration_tree.yaml           #   Research DAG: decisions, experiments, dead_ends, pivots, questions
     pm_reasoning_log.yaml           #   Manager's own organizational decisions per turn
@@ -386,22 +351,11 @@ tree:
 - **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
 ```
 
-The claim file is a **current-state snapshot**. It carries no history — no prior
-statements, no status transition log, no `From staging` pointer, no `Crystallized via`
-note. All of that lives in the trace:
-
-- Original crystallization: `trace/sessions/YYYY-MM-DD_NNN.yaml` (turn where the claim
-  was promoted) and `staging/observations.yaml` (the source observation, still flagged
-  `promoted: true`).
-- Every subsequent edit: `trace/sessions/YYYY-MM-DD_NNN.yaml` under `logic_revisions:`
-  with full before/after, signal, and provenance.
-- Reasoning for each edit: `trace/pm_reasoning_log.yaml`.
-
-`refuted` and `withdrawn` are terminal — once set, the claim is not edited further except
-via an explicit revival by the user (which reopens it through a `revised` transition and
-settles to `testing` or `hypothesis`). `revised` itself is a transition marker, not a
-resting state: after the revision is recorded in the trace, `Status` settles back to a
-working value.
+Current-state snapshot only — no prior statements, no `From staging`/`Crystallized via`
+notes. Crystallization and every edit are recorded in the trace (`trace/sessions/…` under
+`logic_revisions:` with before/after; source observation stays in `staging/`; reasoning in
+`pm_reasoning_log.yaml`). `refuted`/`withdrawn` are terminal and `revised` is a transition
+marker, not a resting state — see Stage 4.
 
 ### Heuristic (`logic/solution/heuristics.md`) — crystallized only
 
@@ -415,8 +369,7 @@ working value.
 - **Last revised**: YYYY-MM-DD (turn-id)   # absent until first revision
 ```
 
-Same principle as claims: current-state snapshot only, no `From staging` or
-`Crystallized via` clutter. Crystallization and revision history live in the trace.
+Current-state snapshot only (same as claims); history lives in the trace.
 
 ### Observation (`staging/observations.yaml`) — staged
 
@@ -527,7 +480,7 @@ Create the structure on the first turn that contains research-significant activi
 ask unprompted on a purely conversational opener.
 
 ```
-mkdir -p ara/{logic/solution,src/{configs,kernel},trace/sessions,evidence/{tables,figures},staging}
+mkdir -p ara/{logic/solution,src,trace/sessions,evidence/{tables,figures},staging}
 ```
 
 Seed:
@@ -557,32 +510,11 @@ deliver the full briefing.
 
 ## Rules
 
-1. **Never run mid-turn.** Per-turn epilogue only.
-2. **Never fabricate events.** Only log what actually happened or was discussed.
-3. **Stage by default for interpretive events.** Claims, heuristics, concepts, constraints,
-   architecture statements are staged first.
-4. **Never crystallize without a closure signal.** No counter, no LM-judged maturity — only
-   abandonment / affirmation / resolution / commitment.
-5. **Never auto-upgrade provenance.** `ai-suggested` stays until explicit user affirmation.
-6. **Stage 4 reconciles the logic layer; default to no change.** Status flips, content
-   rewrites, splits/merges, and consistency repairs are allowed but require an explicit
-   signal from this turn. Log near-misses. Terminal states (`refuted`, `withdrawn`)
-   need explicit triggers — never reach them by silence or staleness.
-7. **Logic layer is a current-state snapshot.** Each edit overwrites the prior value in
-   `logic/`. The before/after lives in the trace, not in the logic file. Never carry a
-   `Previous statement` line or status history in claim entries.
-8. **Trace and staging are append-only.** Never edit prior entries in `trace/sessions/`,
-   `trace/pm_reasoning_log.yaml`, `trace/exploration_tree.yaml`, or
-   `staging/observations.yaml` except to set forward-reference pointers (e.g.
-   `promoted: true`, `promoted_to:`, appending to today's events). Existing content is
-   never rewritten.
-9. **Never silently overwrite contradictions.** Flag both, append unresolved decision
-   node, defer.
-10. **Always read existing files first.** Get correct next IDs, avoid duplicates.
-11. **Establish forensic bindings.** claim→proof, heuristic→code, decision→evidence. Use
-    `[pending]` + TODO if not yet bindable.
-12. **Every logic-layer edit gets a `logic_revisions:` entry in the session record** with
-    full before/after. This is the only place pre-edit content is preserved.
-13. **Skip empty turns.** No record for greetings, ack, pure formatting.
-14. **Keep YAML valid.** Validate structure mentally before writes.
-15. **Be terse in the summary line.** One line per turn, factual, no narration.
+1. **End-of-turn only; never mid-turn.** Skip empty turns (greetings, ack, formatting).
+2. **Never fabricate.** Log only what actually happened or was discussed.
+3. **Stage interpretive events by default; crystallize only on a closure signal** — abandonment / affirmation / resolution / commitment. No counters, no LM-judged maturity.
+4. **Never auto-upgrade provenance.** `ai-suggested` holds until explicit user affirmation.
+5. **Stage 4 defaults to no change.** Edits require an explicit signal this turn; terminal states (`refuted`/`withdrawn`) need explicit triggers, never silence/staleness. Log near-misses.
+6. **Respect layer mutability** (see top): `logic/` overwrites in place; `trace/` and `staging/` are append-only except forward-reference pointers. Every logic edit gets a `logic_revisions:` before/after in the session record — the only place pre-edit content is kept.
+7. **Never silently overwrite contradictions** — flag both, append an `unresolved` decision node, defer.
+8. **Read target files first** (correct IDs, no dupes); establish forensic bindings (claim→proof, heuristic→code, decision→evidence), `[pending]`+TODO if not yet bindable. Keep YAML valid; summary line terse.
