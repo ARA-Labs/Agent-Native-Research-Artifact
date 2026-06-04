@@ -181,3 +181,21 @@ For each file in `evidence/figures/*.md` specifically:
 ### Trace Hygiene
 - Do not add dead_end, decision, or experiment nodes that are unsupported by the provided source material
 - If a node is reconstructed from partial evidence rather than stated explicitly, it should be marked as inferred or excluded from Seal Level 1 outputs
+
+## 10. Citation Verification (Rule 15)
+
+- Every repo path / `file:line` referenced (in `src/`, heuristic `Code ref`, environment "Code location") exists in the provided repo; no line reference points past the file's actual length
+- No fact ABOUT a repo artifact (line count, path, internal structure) is transcribed from the paper without checking the real file — when paper and repo disagree, the discrepancy is flagged, not silently resolved to the paper's number
+- Spot-check trace `source_refs` and evidence `**Source**` labels: the cited section/table/appendix actually contains the claimed content
+- A statistic carries its scope/denominator (N, population) in its `Source` — subset figures (e.g. "5 papers / 3,050 reqs") are not juxtaposed with full-corpus figures as if same-denominator
+
+## 11. Evidence Ledger Completeness
+
+- Every `Table N` / `Figure N` whose value a claim quotes has a filed evidence file
+- Numbered tables/figures present in the source but NOT filed are listed in `evidence/README.md` with a reason (covered-in-narrative / non-quantitative / skipped) — no silent omissions
+
+## 12. Self-Consistency
+
+- Any ARA-authored derived number (a delta, percentage, or comparison the ARA computes itself) recomputes correctly from its cited cells
+- `PAPER.md` frontmatter/Layer-Index declared counts (claims, concepts, experiments, …) match the actual files
+- Tree `evidence:` references are claim IDs (`C\d+`), not observation IDs (`O\d+`) or other layers
