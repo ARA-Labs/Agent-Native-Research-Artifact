@@ -94,13 +94,12 @@ A change in research direction.
 
 1. **Nested YAML**: Children appear inline under parent node's `children` list
 2. **Valid DAG**: No cycles. All `also_depends_on` IDs must exist in the tree
-3. **Minimum 8 nodes**: Cover the paper's key research trajectory
-4. **Must include dead_end nodes**: At least 1 from ablations or rejected alternatives
-5. **Must include decision nodes**: At least 1 documenting a design choice
-6. **Every node has**: `id` (N01, N02...), `type`, `title`
-7. **Every node has `support_level`**: `explicit` or `inferred`
-8. **Explicit nodes should have `source_refs`**: table/figure/section references from the input material
-9. **`also_depends_on`**: Only for DAG convergence (node has multiple parents beyond nesting)
+3. **Target ~8+ nodes** covering the paper's key trajectory — but source-bounded, not a quota. Never add filler nodes to hit the number (Rule 14).
+4. **dead_end / decision nodes**: include every one the paper actually reveals (ablations, rejected alternatives, stated design choices). If the paper exposes none, do NOT invent one — a smaller honest tree is correct (Rule 9). Mark reconstructed nodes `inferred`.
+5. **Every node has**: `id` (N01, N02...), `type`, `title`
+6. **Every node has `support_level`**: `explicit` or `inferred`
+7. **Explicit nodes should have `source_refs`**: table/figure/section references from the input material
+8. **`also_depends_on`**: Only for DAG convergence (node has multiple parents beyond nesting)
 
 ## Extraction Strategy
 

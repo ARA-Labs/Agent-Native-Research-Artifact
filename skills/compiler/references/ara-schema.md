@@ -193,12 +193,13 @@ Each proofed experiment should in turn be backed by evidence files whose rows or
 
 ## logic/concepts.md
 
-≥5 concepts. One section per concept:
+Target ≥5 concepts, but capture the paper's *genuine* technical terms — don't pad with trivial or
+borrowed terms to reach 5 (Rule 14). One section per concept:
 ```markdown
 ## {Term Name}
-- **Notation**: {LaTeX or symbolic notation}
+- **Notation**: {LaTeX or symbolic notation, or "—" if none}
 - **Definition**: {Formal definition}
-- **Boundary conditions**: {When does this concept apply/not apply}
+- **Boundary conditions**: {When it applies/not — or "Not specified in paper"}
 - **Related concepts**: {other concept names}
 ```
 
@@ -236,9 +237,9 @@ Component graph. For each component: name, purpose, inputs, outputs, interaction
 ## logic/solution/algorithm.md
 
 - Mathematical formulation (LaTeX)
-- Pseudocode
+- Pseudocode (reconstruct only from the paper's stated algorithm; don't invent steps the paper omits)
 - Step-by-step explanation
-- Complexity analysis
+- Complexity analysis — only if the paper states or clearly implies it; else "Not specified in paper"
 
 ## logic/solution/constraints.md
 
@@ -248,13 +249,15 @@ Component graph. For each component: name, purpose, inputs, outputs, interaction
 
 ## logic/solution/heuristics.md
 
-Each heuristic MUST have ALL fields:
+Include only heuristics the paper actually states (implementation tricks, convergence hacks,
+practical gotchas). If the paper presents none, `heuristics.md` may be empty/omitted — do not invent
+tricks. Each heuristic present uses these fields; values come from the paper, else "Not specified":
 ```markdown
 ## H{NN}: {Short description}
 - **Rationale**: {Why this trick is needed}
-- **Sensitivity**: {low|medium|high}
-- **Bounds**: {acceptable range or limits}
-- **Code ref**: [{path to src/execution/ file}]
+- **Sensitivity**: {low|medium|high — or "Not specified in paper"}
+- **Bounds**: {acceptable range or limits — or "Not specified in paper"}
+- **Code ref**: [{path to src/execution/ file, or "Not specified"}]
 - **Source**: {Section/table in the paper}
 ```
 
@@ -290,23 +293,38 @@ per-parameter field format:
 ```markdown
 ## {Parameter name}
 - **Value**: {exact value}
-- **Rationale**: {why this value}
+- **Rationale**: {why this value, or "Not specified in paper"}
 - **Search range**: {if mentioned}
-- **Sensitivity**: {low|medium|high}
+- **Sensitivity**: {low|medium|high — or "Not specified in paper"}
 - **Source**: {section/table}
 ```
 
 Do NOT create `training.md`/`model.md` for a profile that did not train a model.
 
-## src/execution/{module}.py  (PROFILE-SPECIFIC)
+## src/execution/{module}.py  (PROFILE-SPECIFIC, CONDITIONAL — grounded or absent)
 
-Present in any profile with a code artifact (ml-model, ml-eval, data-science, systems; optional
-for theory). Whatever the profile, the stub captures the **novel mechanism**:
-- Typed function signatures (input/output types, tensor/array shapes)
-- Docstrings explaining what each function does
-- Implementation logic for the NOVEL contribution (training step, eval/scoring loop, analysis pipeline, etc.)
+Present only when the source provides **implementable content**: actual repo code, paper
+pseudocode/equations, or a named interface. The stub captures the **novel mechanism** and must be
+grounded — never fabricated.
+
+Every file declares its grounding on the first line:
+```python
+# Grounding: transcribed    — adapted from repo code; cite file:line in docstrings
+# Grounding: reconstructed  — from explicit paper pseudocode/equations; cite §/eq
+# Grounding: interface-only — source names the interface but gives no impl
+```
+Contents:
+- Typed function signatures using ONLY names/types the source states
+- Docstrings that cite the source (`§4.2`, `Eq. 3`, `repo: model.py:88`) — not paraphrases of this skill
+- Implementation logic ONLY where the source provides it; everything unspecified stays
+  `raise NotImplementedError("Not specified in paper")` — never plausible filler
 - NO scaffolding (no argparse, logging, distributed wrappers)
 - Import only standard libraries + the field's core stack (torch/numpy, pandas/statsmodels, etc.)
+
+Hard rule: do not invent API names, function bodies, constants, or hyperparameters. If the source
+describes a contribution only in prose (no code, no pseudocode, no named API), do NOT write a stub —
+omit `src/execution/`, drop it from `profile_manifest`, and note "no implementable artifact in
+source" in `environment.md`. A hollow invented API is a hallucination, not an artifact.
 
 For non-code work, write `src/artifacts.md` describing the non-code deliverables instead.
 

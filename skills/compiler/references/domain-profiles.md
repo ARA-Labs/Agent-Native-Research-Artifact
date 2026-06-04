@@ -30,6 +30,8 @@ regardless of profile:
 | `src/environment.md` | Reproducibility: data sources, software, hardware, protocols, seeds (may state "analytical — no computational environment" for theory) |
 
 Notes:
+- The `≥` counts above are **source-bounded targets, not quotas** — meet them from genuine source
+  content, never by padding or inventing (Rule 14). An honest artifact with fewer beats a padded one.
 - `logic/experiments.md` is a **verification plan**, not "model training" — it generalizes to any
   field's way of testing a claim (an eval run, a statistical test, a proof obligation, a user study).
 - The Universal Core deliberately does NOT include `architecture.md`, `algorithm.md`,
@@ -102,6 +104,12 @@ Use when no profile above fits, or the work straddles fields.
 - `src/execution/{module}.py` if code exists; otherwise `src/artifacts.md` describing the non-code artifacts produced
 - Fill what fits; for any layer that genuinely does not apply, write an explicit
   "Not applicable for this work — {reason}" rather than padding or omitting silently.
+
+> Code stubs across all profiles are **conditional and grounded**: include `src/execution/*.py`
+> only when the source has implementable content (repo code, paper pseudocode/equations, or a named
+> interface), tag each file `# Grounding: transcribed|reconstructed|interface-only`, and never invent
+> an API. A prose-only contribution gets no stub — drop it from `profile_manifest`. See SKILL.md
+> Stage 3 and ara-schema.md.
 
 ---
 
