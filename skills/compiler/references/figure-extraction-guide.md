@@ -42,6 +42,11 @@ If no, it is not a `quantitative_plot`.
 The skill allows `Bash(python *)`. Prefer **PyMuPDF** (`fitz`) — no system dependencies, fast,
 and lets you crop a sub-region. `pdf2image` is a fine alternative when you only need full pages.
 
+**Save every render as the evidence screenshot.** The cropped PNG you produce for a table/figure
+is not transient — save it into the artifact next to its markdown (`evidence/figures/figureN.png`,
+`evidence/tables/tableN.png`). Crop to the object's region so the screenshot shows just that
+table/figure. Every numbered table and figure must end up with a saved `.png`.
+
 ### 2a. Render a whole page to PNG (PyMuPDF)
 
 ```python
