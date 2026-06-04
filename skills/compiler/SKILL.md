@@ -197,21 +197,31 @@ intellectual neighborhood is preserved.
 Generate the artifact files in the active `profile_manifest` (configs/code, or data/analysis, or
 proofs — see `domain-profiles.md` for each profile's list). Always include `src/environment.md`
 (reproducibility: data, software, hardware, protocols, seeds; for analytical work state "analytical
-— no computational environment"). Code stubs capture the NOVEL mechanism with typed signatures and
-no boilerplate. Use any provided repo/data to sharpen the stubs. If a rubric was provided, produce
-`rubric/requirements.md` mapping every leaf node. Don't generate model-training files for profiles
-that didn't train a model.
+— no computational environment"). If a rubric was provided, produce `rubric/requirements.md`
+mapping every leaf node. Don't generate model-training files for profiles that didn't train a model.
+
+**Code stubs must be grounded — never fabricated.** Like every other ARA layer, code carries a
+provenance tag. Each `src/execution/*.py` declares its grounding at the top with `# Grounding: …`:
+- `transcribed` — adapted from actual source code (repo provided); cite `file:line`.
+- `reconstructed` — built from explicit pseudocode/equations in the paper; cite the section/equation.
+- `interface-only` — the source specifies behavior but no implementation; use ONLY names/types the
+  source actually states, and leave bodies as `raise NotImplementedError("Not specified in paper")`.
+
+Hard limits: never invent function bodies, constants, hyperparameters, or API names that aren't in
+the source. Unspecified logic stays unimplemented (`Not specified in paper`), never plausible filler.
+The code stub is **conditional**: produce one only when the source gives implementable content (repo
+code, or paper pseudocode/equations, or a named interface). If a paper describes a contribution only
+in prose with no code, no pseudocode, and no named API, do NOT invent a stub — omit `src/execution/`,
+drop it from `profile_manifest`, and note "no implementable artifact in source" in `environment.md`.
 
 **Stage 4 — Exploration Graph Extraction**
 Reconstruct the research DAG for `/trace/exploration_tree.yaml`:
 - Root nodes = central research questions
 - Experiments and decisions nest as children
 - Dead ends from ablations/rejected alternatives = typed leaf nodes
-- ≥8 nodes, must include dead_end and decision types
 - Use `also_depends_on` for DAG convergence points
-- Every node must declare whether it is `explicit` from source material or `inferred` from reconstruction
-- Explicit nodes should carry source references (table/figure/section labels)
-- Inferred nodes are allowed only when they help reconstruct the paper's logic without pretending to be literal session logs
+- Every node declares `explicit` (from source) or `inferred` (reconstructed); explicit nodes carry source refs
+- **Capture every dead_end and decision the source actually reveals** (ablations, rejected alternatives, stated design choices) — aim for breadth (~8+ nodes for a rich paper). But the node count and the dead_end/decision types are **source-bounded, not quotas**: never invent a dead end, decision, or experiment to hit a number or fill a type. A paper that hides its failures yields a smaller, honest tree — that is correct, not a validation failure. (This overrides any "must include" reading: Rule 9 wins.)
 
 ### Step 3: Generate Files
 
@@ -240,7 +250,7 @@ The mandatory set = **Universal Core** (always) + the **active profile's files**
 **Profile files**: exactly those in the active `profile_manifest` — the method layer (`logic/solution/`)
 and artifact layer (`src/`, `data/`) for your chosen profile. See `domain-profiles.md` for each
 profile's list. Where they appear: `solution/heuristics.md` uses H01... blocks (Rationale, Sensitivity,
-Bounds, Code ref, Source); `src/execution/*.py` is a ≥1-function stub with typed signatures.
+Bounds, Code ref, Source); `src/execution/*.py` is a grounded stub (typed signatures + `# Grounding:` tag, see Stage 3) — included only when the source has implementable content, else omitted.
 
 Evidence-generation rules:
 - Preserve **raw source tables** separately from any **derived subset** views
@@ -326,6 +336,8 @@ Print a summary:
 10. **Evidence-limited wording**: Do not use stronger language than the evidence supports; separate direct observations from interpretation
 11. **Visual extraction is honest extraction**: Read figures by looking at them, not by guessing from captions. Values estimated off a plot are marked approximate (`≈`) with an explicit extraction method and reading confidence. Never present a digitized estimate as an exact source value, never invent data points for an unreadable figure, and never turn a diagram or qualitative sample into a fake data table
 12. **Fit the profile to the field, not the field to the profile**: Select the domain profile that matches what the research actually produces, declare it in `ara_profile`/`profile_manifest`, and generate only those files. Do NOT force model-training files (`configs/training.md`, `configs/model.md`, `architecture.md`, `algorithm.md`) onto evaluation, data-science, or theory work. If no starter profile fits, synthesize one rather than distorting the work
+13. **Code is grounded or it is absent**: A `src/execution/*.py` stub must carry a `# Grounding: transcribed|reconstructed|interface-only` tag and contain only signatures, types, and logic traceable to the source (repo code, paper pseudocode/equations, or a named interface). Never invent API names, function bodies, constants, or hyperparameters; unspecified logic stays `NotImplementedError("Not specified in paper")`. If the source provides no implementable content, omit the code file entirely rather than fabricating a plausible one — a hollow invented API is worse than no API
+14. **Source-bounded minimums**: Every count (`≥5` concepts, `≥3` experiments, `≥8` tree nodes, `≥1` stub) and every required field (Sensitivity, Bounds, complexity, boundary conditions) is a **target, never a license to invent**. If the source genuinely supports fewer, produce what is real and note the shortfall — do NOT pad with borrowed, trivial, or fabricated items. For a required field the source does not state, write "Not specified in paper" rather than guessing a value. An honest under-filled artifact beats a padded one
 
 ## Reference Files
 
