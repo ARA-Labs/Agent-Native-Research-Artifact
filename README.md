@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-3%20skills-green)](skills/)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.24658-b31b1b.svg)](https://arxiv.org/abs/2604.24658)
+[![Poster](https://img.shields.io/badge/Poster-PDF-orange.svg)](docs/poster.pdf)
 
 > A protocol that recasts the primary research object from narrative document to **machine-executable knowledge package** — so AI agents can navigate, reproduce, and extend published research without re-discovering every dead end.
 
@@ -138,26 +139,8 @@ npx @ara-commons/ara-skills
 
 Auto-detects Claude Code, Cursor, Gemini CLI, OpenCode, Codex, and Hermes, then prompts for skills, agents, and install scope (global vs. local).
 
-### Non-interactive
-
-```bash
-# All three skills, every detected agent, user-level
-npx @ara-commons/ara-skills install --all
-
-# One skill, one agent
-npx @ara-commons/ara-skills install --skill compiler --agent claude-code
-
-# Into the current project (.claude/skills, .cursor/skills, …) instead of $HOME
-npx @ara-commons/ara-skills install --all --local
-
-# List / update / remove
-npx @ara-commons/ara-skills list
-npx @ara-commons/ara-skills update
-npx @ara-commons/ara-skills uninstall --skill rigor-reviewer
-```
-
 Full CLI reference: [`packages/ara-skills/`](packages/ara-skills/).
-  
+
 ---
 
 ## Compatibility
