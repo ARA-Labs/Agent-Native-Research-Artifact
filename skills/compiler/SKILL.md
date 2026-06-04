@@ -136,6 +136,7 @@ Strip narrative framing. Extract the raw knowledge atoms:
 - Implementation tricks, convergence hacks, sensitivity observations
 
 Before moving on, perform an **evidence capture pass**:
+- **First build an evidence ledger**: enumerate EVERY numbered `Table N` and `Figure N` in the source (main text + appendices). For each, record its destination: filed as an evidence file, covered-in-narrative (with reason), or non-quantitative/skipped (with reason). Any number a claim quotes MUST have its source table/figure filed — never quote a value whose source object you didn't capture. Record dropped items and reasons in `evidence/README.md` (no silent omissions).
 - For every source table or figure you plan to cite, first capture the original source identifier and caption exactly (`Table 2`, `Figure 4`, etc.)
 - Transcribe the raw table/figure content before making any claim-specific summary
 - If you create a filtered view for one claim, store it as a **derived subset**, not as the original table itself
@@ -268,7 +269,10 @@ captured in the ARA, patch those gaps, then note how many fixes were made. If ze
 early. Pay particular attention to appendix content, to citations from the paper's
 References list, and to **figures whose information only exists visually** (plots not yet
 digitized, diagrams not yet reflected in architecture.md, qualitative samples not yet tied
-to a claim) — all of which are easy to miss on the first pass.
+to a claim) — all of which are easy to miss on the first pass. Also check that **every
+distinct contribution / motivating argument thread** is captured, not just tables and
+citations — a paper often makes a conceptual argument (e.g. a forward-looking framing) that
+carries no number and is easy to drop.
 
 The coverage loop does not replace validation — it ensures the ARA is semantically complete
 before structural checks run.
@@ -303,6 +307,9 @@ Perform these checks:
 - Claim wording does not outrun the evidence type (for example, validation tables alone should not be used to claim training-dynamics improvements)
 - Trace nodes declare `support_level: explicit|inferred`
 - Trace nodes with `support_level: explicit` include source references
+- **Cited locations verified** (Rule 15): every repo path/`file:line` referenced exists and is in range (no line refs past EOF); spot-check trace `source_refs` and evidence `Source` actually contain the cited content; no repo fact (line count, path, structure) transcribed from the paper without checking the real file
+- **Evidence ledger complete** (Fix 2): every `Table N`/`Figure N` a claim quotes is filed in `evidence/`; numbered tables/figures not filed are accounted for in `evidence/README.md` with a reason
+- **Self-consistency pass**: any ARA-authored derived number recomputes correctly; `PAPER.md` declared counts (claims/concepts/…) match the actual files; tree `evidence:` refs are claim IDs (C##), not observation IDs
 
 ### Step 6: Fix & Iterate
 
@@ -338,6 +345,7 @@ Print a summary:
 12. **Fit the profile to the field, not the field to the profile**: Select the domain profile that matches what the research actually produces, declare it in `ara_profile`/`profile_manifest`, and generate only those files. Do NOT force model-training files (`configs/training.md`, `configs/model.md`, `architecture.md`, `algorithm.md`) onto evaluation, data-science, or theory work. If no starter profile fits, synthesize one rather than distorting the work
 13. **Code is grounded or it is absent**: A `src/execution/*.py` stub must carry a `# Grounding: transcribed|reconstructed|interface-only` tag and contain only signatures, types, and logic traceable to the source (repo code, paper pseudocode/equations, or a named interface). Never invent API names, function bodies, constants, or hyperparameters; unspecified logic stays `NotImplementedError("Not specified in paper")`. If the source provides no implementable content, omit the code file entirely rather than fabricating a plausible one — a hollow invented API is worse than no API
 14. **Source-bounded minimums**: Every count (`≥5` concepts, `≥3` experiments, `≥8` tree nodes, `≥1` stub) and every required field (Sensitivity, Bounds, complexity, boundary conditions) is a **target, never a license to invent**. If the source genuinely supports fewer, produce what is real and note the shortfall — do NOT pad with borrowed, trivial, or fabricated items. For a required field the source does not state, write "Not specified in paper" rather than guessing a value. An honest under-filled artifact beats a padded one
+15. **Cite by verification, not transcription**: A source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line` or path) is a promise that the cited location actually contains the claim — open it and confirm before writing it. Never transcribe a *description of an artifact* as a verified fact about it: when the paper says the code is "~482 lines" or lives at `code/foo/`, that is a paper claim, NOT a repo fact — verify against the actual repo, and if paper and repo disagree, flag the contradiction rather than picking one silently. If you cannot verify, attribute it ("per §X") or omit. Carry a statistic's scope/denominator (N, population) in its `Source` so subset figures aren't conflated with full-corpus ones
 
 ## Reference Files
 
