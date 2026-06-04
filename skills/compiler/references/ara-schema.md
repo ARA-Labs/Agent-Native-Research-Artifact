@@ -2,40 +2,48 @@
 
 ## Directory Structure
 
+The structure below shows the **Universal Core** (always present) plus the `ml-model` profile's
+files as the worked example. The `logic/solution/` method layer and the `src/`/`data/` artifact
+layer **vary by domain profile** — see `domain-profiles.md` for `ml-eval`, `data-science`,
+`theory`, `systems`, and `generic`. `[core]` = Universal Core; `[profile]` = supplied by the
+active profile's `profile_manifest`.
+
 ```
-PAPER.md                            # Level 1: Root manifest + layer index
+PAPER.md                            # [core] Root manifest + layer index (declares ara_profile)
 logic/
-  problem.md                        # Why: observations → gaps → key insight
-  claims.md                         # Falsifiable assertions
-  concepts.md                       # All key technical terms (one ## per term)
-  experiments.md                    # Declarative experiment plans (NOT scripts)
+  problem.md                        # [core] Why: observations → gaps → key insight
+  claims.md                         # [core] Falsifiable assertions
+  concepts.md                       # [core] All key technical terms (one ## per term)
+  experiments.md                    # [core] Declarative verification/analysis plans (NOT scripts)
   solution/
-    architecture.md                 # System design + component graph
-    algorithm.md                    # Math formulation + pseudocode
-    constraints.md                  # Boundary conditions + limitations
-    heuristics.md                   # Convergence tricks + rationale
-  related_work.md                   # Typed dependency graph (RDO)
+    constraints.md                  # [core] Boundary conditions + assumptions + limitations
+    architecture.md                 # [profile: ml-model/systems] System design + component graph
+    algorithm.md                    # [profile: ml-model] Math formulation + pseudocode
+    heuristics.md                   # [profile: most] Practical tricks + rationale
+    # other profiles place method.md / study_design.md / analysis_plan.md /
+    # formalization.md / results.md / proofs.md / design.md / methods.md here
+  related_work.md                   # [core] Typed dependency graph (RDO)
 src/
-  configs/
-    training.md                     # Training hyperparameters with rationale
-    model.md                        # Architecture/model configs
+  environment.md                    # [core] Data/software/hardware/protocols/seeds
+  configs/                          # [profile] training.md/model.md (ml-model), inference.md (ml-eval), deployment.md (systems)
   execution/
-    {module}.py                     # Minimal code stubs (core algorithm only)
-  environment.md                    # Dependencies, hardware, seeds
+    {module}.py                     # [profile] Minimal code stubs (core mechanism only)
+data/                               # [profile: data-science] dataset.md + preprocessing.md
 trace/
-  exploration_tree.yaml             # Research DAG: nested YAML tree with typed nodes
+  exploration_tree.yaml             # [core] Research DAG: nested YAML tree with typed nodes
 evidence/
-  README.md                         # Index mapping every evidence file to claims
+  README.md                         # [core] Index mapping every evidence file to claims
   tables/                           # Raw result tables (exact cell values)
-  figures/                          # Raw figure data (extracted data points)
+  figures/                          # Figures read visually (see figures spec)
+  proofs/                           # [profile: theory] Derivations / proofs
 rubric/                             # (Only if rubric provided)
   requirements.md                   # Leaf-level rubric requirements mapped to ARA files
 ```
 
-Additional files or subdirectories may be created on demand when the source contains
-content that does not fit the standard layers (for example, appendix-sourced worked
-examples, prompt templates, or enumerated taxonomies). Place such content in the ARA
-layer where it best belongs.
+At least one evidence file must exist (in `tables/`, `figures/`, or `proofs/`). Additional files
+or subdirectories may be created on demand when the source contains content that does not fit the
+standard layers (for example, appendix-sourced worked examples, prompt templates, or enumerated
+taxonomies). Place such content in the ARA layer where it best belongs.
 
 ## Progressive Disclosure (3 Levels)
 
@@ -57,6 +65,10 @@ venue: "{venue}"
 doi: "{DOI or arXiv ID}"
 ara_version: "1.0"
 domain: "{research domain}"
+ara_profile: "{ml-model | ml-eval | data-science | theory | systems | generic | <synthesized name>}"
+profile_manifest:                 # profile-specific mandatory files, beyond the Universal Core
+  - "{path/to/profile/file/1}"
+  - "{path/to/profile/file/2}"
 keywords: [{5-10 keywords}]
 claims_summary:
   - "{one-line summary of main claim 1}"
@@ -65,6 +77,10 @@ claims_summary:
 abstract: "{paper abstract}"
 ---
 ```
+
+`ara_profile` + `profile_manifest` make the mandatory file set self-describing: the validator
+checks the Universal Core (always) plus every path in `profile_manifest`. See
+`domain-profiles.md` for the Universal Core, the starter profiles, and how to select/synthesize one.
 
 Body MUST include a Layer Index — a table for each layer listing every file:
 
@@ -264,7 +280,12 @@ the paper's full citation footprint.
 
 ---
 
-## src/configs/training.md
+## src/configs/{config}.md  (PROFILE-SPECIFIC)
+
+Config files are supplied by the active profile — `training.md` + `model.md` for `ml-model`,
+`inference.md` for `ml-eval`, `deployment.md` for `systems`. Data-science/theory profiles
+typically have none (data-science uses `data/`; theory uses none). ALL config files share one
+per-parameter field format:
 
 ```markdown
 ## {Parameter name}
@@ -275,27 +296,50 @@ the paper's full citation footprint.
 - **Source**: {section/table}
 ```
 
-## src/configs/model.md
+Do NOT create `training.md`/`model.md` for a profile that did not train a model.
 
-Same format as training.md for model/architecture configs.
+## src/execution/{module}.py  (PROFILE-SPECIFIC)
 
-## src/execution/{module}.py
-
-- Typed function signatures (input/output types, tensor shapes)
+Present in any profile with a code artifact (ml-model, ml-eval, data-science, systems; optional
+for theory). Whatever the profile, the stub captures the **novel mechanism**:
+- Typed function signatures (input/output types, tensor/array shapes)
 - Docstrings explaining what each function does
-- Implementation logic for the NOVEL contribution
+- Implementation logic for the NOVEL contribution (training step, eval/scoring loop, analysis pipeline, etc.)
 - NO scaffolding (no argparse, logging, distributed wrappers)
-- Import only standard libraries + torch/numpy
+- Import only standard libraries + the field's core stack (torch/numpy, pandas/statsmodels, etc.)
 
-## src/environment.md
+For non-code work, write `src/artifacts.md` describing the non-code deliverables instead.
+
+## data/  (PROFILE-SPECIFIC: data-science)
+
+- `data/dataset.md` — provenance, source, size, licensing, consent/IRB/ethics, variables
+- `data/preprocessing.md` — cleaning, normalization, QC, feature construction
+
+## src/environment.md  (UNIVERSAL CORE)
+
+Reproducibility for any field. For purely analytical work, state so explicitly.
 
 ```markdown
 # Environment
-- **Python**: {version}
-- **Framework**: {PyTorch version, etc.}
-- **Hardware**: {GPU type, count, memory}
+- **Language/runtime**: {Python version, R version, proof assistant, or "analytical — none"}
+- **Framework**: {PyTorch/pandas/statsmodels/... version, etc.}
+- **Hardware**: {GPU/CPU type, count, memory — or "n/a"}
+- **Data sources**: {datasets/cohorts with access info — for data-driven work}
 - **Key dependencies**: {list with versions}
+- **Protocols**: {analysis protocol / preregistration / pipeline, if any}
 - **Random seeds**: {if specified}
+```
+
+## evidence/proofs/{name}.md  (PROFILE-SPECIFIC: theory)
+
+```markdown
+# {Theorem/Lemma N}: {short title}
+- **Source**: {Theorem N, Section X.Y}
+- **Statement**: {formal statement}
+- **Assumptions used**: {which assumptions from constraints.md}
+
+## Proof
+{proof sketch or full derivation}
 ```
 
 ---
@@ -391,19 +435,59 @@ ALL result tables, exact cell values:
 
 ## evidence/figures/{name}.md
 
-ALL quantitative figures (not diagrams). Extract data points:
+ALL figures, read visually. A figure is captured according to its type. Every figure file
+declares its type, extraction method, and reading confidence so downstream layers know how
+trustworthy the contents are.
+
+Shared header (all figure types):
 ```markdown
 # Figure N: {Title}
 - **Source**: Figure N, Section X.Y
-- **Caption**: "{caption}"
-- **Axes**: X = {label, units}, Y = {label, units}
+- **Caption**: "{verbatim or near-verbatim caption}"
+- **Figure type**: {quantitative_plot | diagram | qualitative_sample | mixed}
+- **Extraction method**: {exact_from_labels | digitized_estimate | visual_description}
+- **Reading confidence**: {high | medium | low}
+```
+
+### quantitative_plot
+Read values off the axes. Record axis scale — misreading a log axis corrupts every value.
+```markdown
+- **Plot kind**: {line | bar | scatter | box | histogram | heatmap}
+- **Axes**: X = {label, units, scale: linear|log}, Y = {label, units, scale: linear|log}
 
 | X | Y (Series A) | Y (Series B) | ... |
 |---|-------------|-------------|-----|
-| v | v           | v           | ... |
+| v | ≈v          | ≈v          | ... |
+
+## Trend summary
+{Directional reading that survives estimation error: monotonic/plateau/crossover at x≈..., variance bands, A vs B ordering.}
+```
+- Use exact values only when shown as data labels or stated in text; otherwise mark readings approximate with `≈` and set extraction method to `digitized_estimate`.
+- A `quantitative_plot` file MUST contain a data table OR an explicit statement that points were unreadable (with `reading confidence: low`) plus a usable trend summary.
+
+### diagram (architecture / pipeline / schematic)
+Do NOT fabricate a data table. Capture structure, and mirror it into `logic/solution/architecture.md`.
+```markdown
+## Visual description
+- **Components**: {boxes/modules with their labels}
+- **Connections**: {arrows / data flow, source → target}
+- **Annotations**: {shapes, colors, groupings that carry meaning}
+- **What it conveys**: {the structural claim the diagram makes}
 ```
 
-Mark approximate readings with "≈".
+### qualitative_sample (example outputs, attention maps, failure cases)
+```markdown
+## Visual description
+- **Shows**: {what the panel depicts}
+- **Demonstrates**: {the qualitative point — e.g. failure mode, behavior, artifact}
+- **Supports**: {claim ID(s) or gap ID(s) this is evidence for}
+```
+
+Rules:
+- Mark every estimated numeric reading with `≈`.
+- Never present a `digitized_estimate` as an exact source value.
+- Never convert a `diagram` or `qualitative_sample` into a numeric table it does not contain.
+- Subset/derived figure views follow the same `derived_`/`subset_` naming and provenance rules as tables.
 
 ---
 

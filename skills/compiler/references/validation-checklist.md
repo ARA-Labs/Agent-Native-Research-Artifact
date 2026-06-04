@@ -2,40 +2,53 @@
 
 These are all checks the Seal validator runs. Fix ALL failures before reporting success.
 
+Validation is **profile-aware**. First read `ara_profile` and `profile_manifest` from PAPER.md.
+Check the **Universal Core** (always) plus every file in `profile_manifest`. Profile-specific
+files and the cross-layer checks that depend on them apply only when the active profile includes
+them. See `domain-profiles.md`.
+
 ## 1. Directory Existence
 
-All must exist as directories:
+Universal Core dirs — all must exist:
 - `logic/`
 - `logic/solution/`
 - `src/`
-- `src/configs/`
 - `trace/`
 - `evidence/`
 
+Profile-conditional dirs — required only when the active profile uses them:
+- `src/configs/` (ml-model, ml-eval, systems)
+- `data/` (data-science)
+- `evidence/proofs/` (theory)
+
 ## 2. Mandatory File Existence (non-empty)
 
-All must exist with >10 bytes:
+### 2a. Universal Core — always required (>10 bytes)
 - `PAPER.md`
 - `logic/problem.md`
 - `logic/claims.md`
 - `logic/concepts.md`
 - `logic/experiments.md`
-- `logic/solution/architecture.md`
-- `logic/solution/algorithm.md`
 - `logic/solution/constraints.md`
-- `logic/solution/heuristics.md`
 - `logic/related_work.md`
-- `src/configs/training.md`
-- `src/configs/model.md`
 - `src/environment.md`
 - `trace/exploration_tree.yaml`
 - `evidence/README.md`
+- ≥1 evidence file in `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`
+
+### 2b. Profile manifest — every path in PAPER.md `profile_manifest` (>10 bytes)
+The domain-specific method/artifact files, defined by `ara_profile` (see `domain-profiles.md` for
+each profile's list). Check that every manifest path exists and is non-empty. Model-training files
+(`training.md`/`model.md`) should not appear unless the work actually trained a model.
 
 ## 3. PAPER.md Checks
 
 - Starts with `---` (YAML frontmatter)
 - Frontmatter is valid YAML mapping
 - Contains keys: `title`, `authors`, `year`
+- Contains `ara_profile` (a starter name or a synthesized name)
+- Contains `profile_manifest` (a non-empty list of profile-specific file paths)
+- Every path in `profile_manifest` exists and is non-empty (drives check 2b)
 - Body contains "Layer Index" section
 
 ## 4. Field-Level Checks (regex patterns)
@@ -61,11 +74,17 @@ All must exist with >10 bytes:
 - Contains `**Procedure**`
 - Contains `**Expected outcome**` or `**Expected results**`
 
-### logic/solution/heuristics.md
+### logic/solution/heuristics.md (only when in the active profile's manifest)
 - Has `## H\d+` blocks
 - Contains `**Rationale**`
 - Contains `**Sensitivity**`
 - Contains `**Bounds**`
+
+### logic/solution/ profile method files
+- The method files named in `profile_manifest` exist and are non-trivial (e.g. ml-model:
+  architecture.md + algorithm.md; data-science: study_design.md + analysis_plan.md; theory:
+  formalization.md + results.md + proofs.md)
+- `logic/solution/constraints.md` exists regardless of profile (Universal Core)
 
 ### logic/related_work.md
 - Has `## RW\d+` blocks
@@ -81,9 +100,9 @@ All must exist with >10 bytes:
 ## 5. Count Checks
 
 - `logic/concepts.md`: ≥5 concept sections (`## ` headers)
-- `logic/experiments.md`: ≥3 experiment blocks (`## E\d+`)
-- `src/execution/`: ≥1 `.py` file
-- `evidence/tables/` or `evidence/figures/`: ≥1 `.md` file
+- `logic/experiments.md`: ≥3 experiment/analysis blocks (`## E\d+`)
+- `src/execution/`: ≥1 `.py` file — only when the active profile includes a code artifact (not required for theory, or for non-code generic work that uses `src/artifacts.md`)
+- `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: ≥1 `.md` file
 
 ## 5b. Appendix Coverage
 
@@ -93,11 +112,18 @@ one ARA file, with the granularity of the source preserved.
 ## 6. Evidence Quality
 
 For each file in `evidence/tables/*.md` and `evidence/figures/*.md`:
-- Must contain a Markdown table (`|...|...|` pattern)
 - Must contain `**Source**` field
+- Table files must contain a Markdown table (`|...|...|` pattern)
 - If the filename includes `table{N}` or `figure{N}`, the `**Source**` field must reference the same identifier
 - If the file is a derived subset, it must say so explicitly via `**Extraction type**: derived_subset` or equivalent
 - Raw source-table files should not silently omit rows while still presenting themselves as the original table
+
+For each file in `evidence/figures/*.md` specifically:
+- Must declare `**Figure type**` in {quantitative_plot, diagram, qualitative_sample, mixed}
+- Must declare `**Extraction method**` in {exact_from_labels, digitized_estimate, visual_description} and `**Reading confidence**` in {high, medium, low}
+- `quantitative_plot` figures must contain either a Markdown data table OR an explicit unreadable statement with `Reading confidence: low` plus a `Trend summary`; their `**Axes**` field must state the scale (linear/log)
+- `diagram` and `qualitative_sample` figures must contain a `Visual description` section and must NOT present a fabricated numeric data table
+- Any estimated numeric reading should be marked approximate (`≈`) and the file's extraction method should be `digitized_estimate` (not `exact_from_labels`)
 
 ## 7. evidence/README.md
 
@@ -134,10 +160,10 @@ For each file in `evidence/tables/*.md` and `evidence/figures/*.md`:
 ### Experiment Verifies → Claim Resolution
 - Every `C\d+` in an experiment's `**Verifies**` must exist in claims.md
 
-### Heuristic Code Ref → File Resolution
+### Heuristic Code Ref → File Resolution (only when heuristics.md + src/execution/ are both in the profile)
 - Every `src/...` path in `**Code ref**: [...]` must be an existing file
 
-### Architecture Components → Code Stubs (fuzzy)
+### Architecture Components → Code Stubs (fuzzy; only when architecture.md + src/execution/ are both in the profile)
 - Significant words from `## ` headings in architecture.md should appear somewhere in src/execution/ code
 
 ### Tree Evidence → Claims (YAML)
