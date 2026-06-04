@@ -364,8 +364,8 @@ marker, not a resting state — see Stage 4.
 - **Rationale**: {current best explanation of why this works}
 - **Status**: active | weakened | retired
 - **Provenance**: user | ai-suggested | user-revised
-- **Sensitivity**: low | medium | high
-- **Code ref**: [{file paths}]
+- **Sensitivity**: low | medium | high | unknown   # "unknown" until the turn establishes it — never guess
+- **Code ref**: [{file paths, or "pending"}]
 - **Last revised**: YYYY-MM-DD (turn-id)   # absent until first revision
 ```
 
