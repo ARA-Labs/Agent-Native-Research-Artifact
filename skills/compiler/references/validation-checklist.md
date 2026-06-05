@@ -87,13 +87,13 @@ fewer passes with fewer; what fails is fabricated filler.
 - `src/execution/`: ≥1 `.py` file only when the work has implementable content (repo code / paper pseudocode / named interface). NOT mandatory otherwise; omitting it (with a note in `environment.md`) beats fabricating one.
 - `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: contains the filed evidence (see §11)
 
-### Implementation layer (`src/`) is not under-captured
-- If the work has a repo, a released tool/library/skill, code, configs, or prompts, `src/` contains more than just `environment.md` (e.g. `src/artifacts.md` grounded in the real repo, `src/configs/`, `src/prompts/`). A lone `environment.md` is correct ONLY for work with genuinely no implementation (e.g. pure theory). Omitting a fabricated `.py` stub is not a reason to leave `src/` empty.
+### Implementation layer (`src/`) — captured, not re-encoded
+- Concrete artifacts that exist are captured in native form: prompts/templates verbatim in `src/prompts/`, real repo code/tools/skills via grounded `src/execution/` or `src/artifacts.md`, config values in `src/configs/`. A lone `environment.md` is wrong when such artifacts exist.
+- Conversely, a prose-only method (no code, no prompt, no config values) is NOT re-encoded as a `.py` stub or pseudo-code — it lives in `logic/solution/`; a lone `environment.md` is correct here. FAIL on a `.py` stub manufactured from prose (it just duplicates the cognitive layer).
 
 ### Code grounding (each `src/execution/*.py`, when present)
-- Declares a `# Grounding: transcribed|reconstructed|interface-only` tag
+- Declares a `# Grounding: transcribed|reconstructed` tag
 - Docstrings cite the source (§/Eq/repo path), not paraphrases of the compiler skill
-- `interface-only` / unspecified bodies are `NotImplementedError("Not specified in paper")`, not invented logic
 - FAIL if the file invents API names, constants, or function bodies with no traceable source — a hollow fabricated API must be omitted, not shipped
 
 ## 5b. Appendix Coverage

@@ -140,36 +140,37 @@ Route appendix content (worked examples, prompt templates, taxonomies, extended 
 whichever layer fits best, preserving the source's granularity. Never silently drop a section.
 
 **Stage 3 — Artifact Layer (`src/`)**
-`src/` captures **how the work is realized** — its implementation, in whatever form it takes.
-`src/environment.md` is always required (reproducibility: data, software, hardware, protocols,
-seeds; for analytical work, state so). Then look at what the work's implementation actually consists
-of, and capture every implementation-relevant part:
-- code → grounded `src/execution/*.py` stubs (see below)
-- hyperparameters / inference / deployment / evaluation settings → `src/configs/*.md`
-- prompts, templates, guideline sets → `src/prompts/`
+`src/` holds the work's **concrete implementation artifacts** — things that exist in a raw,
+runnable, or released form, *distinct from the prose that describes them*. `src/environment.md` is
+always required (reproducibility: data, software, hardware, protocols, seeds; for analytical work,
+state so). Beyond it, capture whatever concrete artifacts the work actually has, **in their native
+form**:
+- real code (a repo is provided) → grounded `src/execution/*.py` (see grounding below)
+- prompts / templates / guideline sets → store **verbatim** in `src/prompts/` (a prompt *is* the
+  artifact — it's raw "code", so record it as-is rather than paraphrasing it)
+- hyperparameters / inference / deployment / eval settings → `src/configs/*.md`
 - data pipelines / provenance / preprocessing → `src/` or `data/`
-- **non-code deliverables** — a released tool, library, skill/spec, system, benchmark, or dataset →
-  `src/artifacts.md` describing them, grounded in the actual repo/files when a repo is provided
-- if a rubric was provided → `rubric/requirements.md` mapping every leaf node
+- a released tool / library / skill-spec / system / benchmark / dataset → `src/artifacts.md`,
+  grounded in the real repo/files
+- (rubric provided → `rubric/requirements.md` mapping every leaf node)
 
-**Omitting a fabricated code stub does NOT mean `src/` is just `environment.md`.** If the
-contribution is prose-only but a repo or released artifact exists, capture the real implementation
-that exists — the repo's actual code/tools/skills/configs (in `src/artifacts.md` with grounded file
-references), and any configs/prompts the paper specifies. Leaving the implementation layer at one
-file when the work clearly has more is under-capture, not honesty.
+**The test — is there a concrete artifact distinct from the prose?**
+- **Yes** (a prompt, real code, config values, a released tool): capture it in its native form — it
+  is real content the cognitive layer does not already hold.
+- **No** — the paper conveys the method only in natural language, with no code, no prompt, no config
+  values: do NOT manufacture a code stub or pseudo-code from that prose. The method already lives in
+  `logic/solution/`; re-encoding prose as fake code just duplicates the same information. Here `src/`
+  is legitimately just `environment.md` (plus any configs the paper does give).
 
-**Code is grounded or it is absent.** A `src/execution/*.py` stub carries a `# Grounding:` tag:
+So: never fabricate code from prose (redundant), and never drop a concrete artifact that exists
+(under-capture). Capture exactly the raw artifacts the source contains — no more, no less.
+
+**Code grounding.** When you do include `src/execution/*.py`, tag it `# Grounding:`:
 - `transcribed` — adapted from actual repo code; cite `file:line`
-- `reconstructed` — built from explicit pseudocode/equations in the paper; cite §/equation
-- `interface-only` — source specifies behavior but no implementation; use only names/types the
-  source states, bodies stay `raise NotImplementedError("Not specified in paper")`
+- `reconstructed` — built from explicit pseudocode/equations the paper actually prints; cite §/eq
 
-Never invent function bodies, constants, hyperparameters, or API names. Produce a `.py` stub ONLY
-when the source gives implementable *code-shaped* content (repo code, paper pseudocode/equations, or
-a named interface). When there is none, do not invent one — but still capture the implementation in
-the right form (configs, prompts, `src/artifacts.md` for the real deliverables). Note "no
-implementable code stub" in `environment.md` only when there is genuinely no implementation to point
-to at all. A hollow invented API is worse than none.
+Never invent function bodies, constants, hyperparameters, or API names. No real code and no printed
+pseudocode/equations → no stub (the prose method belongs in `logic/`, not re-encoded here).
 
 **Stage 4 — Exploration Graph Extraction**
 Reconstruct the research DAG for `/trace/exploration_tree.yaml`: root nodes = central questions;
@@ -265,7 +266,7 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
 12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
-14. **Code is grounded or it is absent — but `src/` is not**: a `.py` stub carries a `# Grounding: transcribed|reconstructed|interface-only` tag and contains only source-traceable signatures/logic; unspecified logic stays `NotImplementedError("Not specified in paper")`; no source-shaped code → no stub. But `src/` is the implementation layer: omitting a fabricated stub never means `src/` is just `environment.md` — capture the real implementation that exists (the repo's actual code/tools/skills in `src/artifacts.md`, plus configs/prompts), grounded in real files
+14. **`src/` holds concrete artifacts, not re-encoded prose**: capture what exists in raw form — real repo code (grounded `# Grounding: transcribed|reconstructed`, cite source), prompts/templates **verbatim** in `src/prompts/`, config values, released tools/skills via `src/artifacts.md`. Two-sided rule: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, and a `.py` here just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work ships a repo/tool/prompts/configs
 15. **Source-bounded minimums**: any count or required field is a target, never a license to invent. If the source supports fewer, produce what is real and note the shortfall; for an unstated field write "Not specified in paper" rather than guessing
 16. **Cite by verification, and ask on conflict**: a source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line`/path) promises the cited location actually contains the claim — open it and confirm. Never transcribe a *description* of an artifact as a verified fact about it. **When the code repo and the paper disagree on a fact (line count, path, value, behavior), do NOT pick one silently — surface the conflict to the user and ask which source to follow.** If unverifiable and the user is unavailable, attribute it ("per §X") or omit. Carry a statistic's scope/denominator in its `Source`
 

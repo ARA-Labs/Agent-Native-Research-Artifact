@@ -286,15 +286,14 @@ field format:
 
 ## src/execution/{module}.py  (when the work warrants it — grounded or absent)
 
-Present only when the source provides **implementable content**: actual repo code, paper
-pseudocode/equations, or a named interface. The stub captures the **novel mechanism** and must be
-grounded — never fabricated.
+Present only when the source provides **concrete code-shaped content**: actual repo code, or
+explicit pseudocode/equations the paper prints. The stub captures the **novel mechanism** and must
+be grounded — never fabricated.
 
 Every file declares its grounding on the first line:
 ```python
-# Grounding: transcribed    — adapted from repo code; cite file:line in docstrings
-# Grounding: reconstructed  — from explicit paper pseudocode/equations; cite §/eq
-# Grounding: interface-only — source names the interface but gives no impl
+# Grounding: transcribed   — adapted from repo code; cite file:line in docstrings
+# Grounding: reconstructed — from explicit paper pseudocode/equations; cite §/eq
 ```
 Contents:
 - Typed function signatures using ONLY names/types the source states
@@ -304,9 +303,11 @@ Contents:
 - NO scaffolding (no argparse, logging, distributed wrappers)
 - Import only standard libraries + the field's core stack (torch/numpy, pandas/statsmodels, etc.)
 
-Hard rule: do not invent API names, function bodies, constants, or hyperparameters. If the source
-describes a contribution only in prose (no code, no pseudocode, no named API), do NOT write a `.py`
-stub. A hollow invented API is a hallucination, not an artifact.
+Hard rule: do not invent API names, function bodies, constants, or hyperparameters. **If the paper
+describes the method only in prose (no code, no printed pseudocode), do NOT write a `.py` stub or
+pseudo-code — that information already lives in `logic/solution/`, and re-encoding it as code merely
+duplicates it.** A concrete artifact that IS raw "code" — e.g. a prompt or template — is different:
+store it verbatim in `src/prompts/`, don't paraphrase it. A hollow invented API is a hallucination.
 
 ## src/artifacts.md  (when the implementation is not a `.py` stub)
 
