@@ -87,6 +87,9 @@ fewer passes with fewer; what fails is fabricated filler.
 - `src/execution/`: ≥1 `.py` file only when the work has implementable content (repo code / paper pseudocode / named interface). NOT mandatory otherwise; omitting it (with a note in `environment.md`) beats fabricating one.
 - `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: contains the filed evidence (see §11)
 
+### Implementation layer (`src/`) is not under-captured
+- If the work has a repo, a released tool/library/skill, code, configs, or prompts, `src/` contains more than just `environment.md` (e.g. `src/artifacts.md` grounded in the real repo, `src/configs/`, `src/prompts/`). A lone `environment.md` is correct ONLY for work with genuinely no implementation (e.g. pure theory). Omitting a fabricated `.py` stub is not a reason to leave `src/` empty.
+
 ### Code grounding (each `src/execution/*.py`, when present)
 - Declares a `# Grounding: transcribed|reconstructed|interface-only` tag
 - Docstrings cite the source (§/Eq/repo path), not paraphrases of the compiler skill

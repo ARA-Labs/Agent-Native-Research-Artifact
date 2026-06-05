@@ -305,11 +305,27 @@ Contents:
 - Import only standard libraries + the field's core stack (torch/numpy, pandas/statsmodels, etc.)
 
 Hard rule: do not invent API names, function bodies, constants, or hyperparameters. If the source
-describes a contribution only in prose (no code, no pseudocode, no named API), do NOT write a stub —
-omit `src/execution/` and note "no implementable artifact in source" in `environment.md`. A hollow
-invented API is a hallucination, not an artifact.
+describes a contribution only in prose (no code, no pseudocode, no named API), do NOT write a `.py`
+stub. A hollow invented API is a hallucination, not an artifact.
 
-For non-code work, write `src/artifacts.md` describing the non-code deliverables instead.
+## src/artifacts.md  (when the implementation is not a `.py` stub)
+
+`src/` must still represent the implementation. When the deliverable is a released tool, library,
+skill/specification, system, benchmark, or dataset rather than a code stub, describe the **real**
+artifacts here — grounded in the actual repo/files when a repo is provided. One block per artifact:
+
+```markdown
+## {Artifact name}
+- **File(s) in repo**: {real path(s), verified to exist}
+- **Nature**: {what it is — tool / library / skill spec / system / dataset}
+- **What it does / contains**: {grounded description}
+- **How to use / run**: {entry point, command, or interface}
+- **Claims supported**: {C## ids}
+```
+
+Do not leave `src/` at just `environment.md` when the work clearly has an implementation (code,
+configs, prompts, a released tool). Capture configs in `src/configs/`, prompts in `src/prompts/`,
+and the rest here.
 
 ## data/  (when the work is data-driven)
 
