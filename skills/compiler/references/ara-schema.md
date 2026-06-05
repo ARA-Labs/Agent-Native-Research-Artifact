@@ -2,40 +2,43 @@
 
 ## Directory Structure
 
+`✓` = mandatory core (always present). Everything else is created **only when the paper's content
+warrants it** — there is no domain template to fill; you decide which method/artifact files
+genuinely represent the work. The layout below is illustrative, not prescriptive.
+
 ```
-PAPER.md                            # Level 1: Root manifest + layer index
+PAPER.md                            # ✓ Root manifest + layer index
 logic/
-  problem.md                        # Why: observations → gaps → key insight
-  claims.md                         # Falsifiable assertions
-  concepts.md                       # All key technical terms (one ## per term)
-  experiments.md                    # Declarative experiment plans (NOT scripts)
+  problem.md                        # ✓ Why: observations → gaps → key insight
+  claims.md                         # ✓ Falsifiable assertions
+  concepts.md                       # ✓ Key technical terms (one ## per term)
+  experiments.md                    # ✓ Declarative verification/analysis plans (NOT scripts)
   solution/
-    architecture.md                 # System design + component graph
-    algorithm.md                    # Math formulation + pseudocode
-    constraints.md                  # Boundary conditions + limitations
-    heuristics.md                   # Convergence tricks + rationale
-  related_work.md                   # Typed dependency graph (RDO)
+    constraints.md                  # ✓ Boundary conditions + assumptions + limitations
+    <method files>                  # as warranted: architecture / algorithm / method /
+                                    #   study_design / formalization / results / proofs /
+                                    #   design / heuristics … — whatever fits THIS work
+  related_work.md                   # ✓ Typed dependency graph (RDO)
 src/
-  configs/
-    training.md                     # Training hyperparameters with rationale
-    model.md                        # Architecture/model configs
-  execution/
-    {module}.py                     # Minimal code stubs (core algorithm only)
-  environment.md                    # Dependencies, hardware, seeds
+  environment.md                    # ✓ Data/software/hardware/protocols/seeds
+  configs/                          # as warranted: hyperparameters / inference / deployment
+  execution/{module}.py             # as warranted: grounded code stub (or absent — see below)
+  prompts/, ...                     # as warranted: prompt templates, etc.
+data/                               # as warranted: dataset.md + preprocessing.md
 trace/
-  exploration_tree.yaml             # Research DAG: nested YAML tree with typed nodes
+  exploration_tree.yaml             # ✓ Research DAG: nested YAML tree with typed nodes
 evidence/
-  README.md                         # Index mapping every evidence file to claims
-  tables/                           # Raw result tables (exact cell values)
-  figures/                          # Raw figure data (extracted data points)
-rubric/                             # (Only if rubric provided)
-  requirements.md                   # Leaf-level rubric requirements mapped to ARA files
+  README.md                         # ✓ Index mapping every evidence file to claims
+  tables/                           # ✓ every numbered Table: tableN.md + tableN.png
+  figures/                          # ✓ every numbered Figure: figureN.md + figureN.png
+  proofs/                           # as warranted: derivations / proofs
+rubric/requirements.md              # (Only if a rubric is provided)
 ```
 
-Additional files or subdirectories may be created on demand when the source contains
-content that does not fit the standard layers (for example, appendix-sourced worked
-examples, prompt templates, or enumerated taxonomies). Place such content in the ARA
-layer where it best belongs.
+Every numbered table and figure in the source gets BOTH a markdown file and a screenshot `.png`
+(see the evidence specs below). Additional files/subdirectories may be created on demand for
+content that doesn't fit the standard layers (appendix worked examples, prompt templates,
+taxonomies) — place such content where it best belongs.
 
 ## Progressive Disclosure (3 Levels)
 
@@ -56,17 +59,15 @@ year: {year}
 venue: "{venue}"
 doi: "{DOI or arXiv ID}"
 ara_version: "1.0"
-domain: "{research domain}"
+domain: "{research domain — free text}"
 keywords: [{5-10 keywords}]
 claims_summary:
-  - "{one-line summary of main claim 1}"
-  - "{one-line summary of main claim 2}"
-  - "{one-line summary of main claim 3}"
+  - "{one-line summary of each main claim}"
 abstract: "{paper abstract}"
 ---
 ```
 
-Body MUST include a Layer Index — a table for each layer listing every file:
+Body MUST include a Layer Index — a table for each layer listing every file actually generated:
 
 ```markdown
 # {Paper Title}
@@ -177,12 +178,13 @@ Each proofed experiment should in turn be backed by evidence files whose rows or
 
 ## logic/concepts.md
 
-≥5 concepts. One section per concept:
+Target ≥5 concepts, but capture the paper's *genuine* technical terms — don't pad with trivial or
+borrowed terms to reach 5 (Rule 14). One section per concept:
 ```markdown
 ## {Term Name}
-- **Notation**: {LaTeX or symbolic notation}
+- **Notation**: {LaTeX or symbolic notation, or "—" if none}
 - **Definition**: {Formal definition}
-- **Boundary conditions**: {When does this concept apply/not apply}
+- **Boundary conditions**: {When it applies/not — or "Not specified in paper"}
 - **Related concepts**: {other concept names}
 ```
 
@@ -220,9 +222,9 @@ Component graph. For each component: name, purpose, inputs, outputs, interaction
 ## logic/solution/algorithm.md
 
 - Mathematical formulation (LaTeX)
-- Pseudocode
+- Pseudocode (reconstruct only from the paper's stated algorithm; don't invent steps the paper omits)
 - Step-by-step explanation
-- Complexity analysis
+- Complexity analysis — only if the paper states or clearly implies it; else "Not specified in paper"
 
 ## logic/solution/constraints.md
 
@@ -232,13 +234,15 @@ Component graph. For each component: name, purpose, inputs, outputs, interaction
 
 ## logic/solution/heuristics.md
 
-Each heuristic MUST have ALL fields:
+Include only heuristics the paper actually states (implementation tricks, convergence hacks,
+practical gotchas). If the paper presents none, `heuristics.md` may be empty/omitted — do not invent
+tricks. Each heuristic present uses these fields; values come from the paper, else "Not specified":
 ```markdown
 ## H{NN}: {Short description}
 - **Rationale**: {Why this trick is needed}
-- **Sensitivity**: {low|medium|high}
-- **Bounds**: {acceptable range or limits}
-- **Code ref**: [{path to src/execution/ file}]
+- **Sensitivity**: {low|medium|high — or "Not specified in paper"}
+- **Bounds**: {acceptable range or limits — or "Not specified in paper"}
+- **Code ref**: [{path to src/execution/ file, or "Not specified"}]
 - **Source**: {Section/table in the paper}
 ```
 
@@ -264,51 +268,111 @@ the paper's full citation footprint.
 
 ---
 
-## src/configs/training.md
+## src/configs/{config}.md  (when the work warrants it)
+
+Name configs for what the work actually has — e.g. `training.md`/`model.md` for a trained model,
+`inference.md` for an eval/prompting method, `deployment.md` for a system. Don't create
+model-training configs for work that trained no model. All config files share one per-parameter
+field format:
 
 ```markdown
 ## {Parameter name}
 - **Value**: {exact value}
-- **Rationale**: {why this value}
+- **Rationale**: {why this value, or "Not specified in paper"}
 - **Search range**: {if mentioned}
-- **Sensitivity**: {low|medium|high}
+- **Sensitivity**: {low|medium|high — or "Not specified in paper"}
 - **Source**: {section/table}
 ```
 
-## src/configs/model.md
+## src/execution/{module}.py  (when the work warrants it — grounded or absent)
 
-Same format as training.md for model/architecture configs.
+Present only when the source provides **concrete code-shaped content**: actual repo code, or
+explicit pseudocode/equations the paper prints. The stub captures the **novel mechanism** and must
+be grounded — never fabricated.
 
-## src/execution/{module}.py
-
-- Typed function signatures (input/output types, tensor shapes)
-- Docstrings explaining what each function does
-- Implementation logic for the NOVEL contribution
+Every file declares its grounding on the first line:
+```python
+# Grounding: transcribed   — adapted from repo code; cite file:line in docstrings
+# Grounding: reconstructed — from explicit paper pseudocode/equations; cite §/eq
+```
+Contents:
+- Typed function signatures using ONLY names/types the source states
+- Docstrings that cite the source (`§4.2`, `Eq. 3`, `repo: model.py:88`) — not paraphrases of this skill
+- Implementation logic ONLY where the source provides it; everything unspecified stays
+  `raise NotImplementedError("Not specified in paper")` — never plausible filler
 - NO scaffolding (no argparse, logging, distributed wrappers)
-- Import only standard libraries + torch/numpy
+- Import only standard libraries + the field's core stack (torch/numpy, pandas/statsmodels, etc.)
 
-## src/environment.md
+Hard rule: do not invent API names, function bodies, constants, or hyperparameters. **If the paper
+describes the method only in prose (no code, no printed pseudocode), do NOT write a `.py` stub or
+pseudo-code — that information already lives in `logic/solution/`, and re-encoding it as code merely
+duplicates it.** A concrete artifact that IS raw "code" — e.g. a prompt or template — is different:
+store it verbatim in `src/prompts/`, don't paraphrase it. A hollow invented API is a hallucination.
+
+## src/artifacts.md  (when the implementation is not a `.py` stub)
+
+`src/` must still represent the implementation. When the deliverable is a released tool, library,
+skill/specification, system, benchmark, or dataset rather than a code stub, describe the **real**
+artifacts here — grounded in the actual repo/files when a repo is provided. One block per artifact:
+
+```markdown
+## {Artifact name}
+- **File(s) in repo**: {real path(s), verified to exist}
+- **Nature**: {what it is — tool / library / skill spec / system / dataset}
+- **What it does / contains**: {grounded description}
+- **How to use / run**: {entry point, command, or interface}
+- **Claims supported**: {C## ids}
+```
+
+Do not leave `src/` at just `environment.md` when the work clearly has an implementation (code,
+configs, prompts, a released tool). Capture configs in `src/configs/`, prompts in `src/prompts/`,
+and the rest here.
+
+## data/  (when the work is data-driven)
+
+- `data/dataset.md` — provenance, source, size, licensing, consent/IRB/ethics, variables
+- `data/preprocessing.md` — cleaning, normalization, QC, feature construction
+
+## src/environment.md  (mandatory core)
+
+Reproducibility for any field. For purely analytical work, state so explicitly.
 
 ```markdown
 # Environment
-- **Python**: {version}
-- **Framework**: {PyTorch version, etc.}
-- **Hardware**: {GPU type, count, memory}
+- **Language/runtime**: {Python version, R version, proof assistant, or "analytical — none"}
+- **Framework**: {PyTorch/pandas/statsmodels/... version, etc.}
+- **Hardware**: {GPU/CPU type, count, memory — or "n/a"}
+- **Data sources**: {datasets/cohorts with access info — for data-driven work}
 - **Key dependencies**: {list with versions}
+- **Protocols**: {analysis protocol / preregistration / pipeline, if any}
 - **Random seeds**: {if specified}
+```
+
+## evidence/proofs/{name}.md  (for theory/derivation work)
+
+```markdown
+# {Theorem/Lemma N}: {short title}
+- **Source**: {Theorem N, Section X.Y}
+- **Statement**: {formal statement}
+- **Assumptions used**: {which assumptions from constraints.md}
+
+## Proof
+{proof sketch or full derivation}
 ```
 
 ---
 
-## evidence/tables/{file}.md
+## evidence/tables/{file}.md (+ screenshot)
 
-Raw source-table transcription:
+Every numbered table gets BOTH this markdown file AND a screenshot `tableN.png` (the rendered
+region of the source) saved beside it. Raw source-table transcription:
 
 ```markdown
 # Table {N} - {Caption or short description}
 
 **Source**: Table {N} in {paper/report title}
 **Caption**: {verbatim or near-verbatim caption}
+**Screenshot**: tableN.png
 **Extraction type**: raw_table
 
 | ... | ... |
@@ -389,21 +453,62 @@ ALL result tables, exact cell values:
 | exact   | values  | ... |
 ```
 
-## evidence/figures/{name}.md
+## evidence/figures/{name}.md (+ screenshot)
 
-ALL quantitative figures (not diagrams). Extract data points:
+ALL figures, read visually. Every numbered figure gets BOTH this markdown file AND a screenshot
+`figureN.png` (the rendered region) saved beside it. Each file declares its type, extraction
+method, and reading confidence so downstream layers know how trustworthy the contents are.
+
+Shared header (all figure types):
 ```markdown
 # Figure N: {Title}
 - **Source**: Figure N, Section X.Y
-- **Caption**: "{caption}"
-- **Axes**: X = {label, units}, Y = {label, units}
+- **Caption**: "{verbatim or near-verbatim caption}"
+- **Screenshot**: figureN.png
+- **Figure type**: {quantitative_plot | diagram | qualitative_sample | mixed}
+- **Extraction method**: {exact_from_labels | digitized_estimate | visual_description}
+- **Reading confidence**: {high | medium | low}
+```
+
+### quantitative_plot
+Read values off the axes. Record axis scale — misreading a log axis corrupts every value.
+```markdown
+- **Plot kind**: {line | bar | scatter | box | histogram | heatmap}
+- **Axes**: X = {label, units, scale: linear|log}, Y = {label, units, scale: linear|log}
 
 | X | Y (Series A) | Y (Series B) | ... |
 |---|-------------|-------------|-----|
-| v | v           | v           | ... |
+| v | ≈v          | ≈v          | ... |
+
+## Trend summary
+{Directional reading that survives estimation error: monotonic/plateau/crossover at x≈..., variance bands, A vs B ordering.}
+```
+- Use exact values only when shown as data labels or stated in text; otherwise mark readings approximate with `≈` and set extraction method to `digitized_estimate`.
+- A `quantitative_plot` file MUST contain a data table OR an explicit statement that points were unreadable (with `reading confidence: low`) plus a usable trend summary.
+
+### diagram (architecture / pipeline / schematic)
+Do NOT fabricate a data table. Capture structure, and mirror it into the relevant method/solution file.
+```markdown
+## Visual description
+- **Components**: {boxes/modules with their labels}
+- **Connections**: {arrows / data flow, source → target}
+- **Annotations**: {shapes, colors, groupings that carry meaning}
+- **What it conveys**: {the structural claim the diagram makes}
 ```
 
-Mark approximate readings with "≈".
+### qualitative_sample (example outputs, attention maps, failure cases)
+```markdown
+## Visual description
+- **Shows**: {what the panel depicts}
+- **Demonstrates**: {the qualitative point — e.g. failure mode, behavior, artifact}
+- **Supports**: {claim ID(s) or gap ID(s) this is evidence for}
+```
+
+Rules:
+- Mark every estimated numeric reading with `≈`.
+- Never present a `digitized_estimate` as an exact source value.
+- Never convert a `diagram` or `qualitative_sample` into a numeric table it does not contain.
+- Subset/derived figure views follow the same `derived_`/`subset_` naming and provenance rules as tables.
 
 ---
 

@@ -3,18 +3,20 @@ name: compiler
 description: |
   Universal ARA Compiler. Converts ANY research input — PDF papers, GitHub repositories,
   experiment logs, code directories, raw notes, or combinations thereof — into a complete
-  Agent-Native Research Artifact (ARA). Produces a structured, machine-executable knowledge
-  package with cognitive layer (claims, concepts, heuristics), physical layer (configs, code
-  stubs), exploration graph (research DAG), and grounded evidence.
+  Agent-Native Research Artifact (ARA): a structured, machine-executable knowledge package with a
+  cognitive layer (claims, concepts, methods), an artifact layer (code/configs/data as the work
+  warrants), an exploration graph (research DAG), and grounded evidence. Works across any research
+  field — not only model-training research.
 
   TRIGGERS: compile, create ARA, generate artifact, convert paper, build artifact, compile paper,
-  ARA from PDF, ARA from repo, ARA from code, structure research, extract knowledge
+  ARA from PDF, ARA from repo, ARA from code, structure research, extract knowledge,
+  extract figure data, digitize plot, read chart, figure to data
 argument-hint: "[any input — paths, URLs, descriptions, or nothing]"
 allowed-tools: Read, Write, Edit, Bash(python *|git clone *|ls *|mkdir *), Glob, Grep, Task
 metadata:
   author: ara-commons
   category: research-tooling
-  version: "1.0.0"
+  version: "1.1.0"
   tags: [research, compilation, artifacts, knowledge-extraction]
 ---
 
@@ -26,50 +28,33 @@ validated ARA artifact. You operate as a first-class Claude Code agent — use y
 
 ## Input Philosophy
 
-The compiler is **open-ended**. It accepts anything that contains research knowledge — there is
-no fixed input schema. Your job is to figure out what you've been given and extract maximum
+The compiler is **open-ended**. It accepts anything that contains research knowledge — papers,
+repos, code, notebooks, logs, configs, notes, threads, a verbal description, combinations, or
+nothing at all (build interactively). Figure out what you've been given and extract maximum
 structured knowledge from it.
 
-Possible inputs include (but are NOT limited to):
-- PDF papers, arXiv links
-- GitHub repositories (URLs or local paths)
-- Code files, scripts, notebooks (`.py`, `.ipynb`, `.rs`, `.cpp`, etc.)
-- Experiment logs, training outputs, evaluation results
-- Configuration files, hyperparameter sweeps
-- Raw research notes, brainstorm transcripts, meeting notes
-- Data directories with results, checkpoints, figures
-- Slack/email threads describing research decisions
-- Combinations of the above
-- A verbal description or conversation with the user about their research
-- Nothing at all — the user may want to build an ARA interactively through dialogue
-
-When arguments are provided (`$ARGUMENTS`), interpret them flexibly:
-- File/directory paths → read them
-- URLs → fetch or clone them
-- `--output <dir>` → where to write the ARA (default: `./ara-output/`)
-- `--rubric <path>` → PaperBench rubric for coverage mapping
-- Anything else → treat as context or ask the user for clarification
+When arguments are provided (`$ARGUMENTS`), interpret them flexibly: paths → read; URLs →
+fetch/clone; `--output <dir>` → where to write (default `./ara-output/`); `--rubric <path>` →
+PaperBench rubric for coverage mapping; anything else → context (ask only if it genuinely blocks).
 
 ### Input Reading Strategy
 
-Adapt to whatever you receive:
-1. **Identify what you have.** Glob, read, and explore the provided paths. Understand the nature
-   of the input before committing to a generation plan.
-2. **Maximize coverage.** Cross-reference all available sources. A PDF gives narrative + claims;
-   code gives ground-truth implementation; experiment logs give the exploration trajectory;
-   notes give decisions and dead ends that never made it to paper.
-3. **Ask when stuck.** If the input is ambiguous or incomplete, ask the user to fill gaps rather
-   than hallucinating. The user is a collaborator, not a passive consumer.
-4. **Handle partial inputs gracefully.** Not every ARA field will be fillable from every input.
-   Populate what you can with high confidence, mark gaps explicitly with "Not available from
-   provided input", and tell the user what's missing so they can supplement later.
+1. **Identify what you have.** Glob, read, explore the inputs before committing to a plan.
+2. **Maximize coverage.** Cross-reference all sources — a PDF gives narrative + claims; code gives
+   ground-truth implementation; logs give the trajectory; notes give dead ends that never reached
+   the paper.
+3. **Decide, then flag.** Resolve ambiguity with your own judgment and proceed. Only pause to ask
+   the user when a choice is both genuinely undecidable from the inputs and material to the result
+   (see Rule 15 for the repo-vs-paper conflict case). Never hallucinate to fill a gap; mark it.
+4. **Handle partial inputs gracefully.** Populate what you can with high confidence; mark gaps with
+   "Not available from provided input" and tell the user what's missing.
 
 ## Workflow
 
 ```
 1. READ all inputs
 2. REASON through the 4-stage epistemic protocol (see below)
-3. GENERATE all ARA files using Write tool
+3. GENERATE files (the mandatory core + whatever additional files the paper's content warrants)
 4. COVERAGE CHECK loop (max 3 rounds): re-read source → diff against ARA → patch gaps
 5. VALIDATE by running Seal Level 1
 6. FIX any failures, re-validate
@@ -78,178 +63,206 @@ Adapt to whatever you receive:
 
 ### Step 1: Read Inputs
 
-Read ALL provided inputs thoroughly before generating anything. For PDFs, read every page,
-**including appendices** — appendices often carry reproduction-critical content and should
-be treated with the same priority as main-text pages.
+Read ALL inputs thoroughly before generating. For PDFs, read every page **including appendices**
+(they carry reproduction-critical content). For repos, prioritize README → core code → configs →
+environment.
 
-For repos, prioritize: README → core algorithm files → configs → environment files.
+**Read figures visually, not just their captions.** Much of a paper's evidence lives in plots,
+diagrams, and qualitative samples whose information cannot be recovered from surrounding text.
+Render PDF pages/regions to PNG (`python` with PyMuPDF/`fitz` or `pdf2image`) and Read them as
+images; read standalone image files directly. Treat reading a figure as a deliberate extraction
+step — see Stage 1's visual evidence pass.
 
 ### Step 2: 4-Stage Epistemic Chain-of-Thought
 
-Before writing any files, reason through these 4 stages. Think carefully about each stage.
+Before writing files, reason through these 4 stages.
 
 **Stage 1 — Semantic Deconstruction**
-Strip narrative framing. Extract the raw knowledge atoms:
-- Mathematical formulations and equations
-- Architectural specifications and component descriptions
-- Experimental configurations (hyperparameters, hardware, datasets, seeds)
-- ALL numerical results and benchmarks (exact values, never rounded)
-- Citation dependencies and their roles (imports, extends, bounds, refutes)
-- Negative results, ablation findings, rejected alternatives
-- Implementation tricks, convergence hacks, sensitivity observations
+Strip narrative framing. Extract the raw knowledge atoms: formulations/equations; architectural
+or method specifications; configurations (hyperparameters, hardware, datasets, seeds); ALL
+numerical results (exact, never rounded); citation dependencies and their roles; negative results
+and ablation findings; implementation tricks and sensitivity observations.
 
-Before moving on, perform an **evidence capture pass**:
-- For every source table or figure you plan to cite, first capture the original source identifier and caption exactly (`Table 2`, `Figure 4`, etc.)
-- Transcribe the raw table/figure content before making any claim-specific summary
-- If you create a filtered view for one claim, store it as a **derived subset**, not as the original table itself
-- Never label a subset or merged summary as `Table N` unless it reproduces the original source table faithfully
-- If PDF extraction is ambiguous, re-read the page with layout preserved or inspect the page manually before writing evidence files
+Then perform the **evidence pass** — capture every table and figure, completely and in order:
+
+- **Build an evidence ledger first.** Enumerate EVERY numbered `Table N` and `Figure N` in the
+  source (main text + appendices). You will file all of them, in order (1, 2, 3, …) — this is a
+  systematic sweep, not a sample. Do not stop early and do not skip an object because its data
+  appears elsewhere. If an object genuinely warrants no file (e.g. an exact duplicate), record it
+  in `evidence/README.md` with a reason — no silent omissions.
+- **Save the screenshot AND the description.** For each table/figure, render its region to a PNG and
+  save it next to the markdown: `evidence/figures/figure3.png` + `evidence/figures/figure3.md`,
+  `evidence/tables/table2.png` + `evidence/tables/table2.md`. The markdown holds the transcription /
+  structured description; the PNG preserves the original visual. Keep both, never just the text.
+- Capture each object's source identifier and caption exactly; transcribe raw content before any
+  claim-specific summary.
+- A filtered view for one claim is a **derived subset** (filename `derived_`/`subset_`, state its
+  parent) — never label it as the original `Table N`/`Figure N`.
+
+Then the **visual evidence pass** over every figure (data does not extract itself from pixels):
+1. **Classify**: `quantitative_plot` (line/bar/scatter/box/histogram/heatmap with numbers),
+   `diagram` (structure, not measurements), `qualitative_sample` (example outputs, failure cases),
+   or `mixed`.
+2. **Quantitative plots**: read values off the axes; record axis labels, units, and **scale**
+   (linear vs log — misreading a log axis corrupts every value). Use exact values when printed as
+   data labels or stated in text; otherwise estimate and mark approximate (`≈`). Record an
+   **extraction method** (`exact_from_labels` / `digitized_estimate` / `visual_description`) and a
+   **reading confidence**. Capture the trend even when exact points are unreadable.
+3. **Diagrams**: do NOT fabricate a data table. Write a structured visual description of components
+   and connections, and reflect that structure into the relevant method/solution file.
+4. **Qualitative samples**: describe what the figure demonstrates and which claim/gap it supports.
+5. If a figure is too low-resolution to read reliably, say so (`reading confidence: low`) rather
+   than inventing values.
+
+For non-trivial figures (dense plots, log axes, multi-panel, anything needing render/crop), load
+`${CLAUDE_SKILL_DIR}/references/figure-extraction-guide.md`.
 
 **Stage 2 — Cognitive Mapping**
-Map extracted atoms to `/logic/`:
+Map the atoms into `/logic/`:
 - **problem.md**: observations (with numbers) → gaps → key insight → assumptions
-- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02...), plus a separation between direct evidence basis and higher-level interpretation
-- **concepts.md**: ≥5 formal definitions with notation and boundary conditions
-- **experiments.md**: ≥3 declarative verification plans (NO exact numbers — directional only)
-- **solution/**: architecture (component graph), algorithm (math + pseudocode), constraints, heuristics
-- **related_work.md**: typed dependency graph (imports/extends/bounds/baseline/refutes)
+- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). Phrase each
+  `Statement` at the strongest level the cited evidence directly supports; keep raw support in
+  `Evidence basis` and broader synthesis in `Interpretation`. Don't upgrade a validation-metric
+  result into a claim about training dynamics without training-side evidence.
+- **concepts.md**: the paper's genuine technical terms, formally defined
+- **experiments.md**: declarative verification/analysis plans (NO exact numbers — directional
+  only). "Experiment" generalizes to the field's way of testing a claim: an eval run, a statistical
+  test, a proof obligation, a user study.
+- **solution/**: the method layer — `constraints.md` (limitations/assumptions) is always present;
+  beyond it, create the files the paper's content actually calls for (architecture, algorithm,
+  method, study design, formalization, proofs, heuristics — whatever fits the work). You decide
+  which; do not force a fixed template.
+- **related_work.md**: typed dependency graph (imports/extends/bounds/baseline/refutes). Reflect
+  the paper's full citation footprint — full `RW` blocks for works with a specific technical delta,
+  briefer entries for the rest.
 
-Appendix content (worked examples, prompt templates, enumerated taxonomies, annotation
-schemas, extended analyses, prescriptive content) should be routed into the ARA layers
-where it fits best, preserving the granularity the source uses. Never silently drop an
-appendix section.
+Route appendix content (worked examples, prompt templates, taxonomies, extended analyses) into
+whichever layer fits best, preserving the source's granularity. Never silently drop a section.
 
-When writing claims:
-- Phrase the main `Statement` at the strongest level directly supported by the cited evidence
-- Put raw support in `Evidence basis`
-- Put any broader synthesis in `Interpretation`
-- If the evidence only shows validation metrics, do not upgrade the claim to training dynamics or optimization quality unless training-side evidence is also captured
+**Stage 3 — Artifact Layer (`src/`)**
+`src/` holds the work's **concrete implementation artifacts** — whatever exists in a raw, runnable,
+or released form, *distinct from the prose that describes it*. `src/environment.md` is always
+required (reproducibility). Beyond it, one rule decides everything:
 
-`related_work.md` should reflect the paper's full citation footprint, not only the
-closest predecessors. Works with a specific technical delta get full `RW` blocks; remaining
-citations from the paper's References list should still be captured (more briefly) so the
-intellectual neighborhood is preserved.
+> **Capture every concrete artifact the source actually contains, in its native form; never
+> re-encode a prose-only description as code.**
 
-**Stage 3 — Physical Stubbing**
-Generate `/src/`:
-- **configs/**: exact hyperparameter values with rationale and sensitivity
-- **execution/**: ≥1 Python code stub implementing the NOVEL contribution (typed signatures, no boilerplate)
-- **environment.md**: Python version, framework, hardware, dependencies, seeds
-- If repo available: use actual code to improve stub precision
-- If rubric provided: produce `rubric/requirements.md` mapping every leaf node
+A concrete artifact is real content the cognitive layer doesn't already hold — capture it (grounded
+in the real repo/files when provided), in whatever directory fits. But a method conveyed only in
+natural language already lives in `logic/solution/`; manufacturing a stub or pseudo-code from it just
+duplicates it. Capture what exists, no more, no less — so a lone `environment.md` is correct when the
+work has no concrete artifact, and wrong when it does. (If a rubric was provided, also produce
+`rubric/requirements.md`.)
+
+**Code grounding.** When you include `src/execution/*.py`, tag it `# Grounding: transcribed` (repo
+code, cite `file:line`) or `reconstructed` (printed pseudocode/equations, cite §/eq). Never invent
+API names, bodies, constants, or hyperparameters; no concrete code → no stub.
+
+Never invent function bodies, constants, hyperparameters, or API names. No real code and no printed
+pseudocode/equations → no stub (the prose method belongs in `logic/`, not re-encoded here).
 
 **Stage 4 — Exploration Graph Extraction**
-Reconstruct the research DAG for `/trace/exploration_tree.yaml`:
-- Root nodes = central research questions
-- Experiments and decisions nest as children
-- Dead ends from ablations/rejected alternatives = typed leaf nodes
-- ≥8 nodes, must include dead_end and decision types
-- Use `also_depends_on` for DAG convergence points
-- Every node must declare whether it is `explicit` from source material or `inferred` from reconstruction
-- Explicit nodes should carry source references (table/figure/section labels)
-- Inferred nodes are allowed only when they help reconstruct the paper's logic without pretending to be literal session logs
+Reconstruct the research DAG for `/trace/exploration_tree.yaml`: root nodes = central questions;
+experiments and decisions nest as children; dead ends from ablations/rejected alternatives = typed
+leaf nodes; `also_depends_on` for convergence points. Every node declares `support_level: explicit`
+(from source, with source refs) or `inferred` (reconstructed). Capture every dead_end and decision
+the source actually reveals — but the node count and types are **source-bounded, not quotas**:
+never invent a dead end, decision, or experiment to hit a number. A paper that hides its failures
+yields a smaller, honest tree (Rule 9 wins).
 
 ### Step 3: Generate Files
 
-Write ALL mandatory files. See `${CLAUDE_SKILL_DIR}/references/ara-schema.md` for the complete
-directory structure and field-level requirements for every file.
+Write the mandatory core, then the additional files the paper warrants. See
+`${CLAUDE_SKILL_DIR}/references/ara-schema.md` for field-level format.
 
-**Mandatory files** (all must exist and be non-trivial):
-- `PAPER.md` — YAML frontmatter (title, authors, year, venue, doi, ara_version, domain, keywords, claims_summary, abstract) + Layer Index
-- `logic/problem.md` — Observations (O1, O2...), Gaps (G1, G2...), Key Insight, Assumptions
-- `logic/claims.md` — Claims (C01, C02...) each with Statement, Status, Falsification criteria, Proof, Evidence basis, Interpretation, Dependencies, Tags
-- `logic/concepts.md` — ≥5 concepts each with Notation, Definition, Boundary conditions, Related concepts
-- `logic/experiments.md` — ≥3 experiments (E01, E02...) each with Verifies, Setup, Procedure, Metrics, Expected outcome (directional only!), Baselines, Dependencies
-- `logic/solution/architecture.md` — Component graph with inputs/outputs
-- `logic/solution/algorithm.md` — Math formulation + pseudocode + complexity
-- `logic/solution/constraints.md` — Boundary conditions and limitations
-- `logic/solution/heuristics.md` — Heuristics (H01, H02...) each with Rationale, Sensitivity, Bounds, Code ref, Source
-- `logic/related_work.md` — Related work (RW01, RW02...) each with DOI, Type, Delta, Claims affected
-- `src/configs/training.md` — Hyperparameters with Value, Rationale, Search range, Sensitivity, Source
-- `src/configs/model.md` — Model/architecture configs
-- `src/execution/{module}.py` — ≥1 code stub with typed signatures
-- `src/environment.md` — Python version, framework, hardware, dependencies, seeds
-- `trace/exploration_tree.yaml` — Research DAG (≥8 nodes, nested YAML)
-- `evidence/README.md` — Index table mapping every evidence file to claims
-- `evidence/tables/*.md` — ALL result tables (exact cell values, never rounded)
-- `evidence/figures/*.md` — ALL quantitative figures (extracted data points)
+**Mandatory core** (every ARA, must exist and be non-trivial):
+- `PAPER.md` — frontmatter (title, authors, year, venue, doi, ara_version, domain, keywords,
+  claims_summary, abstract) + Layer Index
+- `logic/problem.md`, `logic/claims.md`, `logic/concepts.md`, `logic/experiments.md`,
+  `logic/related_work.md`, `logic/solution/constraints.md`
+- `src/environment.md`
+- `trace/exploration_tree.yaml`
+- `evidence/README.md` + an evidence file (markdown **and** screenshot) for **every** numbered
+  table and figure in the source (`evidence/tables/`, `evidence/figures/`; `evidence/proofs/` for
+  derivations)
 
-Evidence-generation rules:
-- Preserve **raw source tables** separately from any **derived subset** views
-- A file named after a source object (for example `table3_...`) must match that source object's caption and contents
-- If only a subset is included, the filename must say `derived_`, `subset_`, or equivalent, and the file must state what it was derived from
-- Do not merge rows from different source tables into one evidence file unless the file is explicitly labeled as a derived comparison
+**Additional files — your judgment, not a fixed list.** Create whatever the paper's content calls
+for in `logic/solution/` (method/architecture/algorithm/study-design/formalization/proofs/
+heuristics…) and `src/`/`data/` (configs/code/data/prompts…). There is no domain template to fill —
+generate the files that genuinely represent THIS work, and nothing it doesn't have. Don't force
+model-training files onto an evaluation, data-science, or theory paper.
+
+Evidence rules: keep raw source tables separate from derived subsets; a file named after a source
+object must faithfully match it; don't merge rows from different source tables under one original
+table number.
 
 ### Step 4: Coverage Check Loop (max 3 rounds)
 
-Before running Seal validation, verify that the ARA faithfully covers the source material.
-Repeat up to **3 rounds**; stop early if a round produces no patches.
-
-**Each round:** re-read the source, identify anything not yet captured or only shallowly
-captured in the ARA, patch those gaps, then note how many fixes were made. If zero, exit
-early. Pay particular attention to appendix content and to citations from the paper's
-References list, which are easy to miss on the first pass.
-
-The coverage loop does not replace validation — it ensures the ARA is semantically complete
-before structural checks run.
+Re-read the source, find anything not yet captured or only shallowly captured, patch it, count the
+fixes; exit early when a round yields zero. Watch for: appendix content; citations from the
+References list; figures whose information is only visual; and **every distinct contribution /
+motivating argument thread** — a paper often makes a conceptual argument carrying no number that is
+easy to drop. The coverage loop ensures semantic completeness before structural checks.
 
 ### Step 5: Validate
 
-Run ARA Seal Level 1 validation. Perform these checks:
-- All mandatory dirs exist: `logic/`, `logic/solution/`, `src/`, `src/configs/`, `trace/`, `evidence/`
-- All mandatory files exist and are non-empty
-- PAPER.md has YAML frontmatter with title, authors, year
-- PAPER.md has Layer Index section
-- claims.md has C01+ blocks with Statement, Status, Falsification criteria, Proof fields
-- experiments.md has E01+ blocks with Verifies, Setup, Procedure, Expected outcome fields
-- heuristics.md has H01+ blocks with Rationale, Sensitivity, Bounds fields
-- concepts.md has ≥5 concept sections
-- experiments.md has ≥3 experiment plans
-- exploration_tree.yaml parses as valid YAML with ≥8 nodes, has dead_end and decision types
-- Claim Proof references (E01, E02...) resolve to experiments.md
-- Experiment Verifies references (C01, C02...) resolve to claims.md
-- Heuristic Code ref paths resolve to actual files in src/execution/
-- Evidence files contain Markdown tables with **Source** fields
-- Evidence file names, source labels, and captions agree on the original table/figure identifier
-- Any file named like a raw source table is a faithful transcription rather than a filtered subset
-- Claims only cite experiments whose evidence actually contains the compared rows or measurements
-- Claim wording does not outrun the evidence type (for example, validation tables alone should not be used to claim training-dynamics improvements)
-- Trace nodes declare `support_level: explicit|inferred`
-- Trace nodes with `support_level: explicit` include source references
+Run ARA Seal Level 1. Check:
+- Mandatory-core dirs exist (`logic/`, `logic/solution/`, `src/`, `trace/`, `evidence/`) and all
+  mandatory-core files exist and are non-empty
+- PAPER.md has valid frontmatter (title, authors, year) + a Layer Index
+- claims.md has C01+ blocks with Statement, Status, Falsification criteria, Proof
+- experiments.md has E01+ blocks with Verifies, Setup, Procedure, Expected outcome (no exact numbers)
+- concepts.md, related_work.md, constraints.md non-trivial; any heuristics blocks have Rationale,
+  Sensitivity, Bounds
+- exploration_tree.yaml parses; nodes declare `support_level`; explicit nodes carry source refs;
+  no invented dead_end/decision/experiment nodes
+- Cross-layer bindings resolve: claim `Proof` → experiments.md; experiment `Verifies` → claims.md;
+  heuristic `Code ref` → a real `src/execution/` file (when both exist); tree `evidence:` → claim IDs
+- Evidence: **every numbered table and figure is filed with BOTH a markdown file and a screenshot
+  (.png)**; numbered objects not filed are accounted for in `evidence/README.md` with a reason
+- Evidence files have **Source** fields; figures declare Figure type / Extraction method / Reading
+  confidence; estimated readings marked `≈` (not `exact_from_labels`); diagrams/qualitative samples
+  carry a visual description, not a fabricated table
+- Code stubs carry a `# Grounding:` tag and invent nothing; absent when the source is prose-only
+- **Cited locations verified** (Rule 15): every repo path/`file:line` exists and is in range;
+  spot-check that trace `source_refs` and evidence `Source` actually contain the cited content; no
+  repo fact transcribed from the paper without checking the real file
+- **Self-consistency**: ARA-authored derived numbers recompute; PAPER.md declared counts match the
+  files; tree `evidence:` refs are claim IDs (C##), not observation IDs
 
 ### Step 6: Fix & Iterate
 
-For each validation failure:
-1. Read the failing file
-2. Apply targeted edits (prefer Edit over full rewrite to preserve correct content)
-3. Re-validate after all fixes
-
-Typically converges in 2-3 rounds.
+For each failure: read the file, apply targeted edits (prefer Edit over rewrite), re-validate.
+Typically converges in 2–3 rounds.
 
 ### Step 7: Report
 
-Print a summary:
-- Artifact location
-- File count and total size
-- Validation result (pass/fail with details)
-- Key statistics: number of claims, experiments, heuristics, concepts, tree nodes, evidence files
+Print: artifact location; file count and total size; validation result (pass/fail with details);
+key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 
 ## Critical Rules
 
-1. **Exact numbers**: All numerical values copied EXACTLY from source — never round or approximate
-2. **No hallucination**: Never invent claims, results, or heuristics not in the source material
-3. **Experiments have NO exact numbers**: `experiments.md` contains only directional/relative expected outcomes. Exact numbers go in `evidence/`
-4. **Every claim has proof**: Proof field references experiment IDs (E01, E02), not file paths
+1. **Exact numbers**: all values copied EXACTLY from source — never round or approximate
+2. **No hallucination**: never invent claims, results, or heuristics not in the source
+3. **Experiments have NO exact numbers**: `experiments.md` is directional only; exact numbers live in `evidence/`
+4. **Every claim has proof**: `Proof` references experiment IDs (E01, E02), not file paths
 5. **Cross-layer binding**: Claims ↔ Experiments ↔ Evidence ↔ Code refs must all resolve
-6. **Dead ends matter**: Include failed approaches, rejected alternatives, ablation findings
-7. **"Not specified"**: If information is genuinely unavailable, write "Not specified in paper" — never guess
-8. **No fake source labels**: Never call a derived subset `Table N` or `Figure N` unless it faithfully reproduces the original source object
-9. **No synthetic trace history**: Do not invent decisions, dead ends, or experiments that are not explicit in the provided inputs; if a trajectory is inferred, mark it as inferred or omit it
-10. **Evidence-limited wording**: Do not use stronger language than the evidence supports; separate direct observations from interpretation
+6. **Dead ends matter**: include failed approaches, rejected alternatives, ablation findings
+7. **"Not specified"**: if information is genuinely unavailable, write "Not specified in paper" — never guess
+8. **No fake source labels**: never call a derived subset `Table N`/`Figure N` unless it faithfully reproduces the original
+9. **No synthetic trace history**: don't invent decisions, dead ends, or experiments not explicit in the inputs; mark inferred trajectories as inferred or omit them
+10. **Evidence-limited wording**: don't use stronger language than the evidence supports; separate observation from interpretation
+11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
+12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
+13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
+14. **`src/` holds concrete artifacts, not re-encoded prose**: capture every concrete artifact the source actually contains, in its native form, grounded in real files. Two sides: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, so a `.py` just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work has one
+15. **Source-bounded minimums**: any count or required field is a target, never a license to invent. If the source supports fewer, produce what is real and note the shortfall; for an unstated field write "Not specified in paper" rather than guessing
+16. **Cite by verification, and ask on conflict**: a source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line`/path) promises the cited location actually contains the claim — open it and confirm. Never transcribe a *description* of an artifact as a verified fact about it. **When the code repo and the paper disagree on a fact (line count, path, value, behavior), do NOT pick one silently — surface the conflict to the user and ask which source to follow.** If unverifiable and the user is unavailable, attribute it ("per §X") or omit. Carry a statistic's scope/denominator in its `Source`
 
 ## Reference Files
 
-For detailed schema specifications, load these on demand:
-- `${CLAUDE_SKILL_DIR}/references/ara-schema.md` — Complete ARA directory schema with field-level format for every file
-- `${CLAUDE_SKILL_DIR}/references/exploration-tree-spec.md` — Detailed exploration tree YAML specification with examples
-- `${CLAUDE_SKILL_DIR}/references/validation-checklist.md` — All Seal Level 1 checks (what the validator looks for)
+Load on demand:
+- `${CLAUDE_SKILL_DIR}/references/ara-schema.md` — field-level format for every file
+- `${CLAUDE_SKILL_DIR}/references/exploration-tree-spec.md` — exploration tree YAML spec
+- `${CLAUDE_SKILL_DIR}/references/validation-checklist.md` — all Seal Level 1 checks
+- `${CLAUDE_SKILL_DIR}/references/figure-extraction-guide.md` — reading plots/diagrams/samples + PyMuPDF render/crop recipes; load when an input has figures whose information is only visual

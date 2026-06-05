@@ -4,37 +4,30 @@ These are all checks the Seal validator runs. Fix ALL failures before reporting 
 
 ## 1. Directory Existence
 
-All must exist as directories:
-- `logic/`
-- `logic/solution/`
-- `src/`
-- `src/configs/`
-- `trace/`
-- `evidence/`
+Mandatory-core dirs — all must exist: `logic/`, `logic/solution/`, `src/`, `trace/`, `evidence/`.
+Other dirs (`src/configs/`, `data/`, `evidence/proofs/`, …) exist only when the work warrants them.
 
-## 2. Mandatory File Existence (non-empty)
+## 2. Mandatory File Existence (non-empty, >10 bytes)
 
-All must exist with >10 bytes:
 - `PAPER.md`
 - `logic/problem.md`
 - `logic/claims.md`
 - `logic/concepts.md`
 - `logic/experiments.md`
-- `logic/solution/architecture.md`
-- `logic/solution/algorithm.md`
 - `logic/solution/constraints.md`
-- `logic/solution/heuristics.md`
 - `logic/related_work.md`
-- `src/configs/training.md`
-- `src/configs/model.md`
 - `src/environment.md`
 - `trace/exploration_tree.yaml`
 - `evidence/README.md`
+- an evidence file for every numbered table and figure (see §11)
+
+Additional method/artifact files (`logic/solution/*`, `src/*`, `data/*`) are validated only that,
+where present, they are non-trivial — there is no fixed list. Model-training files
+(`training.md`/`model.md`) should not appear unless the work actually trained a model.
 
 ## 3. PAPER.md Checks
 
-- Starts with `---` (YAML frontmatter)
-- Frontmatter is valid YAML mapping
+- Starts with `---` (YAML frontmatter); valid YAML mapping
 - Contains keys: `title`, `authors`, `year`
 - Body contains "Layer Index" section
 
@@ -61,11 +54,16 @@ All must exist with >10 bytes:
 - Contains `**Procedure**`
 - Contains `**Expected outcome**` or `**Expected results**`
 
-### logic/solution/heuristics.md
+### logic/solution/heuristics.md (when present)
 - Has `## H\d+` blocks
 - Contains `**Rationale**`
 - Contains `**Sensitivity**`
 - Contains `**Bounds**`
+
+### logic/solution/ method files
+- `logic/solution/constraints.md` exists (mandatory core)
+- Whatever other method files the work warrants (architecture/algorithm/method/study_design/
+  formalization/proofs/…) exist and are non-trivial — there is no required set
 
 ### logic/related_work.md
 - Has `## RW\d+` blocks
@@ -80,10 +78,23 @@ All must exist with >10 bytes:
 
 ## 5. Count Checks
 
-- `logic/concepts.md`: ≥5 concept sections (`## ` headers)
-- `logic/experiments.md`: ≥3 experiment blocks (`## E\d+`)
-- `src/execution/`: ≥1 `.py` file
-- `evidence/tables/` or `evidence/figures/`: ≥1 `.md` file
+Counts are **source-bounded targets, not quotas** (Rule 14): they must be met from genuine source
+content, never by padding with trivial, borrowed, or invented items. A paper that honestly supports
+fewer passes with fewer; what fails is fabricated filler.
+
+- `logic/concepts.md`: aim ≥5 concept sections (`## ` headers) — but only genuine technical terms
+- `logic/experiments.md`: aim ≥3 experiment/analysis blocks (`## E\d+`) — only experiments the paper actually describes
+- `src/execution/`: ≥1 `.py` file only when the work has implementable content (repo code / paper pseudocode / named interface). NOT mandatory otherwise; omitting it (with a note in `environment.md`) beats fabricating one.
+- `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: contains the filed evidence (see §11)
+
+### Implementation layer (`src/`) — captured, not re-encoded
+- Concrete artifacts that exist are captured in native form: prompts/templates verbatim in `src/prompts/`, real repo code/tools/skills via grounded `src/execution/` or `src/artifacts.md`, config values in `src/configs/`. A lone `environment.md` is wrong when such artifacts exist.
+- Conversely, a prose-only method (no code, no prompt, no config values) is NOT re-encoded as a `.py` stub or pseudo-code — it lives in `logic/solution/`; a lone `environment.md` is correct here. FAIL on a `.py` stub manufactured from prose (it just duplicates the cognitive layer).
+
+### Code grounding (each `src/execution/*.py`, when present)
+- Declares a `# Grounding: transcribed|reconstructed` tag
+- Docstrings cite the source (§/Eq/repo path), not paraphrases of the compiler skill
+- FAIL if the file invents API names, constants, or function bodies with no traceable source — a hollow fabricated API must be omitted, not shipped
 
 ## 5b. Appendix Coverage
 
@@ -93,11 +104,19 @@ one ARA file, with the granularity of the source preserved.
 ## 6. Evidence Quality
 
 For each file in `evidence/tables/*.md` and `evidence/figures/*.md`:
-- Must contain a Markdown table (`|...|...|` pattern)
 - Must contain `**Source**` field
+- **Must have a sibling screenshot `.png`** (e.g. `table3.md` ↔ `table3.png`, `figure5.md` ↔ `figure5.png`), declared via a `**Screenshot**` field
+- Table files must contain a Markdown table (`|...|...|` pattern)
 - If the filename includes `table{N}` or `figure{N}`, the `**Source**` field must reference the same identifier
 - If the file is a derived subset, it must say so explicitly via `**Extraction type**: derived_subset` or equivalent
 - Raw source-table files should not silently omit rows while still presenting themselves as the original table
+
+For each file in `evidence/figures/*.md` specifically:
+- Must declare `**Figure type**` in {quantitative_plot, diagram, qualitative_sample, mixed}
+- Must declare `**Extraction method**` in {exact_from_labels, digitized_estimate, visual_description} and `**Reading confidence**` in {high, medium, low}
+- `quantitative_plot` figures must contain either a Markdown data table OR an explicit unreadable statement with `Reading confidence: low` plus a `Trend summary`; their `**Axes**` field must state the scale (linear/log)
+- `diagram` and `qualitative_sample` figures must contain a `Visual description` section and must NOT present a fabricated numeric data table
+- Any estimated numeric reading should be marked approximate (`≈`) and the file's extraction method should be `digitized_estimate` (not `exact_from_labels`)
 
 ## 7. evidence/README.md
 
@@ -109,10 +128,9 @@ For each file in `evidence/tables/*.md` and `evidence/figures/*.md`:
 
 - Parses as valid YAML
 - Has top-level `tree` key
-- ≥8 nodes total (counted recursively through children)
+- ~8+ nodes is the target for a rich paper, but a smaller fully source-backed tree PASSES — do not flag low counts that reflect a paper genuinely exposing little exploration (Rule 14). What fails is invented/unsupported nodes (see Trace Hygiene), not honest small trees.
 - All node types in {question, decision, experiment, dead_end, pivot}
-- At least 1 `dead_end` node exists
-- At least 1 `decision` node exists
+- `dead_end` / `decision` nodes are expected when the paper reveals ablations, rejected alternatives, or design choices — but are NOT required if the source exposes none; never invent one to satisfy this check (Rule 9)
 - Every node has `id` and `type` fields
 - Every node has `support_level` in {explicit, inferred}
 - Type-specific required fields:
@@ -134,10 +152,10 @@ For each file in `evidence/tables/*.md` and `evidence/figures/*.md`:
 ### Experiment Verifies → Claim Resolution
 - Every `C\d+` in an experiment's `**Verifies**` must exist in claims.md
 
-### Heuristic Code Ref → File Resolution
+### Heuristic Code Ref → File Resolution (only when heuristics.md + src/execution/ are both present)
 - Every `src/...` path in `**Code ref**: [...]` must be an existing file
 
-### Architecture Components → Code Stubs (fuzzy)
+### Architecture Components → Code Stubs (fuzzy; only when architecture.md + src/execution/ are both present)
 - Significant words from `## ` headings in architecture.md should appear somewhere in src/execution/ code
 
 ### Tree Evidence → Claims (YAML)
@@ -146,3 +164,25 @@ For each file in `evidence/tables/*.md` and `evidence/figures/*.md`:
 ### Trace Hygiene
 - Do not add dead_end, decision, or experiment nodes that are unsupported by the provided source material
 - If a node is reconstructed from partial evidence rather than stated explicitly, it should be marked as inferred or excluded from Seal Level 1 outputs
+
+## 10. Citation Verification (Rule 15)
+
+- Every repo path / `file:line` referenced (in `src/`, heuristic `Code ref`, environment "Code location") exists in the provided repo; no line reference points past the file's actual length
+- No fact ABOUT a repo artifact (line count, path, internal structure) is transcribed from the paper without checking the real file — when paper and repo disagree, the discrepancy is flagged, not silently resolved to the paper's number
+- Spot-check trace `source_refs` and evidence `**Source**` labels: the cited section/table/appendix actually contains the claimed content
+- A statistic carries its scope/denominator (N, population) in its `Source` — subset figures (e.g. "5 papers / 3,050 reqs") are not juxtaposed with full-corpus figures as if same-denominator
+
+## 11. Evidence Ledger Completeness
+
+- **Every numbered `Table N` and `Figure N` in the source is filed** — a complete, in-order sweep,
+  not a sample. Each filed object has BOTH a markdown file and a screenshot `.png`.
+- Every value a claim quotes traces to a filed table/figure.
+- Any numbered object deliberately not filed (e.g. an exact duplicate) is listed in
+  `evidence/README.md` with a reason — no silent omissions. A run that quietly filed only some of
+  the source's tables/figures FAILS.
+
+## 12. Self-Consistency
+
+- Any ARA-authored derived number (a delta, percentage, or comparison the ARA computes itself) recomputes correctly from its cited cells
+- `PAPER.md` frontmatter/Layer-Index declared counts (claims, concepts, experiments, …) match the actual files
+- Tree `evidence:` references are claim IDs (`C\d+`), not observation IDs (`O\d+`) or other layers
