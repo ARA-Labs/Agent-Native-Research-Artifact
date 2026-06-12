@@ -53,3 +53,32 @@ test('install + uninstall cycle (local, tmp dir)', () => {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test('lock file updatedAt advances on reinstall', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ara-skills-lock-'));
+  try {
+    const opts = {
+      agentId: 'claude-code',
+      skillIds: ['compiler'],
+      local: true,
+      cwd: tmp,
+      force: true,
+      quiet: true,
+    };
+    const lockPath = path.join(tmp, '.claude/skills/.ara-skills.json');
+
+    install(opts);
+    const first = JSON.parse(fs.readFileSync(lockPath, 'utf8')).updatedAt;
+
+    await new Promise((r) => setTimeout(r, 10));
+    install(opts);
+    const second = JSON.parse(fs.readFileSync(lockPath, 'utf8')).updatedAt;
+
+    assert.ok(
+      new Date(second) > new Date(first),
+      `updatedAt should advance on reinstall (was ${first}, still ${second})`
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});

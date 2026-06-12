@@ -45,7 +45,7 @@ function writeLock(dir, data) {
   ensureDir(dir);
   fs.writeFileSync(
     file,
-    JSON.stringify({ updatedAt: new Date().toISOString(), ...data }, null, 2)
+    JSON.stringify({ ...data, updatedAt: new Date().toISOString() }, null, 2)
   );
 }
 
