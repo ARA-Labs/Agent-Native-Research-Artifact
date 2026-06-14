@@ -40,12 +40,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AmberLJC/Agent-Native-Research-Artifact.git",
+    "url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact.git",
     "directory": "packages/ara-skills"
   },
-  "homepage": "https://github.com/AmberLJC/Agent-Native-Research-Artifact#readme",
+  "homepage": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact#readme",
   "bugs": {
-    "url": "https://github.com/AmberLJC/Agent-Native-Research-Artifact/issues"
+    "url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/issues"
   },
   "engines": {
     "node": ">=18.0.0"
