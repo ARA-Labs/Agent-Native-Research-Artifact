@@ -145,16 +145,14 @@ Every load-bearing number in a `Statement` (or a heuristic's `Rationale`/`Sensit
 is grounded the way code is — transcribed from an open source, never written from memory:
 
 1. **Open before you write.** Before the number enters the prose, open its source and copy the
-   matched line *verbatim* into `Sources`:
-   `0.045 ← train_gpt_simple_v12.py:346 «lr = 0.045» [input]`. The number you then write in the
-   prose is a copy of the value inside that quote — not a value recalled and back-cited. An entry
-   with a bare path and no «quote» is invalid.
-2. **Input vs result.** Tag each entry `[input]` (a hyperparameter/config you set — cite the recipe
-   script `file:line`) or `[result]` (a measured bin/loss/margin/N — cite the run log or trace
-   `node:field`). A binned `step_to_3.28` is a `[result]`, not the script's `train_steps`.
+   matched line *verbatim* into `Sources` (`<value> ← <source ref> «matched line» [input|result]`).
+   The number you then write in the prose is a copy of the value inside that quote — not a value
+   recalled and back-cited. An entry with a bare path and no «quote» is invalid.
+2. **Input vs result.** Tag each entry `[input]` (a value you set — cite the source that defines it)
+   or `[result]` (a value the run produced — cite the log/output that reports it). Don't cite a
+   measured outcome to the config meant to produce it, or vice versa.
 3. **No inheritance.** Re-open *this* claim's own source for every number; a value shared with a
-   dependency claim is re-verified here, never copied from the dependency's wording (this is how the
-   v5→v12 hyperparameter bleed gets caught).
+   dependency claim is re-verified here, never copied from the dependency's wording.
 4. **`[pending]` beats a guess.** Can't open or locate a source this turn? Write
    `<value> ← [pending: what's missing]`. An unverified-but-plausible path is fabrication and is
    worse than `[pending]`.

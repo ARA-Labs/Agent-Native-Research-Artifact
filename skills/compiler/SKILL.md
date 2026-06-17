@@ -126,12 +126,12 @@ Map the atoms into `/logic/`:
   result into a claim about training dynamics without training-side evidence.
   **Ground every load-bearing number in a `Statement` like code** (the `# Grounding` discipline,
   applied to numbers): before writing it, open its source and copy the matched line verbatim into a
-  `**Sources**` entry — `0.045 ← train_gpt_simple_v12.py:346 «lr = 0.045» [input]` for set
-  hyperparameters/configs (cite the recipe script `file:line`), `2920 ← <log/trace ref>
-  «step_to_3.28: 2920» [result]` for measurements (cite the run log / trace field). Never write a
-  number from memory and back-fill a path; never carry a value over from a dependency claim —
-  re-open this claim's own source. A bare path with no «quote» is invalid; if a source can't be
-  opened this turn, write `[pending: …]` (an unverified path is fabrication, worse than `[pending]`).
+  `**Sources**` entry — `<value> ← <source ref> «matched line» [input]` for values that were set
+  (cite where they're defined), `[result]` for values a run produced (cite the log/output that
+  reports them). Never write a number from memory and back-fill a path; never carry a value over
+  from a dependency claim — re-open this claim's own source. A bare path with no «quote» is invalid;
+  if a source can't be opened this turn, write `[pending: …]` (an unverified path is fabrication,
+  worse than `[pending]`).
 - **concepts.md**: the paper's genuine technical terms, formally defined
 - **experiments.md**: declarative verification/analysis plans (NO exact numbers — directional
   only). "Experiment" generalizes to the field's way of testing a claim: an eval run, a statistical
