@@ -124,6 +124,14 @@ Map the atoms into `/logic/`:
   `Statement` at the strongest level the cited evidence directly supports; keep raw support in
   `Evidence basis` and broader synthesis in `Interpretation`. Don't upgrade a validation-metric
   result into a claim about training dynamics without training-side evidence.
+  **Ground every load-bearing number in a `Statement` like code** (the `# Grounding` discipline,
+  applied to numbers): before writing it, open its source and copy the matched line verbatim into a
+  `**Sources**` entry — `0.045 ← train_gpt_simple_v12.py:346 «lr = 0.045» [input]` for set
+  hyperparameters/configs (cite the recipe script `file:line`), `2920 ← <log/trace ref>
+  «step_to_3.28: 2920» [result]` for measurements (cite the run log / trace field). Never write a
+  number from memory and back-fill a path; never carry a value over from a dependency claim —
+  re-open this claim's own source. A bare path with no «quote» is invalid; if a source can't be
+  opened this turn, write `[pending: …]` (an unverified path is fabrication, worse than `[pending]`).
 - **concepts.md**: the paper's genuine technical terms, formally defined
 - **experiments.md**: declarative verification/analysis plans (NO exact numbers — directional
   only). "Experiment" generalizes to the field's way of testing a claim: an eval run, a statistical
@@ -227,6 +235,13 @@ Run ARA Seal Level 1. Check:
 - **Cited locations verified** (Rule 15): every repo path/`file:line` exists and is in range;
   spot-check that trace `source_refs` and evidence `Source` actually contain the cited content; no
   repo fact transcribed from the paper without checking the real file
+- **Number sources bound** (claims & heuristics) — run this as its own dedicated pass, one job: for
+  *each* `**Sources**` entry, re-open the cited `file:line` (or trace `node:field`) and confirm the
+  verbatim «quote» is actually there and the number in the `Statement`/`Rationale` matches the value
+  inside the quote; `[input]` entries cite recipe scripts, `[result]` entries cite logs/trace (not
+  swapped). Exhaustive, not spot-checked. `[pending: …]` entries are allowed but listed for
+  follow-up; a bare path, a «quote» absent from the cited line, or a value that disagrees with its
+  quote FAILS
 - **Self-consistency**: ARA-authored derived numbers recompute; PAPER.md declared counts match the
   files; tree `evidence:` refs are claim IDs (C##), not observation IDs
 
@@ -257,7 +272,7 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
 14. **`src/` holds concrete artifacts, not re-encoded prose**: capture every concrete artifact the source actually contains, in its native form, grounded in real files. Two sides: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, so a `.py` just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work has one
 15. **Source-bounded minimums**: any count or required field is a target, never a license to invent. If the source supports fewer, produce what is real and note the shortfall; for an unstated field write "Not specified in paper" rather than guessing
-16. **Cite by verification, and ask on conflict**: a source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line`/path) promises the cited location actually contains the claim — open it and confirm. Never transcribe a *description* of an artifact as a verified fact about it. **When the code repo and the paper disagree on a fact (line count, path, value, behavior), do NOT pick one silently — surface the conflict to the user and ask which source to follow.** If unverifiable and the user is unavailable, attribute it ("per §X") or omit. Carry a statistic's scope/denominator in its `Source`
+16. **Cite by verification, and ask on conflict**: a source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line`/path) promises the cited location actually contains the claim — open it and confirm. Never transcribe a *description* of an artifact as a verified fact about it. **When the code repo and the paper disagree on a fact (line count, path, value, behavior), do NOT pick one silently — surface the conflict to the user and ask which source to follow.** If unverifiable and the user is unavailable, attribute it ("per §X") or omit. Carry a statistic's scope/denominator in its `Source`. **This extends to every load-bearing number in a claim/heuristic `Statement`/`Rationale`: it carries a `**Sources**` entry whose verbatim «quote» you opened and confirmed contains that value — a memory-filled value or a bare path is fabrication; use `[pending]` when you cannot open the source**
 
 ## Reference Files
 
