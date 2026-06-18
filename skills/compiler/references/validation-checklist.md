@@ -90,7 +90,8 @@ fewer passes with fewer; what fails is fabricated filler.
 - `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: contains the filed evidence (see §11)
 
 ### Implementation layer (`src/`) — captured, not re-encoded
-- Concrete artifacts that exist are captured in native form: prompts/templates verbatim in `src/prompts/`, real repo code/tools/skills via grounded `src/execution/` or `src/artifacts.md`, config values in `src/configs/`. A lone `environment.md` is wrong when such artifacts exist.
+- Concrete artifacts that exist are captured in native form: prompts/templates verbatim in `src/prompts/`, **real repo source code captured into `src/execution/`** (native form, `# Grounding: transcribed`, cite path — not reduced to a pointer), non-code deliverables (released binaries, skill/spec docs, referenced datasets) described in `src/artifacts.md`, config values in `src/configs/`. A lone `environment.md` is wrong when such artifacts exist.
+- **When a code repo/directory was provided as input**: every non-trivial runnable source file in it (a named module, entrypoint, or roughly ≥30 lines) is captured into `src/execution/` (or another `src/` subdir, in native form), not merely named in `artifacts.md`. FAIL on real source code represented only by a pointer, or a set of real files dismissed collectively (e.g. "not a core contribution") without capture.
 - Conversely, a prose-only method (no code, no prompt, no config values) is NOT re-encoded as a `.py` stub or pseudo-code — it lives in `logic/solution/`; a lone `environment.md` is correct here. FAIL on a `.py` stub manufactured from prose (it just duplicates the cognitive layer).
 
 ### Code grounding (each `src/execution/*.py`, when present)
