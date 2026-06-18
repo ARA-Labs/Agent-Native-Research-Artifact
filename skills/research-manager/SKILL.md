@@ -15,7 +15,7 @@ argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.2.0"
+  version: "2.3.0"
   tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management]
 ---
 
