@@ -36,6 +36,8 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 ### logic/claims.md
 - Has `## C\d+` blocks (at least one claim)
 - Contains `**Statement**`
+- Contains `**Sources**`; every load-bearing number in a `Statement` has a `Sources` entry carrying
+  a verbatim «quote» plus an `[input]`/`[result]` tag — no bare-path entries, no memory-filled numbers
 - Contains `**Status**`
 - Contains `**Falsification criteria**`
 - Contains `**Proof**`
@@ -171,6 +173,12 @@ For each file in `evidence/figures/*.md` specifically:
 - No fact ABOUT a repo artifact (line count, path, internal structure) is transcribed from the paper without checking the real file — when paper and repo disagree, the discrepancy is flagged, not silently resolved to the paper's number
 - Spot-check trace `source_refs` and evidence `**Source**` labels: the cited section/table/appendix actually contains the claimed content
 - A statistic carries its scope/denominator (N, population) in its `Source` — subset figures (e.g. "5 papers / 3,050 reqs") are not juxtaposed with full-corpus figures as if same-denominator
+- **Claim/heuristic number sources** (exhaustive, not spot-checked): each `**Sources**` entry's cited
+  `file:line` (or trace `node:field`) exists, the verbatim «quote» is actually present there, and the
+  number in the `Statement`/`Rationale` matches the value inside that quote; `[input]` entries cite
+  recipe scripts and `[result]` entries cite run logs/trace (not swapped). A bare path with no «quote»,
+  a «quote» absent from the cited line, or a value that disagrees with its quote FAILS. `[pending: …]`
+  entries pass but are listed for follow-up — an unverified plausible path does not pass
 
 ## 11. Evidence Ledger Completeness
 

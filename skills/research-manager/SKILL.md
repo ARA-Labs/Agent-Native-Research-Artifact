@@ -128,14 +128,34 @@ When a signal fires for `O{XX}`:
 
 1. Read O{XX}'s `content`, `context`, `potential_type`, `provenance`, `bound_to`.
 2. Allocate the next ID for the target layer (read the target file first).
-3. Construct a typed entry using the schema (see Schemas below). Carry forward
-   `provenance`. Verbal-affirmation upgrades `ai-suggested` → `user-revised` (or `user` if
+3. Construct a typed entry using the schema (see Schemas below). **Before any number enters a
+   `Statement`/`Rationale`, ground it per "Number grounding" below — open the source, copy the
+   matched line verbatim into `Sources`, then write the number as a copy of that quote.** Carry
+   forward `provenance`. Verbal-affirmation upgrades `ai-suggested` → `user-revised` (or `user` if
    reproduced verbatim). The other three signals do **not** upgrade provenance.
 4. Add fields: `Crystallized via: <signal>`, `From staging: O{XX}`.
 5. Establish forensic bindings (claim→proof, heuristic→code, decision→evidence). Use
    `[pending]` + TODO if a binding cannot be made now.
 6. Update O{XX}: `promoted: true`, `promoted_to: <layer>:<id>`, `crystallized_via: <signal>`.
    **Do not delete the observation** — the trail from raw to typed is part of the record.
+
+#### Number grounding (claims & heuristics)
+
+Every load-bearing number in a `Statement` (or a heuristic's `Rationale`/`Sensitivity`/`Bounds`)
+is grounded the way code is — transcribed from an open source, never written from memory:
+
+1. **Open before you write.** Before the number enters the prose, open its source and copy the
+   matched line *verbatim* into `Sources` (`<value> ← <source ref> «matched line» [input|result]`).
+   The number you then write in the prose is a copy of the value inside that quote — not a value
+   recalled and back-cited. An entry with a bare path and no «quote» is invalid.
+2. **Input vs result.** Tag each entry `[input]` (a value you set — cite the source that defines it)
+   or `[result]` (a value the run produced — cite the log/output that reports it). Don't cite a
+   measured outcome to the config meant to produce it, or vice versa.
+3. **No inheritance.** Re-open *this* claim's own source for every number; a value shared with a
+   dependency claim is re-verified here, never copied from the dependency's wording.
+4. **`[pending]` beats a guess.** Can't open or locate a source this turn? Write
+   `<value> ← [pending: what's missing]`. An unverified-but-plausible path is fabrication and is
+   worse than `[pending]`.
 
 #### Contradiction trigger
 
@@ -164,7 +184,8 @@ entries — staged observations belong to Stage 3. (History lives in the trace; 
 1. **Status updates** — flip a claim's `Status` field when evidence warrants.
 2. **Content revisions** — rewrite a `Statement`, `Rationale`, or definition when new
    evidence narrows scope, terminology changed, or wording no longer matches what's
-   actually supported.
+   actually supported. A rewrite re-grounds every number it now contains (Number grounding);
+   any changed value gets its own fresh `Sources` «quote», never a carried-over one.
 3. **Structural changes** — split a claim into two, merge duplicates, repair
    dependencies, rename ids when concepts are renamed.
 4. **Consistency pass** — scan for broken cross-references (claim cites C05 which no
@@ -342,6 +363,7 @@ tree:
 ```markdown
 ## C{XX}: {title}
 - **Statement**: {current falsifiable assertion}
+- **Sources**: [{one entry per load-bearing number in `Statement`: `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
 - **Status**: hypothesis | untested | testing | supported | weakened | refuted | withdrawn
 - **Provenance**: user | ai-suggested | user-revised
 - **Falsification criteria**: {what would disprove this}
@@ -362,6 +384,7 @@ marker, not a resting state — see Stage 4.
 ```markdown
 ## H{XX}: {title}
 - **Rationale**: {current best explanation of why this works}
+- **Sources**: [{one entry per load-bearing number in `Rationale`/`Sensitivity`/`Bounds`, same format as claims — see "Number grounding"}]
 - **Status**: active | weakened | retired
 - **Provenance**: user | ai-suggested | user-revised
 - **Sensitivity**: low | medium | high | unknown   # "unknown" until the turn establishes it — never guess
