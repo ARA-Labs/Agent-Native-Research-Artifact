@@ -4,6 +4,8 @@
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-3%20skills-green)](skills/)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.24658-b31b1b.svg)](https://arxiv.org/abs/2604.24658)
 [![Poster](https://img.shields.io/badge/Poster-PDF-orange.svg)](docs/poster.pdf)
+[![Demo](https://img.shields.io/badge/Demo-ARA--Demo-purple.svg)](https://github.com/ARA-Labs/ARA-Demo)
+[![Blog](https://img.shields.io/badge/Blog-aracommons.com-ff69b4.svg)](https://aracommons.com/ara)
 
 > A protocol that recasts the primary research object from narrative document to **machine-executable knowledge package** — so AI agents can navigate, reproduce, and extend published research without re-discovering every dead end.
 
