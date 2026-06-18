@@ -287,21 +287,32 @@ field format:
 ## src/execution/{module}.py  (when the work warrants it — grounded or absent)
 
 Present only when the source provides **concrete code-shaped content**: actual repo code, or
-explicit pseudocode/equations the paper prints. The stub captures the **novel mechanism** and must
-be grounded — never fabricated.
+explicit pseudocode/equations the paper prints. When a repo is provided, capture its real runnable
+source files here in native form (transcribed) — not merely a stub of the novel mechanism; when only
+pseudocode/equations exist, the reconstructed stub captures the **novel mechanism**. Either way it
+must be grounded — never fabricated.
 
 Every file declares its grounding on the first line:
 ```python
 # Grounding: transcribed   — adapted from repo code; cite file:line in docstrings
 # Grounding: reconstructed — from explicit paper pseudocode/equations; cite §/eq
 ```
-Contents:
+Contents depend on the grounding:
+
+**`transcribed` (a real repo file is provided)** — copy it faithfully in native form: full function
+bodies, the file's own imports (third-party deps included), and its real scaffolding (CLI/argparse,
+logging, entrypoints) all kept as in the repo. Do NOT replace working code with
+`NotImplementedError`, strip plumbing, or reduce to signatures-only — that mutates the artifact and
+breaks the cited `file:line`. Add only the `# Grounding` line and source-citing docstrings; otherwise
+leave the file as it is in the repo.
+
+**`reconstructed` (only pseudocode/equations exist)** — build a minimal stub of the novel mechanism:
 - Typed function signatures using ONLY names/types the source states
-- Docstrings that cite the source (`§4.2`, `Eq. 3`, `repo: model.py:88`) — not paraphrases of this skill
+- Docstrings that cite the source (`§4.2`, `Eq. 3`) — not paraphrases of this skill
 - Implementation logic ONLY where the source provides it; everything unspecified stays
   `raise NotImplementedError("Not specified in paper")` — never plausible filler
-- NO scaffolding (no argparse, logging, distributed wrappers)
-- Import only standard libraries + the field's core stack (torch/numpy, pandas/statsmodels, etc.)
+- NO scaffolding (no argparse, logging, distributed wrappers); import only standard libraries + the
+  field's core stack (torch/numpy, pandas/statsmodels, etc.)
 
 Hard rule: do not invent API names, function bodies, constants, or hyperparameters. **If the paper
 describes the method only in prose (no code, no printed pseudocode), do NOT write a `.py` stub or
@@ -309,11 +320,17 @@ pseudo-code — that information already lives in `logic/solution/`, and re-enco
 duplicates it.** A concrete artifact that IS raw "code" — e.g. a prompt or template — is different:
 store it verbatim in `src/prompts/`, don't paraphrase it. A hollow invented API is a hallucination.
 
-## src/artifacts.md  (when the implementation is not a `.py` stub)
+## src/artifacts.md  (for non-code deliverables — NOT a substitute for capturing real source)
 
 `src/` must still represent the implementation. When the deliverable is a released tool, library,
 skill/specification, system, benchmark, or dataset rather than a code stub, describe the **real**
 artifacts here — grounded in the actual repo/files when a repo is provided. One block per artifact:
+
+**Exception — actual source code is captured, not pointed at.** When the repo contains real runnable
+source files, copy those files into `src/execution/` in native form (`# Grounding: transcribed`,
+cite path); do not reduce them to a prose block here. `artifacts.md` covers only deliverables with
+no capturable source — released binaries, natural-language skill/spec docs, datasets referenced by
+location. Naming a real `.py`/`.js`/… file here instead of capturing it is a coverage failure.
 
 ```markdown
 ## {Artifact name}
