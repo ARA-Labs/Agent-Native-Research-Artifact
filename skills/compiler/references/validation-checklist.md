@@ -35,14 +35,15 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 
 ### logic/claims.md
 - Has `## C\d+` blocks (at least one claim)
-- Contains `**Statement**`
-- Contains `**Sources**`; every load-bearing number in a `Statement` has a `Sources` entry carrying
+- Contains `**Statement**` (a generalized mechanism/relationship — no run numbers in the Statement)
+- Contains `**Conditions**` (non-trivial: the regime + the untested boundary)
+- Contains `**Sources**`; every load-bearing number in a claim has a `Sources` entry carrying
   a verbatim «quote» plus an `[input]`/`[result]` tag — no bare-path entries, no memory-filled numbers
 - Contains `**Status**`
-- Contains `**Falsification criteria**`
+- Contains `**Falsification criteria**` (a substantive observation — about the system, or about the benchmark's behavior for a methodological claim — not a tautology or a re-run of a metric gate)
+- `Statement` strength is calibrated to the evidence: no confounded distinction asserted as separated, no single-instance result stated as a law without hedging
 - Contains `**Proof**`
 - Contains `**Evidence basis**`
-- Contains `**Interpretation**`
 
 ### logic/problem.md
 - Has `### O\d+` blocks (observations)
@@ -150,7 +151,7 @@ For each file in `evidence/figures/*.md` specifically:
 ### Claim Proof → Experiment Resolution
 - Every `E\d+` in a claim's `**Proof**: [...]` must exist in experiments.md
 - Proof-linked experiments should have evidence files whose labels and row contents actually match the compared systems or measurements
-- Claim wording should be auditable against `Evidence basis`; broader language should be isolated to `Interpretation`
+- Claim `Statement` is a generalized mechanism/relationship auditable against `Evidence basis`; its reach is bounded by `Conditions` and its run numbers live in the evidence layer (not pasted into the Statement)
 
 ### Experiment Verifies → Claim Resolution
 - Every `C\d+` in an experiment's `**Verifies**` must exist in claims.md

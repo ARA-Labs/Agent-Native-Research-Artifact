@@ -159,20 +159,31 @@ Rule: if a filename includes a source label such as `table3` or `figure4`, it sh
 
 Each claim MUST have ALL fields:
 ```markdown
-## C{NN}: {Short title}
-- **Statement**: {Precise, falsifiable assertion}
+## C{NN}: {generalized title — the takeaway, not a recipe/result name}
+- **Statement**: {the generalized, mechanistic conclusion the evidence supports; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
+- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
 - **Status**: {hypothesis|supported|refuted}
-- **Falsification criteria**: {What would disprove this}
+- **Falsification criteria**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. Not a tautology or a re-run of the same gate}
 - **Proof**: [{experiment IDs: E01, E02}]
-- **Evidence basis**: {What the cited evidence directly shows}
-- **Interpretation**: {Optional broader reading that should not be confused with the raw evidence}
+- **Evidence basis**: {what the cited evidence shows — point to it; do NOT restate run numbers in the Statement}
 - **Dependencies**: {other claim IDs, if any}
 - **Tags**: {comma-separated keywords}
 ```
 
 Proof MUST reference experiment IDs from experiments.md.
 Each proofed experiment should in turn be backed by evidence files whose rows or measurements actually match the claim being asserted.
-`Statement` should stay at the strongest level directly supported by the cited evidence. Use `Interpretation` for broader synthesis.
+`Statement` is the **generalized conclusion the evidence supports** — a mechanism or relationship,
+not a restatement of run numbers. The claim is kept falsifiable and honest by `Conditions` (the
+regime it holds in + the untested boundary) and a `Falsification criteria`, not by narrowing the
+sentence to a single measured value. Numbers (n, scores, step counts, run IDs) live in the evidence
+layer and are reached via `Proof`/`Evidence basis`, never pasted into `Statement`. `Conditions` is
+mandatory: a generalized Statement with no Conditions is an unbounded slogan.
+
+**Calibrate the Statement to what the evidence separates.** Do not assert a distinction the design
+cannot disentangle (confounded factors that co-vary in the source — e.g. matrix "shape" vs "role"),
+or a law from a single instance. Hedge such cases in the Statement itself (name the unseparated
+factors together, or mark it "shown once") — `Conditions` bounds *where* the claim holds; it is not a
+license for the Statement's verb to over-reach what the evidence licenses.
 
 ---
 

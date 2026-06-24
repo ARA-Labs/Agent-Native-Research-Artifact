@@ -121,10 +121,16 @@ For non-trivial figures (dense plots, log axes, multi-panel, anything needing re
 Map the atoms into `/logic/`:
 - **problem.md**: observations (with numbers) → gaps → key insight → assumptions
 - **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). Phrase each
-  `Statement` at the strongest level the cited evidence directly supports; keep raw support in
-  `Evidence basis` and broader synthesis in `Interpretation`. Don't upgrade a validation-metric
-  result into a claim about training dynamics without training-side evidence.
-  **Ground every load-bearing number in a `Statement` like code** (the `# Grounding` discipline,
+  `Statement` as the **generalized conclusion** the evidence supports — a mechanism/relationship as
+  subject, carrying NO run numbers — and bound it with a `Conditions` field (the regime + the
+  untested boundary). Keep numbers in `Evidence basis`/`Proof` and reference them, never restate them
+  in the Statement. Don't upgrade a validation-metric result into a claim about training dynamics
+  without training-side evidence; let `Conditions` and a substantive `Falsification criteria` (about
+  the system for a mechanism claim, about the benchmark's behavior for a methodological one) carry the
+  accountability that a narrowed sentence used to. Calibrate the Statement's strength to what the
+  evidence actually separates — don't assert a distinction the design confounds, or a law from a
+  single instance; hedge that in the Statement, not only in `Conditions`.
+  **Ground every load-bearing number in a claim like code** (the `# Grounding` discipline,
   applied to numbers): before writing it, open its source and copy the matched line verbatim into a
   `**Sources**` entry — `<value> ← <source ref> «matched line» [input]` for values that were set
   (cite where they're defined), `[result]` for values a run produced (cite the log/output that
@@ -218,7 +224,7 @@ Run ARA Seal Level 1. Check:
 - Mandatory-core dirs exist (`logic/`, `logic/solution/`, `src/`, `trace/`, `evidence/`) and all
   mandatory-core files exist and are non-empty
 - PAPER.md has valid frontmatter (title, authors, year) + a Layer Index
-- claims.md has C01+ blocks with Statement, Status, Falsification criteria, Proof
+- claims.md has C01+ blocks with Statement, Conditions, Status, Falsification criteria, Proof; Statement is a generalized mechanism/relationship (no run numbers), Conditions non-trivial
 - experiments.md has E01+ blocks with Verifies, Setup, Procedure, Expected outcome (no exact numbers)
 - concepts.md, related_work.md, constraints.md non-trivial; any heuristics blocks have Rationale,
   Sensitivity, Bounds
@@ -266,7 +272,7 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 7. **"Not specified"**: if information is genuinely unavailable, write "Not specified in paper" — never guess
 8. **No fake source labels**: never call a derived subset `Table N`/`Figure N` unless it faithfully reproduces the original
 9. **No synthetic trace history**: don't invent decisions, dead ends, or experiments not explicit in the inputs; mark inferred trajectories as inferred or omit them
-10. **Evidence-limited wording**: don't use stronger language than the evidence supports; separate observation from interpretation
+10. **Generalize, then bound — but only as far as the evidence separates**: a `Statement` is the generalized conclusion the evidence supports (a mechanism/relationship, no run numbers), held accountable by an explicit `Conditions` regime, a substantive `Falsification criteria` (about the system, or about the benchmark's behavior for a methodological claim), and grounded `Proof` — not by narrowing the sentence to a single measured value. Calibrate the verb to what the design actually disentangles: don't claim a distinction that is confounded in the source, or a law from one instance — hedge it in the Statement, not just in `Conditions`. Still separate observation from interpretation: the numbers stay in the evidence layer, reached via `Proof`/`Evidence basis`
 11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
 12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
