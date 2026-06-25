@@ -53,6 +53,8 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 ### logic/experiments.md
 - Has `## E\d+` blocks (at least 3)
 - Contains `**Verifies**`
+- Contains `**Evidence**` (link to where the run's results are filed, or "pending")
+- Contains `**Run**` (what produced the run — a `src/execution/` file or a link/ref into the source repo/DB; failed/ablated runs are linked too, not omitted)
 - Contains `**Setup**`
 - Contains `**Procedure**`
 - Contains `**Expected outcome**` or `**Expected results**`
@@ -155,6 +157,13 @@ For each file in `evidence/figures/*.md` specifically:
 
 ### Experiment Verifies → Claim Resolution
 - Every `C\d+` in an experiment's `**Verifies**` must exist in claims.md
+
+### Experiment Evidence / Run → Resolution
+- Every `evidence/…` path in an experiment's `**Evidence**` is a filed evidence file (or "pending")
+- Every experiment carries a `**Run**` ref — a real `src/execution/` file or a link/ref into the source repo/DB; failed/ablated runs are linked, not dropped
+
+### Claim Dependencies → Claim Resolution
+- Every `C\d+` in a claim's `**Dependencies**` must exist in claims.md (an unresolved ID FAILS)
 
 ### Heuristic Code Ref → File Resolution (only when heuristics.md + src/execution/ are both present)
 - Every `src/...` path in `**Code ref**: [...]` must be an existing file

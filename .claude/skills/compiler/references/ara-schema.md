@@ -166,7 +166,7 @@ Each claim MUST have ALL fields:
 - **Falsification criteria**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. Not a tautology or a re-run of the same gate}
 - **Proof**: [{experiment IDs: E01, E02}]
 - **Evidence basis**: {what the cited evidence shows — point to it; do NOT restate run numbers in the Statement}
-- **Dependencies**: {other claim IDs, if any}
+- **Dependencies**: {claim IDs this one rests on — the narrower claims a more general claim draws on, or a claim it corrects/refines; not mere shared setup; omit if it rests only on its own evidence}
 - **Tags**: {comma-separated keywords}
 ```
 
@@ -186,6 +186,16 @@ licenses a mechanism `Statement`; what is forbidden is extrapolating it into a u
 its regime, or asserting a distinction the design cannot disentangle. Put that boundary in
 `Conditions` — it bounds *where* the claim holds and is not a license for the verb to over-reach.
 `Conditions` carries the limits so the `Statement` can carry the mechanism.
+
+**A claim's evidence may be one result or several read together.** Most claims distill what a single
+result reveals; but where several experiments together reveal a relationship none shows alone —
+whether they agree on it, or differ in a way that itself reveals what bounds or explains the
+difference — that relationship is the claim. Write it as an ordinary `## C` block whose `Proof` lists
+every experiment it draws on and whose `Dependencies` names the narrower claims it rests on; the same
+distill-the-mechanism, bound-the-reach discipline applies. State the most general relationship the
+evidence supports — bounded by `Conditions`, never asserted past what those experiments jointly show —
+rather than settling for one claim per experiment. A claim need not be about the object under study:
+a reusable relationship the work itself exposes, including in how it was run, is worth a claim.
 
 **The attribution trap (the most common miss).** An ablation / leave-one-out that shows *which*
 components dominate is the *evidence*, not the claim. A Statement that merely names the load-bearing
@@ -213,11 +223,15 @@ borrowed terms to reach 5 (Rule 14). One section per concept:
 
 ## logic/experiments.md
 
-≥3 experiments. Declarative plans, NOT scripts. NO exact numerical results.
+≥3 experiments. Declarative plans, NOT scripts. NO exact numerical results. Experiments and claims
+are **many-to-many**: one experiment may verify several claims, and a claim that generalises across
+runs lists every experiment it draws on in its `Proof` — do not force a 1:1 claim↔experiment ledger.
 
 ```markdown
 ## E{NN}: {Short title}
-- **Verifies**: {claim IDs, e.g., C01, C02}
+- **Verifies**: {claim IDs this run bears on — may be several}
+- **Evidence**: {evidence file(s) where this run's results are recorded — `evidence/…`; "pending" if not yet filed}
+- **Run**: {what produced this result — a `src/execution/` file (or other `src/` artifact) when captured, else a link/ref into the source repo or run database; give it for EVERY experiment, including failed or ablated runs}
 - **Setup**:
   - Model: {model name and size}
   - Hardware: {GPU type, count, memory}
@@ -312,6 +326,11 @@ explicit pseudocode/equations the paper prints. When a repo is provided, capture
 source files here in native form (transcribed) — not merely a stub of the novel mechanism; when only
 pseudocode/equations exist, the reconstructed stub captures the **novel mechanism**. Either way it
 must be grounded — never fabricated.
+
+When the input is a run database / repo of many experiment runs, capture the source for the runs and
+link EVERY experiment to its run via the experiment's `Run` field — the final or successful runs
+transcribed as files, and the failed, ablated, or dead-end runs at least linked or ref'd into the
+source database. Capturing only the final/successful run is incomplete.
 
 Every file declares its grounding on the first line:
 ```python

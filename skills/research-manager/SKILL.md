@@ -15,7 +15,7 @@ argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.3.0"
+  version: "2.4.0"
   tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management]
 ---
 
@@ -189,7 +189,12 @@ entries — staged observations belong to Stage 3. (History lives in the trace; 
    never the Statement. A rewrite re-grounds every number it now contains (Number grounding);
    any changed value gets its own fresh `Sources` «quote», never a carried-over one.
 3. **Structural changes** — split a claim into two, merge duplicates, repair
-   dependencies, rename ids when concepts are renamed.
+   dependencies, rename ids when concepts are renamed. Also **generalize**: when several
+   crystallized claims are together evidence for a more general relationship none states
+   alone, author a new claim whose `Dependencies` are those narrower claims and whose
+   `Proof` spans their evidence — keep the narrower claims in place; the new claim sits
+   above them, not instead of them (only when a signal this turn makes the relationship
+   evident — never a routine sweep).
 4. **Consistency pass** — scan for broken cross-references (claim cites C05 which no
    longer exists), terminology mismatch with `concepts.md`, dependency loops.
 
@@ -259,6 +264,8 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
      new id for the spin-off, update all cross-references.
    - **Merge**: keep the lower id, mark the higher id as `withdrawn` with
      `Merged into: C{XX}`, redirect cross-references.
+   - **Generalize**: allocate a new id for the more general claim, set its `Dependencies`
+     to the narrower claims, and leave those claims in place (they remain its grounding).
 6. **Record full before/after in today's session record** under `logic_revisions:`
    (see schema below). This is the ONLY place the prior wording is preserved — the
    logic file does not keep it.

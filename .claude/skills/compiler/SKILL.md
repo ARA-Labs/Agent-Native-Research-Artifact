@@ -123,7 +123,11 @@ Map the atoms into `/logic/`:
 - **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). A claim's job
   is the **takeaway, not the record**. Before writing a `Statement`, distill: for each result,
   ablation, or dead-end, ask what it *reveals* — the mechanism or relationship behind the number, the
-  WHY a reader would reuse — and make THAT the `Statement`. The recipe name, run IDs, and numbers are
+  WHY a reader would reuse — and make THAT the `Statement`. Look across results too, not one at a
+  time: where several experiments together reveal a relationship none shows alone — whether they
+  agree on it or differ in a way that reveals what bounds it — make THAT relationship the claim
+  (`Proof` spanning them, `Dependencies` the narrower claims it rests on), rather than settling for
+  one claim per experiment. The recipe name, run IDs, and numbers are
   the evidence *for* the takeaway, not the takeaway itself: they live in `Evidence basis`/`Proof`,
   referenced and never restated in the Statement. A `Statement`'s subject is a mechanism/relationship,
   never a named recipe/config/run, and carries no run numbers, scores, step counts, or p-values. Bound
@@ -146,7 +150,10 @@ Map the atoms into `/logic/`:
 - **concepts.md**: the paper's genuine technical terms, formally defined
 - **experiments.md**: declarative verification/analysis plans (NO exact numbers — directional
   only). "Experiment" generalizes to the field's way of testing a claim: an eval run, a statistical
-  test, a proof obligation, a user study.
+  test, a proof obligation, a user study. Link each experiment to where its results are filed
+  (`Evidence`) and to what produced it (`Run`, including failed/ablated runs). Claims and experiments
+  are many-to-many — a claim that generalises across runs lists every experiment in its `Proof`;
+  don't mirror one experiment per claim.
 - **solution/**: the method layer — `constraints.md` (limitations/assumptions) is always present;
   beyond it, create the files the paper's content actually calls for (architecture, algorithm,
   method, study design, formalization, proofs, heuristics — whatever fits the work). You decide
