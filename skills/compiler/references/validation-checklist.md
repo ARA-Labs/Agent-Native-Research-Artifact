@@ -160,7 +160,7 @@ For each file in `evidence/figures/*.md` specifically:
 
 ### Experiment Evidence / Run → Resolution
 - Every `evidence/…` path in an experiment's `**Evidence**` is a filed evidence file (or "pending")
-- Every experiment carries a `**Run**` ref — a real `src/execution/` file or a link/ref into the source repo/DB; failed/ablated runs are linked, not dropped
+- Every experiment carries a `**Run**` ref — a real `src/execution/` file or an entry in the run ledger `src/execution/artifacts.md` that links the source-DB location; failed/ablated runs are linked there, not dropped
 
 ### Claim Dependencies → Claim Resolution
 - Every `C\d+` in a claim's `**Dependencies**` must exist in claims.md (an unresolved ID FAILS)

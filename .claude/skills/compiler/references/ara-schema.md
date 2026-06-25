@@ -327,10 +327,12 @@ source files here in native form (transcribed) — not merely a stub of the nove
 pseudocode/equations exist, the reconstructed stub captures the **novel mechanism**. Either way it
 must be grounded — never fabricated.
 
-When the input is a run database / repo of many experiment runs, capture the source for the runs and
-link EVERY experiment to its run via the experiment's `Run` field — the final or successful runs
-transcribed as files, and the failed, ablated, or dead-end runs at least linked or ref'd into the
-source database. Capturing only the final/successful run is incomplete.
+When the input is a run database / repo of many experiment runs, index them in a **run ledger at
+`src/execution/artifacts.md`** — one entry per run (its id/label, status, and source link) — with each
+experiment's `Run` field pointing at its entry. The final or successful runs are transcribed as
+`src/execution/` files (the ledger links them); the failed, ablated, or dead-end runs are ledger
+entries that link/ref the source-database location — never a fabricated per-run stub. Capturing only
+the final/successful run is incomplete.
 
 Every file declares its grounding on the first line:
 ```python
@@ -370,7 +372,9 @@ artifacts here — grounded in the actual repo/files when a repo is provided. On
 source files, copy those files into `src/execution/` in native form (`# Grounding: transcribed`,
 cite path); do not reduce them to a prose block here. `artifacts.md` covers only deliverables with
 no capturable source — released binaries, natural-language skill/spec docs, datasets referenced by
-location. Naming a real `.py`/`.js`/… file here instead of capturing it is a coverage failure.
+location. Naming a real `.py`/`.js`/… file here instead of capturing it is a coverage failure. For an
+index of experiment **runs** (incl. failed/ablated/dead-end), use the run ledger
+`src/execution/artifacts.md` instead of this file.
 
 ```markdown
 ## {Artifact name}
