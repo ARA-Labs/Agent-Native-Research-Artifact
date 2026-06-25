@@ -120,16 +120,21 @@ For non-trivial figures (dense plots, log axes, multi-panel, anything needing re
 **Stage 2 — Cognitive Mapping**
 Map the atoms into `/logic/`:
 - **problem.md**: observations (with numbers) → gaps → key insight → assumptions
-- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). Phrase each
-  `Statement` as the **generalized conclusion** the evidence supports — a mechanism/relationship as
-  subject, carrying NO run numbers — and bound it with a `Conditions` field (the regime + the
-  untested boundary). Keep numbers in `Evidence basis`/`Proof` and reference them, never restate them
-  in the Statement. Don't upgrade a validation-metric result into a claim about training dynamics
-  without training-side evidence; let `Conditions` and a substantive `Falsification criteria` (about
-  the system for a mechanism claim, about the benchmark's behavior for a methodological one) carry the
-  accountability that a narrowed sentence used to. Calibrate the Statement's strength to what the
-  evidence actually separates — don't assert a distinction the design confounds, or a law from a
-  single instance; hedge that in the Statement, not only in `Conditions`.
+- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). A claim's job
+  is the **takeaway, not the record**. Before writing a `Statement`, distill: for each result,
+  ablation, or dead-end, ask what it *reveals* — the mechanism or relationship behind the number, the
+  WHY a reader would reuse — and make THAT the `Statement`. The recipe name, run IDs, and numbers are
+  the evidence *for* the takeaway, not the takeaway itself: they live in `Evidence basis`/`Proof`,
+  referenced and never restated in the Statement. A `Statement`'s subject is a mechanism/relationship,
+  never a named recipe/config/run, and carries no run numbers, scores, step counts, or p-values. Bound
+  every Statement with a `Conditions` field (the regime + the untested boundary) and a substantive
+  `Falsification criteria` (about the system for a mechanism claim, about the benchmark's behavior for
+  a methodological one) — this accountability, not a narrowed sentence, is what keeps a generalized
+  claim honest. Don't upgrade a validation-metric result into a claim about training dynamics without
+  training-side evidence. Stating the mechanism a result reveals is the goal **even from a single
+  instance** — what you must NOT do is extrapolate it into a universal law beyond its regime, or
+  assert a distinction the design cannot disentangle; that limit goes in `Conditions` so the
+  `Statement` can still carry the mechanism rather than collapsing back to a recipe-and-number.
   **Ground every load-bearing number in a claim like code** (the `# Grounding` discipline,
   applied to numbers): before writing it, open its source and copy the matched line verbatim into a
   `**Sources**` entry — `<value> ← <source ref> «matched line» [input]` for values that were set
@@ -224,7 +229,7 @@ Run ARA Seal Level 1. Check:
 - Mandatory-core dirs exist (`logic/`, `logic/solution/`, `src/`, `trace/`, `evidence/`) and all
   mandatory-core files exist and are non-empty
 - PAPER.md has valid frontmatter (title, authors, year) + a Layer Index
-- claims.md has C01+ blocks with Statement, Conditions, Status, Falsification criteria, Proof; Statement is a generalized mechanism/relationship (no run numbers), Conditions non-trivial
+- claims.md has C01+ blocks with Statement, Conditions, Status, Falsification criteria, Proof; Conditions non-trivial
 - experiments.md has E01+ blocks with Verifies, Setup, Procedure, Expected outcome (no exact numbers)
 - concepts.md, related_work.md, constraints.md non-trivial; any heuristics blocks have Rationale,
   Sensitivity, Bounds
@@ -241,6 +246,11 @@ Run ARA Seal Level 1. Check:
 - **Cited locations verified** (Rule 15): every repo path/`file:line` exists and is in range;
   spot-check that trace `source_refs` and evidence `Source` actually contain the cited content; no
   repo fact transcribed from the paper without checking the real file
+- **Statement is a takeaway, not a record** — its own dedicated FAIL pass, symmetric to the
+  number-sources pass: scan EVERY claim's `Statement`. It FAILS if the Statement's subject is a named
+  recipe/config/run, or if the Statement contains a run number, n-count, score, step/bin count, or
+  p-value. Such a claim is a leaderboard coordinate, not knowledge — the mechanism it reveals must
+  become the Statement and the numbers move to `Evidence basis`/`Proof`. Exhaustive, not spot-checked
 - **Number sources bound** (claims & heuristics) — run this as its own dedicated pass, one job: for
   *each* `**Sources**` entry, re-open the cited `file:line` (or trace `node:field`) and confirm the
   verbatim «quote» is actually there and the number in the `Statement`/`Rationale` matches the value
@@ -272,7 +282,7 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 7. **"Not specified"**: if information is genuinely unavailable, write "Not specified in paper" — never guess
 8. **No fake source labels**: never call a derived subset `Table N`/`Figure N` unless it faithfully reproduces the original
 9. **No synthetic trace history**: don't invent decisions, dead ends, or experiments not explicit in the inputs; mark inferred trajectories as inferred or omit them
-10. **Generalize, then bound — but only as far as the evidence separates**: a `Statement` is the generalized conclusion the evidence supports (a mechanism/relationship, no run numbers), held accountable by an explicit `Conditions` regime, a substantive `Falsification criteria` (about the system, or about the benchmark's behavior for a methodological claim), and grounded `Proof` — not by narrowing the sentence to a single measured value. Calibrate the verb to what the design actually disentangles: don't claim a distinction that is confounded in the source, or a law from one instance — hedge it in the Statement, not just in `Conditions`. Still separate observation from interpretation: the numbers stay in the evidence layer, reached via `Proof`/`Evidence basis`
+10. **Distill the takeaway, then bound it**: a `Statement` is the mechanism or relationship a result reveals — the reusable WHY — with the named recipe and its numbers demoted to `Evidence basis`/`Proof`, never restated in the sentence and never its subject. Keep it accountable by an explicit `Conditions` regime, a substantive `Falsification criteria` (about the system, or about the benchmark's behavior for a methodological claim), and grounded `Proof` — not by narrowing the sentence to a measured value. A single instance still licenses a mechanism `Statement`: what is forbidden is extrapolating it into a universal law beyond its regime, or asserting a distinction the design cannot disentangle — those limits go in `Conditions`, they do not shrink the Statement back to a recipe-and-number. Still separate observation from interpretation: the numbers stay in the evidence layer, reached via `Proof`/`Evidence basis`
 11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
 12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)

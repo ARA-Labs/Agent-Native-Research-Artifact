@@ -65,6 +65,7 @@ resolution, field presence, YAML parsing) is handled entirely by Level 1.
 |-------|---------------|-----------------|
 | Over-claiming | Statement uses universal scope while evidence covers narrow conditions | critical if extreme, major if moderate |
 | Under-claiming | Evidence files or experiment results not captured by any claim | minor |
+| Attribution vs mechanism | Statement names which components rank where (name-deletion test leaves nothing transferable) instead of what the ranking reveals | major |
 | Assumption explicitness | Key assumptions stated in problem.md or constraints.md | major if unstated assumptions affect validity |
 | Generalization boundaries | Artifact states what claims do NOT apply to | minor |
 | Qualifier consistency | Hedging language matches evidence strength | minor |
