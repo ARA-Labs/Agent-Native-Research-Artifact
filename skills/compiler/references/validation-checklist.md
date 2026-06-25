@@ -35,14 +35,15 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 
 ### logic/claims.md
 - Has `## C\d+` blocks (at least one claim)
-- Contains `**Statement**`
-- Contains `**Sources**`; every load-bearing number in a `Statement` has a `Sources` entry carrying
+- Contains `**Statement**` (the mechanism/takeaway a result reveals — subject is a mechanism/relationship, never a named recipe; no run numbers)
+- Contains `**Conditions**` (non-trivial: the regime + the untested boundary)
+- Contains `**Sources**`; every load-bearing number in a claim has a `Sources` entry carrying
   a verbatim «quote» plus an `[input]`/`[result]` tag — no bare-path entries, no memory-filled numbers
 - Contains `**Status**`
-- Contains `**Falsification criteria**`
+- Contains `**Falsification criteria**` (a substantive observation — about the system, or about the benchmark's behavior for a methodological claim — not a tautology or a re-run of a metric gate)
+- `Statement` is the mechanism/takeaway a result reveals, not a record: a single instance may state the mechanism it reveals, but must not be extrapolated into a universal law beyond its regime, nor assert a distinction the design cannot disentangle — those limits live in `Conditions`
 - Contains `**Proof**`
 - Contains `**Evidence basis**`
-- Contains `**Interpretation**`
 
 ### logic/problem.md
 - Has `### O\d+` blocks (observations)
@@ -52,6 +53,8 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 ### logic/experiments.md
 - Has `## E\d+` blocks (at least 3)
 - Contains `**Verifies**`
+- Contains `**Evidence**` (link to where the run's results are filed, or "pending")
+- Contains `**Run**` (what produced the run — a `src/execution/` file or a link/ref into the source repo/DB; failed/ablated runs are linked too, not omitted)
 - Contains `**Setup**`
 - Contains `**Procedure**`
 - Contains `**Expected outcome**` or `**Expected results**`
@@ -89,9 +92,10 @@ fewer passes with fewer; what fails is fabricated filler.
 - `src/execution/`: ≥1 `.py` file only when the work has implementable content (repo code / paper pseudocode / named interface). NOT mandatory otherwise; omitting it (with a note in `environment.md`) beats fabricating one.
 - `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: contains the filed evidence (see §11)
 
-### Implementation layer (`src/`) — captured, not re-encoded
-- Concrete artifacts that exist are captured in native form: prompts/templates verbatim in `src/prompts/`, **real repo source code captured into `src/execution/`** (native form, `# Grounding: transcribed`, cite path — not reduced to a pointer), non-code deliverables (released binaries, skill/spec docs, referenced datasets) described in `src/artifacts.md`, config values in `src/configs/`. A lone `environment.md` is wrong when such artifacts exist.
-- **When a code repo/directory was provided as input**: every non-trivial runnable source file in it (a named module, entrypoint, or roughly ≥30 lines) is captured into `src/execution/` (or another `src/` subdir, in native form), not merely named in `artifacts.md`. FAIL on real source code represented only by a pointer, or a set of real files dismissed collectively (e.g. "not a core contribution") without capture.
+### Implementation layer (`src/`) — indexed when external, captured when it'd be lost
+- Concrete artifacts are represented losslessly: prompts/templates verbatim in `src/prompts/`, config values in `src/configs/`, and — when the work's code/runs **persist in a linkable external store** — a **comprehensive pointer index** in `src/artifacts.md` linking every artifact. A lone `environment.md` is wrong when such artifacts exist.
+- **Comprehensiveness** (external repo/run-database input): `src/artifacts.md` links **every** run and source file (per-run logs included — a `runs.jsonl` counts), nothing aggregated into a bare directory link or a "~N others" summary. FAIL on a lossy subset (only the winning run; real artifacts collapsed into a vague bucket).
+- **Capture only when it'd be lost**: transcribe source into `src/execution/` (native form, `# Grounding: transcribed`, cite path) only when it exists solely inside the paper or its source is not externally persisted. Pointer-only is correct when the source persists; it FAILS only when the pointer would dangle (no persisted source).
 - Conversely, a prose-only method (no code, no prompt, no config values) is NOT re-encoded as a `.py` stub or pseudo-code — it lives in `logic/solution/`; a lone `environment.md` is correct here. FAIL on a `.py` stub manufactured from prose (it just duplicates the cognitive layer).
 
 ### Code grounding (each `src/execution/*.py`, when present)
@@ -150,10 +154,17 @@ For each file in `evidence/figures/*.md` specifically:
 ### Claim Proof → Experiment Resolution
 - Every `E\d+` in a claim's `**Proof**: [...]` must exist in experiments.md
 - Proof-linked experiments should have evidence files whose labels and row contents actually match the compared systems or measurements
-- Claim wording should be auditable against `Evidence basis`; broader language should be isolated to `Interpretation`
+- Claim `Statement` is a generalized mechanism/relationship auditable against `Evidence basis`; its reach is bounded by `Conditions` and its run numbers live in the evidence layer (not pasted into the Statement)
 
 ### Experiment Verifies → Claim Resolution
 - Every `C\d+` in an experiment's `**Verifies**` must exist in claims.md
+
+### Experiment Evidence / Run → Resolution
+- Every `evidence/…` path in an experiment's `**Evidence**` is a filed evidence file (or "pending")
+- Every experiment carries a `**Run**` ref — an entry in the comprehensive `src/artifacts.md` index (or, in the capture-fallback case, a `src/execution/` file) that links the source location; failed/ablated runs are linked there, not dropped
+
+### Claim Dependencies → Claim Resolution
+- Every `C\d+` in a claim's `**Dependencies**` must exist in claims.md (an unresolved ID FAILS)
 
 ### Heuristic Code Ref → File Resolution (only when heuristics.md + src/execution/ are both present)
 - Every `src/...` path in `**Code ref**: [...]` must be an existing file
@@ -174,6 +185,19 @@ For each file in `evidence/figures/*.md` specifically:
 - No fact ABOUT a repo artifact (line count, path, internal structure) is transcribed from the paper without checking the real file — when paper and repo disagree, the discrepancy is flagged, not silently resolved to the paper's number
 - Spot-check trace `source_refs` and evidence `**Source**` labels: the cited section/table/appendix actually contains the claimed content
 - A statistic carries its scope/denominator (N, population) in its `Source` — subset figures (e.g. "5 papers / 3,050 reqs") are not juxtaposed with full-corpus figures as if same-denominator
+- **Claim Statements are takeaways** (exhaustive, not spot-checked — symmetric to the number-sources
+  pass): each `## C\d+` Statement FAILS if its subject is a named recipe/config/run, or if it
+  contains a run number, n-count, score, step/bin count, or p-value. The mechanism a result reveals
+  must be the subject; the numbers must live in `Evidence basis`/`Proof`
+- **Attribution is not insight** (exhaustive, applied to each Statement that already passed the
+  takeaways gate above): a Statement also FAILS if it only identifies *which* named components of
+  this one system rank highest/lowest (load-bearing / dominant / decorative / inert / "largest
+  contributor") without stating what that ranking *reveals* — a relationship or mechanism a reader
+  could carry to a different system. **Operational tell: delete this system's component names from
+  the Statement; if no transferable relationship survives, it is attribution, not a mechanism — it
+  FAILS.** The fix is to state the generalization the ranking licenses; the named components and
+  their deltas stay in `Evidence basis`. This is the most common way a numerically-clean Statement
+  still fails the insight bar.
 - **Claim/heuristic number sources** (exhaustive, not spot-checked): each `**Sources**` entry's cited
   `file:line` (or trace `node:field`) exists, the verbatim «quote» is actually present there, and the
   number in the `Statement`/`Rationale` matches the value inside that quote; `[input]` entries cite

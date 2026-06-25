@@ -72,7 +72,7 @@ What KIND of event is this?
       → ai-action  [session record only]
 
   Interpretation (something asserted to be true / general)?
-    Falsifiable assertion about the system?
+    Generalizable falsifiable assertion (a mechanism/relationship, bounded by conditions)?
       → STAGE as potential_type: claim
     Implementation rule with rationale?
       → STAGE as potential_type: heuristic

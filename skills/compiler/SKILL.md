@@ -120,11 +120,26 @@ For non-trivial figures (dense plots, log axes, multi-panel, anything needing re
 **Stage 2 — Cognitive Mapping**
 Map the atoms into `/logic/`:
 - **problem.md**: observations (with numbers) → gaps → key insight → assumptions
-- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). Phrase each
-  `Statement` at the strongest level the cited evidence directly supports; keep raw support in
-  `Evidence basis` and broader synthesis in `Interpretation`. Don't upgrade a validation-metric
-  result into a claim about training dynamics without training-side evidence.
-  **Ground every load-bearing number in a `Statement` like code** (the `# Grounding` discipline,
+- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). A claim's job
+  is the **takeaway, not the record**. Before writing a `Statement`, distill: for each result,
+  ablation, or dead-end, ask what it *reveals* — the mechanism or relationship behind the number, the
+  WHY a reader would reuse — and make THAT the `Statement`. Look across results too, not one at a
+  time: where several experiments together reveal a relationship none shows alone — whether they
+  agree on it or differ in a way that reveals what bounds it — make THAT relationship the claim
+  (`Proof` spanning them, `Dependencies` the narrower claims it rests on), rather than settling for
+  one claim per experiment. The recipe name, run IDs, and numbers are
+  the evidence *for* the takeaway, not the takeaway itself: they live in `Evidence basis`/`Proof`,
+  referenced and never restated in the Statement. A `Statement`'s subject is a mechanism/relationship,
+  never a named recipe/config/run, and carries no run numbers, scores, step counts, or p-values. Bound
+  every Statement with a `Conditions` field (the regime + the untested boundary) and a substantive
+  `Falsification criteria` (about the system for a mechanism claim, about the benchmark's behavior for
+  a methodological one) — this accountability, not a narrowed sentence, is what keeps a generalized
+  claim honest. Don't upgrade a validation-metric result into a claim about training dynamics without
+  training-side evidence. Stating the mechanism a result reveals is the goal **even from a single
+  instance** — what you must NOT do is extrapolate it into a universal law beyond its regime, or
+  assert a distinction the design cannot disentangle; that limit goes in `Conditions` so the
+  `Statement` can still carry the mechanism rather than collapsing back to a recipe-and-number.
+  **Ground every load-bearing number in a claim like code** (the `# Grounding` discipline,
   applied to numbers): before writing it, open its source and copy the matched line verbatim into a
   `**Sources**` entry — `<value> ← <source ref> «matched line» [input]` for values that were set
   (cite where they're defined), `[result]` for values a run produced (cite the log/output that
@@ -135,7 +150,10 @@ Map the atoms into `/logic/`:
 - **concepts.md**: the paper's genuine technical terms, formally defined
 - **experiments.md**: declarative verification/analysis plans (NO exact numbers — directional
   only). "Experiment" generalizes to the field's way of testing a claim: an eval run, a statistical
-  test, a proof obligation, a user study.
+  test, a proof obligation, a user study. Link each experiment to where its results are filed
+  (`Evidence`) and to what produced it (`Run`, including failed/ablated runs). Claims and experiments
+  are many-to-many — a claim that generalises across runs lists every experiment in its `Proof`;
+  don't mirror one experiment per claim.
 - **solution/**: the method layer — `constraints.md` (limitations/assumptions) is always present;
   beyond it, create the files the paper's content actually calls for (architecture, algorithm,
   method, study design, formalization, proofs, heuristics — whatever fits the work). You decide
@@ -152,8 +170,11 @@ whichever layer fits best, preserving the source's granularity. Never silently d
 or released form, *distinct from the prose that describes it*. `src/environment.md` is always
 required (reproducibility). Beyond it, one rule decides everything:
 
-> **Capture every concrete artifact the source actually contains, in its native form; never
-> re-encode a prose-only description as code.**
+> **Represent every concrete artifact losslessly. When it persists in a linkable external store (a
+> run database, a released/versioned repo), point to it — a comprehensive `src/artifacts.md` index,
+> one link per artifact (every run, config, log, script), nothing aggregated or copied. Capture it
+> into `src/execution/` only when it would otherwise be lost — code that lives solely inside the
+> paper, or a source not externally persisted. Never re-encode a prose-only description as code.**
 
 A concrete artifact is real content the cognitive layer doesn't already hold — capture it (grounded
 in the real repo/files when provided), in whatever directory fits. But a method conveyed only in
@@ -218,7 +239,7 @@ Run ARA Seal Level 1. Check:
 - Mandatory-core dirs exist (`logic/`, `logic/solution/`, `src/`, `trace/`, `evidence/`) and all
   mandatory-core files exist and are non-empty
 - PAPER.md has valid frontmatter (title, authors, year) + a Layer Index
-- claims.md has C01+ blocks with Statement, Status, Falsification criteria, Proof
+- claims.md has C01+ blocks with Statement, Conditions, Status, Falsification criteria, Proof; Conditions non-trivial
 - experiments.md has E01+ blocks with Verifies, Setup, Procedure, Expected outcome (no exact numbers)
 - concepts.md, related_work.md, constraints.md non-trivial; any heuristics blocks have Rationale,
   Sensitivity, Bounds
@@ -235,6 +256,11 @@ Run ARA Seal Level 1. Check:
 - **Cited locations verified** (Rule 15): every repo path/`file:line` exists and is in range;
   spot-check that trace `source_refs` and evidence `Source` actually contain the cited content; no
   repo fact transcribed from the paper without checking the real file
+- **Statement is a takeaway, not a record** — its own dedicated FAIL pass, symmetric to the
+  number-sources pass: scan EVERY claim's `Statement`. It FAILS if the Statement's subject is a named
+  recipe/config/run, or if the Statement contains a run number, n-count, score, step/bin count, or
+  p-value. Such a claim is a leaderboard coordinate, not knowledge — the mechanism it reveals must
+  become the Statement and the numbers move to `Evidence basis`/`Proof`. Exhaustive, not spot-checked
 - **Number sources bound** (claims & heuristics) — run this as its own dedicated pass, one job: for
   *each* `**Sources**` entry, re-open the cited `file:line` (or trace `node:field`) and confirm the
   verbatim «quote» is actually there and the number in the `Statement`/`Rationale` matches the value
@@ -266,11 +292,11 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 7. **"Not specified"**: if information is genuinely unavailable, write "Not specified in paper" — never guess
 8. **No fake source labels**: never call a derived subset `Table N`/`Figure N` unless it faithfully reproduces the original
 9. **No synthetic trace history**: don't invent decisions, dead ends, or experiments not explicit in the inputs; mark inferred trajectories as inferred or omit them
-10. **Evidence-limited wording**: don't use stronger language than the evidence supports; separate observation from interpretation
+10. **Distill the takeaway, then bound it**: a `Statement` is the mechanism or relationship a result reveals — the reusable WHY — with the named recipe and its numbers demoted to `Evidence basis`/`Proof`, never restated in the sentence and never its subject. Keep it accountable by an explicit `Conditions` regime, a substantive `Falsification criteria` (about the system, or about the benchmark's behavior for a methodological claim), and grounded `Proof` — not by narrowing the sentence to a measured value. A single instance still licenses a mechanism `Statement`: what is forbidden is extrapolating it into a universal law beyond its regime, or asserting a distinction the design cannot disentangle — those limits go in `Conditions`, they do not shrink the Statement back to a recipe-and-number. Still separate observation from interpretation: the numbers stay in the evidence layer, reached via `Proof`/`Evidence basis`
 11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
 12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
-14. **`src/` holds concrete artifacts, not re-encoded prose**: capture every concrete artifact the source actually contains, in its native form, grounded in real files. Three sides: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, so a `.py` just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work has one; (c) when the input provides a repo or code directory, every real runnable source file is **captured into `src/execution/`** in its native form (any language; `# Grounding: transcribed`, cite repo path) — NOT reduced to a pointer in `artifacts.md`. `artifacts.md` is only for deliverables with no capturable source (released binaries, natural-language skill/spec docs, datasets referenced by location), never a shortcut to avoid copying code that exists. No code in the input → (c) does not apply.
+14. **`src/` holds concrete artifacts, not re-encoded prose**: capture every concrete artifact the source actually contains, in its native form, grounded in real files. Three sides: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, so a `.py` just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work has one; (c) when the work's artifacts **persist in a linkable external store** (a run database, a released or versioned repo), represent them as a **comprehensive pointer index** in `src/artifacts.md` — one link per artifact (every run, config, log, script), nothing aggregated into a vague bucket, nothing copied; a lossy subset-copy is the failure. **Transcribe real source into `src/execution/` only when it would otherwise be lost** — code that lives solely inside the paper, or a source not externally persisted (then `# Grounding: transcribed`, cite path). No implementation in the input → neither applies.
 15. **Source-bounded minimums**: any count or required field is a target, never a license to invent. If the source supports fewer, produce what is real and note the shortfall; for an unstated field write "Not specified in paper" rather than guessing
 16. **Cite by verification, and ask on conflict**: a source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line`/path) promises the cited location actually contains the claim — open it and confirm. Never transcribe a *description* of an artifact as a verified fact about it. **When the code repo and the paper disagree on a fact (line count, path, value, behavior), do NOT pick one silently — surface the conflict to the user and ask which source to follow.** If unverifiable and the user is unavailable, attribute it ("per §X") or omit. Carry a statistic's scope/denominator in its `Source`. **This extends to every load-bearing number in a claim/heuristic `Statement`/`Rationale`: it carries a `**Sources**` entry whose verbatim «quote» you opened and confirmed contains that value — a memory-filled value or a bare path is fabrication; use `[pending]` when you cannot open the source**
 

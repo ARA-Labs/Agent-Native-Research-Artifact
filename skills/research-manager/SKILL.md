@@ -15,7 +15,7 @@ argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.3.0"
+  version: "2.4.0"
   tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management]
 ---
 
@@ -184,10 +184,17 @@ entries — staged observations belong to Stage 3. (History lives in the trace; 
 1. **Status updates** — flip a claim's `Status` field when evidence warrants.
 2. **Content revisions** — rewrite a `Statement`, `Rationale`, or definition when new
    evidence narrows scope, terminology changed, or wording no longer matches what's
-   actually supported. A rewrite re-grounds every number it now contains (Number grounding);
+   actually supported. Keep `Statement` a generalized mechanism/relationship and sharpen
+   `Conditions` as the regime becomes clearer; new run numbers update `Proof`/`evidence`,
+   never the Statement. A rewrite re-grounds every number it now contains (Number grounding);
    any changed value gets its own fresh `Sources` «quote», never a carried-over one.
 3. **Structural changes** — split a claim into two, merge duplicates, repair
-   dependencies, rename ids when concepts are renamed.
+   dependencies, rename ids when concepts are renamed. Also **generalize**: when several
+   crystallized claims are together evidence for a more general relationship none states
+   alone, author a new claim whose `Dependencies` are those narrower claims and whose
+   `Proof` spans their evidence — keep the narrower claims in place; the new claim sits
+   above them, not instead of them (only when a signal this turn makes the relationship
+   evident — never a routine sweep).
 4. **Consistency pass** — scan for broken cross-references (claim cites C05 which no
    longer exists), terminology mismatch with `concepts.md`, dependency loops.
 
@@ -257,6 +264,8 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
      new id for the spin-off, update all cross-references.
    - **Merge**: keep the lower id, mark the higher id as `withdrawn` with
      `Merged into: C{XX}`, redirect cross-references.
+   - **Generalize**: allocate a new id for the more general claim, set its `Dependencies`
+     to the narrower claims, and leave those claims in place (they remain its grounding).
 6. **Record full before/after in today's session record** under `logic_revisions:`
    (see schema below). This is the ONLY place the prior wording is preserved — the
    logic file does not keep it.
@@ -361,17 +370,33 @@ tree:
 ### Claim (`logic/claims.md`) — crystallized only
 
 ```markdown
-## C{XX}: {title}
-- **Statement**: {current falsifiable assertion}
-- **Sources**: [{one entry per load-bearing number in `Statement`: `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
+## C{XX}: {generalized title — the takeaway, not a recipe name}
+- **Statement**: {the generalized, mechanistic conclusion; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
+- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
+- **Sources**: [{one entry per load-bearing number in the claim (now in `Conditions`/`Proof`): `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
 - **Status**: hypothesis | untested | testing | supported | weakened | refuted | withdrawn
 - **Provenance**: user | ai-suggested | user-revised
-- **Falsification criteria**: {what would disprove this}
-- **Proof**: [{evidence refs or "pending"}]
+- **Falsification**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. NOT a tautology or a re-run of the same gate ("if the recipe fails the gate")}
+- **Proof**: [{evidence refs (→ evidence/) or "pending"; run numbers/IDs/scores live HERE, not in Statement}]
 - **Dependencies**: [C{YY}, ...]
 - **Tags**: {comma-separated}
 - **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
 ```
+
+**The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,
+not a restatement of run numbers.** What keeps it falsifiable and honest is `Conditions` (the regime
+it holds in + the untested boundary) plus a `Falsification`, not a narrowed sentence. Numbers (run
+IDs, n, scores, step counts) belong in `Proof` → `evidence/` (grounded per Number grounding), never
+in `Statement`. `Conditions` is mandatory: a generalized Statement with no Conditions is an unbounded
+slogan.
+
+**Calibrate the Statement to what the evidence actually separates.** Do not assert a distinction the
+design cannot disentangle (confounded factors — e.g. matrix "shape" vs "role" when they co-vary), or
+a law from a single instance. When that's the case, hedge in the Statement itself — name the
+unseparated factors together, or say "shown once here" — rather than only burying it in `Conditions`.
+`Conditions` bounds *where* the claim applies; it is not a license for the Statement's verb to
+over-reach. The Statement/Conditions may be sharpened on a later turn (Stage 4 content revision) as
+the mechanism becomes clearer — no new closure signal is needed.
 
 Current-state snapshot only — no prior statements, no `From staging`/`Crystallized via`
 notes. Crystallization and every edit are recorded in the trace (`trace/sessions/…` under

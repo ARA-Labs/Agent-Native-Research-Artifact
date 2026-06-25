@@ -148,6 +148,7 @@ For each claim's Falsification criteria field:
 
 - **Over-claiming**: Does any Statement use universal scope markers ("all models", "any dataset", "state-of-the-art across all") while cited experiments cover only specific, narrow conditions? The gap must be substantial.
 - **Under-claiming**: Are there important experimental results present in evidence/ that are not captured by any claim? (Evidence without a corresponding claim.)
+- **Attribution vs mechanism**: Does any Statement merely name *which* components of this one system rank highest/lowest (load-bearing, dominant, decorative, inert) without stating what that ranking *reveals*? Apply the name-deletion test — strike the system's component names; if no transferable relationship survives, the Statement is attribution, not insight. Flag as `major` (the claim is a league table of this system, not a reusable finding); suggest the generalization the ranking licenses.
 - **Assumption explicitness**: Are key assumptions stated in problem.md (Assumptions section) or constraints.md? Are there unstated assumptions implied by the experimental design?
 - **Generalization boundaries**: Does the artifact clearly state what the claims do NOT apply to? Check constraints.md and limitations in the exploration tree.
 - **Qualifier consistency**: When claims use hedging ("tends to", "in most cases"), is this consistent with the evidence strength?
