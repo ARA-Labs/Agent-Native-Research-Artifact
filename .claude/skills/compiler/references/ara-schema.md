@@ -321,18 +321,19 @@ field format:
 
 ## src/execution/{module}.py  (when the work warrants it — grounded or absent)
 
-Present only when the source provides **concrete code-shaped content**: actual repo code, or
-explicit pseudocode/equations the paper prints. When a repo is provided, capture its real runnable
-source files here in native form (transcribed) — not merely a stub of the novel mechanism; when only
-pseudocode/equations exist, the reconstructed stub captures the **novel mechanism**. Either way it
+Capture here is the **fallback, not the default**: transcribe code into `src/execution/` only when it
+would otherwise be **lost** — it exists solely inside the paper, or its source is not externally
+persisted. When the work's code/runs **persist in a linkable external store** (a repo, a run
+database), do NOT copy them here — index them comprehensively in `src/artifacts.md` (see below). When
+capture IS the call: actual repo code → capture real runnable files in native form (transcribed); only
+pseudocode/equations the paper prints → a reconstructed stub of the **novel mechanism**. Either way it
 must be grounded — never fabricated.
 
-When the input is a run database / repo of many experiment runs, index them in a **run ledger at
-`src/execution/artifacts.md`** — one entry per run (its id/label, status, and source link) — with each
-experiment's `Run` field pointing at its entry. The final or successful runs are transcribed as
-`src/execution/` files (the ledger links them); the failed, ablated, or dead-end runs are ledger
-entries that link/ref the source-database location — never a fabricated per-run stub. Capturing only
-the final/successful run is incomplete.
+When the input is a run database / repo of many experiment runs, index it **comprehensively** in
+`src/artifacts.md`: a link for **every** run and artifact (the per-run logs — e.g. a `runs.jsonl`
+already indexes each — plus every config, candidate, log, and script), nothing aggregated into a vague
+bucket and nothing copied. Each experiment's `Run` field points at the relevant entries. A lossy
+subset — only the winning run, or runs collapsed into a single directory link — is the failure.
 
 Every file declares its grounding on the first line:
 ```python
@@ -362,19 +363,18 @@ pseudo-code — that information already lives in `logic/solution/`, and re-enco
 duplicates it.** A concrete artifact that IS raw "code" — e.g. a prompt or template — is different:
 store it verbatim in `src/prompts/`, don't paraphrase it. A hollow invented API is a hallucination.
 
-## src/artifacts.md  (for non-code deliverables — NOT a substitute for capturing real source)
+## src/artifacts.md  (the artifact index — comprehensive pointer file when the source persists externally)
 
-`src/` must still represent the implementation. When the deliverable is a released tool, library,
-skill/specification, system, benchmark, or dataset rather than a code stub, describe the **real**
-artifacts here — grounded in the actual repo/files when a repo is provided. One block per artifact:
+`src/` must represent the implementation **losslessly**. When the work's artifacts **persist in a
+linkable external store** (a repo, a run database, a released tool/dataset), `artifacts.md` is the
+**comprehensive pointer index** — a link to **every** artifact (every run, config, log, script,
+released binary, dataset), grounded in the real files, nothing aggregated into a vague bucket and
+nothing copied. One block (or row) per artifact:
 
-**Exception — actual source code is captured, not pointed at.** When the repo contains real runnable
-source files, copy those files into `src/execution/` in native form (`# Grounding: transcribed`,
-cite path); do not reduce them to a prose block here. `artifacts.md` covers only deliverables with
-no capturable source — released binaries, natural-language skill/spec docs, datasets referenced by
-location. Naming a real `.py`/`.js`/… file here instead of capturing it is a coverage failure. For an
-index of experiment **runs** (incl. failed/ablated/dead-end), use the run ledger
-`src/execution/artifacts.md` instead of this file.
+**Capture is the fallback, not the default.** Transcribe a file into `src/execution/` only when it
+would otherwise be **lost** — code that lives solely inside the paper, or a source not externally
+persisted. When the source persists and is linkable, point to it here; copying a lossy subset (only
+the winner, or files collapsed into a single directory link) is the failure.
 
 ```markdown
 ## {Artifact name}

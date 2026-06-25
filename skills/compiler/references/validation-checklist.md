@@ -92,9 +92,10 @@ fewer passes with fewer; what fails is fabricated filler.
 - `src/execution/`: ≥1 `.py` file only when the work has implementable content (repo code / paper pseudocode / named interface). NOT mandatory otherwise; omitting it (with a note in `environment.md`) beats fabricating one.
 - `evidence/tables/`, `evidence/figures/`, or `evidence/proofs/`: contains the filed evidence (see §11)
 
-### Implementation layer (`src/`) — captured, not re-encoded
-- Concrete artifacts that exist are captured in native form: prompts/templates verbatim in `src/prompts/`, **real repo source code captured into `src/execution/`** (native form, `# Grounding: transcribed`, cite path — not reduced to a pointer), non-code deliverables (released binaries, skill/spec docs, referenced datasets) described in `src/artifacts.md`, config values in `src/configs/`. A lone `environment.md` is wrong when such artifacts exist.
-- **When a code repo/directory was provided as input**: every non-trivial runnable source file in it (a named module, entrypoint, or roughly ≥30 lines) is captured into `src/execution/` (or another `src/` subdir, in native form), not merely named in `artifacts.md`. FAIL on real source code represented only by a pointer, or a set of real files dismissed collectively (e.g. "not a core contribution") without capture.
+### Implementation layer (`src/`) — indexed when external, captured when it'd be lost
+- Concrete artifacts are represented losslessly: prompts/templates verbatim in `src/prompts/`, config values in `src/configs/`, and — when the work's code/runs **persist in a linkable external store** — a **comprehensive pointer index** in `src/artifacts.md` linking every artifact. A lone `environment.md` is wrong when such artifacts exist.
+- **Comprehensiveness** (external repo/run-database input): `src/artifacts.md` links **every** run and source file (per-run logs included — a `runs.jsonl` counts), nothing aggregated into a bare directory link or a "~N others" summary. FAIL on a lossy subset (only the winning run; real artifacts collapsed into a vague bucket).
+- **Capture only when it'd be lost**: transcribe source into `src/execution/` (native form, `# Grounding: transcribed`, cite path) only when it exists solely inside the paper or its source is not externally persisted. Pointer-only is correct when the source persists; it FAILS only when the pointer would dangle (no persisted source).
 - Conversely, a prose-only method (no code, no prompt, no config values) is NOT re-encoded as a `.py` stub or pseudo-code — it lives in `logic/solution/`; a lone `environment.md` is correct here. FAIL on a `.py` stub manufactured from prose (it just duplicates the cognitive layer).
 
 ### Code grounding (each `src/execution/*.py`, when present)
@@ -160,7 +161,7 @@ For each file in `evidence/figures/*.md` specifically:
 
 ### Experiment Evidence / Run → Resolution
 - Every `evidence/…` path in an experiment's `**Evidence**` is a filed evidence file (or "pending")
-- Every experiment carries a `**Run**` ref — a real `src/execution/` file or an entry in the run ledger `src/execution/artifacts.md` that links the source-DB location; failed/ablated runs are linked there, not dropped
+- Every experiment carries a `**Run**` ref — an entry in the comprehensive `src/artifacts.md` index (or, in the capture-fallback case, a `src/execution/` file) that links the source location; failed/ablated runs are linked there, not dropped
 
 ### Claim Dependencies → Claim Resolution
 - Every `C\d+` in a claim's `**Dependencies**` must exist in claims.md (an unresolved ID FAILS)
