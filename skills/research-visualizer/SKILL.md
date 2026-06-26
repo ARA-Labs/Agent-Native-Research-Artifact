@@ -10,15 +10,18 @@ description: |
   When the ARA carries them, it also surfaces (each optional, only when present) the related-work
   dependency graph, the problem framing, a concepts glossary with in-text term popovers, and the
   solution recipes — reached from header disclosures without leaving the process map.
+  Accepts either an existing ARA or raw research input (a paper, repo, run logs, or notes); when the
+  input is not yet an ARA it is compiled into one first, then visualized.
 
   TRIGGERS: visualize, visualizer, trajectory view, render the ARA, see the steps, step-by-step view,
-  process map, replay the trajectory, watch the agent work, drill into steps
+  process map, replay the trajectory, watch the agent work, drill into steps,
+  visualize a paper, visualize a repo, visualize a run
 argument-hint: "[ara-dir] [--output <path>]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *|base64 *|find *|ls *|open *)
 metadata:
   author: ara-commons
   category: research-tooling
-  version: "1.1.0"
+  version: "1.0.0"
   tags: [research, visualization, trajectory, exploration-tree, html]
 ---
 
@@ -50,9 +53,20 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
 
 1. **Args.** Resolve `<ara-dir>` (default: the ARA in the current working context / most-recently
    referenced). Resolve `--output` (default `<ara-dir>/trajectory.html`).
+1b. **Precondition — the input must be an ARA; if it is not, compile it first.** Decide with one
+   observable test: does the resolved input expose a parseable `trace/exploration_tree.yaml`
+   (**≥1 node**) — directly, or as a standard ARA directory layout?
+   - **It is an ARA** → continue to Validate unchanged.
+   - **It is not an ARA** — the input is raw research material (a paper/PDF, a code repository, a
+     run/log directory, notes, or any directory with no exploration tree) → **invoke the `compiler`
+     skill on that input to produce an ARA**, then set `<ara-dir>` to the compiler's output artifact
+     and continue. Do not hand-roll an ARA yourself; the compiler is the only path that builds one.
+     Default `--output` to `<compiled-ara-dir>/trajectory.html` unless the user set it.
+   Only if the compiler still yields no exploration tree does the Validate step's "no process" message apply.
 2. **Validate — the exploration tree is the ONLY hard requirement.** Confirm
-   `trace/exploration_tree.yaml` exists and parses to **≥1 node**; if not, tell the user there is no
-   process to show (this replaces the old `PAPER.md` "is-this-an-ARA?" guard). Everything else —
+   `trace/exploration_tree.yaml` exists and parses to **≥1 node**; if not (and the precondition's
+   compile step has already run), tell the user there is no process to show (this replaces the old
+   `PAPER.md` "is-this-an-ARA?" guard). Everything else —
    `PAPER.md`, `logic/`, `src/`, `evidence/`, and the four enrichment layers — is **optional
    enrichment**: glob whatever is present. If `PAPER.md` is absent, synthesize a minimal `meta` (title
    from a tree-level `title:` or the dir name; empty `abstract` hides the disclosure). This is the
@@ -145,6 +159,9 @@ Run on any ARA and confirm these properties — no named fixtures required:
   popovers fire on body terms; inline `$LaTeX$` renders with no network.
 - **Degradation:** a `minimal-artifact` (only `problem.md`) shows only the Context button, others absent,
   popovers off, per-node chips empty, zero console errors.
+- **Compile-first (non-ARA input):** pointing the skill at raw research material with no exploration
+  tree (a paper, a repo, a run/log dir) triggers the `compiler` skill first, then visualizes the
+  resulting ARA — the output is identical to running the compiler then the visualizer by hand.
 - **Raw trajectory (the decoupled path):** a **tree-only** ARA — just `trace/exploration_tree.yaml`, no
   `PAPER.md`, no `logic/`, no `evidence/` — still renders the full process map + each step's narrative
   (`thinking`/`body`), with no layer bar and no claim/result/verified blocks, zero console errors. This
