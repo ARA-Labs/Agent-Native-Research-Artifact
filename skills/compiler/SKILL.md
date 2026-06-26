@@ -199,6 +199,28 @@ the source actually reveals — but the node count and types are **source-bounde
 never invent a dead end, decision, or experiment to hit a number. A paper that hides its failures
 yields a smaller, honest tree (Rule 9 wins).
 
+**Optional per-node changed-code (enrichment for the Research Visualizer).** When the work is a
+sequence of code edits and the scripts are resolvable at compile time, you MAY attach to an experiment
+node the **unified diff** it represents — never required, omitted when unclear:
+1. **Resolve node → representative variant — this link does NOT already exist; construct it.** From the
+   node's `source_refs` / its claims' cited `record_configs` → the run index (`runs.csv`/`runs.jsonl`)
+   row(s) whose family+purpose+bin match → the representative submitted script. Where this is empty or
+   ambiguous (most `decision`/`dead_end` nodes, or evidence that is only journal prose), **omit
+   `code_change`** — never guess a script.
+2. **Resolve node → diff base** from the lineage you already reconstruct for `solution/*` (wave baseline
+   or immediate-parent variant).
+3. **Index both scripts in `src/artifacts.md` under a stable anchor** (`A01`, `A02`, …) carrying real
+   path + sha256 + original location; compute the unified diff (variant vs base) and write it to a tracked
+   **`evidence/changes/<node-id>.diff.md`** sidecar (fenced ```diff, `**Source**` header citing the two
+   anchor ids). Set the node's `code_change: {base_artifact, variant_artifact, lang, diff_file}`. The whole
+   scripts stay pointers (Rule 14) — the diff is a derived, grounded view, like a `derived_subset` table.
+4. **Store-absent ⇒ pointers, not a diff.** If the scripts don't resolve on disk (git-ignored store),
+   still record `code_change` with the anchor ids + a `note`, omit `diff_file` — the visualizer shows a
+   pointer chip. Expected, not a failure.
+
+You MAY also attach `node.thinking` — the agent's deliberation — but **only verbatim** grounded
+journal/decision text; never compose new prose. No verbatim rationale ⇒ leave it absent.
+
 ### Step 3: Generate Files
 
 Write the mandatory core, then the additional files the paper warrants. See
@@ -249,6 +271,10 @@ Run ARA Seal Level 1. Check:
   heuristic `Code ref` → a real `src/execution/` file (when both exist); tree `evidence:` → claim IDs
 - Evidence: **every numbered table and figure is filed with BOTH a markdown file and a screenshot
   (.png)**; numbered objects not filed are accounted for in `evidence/README.md` with a reason
+- **Changed-code (only if emitted):** each `evidence/changes/<node>.diff.md` cites two `src/artifacts.md`
+  anchors (`base`/`variant`) that resolve; the diff is verbatim; the node's `code_change` points at the
+  sidecar via `diff_file` (or carries a `note` with no `diff_file` when the store was absent). Optional —
+  absent is fine; never invent a diff or a node→script mapping
 - Evidence files have **Source** fields; figures declare Figure type / Extraction method / Reading
   confidence; estimated readings marked `≈` (not `exact_from_labels`); diagrams/qualitative samples
   carry a visual description, not a fabricated table
