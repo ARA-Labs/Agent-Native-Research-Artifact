@@ -32,6 +32,7 @@ evidence/
   tables/                           # ✓ every numbered Table: tableN.md + tableN.png
   figures/                          # ✓ every numbered Figure: figureN.md + figureN.png
   proofs/                           # as warranted: derivations / proofs
+  changes/                          # as warranted: per-node code-change unified diffs (Research Visualizer)
 rubric/requirements.md              # (Only if a rubric is provided)
 ```
 
@@ -378,6 +379,8 @@ the winner, or files collapsed into a single directory link) is the failure.
 
 ```markdown
 ## {Artifact name}
+- **Anchor**: {stable short id — `A01`, `A02`, … — so a trace node's `code_change` can reference this artifact by id; optional, but required for the Research Visualizer's changed-code diffs}
+- **sha256**: {content hash of the file, when a code-change diff cites it}
 - **File(s) in repo**: {real path(s), verified to exist}
 - **Nature**: {what it is — tool / library / skill spec / system / dataset}
 - **What it does / contains**: {grounded description}
@@ -420,6 +423,28 @@ Reproducibility for any field. For purely analytical work, state so explicitly.
 ## Proof
 {proof sketch or full derivation}
 ```
+
+---
+
+## evidence/changes/{node-id}.diff.md  (Research Visualizer changed-code diffs)
+
+Per-experiment-node **unified diff** the step represents — a derived, grounded view (the whole scripts
+stay pointers in `src/artifacts.md`; this is NOT a copy of the artifact). One tracked file per node that
+has a resolvable code change:
+
+```markdown
+# Change {node-id}: {short description}
+- **Base**: A01   (→ src/artifacts.md anchor; path + sha256 + original location live there)
+- **Variant**: A07
+- **Language**: python
+
+<unified diff fenced as ```diff … ``` — verbatim from the real scripts>
+```
+
+Rules: cite the two artifacts **by anchor id**, never paste their paths/sha here (those live once in
+`src/artifacts.md`). The diff text is verbatim. If the scripts can't be resolved at compile time
+(git-ignored store), omit this file and set the node's `code_change.note` instead (the visualizer shows a
+pointer chip, no diff). These sidecars MUST be tracked/committed (not swept by any store `.gitignore`).
 
 ---
 
@@ -475,6 +500,9 @@ tree:
     source_refs: ["Table 2", "§4.1"]   # recommended for explicit nodes
     title: "{...}"
     description: "{...}"
+    # OPTIONAL enrichment (Research Visualizer; omit when absent):
+    # thinking: "{verbatim agent deliberation — why it did/branched}"
+    # code_change: { base_artifact: A01, variant_artifact: A07, lang: python, diff_file: evidence/changes/N01.diff.md }
 ```
 
 Rules:
