@@ -143,7 +143,11 @@ export function uninstall(opts) {
 }
 
 /**
- * "Update" = re-install (overwrite) every currently tracked skill.
+ * "Update" = reconcile this agent against the FULL bundled skill set:
+ * re-install (overwrite) every tracked skill AND pull in any skills that
+ * were added to the package since the last install. Skips agents that have
+ * nothing installed — update should refresh an existing setup, not bootstrap
+ * a fresh one (use `install` for that).
  */
 export function update(opts) {
   const { agentId, local = false, cwd, quiet = false } = opts;
@@ -157,7 +161,8 @@ export function update(opts) {
     if (!quiet) console.log(`  (no skills tracked at ${targetDir})`);
     return { agent: agent.id, targetDir, results: [] };
   }
-  return install({ agentId, skillIds: ids, local, cwd, force: true, quiet });
+  // skillIds: [] => all bundled skills; force => overwrite the tracked ones.
+  return install({ agentId, skillIds: [], local, cwd, force: true, quiet });
 }
 
 /**

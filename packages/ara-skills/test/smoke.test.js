@@ -6,7 +6,7 @@ import path from 'node:path';
 
 import { listSkills } from '../src/skills.js';
 import { SUPPORTED_AGENTS, getAgentById } from '../src/agents.js';
-import { install, uninstall, listInstalled } from '../src/installer.js';
+import { install, uninstall, update, listInstalled } from '../src/installer.js';
 
 test('listSkills discovers the four ARA skills', () => {
   const ids = listSkills().map((s) => s.id).sort();
@@ -49,6 +49,27 @@ test('install + uninstall cycle (local, tmp dir)', () => {
     });
     assert.equal(rm.results[0].status, 'removed');
     assert.ok(!fs.existsSync(installed));
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('update reconciles a partial install to the full bundled skill set', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ara-skills-update-'));
+  try {
+    // Start with only one skill installed.
+    install({ agentId: 'claude-code', skillIds: ['compiler'], local: true, cwd: tmp, force: true, quiet: true });
+
+    // update() must pull in skills added to the package since that install.
+    update({ agentId: 'claude-code', local: true, cwd: tmp, quiet: true });
+
+    const skillsDir = path.join(tmp, '.claude/skills');
+    for (const id of listSkills().map((s) => s.id)) {
+      assert.ok(
+        fs.existsSync(path.join(skillsDir, id, 'SKILL.md')),
+        `update should have installed "${id}"`
+      );
+    }
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
