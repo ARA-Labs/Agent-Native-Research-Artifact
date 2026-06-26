@@ -4,8 +4,9 @@ description: |
   Research Visualizer. Renders an existing Agent-Native Research Artifact (ARA) into ONE
   self-contained, interactive HTML file showing the AI scientist's step-by-step research process:
   a clickable process map of the exploration tree (branches and dead ends included) on the left,
-  and a per-step drill-down on the right — what the step did, why (the linked claim), the real
-  result (verbatim grounded numbers + inline figures + tables), and the code/artifact pointer.
+  and a per-step drill-down on the right — what the step did (its narrative written in plain language a
+  person can follow), why (the linked claim), the real result (verbatim grounded numbers + inline figures
+  + tables), and the code/artifact pointer.
   Read-only consumer of the artifact — it never changes how research is done.
   When the ARA carries them, it also surfaces (each optional, only when present) the related-work
   dependency graph, the problem framing, a concepts glossary with in-text term popovers, and the
@@ -93,6 +94,15 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
    never link off-ARA); derive each node's `built_on`/`rejected_here` (dependency→claim→node, bucketed by
    `relation_norm`), `concepts` (whole-word name-match), and `recipe_refs` (recipe→claim→node); mark
    cross-agent entries. All per-node enrichment fields default `[]`.
+5c. **Write each step's narrative as plain language (same layout, human words).** The trace's notes are
+   written for an agent; rendered as-is they read like a log and a person can't follow what happened or
+   why it mattered. For each node, write its narrative — `thinking`, and `body` if used — in plain
+   language a reader who has NOT seen the ARA can follow: your own words, translating the trace's
+   agent-facing deliberation, **not** a verbatim paste; expand jargon on first use and state the point,
+   not the log line. This changes ONLY the prose that fills the existing reasoning block — keep every
+   block and the layout exactly as they are. Stay grounded: introduce no number, name, or claim that is
+   not already in that node, and keep claim `Statement`s, `Sources` quotes and table numbers **verbatim**
+   in the why/result blocks — those are the receipts.
 6. **Inline figures.** For each referenced figure that has a real raster (`evidence/figures/*.png`),
    base64-encode it and put the `data:` URI in `figures[].img`. Use Bash, e.g.
    `python3 -c "import base64,sys;print('data:image/png;base64,'+base64.b64encode(open(sys.argv[1],'rb').read()).decode())" <path>`.
@@ -100,8 +110,9 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
    **Also inline code diffs + the artifact index:** for each node with `code_change.diff_file`, read that
    tracked `evidence/changes/<id>.diff.md` sidecar and inline its fenced diff text into `code_change.diff`
    (parallel to figures); build the top-level `artifacts[]` index from `src/artifacts.md` so
-   `base_artifact`/`variant_artifact` ids resolve; carry each node's verbatim `thinking` straight through.
-   Sanitize all three verbatim fields per the Injection contract. The visualizer never computes a diff
+   `base_artifact`/`variant_artifact` ids resolve; carry each node's `thinking` (the plain-language
+   narrative from 5c) through.
+   Sanitize all three free-text fields per the Injection contract. The visualizer never computes a diff
    itself and never opens the external store — it only inlines what the ARA already contains.
 7. **Assemble `ARA_DATA`** (exact schema in `references/binding.md`) and **inject** it: replace ONLY
    the JSON between `/* __ARA_DATA_BEGIN__ */` and `/* __ARA_DATA_END__ */` in the
@@ -131,6 +142,11 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
 
 ## Faithfulness (hard rules)
 
+- **Speak human in the narrative, quote the evidence.** A node's narrative (`thinking`/`body`) is plain
+  language — your own words, a grounded translation (5c), not a verbatim paste. Everything that is
+  *evidence* — claim `Statement`s, `Sources` quotes, table cells/numbers, relations, definitions — is
+  reproduced **verbatim** in the why/result/overlay blocks. The narrative explains; the receipts prove. A
+  narrative that states a number absent from the node fails; so does an evidence block that paraphrases.
 - Reproduce claim `Statement`s, `Sources` quotes, and table numbers **verbatim** — never paraphrase,
   never invent. Missing data → set the field empty/omit (the viewer shows "No …"); never fabricate.
 - Provenance, `support_level`, and `status` are shown **only if present** in the source; do not guess.

@@ -73,7 +73,7 @@ live in ONE place and are referenced by id (weak coupling):
   and resolves `base_artifact`/`variant_artifact` into the shown-not-resolved pointer chip under the diff.
 - **Degrade**: when the scripts don't resolve at compile time (store absent), the compiler emits
   `code_change` with the artifact ids + a `note` but no diff; the viewer shows a pointer chip, not a diff.
-- **Marker safety**: `diff` and `thinking` are verbatim, so the producer MUST ensure neither the literal
+- **Marker safety**: `diff` is verbatim and `thinking` is authored prose; both are free-text, so the producer MUST ensure neither the literal
   `/* __ARA_DATA_BEGIN__ */` / `/* __ARA_DATA_END__ */` tokens nor `</script>` appears in any inlined
   string (escape `<`→`&lt;`; break the marker tokens). See SKILL.md "Injection contract".
 
@@ -106,7 +106,7 @@ live in ONE place and are referenced by id (weak coupling):
       "parent": "N01",             // id of the nesting parent, or null for a root
       "title": "<normalized step title>",            // see parsing.md
       "body":  "<what the step did / its outcome>",
-      "thinking": "<verbatim agent deliberation — why it did/branched; OPTIONAL>", // primary block; falls back to body
+      "thinking": "<the step's narrative in PLAIN, human language — a grounded translation, NOT a verbatim paste (SKILL.md 5c); OPTIONAL>", // primary block; falls back to body
       "support_level": "explicit", // "explicit"|"inferred"|null
       "isolated": false,           // true → rendered in a separated dashed box
       "depends_on": ["N00"],       // also_depends_on cross-edges (ids); [] if none
