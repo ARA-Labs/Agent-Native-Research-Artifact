@@ -23,6 +23,12 @@ top-level nodes have `parent: null`.
 - `source_refs` — list of strings if present, else `[]`. **External pointers; shown, never resolved.**
 - `isolated: true` — carry through (renders in a separated box).
 - `also_depends_on: [ids]` → emit as `depends_on` (DAG cross-edges).
+- `thinking` — verbatim agent deliberation, **passed straight through** (the primary reasoning block).
+  Absent ⇒ omit. Never paraphrase or synthesize it.
+- `code_change` — when the compiler wrote one onto the node (`base_artifact` / `variant_artifact` /
+  `lang` / `diff_file`), **pass it through**. The `diff_file`→`diff` inlining and the top-level
+  `artifacts[]` index are done in the binding/inline step (binding.md); the visualizer never computes a
+  diff itself. Absent ⇒ omit.
 
 ## 3. Title + body normalization (the dialect bridge)
 
@@ -71,11 +77,38 @@ provenance — do not guess.
 - `logic/experiments.md` — split on `## E\d+`. Pull `Verifies` (→ `C##`), `Run`, `Setup`, `Metrics`.
 - `evidence/README.md` — parse the Tables/Figures index to build `claim_id → [evidence files]`.
 
-## 7. Degrade, don't fail
+## 7. Degrade, don't fail — the tree is the only hard requirement
 
 Any missing/oddly-shaped field → fall back per the tables above and continue. A smaller honest view
-is correct. Only hard-stop if `trace/exploration_tree.yaml` itself is absent (nothing to show) or
-`PAPER.md` is missing (not an ARA).
+is correct. **Hard-stop on exactly one condition: `trace/exploration_tree.yaml` is absent or parses to
+zero nodes** (nothing to show). Minimal-validity guard = *the tree parses AND yields ≥1 node* — this
+replaces the old "`PAPER.md` missing ⇒ not an ARA" guard, which no longer hard-stops (a missing
+`PAPER.md` just means the visualizer synthesizes a minimal `meta` from a tree-level `title:` / the dir
+name). Everything else — `logic/`, `evidence/`, `src/`, the four enrichment layers — is optional; absent
+⇒ contributes nothing, never an error.
+
+### 7a. Raw-trajectory input mode (first-class)
+
+The minimum a node needs to render a useful step is `id` + (`title` **or** a type-named text field);
+`body` / `thinking` are optional but make the step legible. So a **bare exploration tree with no
+`logic/`, no `evidence/`, and no `PAPER.md`** — i.e. a raw agent run — is a fully supported input, not a
+degraded one. Each node renders from its own normalized `title` / `body` (per §3) plus its `thinking`
+(the agent's deliberation, when the source carries it — a verbatim pass-through field); the
+`why` / `result` / `how-verified` blocks are simply empty and omitted.
+
+**Adapter recipe (generic agent run → minimal tree).** A typical agent log is a sequence of steps, each
+a `{thought, action, observation/result}`. Map it onto the tree:
+- one tree node per step (or per meaningful decision/experiment); `id` = the step index/label.
+- `type` from the step kind: a tried approach → `experiment`; a chosen direction → `decision`; an
+  abandoned/failed approach → `dead_end`; an opening/guiding question → `question`.
+- `title` = a one-line summary of the step (first sentence of the action, ≤80 chars).
+- `thinking` = the agent's thought/deliberation for the step (**verbatim** — why it did/branched).
+- `body` = what it actually did + what came back (action + observation).
+- `source_refs` = a pointer back to the log line(s) (shown, never resolved).
+- nesting via `children`; convergence via `also_depends_on`; a discarded branch via `isolated`.
+
+No `logic/` or `evidence/` is required; enrich the same tree later (via the compiler) to add claims,
+evidence, and per-node `code_change` diffs.
 
 # 8. The four `logic/` enrichment layers (all optional)
 

@@ -8,9 +8,9 @@ import { listSkills } from '../src/skills.js';
 import { SUPPORTED_AGENTS, getAgentById } from '../src/agents.js';
 import { install, uninstall, listInstalled } from '../src/installer.js';
 
-test('listSkills discovers the three ARA skills', () => {
+test('listSkills discovers the four ARA skills', () => {
   const ids = listSkills().map((s) => s.id).sort();
-  assert.deepEqual(ids, ['compiler', 'research-manager', 'rigor-reviewer']);
+  assert.deepEqual(ids, ['compiler', 'research-manager', 'research-visualizer', 'rigor-reviewer']);
 });
 
 test('agent registry exposes expected ids', () => {

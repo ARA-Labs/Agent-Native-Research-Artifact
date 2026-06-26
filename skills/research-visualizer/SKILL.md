@@ -1,7 +1,7 @@
 ---
-name: visualizer
+name: research-visualizer
 description: |
-  ARA Trajectory Visualizer. Renders an existing Agent-Native Research Artifact (ARA) into ONE
+  Research Visualizer. Renders an existing Agent-Native Research Artifact (ARA) into ONE
   self-contained, interactive HTML file showing the AI scientist's step-by-step research process:
   a clickable process map of the exploration tree (branches and dead ends included) on the left,
   and a per-step drill-down on the right — what the step did, why (the linked claim), the real
@@ -12,7 +12,7 @@ description: |
   solution recipes — reached from header disclosures without leaving the process map.
 
   TRIGGERS: visualize, visualizer, trajectory view, render the ARA, see the steps, step-by-step view,
-  process map, replay the trajectory, watch the agent work, drill into steps, 可视化, 轨迹视图, 过程地图, 回放
+  process map, replay the trajectory, watch the agent work, drill into steps
 argument-hint: "[ara-dir] [--output <path>]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *|base64 *|find *|ls *|open *)
 metadata:
@@ -22,7 +22,7 @@ metadata:
   tags: [research, visualization, trajectory, exploration-tree, html]
 ---
 
-# ARA Trajectory Visualizer
+# Research Visualizer
 
 You render an existing ARA into a single portable HTML view of the agent's step-by-step process.
 You are a **read-only consumer**: you read the artifact and emit a file; you never edit the ARA.
@@ -50,20 +50,30 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
 
 1. **Args.** Resolve `<ara-dir>` (default: the ARA in the current working context / most-recently
    referenced). Resolve `--output` (default `<ara-dir>/trajectory.html`).
-2. **Validate.** Confirm `PAPER.md` exists. Glob the layout (`logic/`, `src/`, `trace/`, `evidence/`).
-   If `trace/exploration_tree.yaml` is missing, tell the user — there is no process to show.
+2. **Validate — the exploration tree is the ONLY hard requirement.** Confirm
+   `trace/exploration_tree.yaml` exists and parses to **≥1 node**; if not, tell the user there is no
+   process to show (this replaces the old `PAPER.md` "is-this-an-ARA?" guard). Everything else —
+   `PAPER.md`, `logic/`, `src/`, `evidence/`, and the four enrichment layers — is **optional
+   enrichment**: glob whatever is present. If `PAPER.md` is absent, synthesize a minimal `meta` (title
+   from a tree-level `title:` or the dir name; empty `abstract` hides the disclosure). This is the
+   **raw-trajectory path**: the skill produces a useful step-by-step view from *just the tree* (a raw
+   agent run), not only a fully-compiled ARA — see `references/parsing.md` §7.
 3. **Parse the trace** into normalized nodes. The field conventions vary across ARAs — follow
    `references/parsing.md` exactly (handles `tree:` vs `root:`, generic vs type-named fields,
    `evidence:` routing, `isolated`, `also_depends_on`). Every node must yield a `title` + `body`.
-4. **Parse the hub layers:** `logic/claims.md` (the binding hub), `logic/experiments.md`,
-   `evidence/README.md` (figure/table ↔ claim reverse index), `src/artifacts.md`, `logic/solution/*`.
+4. **Parse the hub layers — each only when present (all optional now):** `logic/claims.md` (the
+   binding hub *when it exists*), `logic/experiments.md`, `evidence/README.md` (figure/table ↔ claim
+   reverse index), `src/artifacts.md`, `logic/solution/*`. A missing layer simply contributes nothing;
+   the node still renders from its own `title`/`body`/`thinking`.
    **Also parse the four OPTIONAL enrichment layers when present, per `references/parsing.md` §8:**
    `logic/problem.md`→`context`, `logic/concepts.md`→`glossary` (+ build the `lexicon`),
    `logic/related_work.md`→`dependencies`, `logic/solution/*.md`→`recipes` (role-classify by content, not
    filename). A missing file/dir omits its key entirely. Reproduce statements/deltas/definitions/relations/
    headings/quotes/cells **verbatim**.
-5. **Build each node's drill-down** via the claim-hub chain in `references/binding.md`
-   (node → `evidence:[C##]` → claims → {Sources quotes, figures/tables, experiments, artifact pointers}).
+5. **Build each node's drill-down.** When `logic/claims.md` exists, follow the claim-hub chain in
+   `references/binding.md` (node → `evidence:[C##]` → claims → {Sources quotes, figures/tables,
+   experiments, artifact pointers}). When it does **not**, the drill-down is just the node's own
+   narrative (`thinking`/`body`) — every claim/result/verified block is empty and omitted.
 5b. **Bind the enrichment layers** per the "four enrichment layers" section of `references/binding.md`:
    build `claimIds`/`nodeByClaim`/`conceptNames`/`rwIds`; resolve every `refs[].target` (drop danglers,
    never link off-ARA); derive each node's `built_on`/`rejected_here` (dependency→claim→node, bucketed by
@@ -73,6 +83,12 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
    base64-encode it and put the `data:` URI in `figures[].img`. Use Bash, e.g.
    `python3 -c "import base64,sys;print('data:image/png;base64,'+base64.b64encode(open(sys.argv[1],'rb').read()).decode())" <path>`.
    For data-only figure markdown (no raster), render its data table instead (as a `tables[]` entry).
+   **Also inline code diffs + the artifact index:** for each node with `code_change.diff_file`, read that
+   tracked `evidence/changes/<id>.diff.md` sidecar and inline its fenced diff text into `code_change.diff`
+   (parallel to figures); build the top-level `artifacts[]` index from `src/artifacts.md` so
+   `base_artifact`/`variant_artifact` ids resolve; carry each node's verbatim `thinking` straight through.
+   Sanitize all three verbatim fields per the Injection contract. The visualizer never computes a diff
+   itself and never opens the external store — it only inlines what the ARA already contains.
 7. **Assemble `ARA_DATA`** (exact schema in `references/binding.md`) and **inject** it: replace ONLY
    the JSON between `/* __ARA_DATA_BEGIN__ */` and `/* __ARA_DATA_END__ */` in the
    `<script id="ara-data">` block of a copy of the template. Write the result to the output path.
@@ -91,6 +107,10 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
   `/* __ARA_DATA_BEGIN__ */` / `/* __ARA_DATA_END__ */`. Escape any `<` in inlined markdown/text as `&lt;`
   (or `<`) — this also neutralizes `</script>`. (A bare `*/` inside a string value is harmless to
   `JSON.parse`; only the exact marker strings would be stripped.)
+- **The verbatim free-text fields `thinking` and `code_change.diff` are the high-risk carriers** (source
+  code routinely contains `/* … */`). If either marker token would appear in their text, break it (e.g.
+  insert a zero-width space inside `__ARA_DATA_…`) so the global marker-strip can't delete it from inside
+  a value. Re-validate: a node whose `thinking`/`diff` contains a marker token MUST round-trip intact.
 - Do not touch anything else in the template — only the bytes between the two markers.
 - After writing, re-validate: the file still parses (the embedded JSON loads). If a figure pushed the
   file very large, apply the size guards in `references/binding.md` (truncate logs/tables, keep figures).
@@ -125,6 +145,10 @@ Run on any ARA and confirm these properties — no named fixtures required:
   popovers fire on body terms; inline `$LaTeX$` renders with no network.
 - **Degradation:** a `minimal-artifact` (only `problem.md`) shows only the Context button, others absent,
   popovers off, per-node chips empty, zero console errors.
+- **Raw trajectory (the decoupled path):** a **tree-only** ARA — just `trace/exploration_tree.yaml`, no
+  `PAPER.md`, no `logic/`, no `evidence/` — still renders the full process map + each step's narrative
+  (`thinking`/`body`), with no layer bar and no claim/result/verified blocks, zero console errors. This
+  is a first-class supported input, not a failure mode.
 
 Cover the variant axes with whatever ARAs you have: both root forms (`tree:`/`root:`), both field
 dialects (generic / type-named), figures present as real raster vs. data-markdown-only, `src/` as a

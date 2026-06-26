@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ARA Trajectory</title>
 <!--
-  ARA Trajectory Viewer — canonical self-contained scaffold for the `visualizer` skill.
+  ARA Trajectory Viewer — canonical self-contained scaffold for the `research-visualizer` skill.
 
   HOW THE SKILL USES THIS FILE
   ----------------------------
@@ -26,89 +26,98 @@
     shows every node state (experiment, dead_end, isolated). The skill overwrites it.
 -->
 <style>
+  /* Research Visualizer — warm-cream light theme (single accent); type read from glyph+label, not colour. */
   :root{
-    --bg:#0f1216; --panel:#161b22; --panel2:#1b2230; --line:#2a3340; --ink:#e6edf3;
-    --muted:#8b98a8; --accent:#4aa3ff; --chip:#222b38;
-    --q:#4aa3ff; --exp:#3fb950; --dec:#d29922; --dead:#f0556b; --piv:#bc8cff; --ins:#39c5cf; --def:#8b98a8;
+    --bg:#faf6ef; --panel:#fffdf8; --panel2:#f4ecdf; --line:#e6ddcc; --ink:#2f2a23;
+    --muted:#90856f; --accent:#bf6a2e; --chip:#f1e9da;
+    --ok:#5d7c3f; --warn:#a23b2d; --glyph-bg:#e7ddca; --glyph-ink:#5a5142;
+    --sel-bg:#f7ead2; --code-bg:#f6f0e4; --reason-bg:#fffdf7;
+    --iso-line:#cdbfa6; --iso-bg:#f7f1e6; --iso-ink:#8a7a5c;
+    --scrim:rgba(47,42,35,.40); --shadow:rgba(47,42,35,.18);
+    --add-bg:#e8f0df; --add-ink:#3f6b34; --del-bg:#f7e4df; --del-ink:#9c3b2e; --hunk:#90856f;
+    /* legacy type vars retained so existing class hooks resolve; all neutral except dead */
+    --q:var(--glyph-bg); --exp:var(--glyph-bg); --dec:var(--glyph-bg); --piv:var(--glyph-bg); --ins:var(--glyph-bg); --def:var(--glyph-bg); --dead:var(--warn);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
-  body{background:var(--bg);color:var(--ink);font:14px/1.5 ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  body{background:var(--bg);color:var(--ink);font:14.5px/1.6 ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
   code,pre,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   a{color:var(--accent);text-decoration:none}
   a:hover{text-decoration:underline}
 
-  header{padding:16px 20px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#12161c,#0f1216)}
-  header .title{font-size:18px;font-weight:650;margin:0}
+  header{padding:18px 22px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header .title{font-size:19px;font-weight:650;margin:0;letter-spacing:-.01em}
   header .sub{color:var(--muted);font-size:12.5px;margin-top:3px}
-  header details{margin-top:8px;color:#c9d4e0}
+  header details{margin-top:8px;color:var(--ink)}
   header summary{cursor:pointer;color:var(--muted);font-size:12.5px}
-  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
-  .toolbar input[type=search],.toolbar select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:6px 9px;font-size:13px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+  .toolbar input[type=search],.toolbar select{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 9px;font-size:13px}
   .toolbar input[type=search]{min-width:230px}
   .toolbar label{color:var(--muted);font-size:12.5px;display:flex;gap:5px;align-items:center}
-  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:6px 11px;font-size:13px;cursor:pointer}
+  .btn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 11px;font-size:13px;cursor:pointer}
   .btn:hover{border-color:var(--accent)}
-  .btn.primary{border-color:var(--accent);color:#dceaff}
+  .btn.primary{border-color:var(--accent);color:var(--accent)}
   .spacer{flex:1}
   .count{color:var(--muted);font-size:12px}
 
-  main{display:grid;grid-template-columns:minmax(320px,40%) 1fr;height:calc(100% - 0px);min-height:0}
-  #map{overflow:auto;border-right:1px solid var(--line);padding:12px 8px 40px}
-  #detail{overflow:auto;padding:18px 22px 60px}
+  main{display:grid;grid-template-columns:minmax(320px,38%) 1fr;height:calc(100% - 0px);min-height:0}
+  #map{overflow:auto;border-right:1px solid var(--line);padding:14px 10px 48px;background:var(--bg)}
+  #detail{overflow:auto;padding:22px 28px 72px}
 
   /* ---- process map ---- */
-  .node{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:7px;cursor:pointer;border:1px solid transparent}
-  .node:hover{background:#141a22}
-  .node.sel{background:#15233a;border-color:#27456f}
-  .node.dim{opacity:.45}
-  .node .glyph{flex:none;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700;color:#0b0e12;margin-top:1px}
+  .node{display:flex;gap:9px;align-items:flex-start;padding:7px 9px;border-radius:9px;cursor:pointer;border:1px solid transparent}
+  .node:hover{background:var(--panel2)}
+  .node.sel{background:var(--sel-bg);border-color:var(--accent)}
+  .node.deptarget{background:var(--sel-bg);outline:1px dashed var(--accent);outline-offset:-1px}
+  .node.dim{opacity:.4}
+  .node .glyph{flex:none;width:21px;height:21px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--glyph-ink);background:var(--glyph-bg);margin-top:1px}
   .node .nid{color:var(--muted);font-size:11px;font-family:ui-monospace,monospace}
   .node .ntitle{font-size:13px}
-  .node.dead .ntitle{color:#ffb3bd}
+  .node.dead .ntitle{color:var(--warn);text-decoration:line-through;text-decoration-color:rgba(162,59,45,.4)}
   .node .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  .kid{margin-left:18px;border-left:1px solid var(--line);padding-left:6px}
-  .isobox{border:1px dashed #5b4570;border-radius:9px;margin:8px 2px;padding:6px 4px;background:#180f20}
-  .isobox .isohdr{color:#caa6e6;font-size:11px;padding:2px 8px 6px;text-transform:uppercase;letter-spacing:.04em}
+  .kid{margin-left:19px;border-left:1px solid var(--line);padding-left:7px}
+  .isobox{border:1px dashed var(--iso-line);border-radius:11px;margin:10px 2px;padding:6px 4px;background:var(--iso-bg)}
+  .isobox .isohdr{color:var(--iso-ink);font-size:11px;padding:2px 8px 6px;text-transform:uppercase;letter-spacing:.05em}
   .dep{color:var(--muted);font-size:10.5px;border:1px solid var(--line);border-radius:6px;padding:0 5px}
 
-  .glyph.question{background:var(--q)} .glyph.experiment{background:var(--exp)}
-  .glyph.decision{background:var(--dec)} .glyph.dead_end{background:var(--dead);color:#fff}
-  .glyph.pivot{background:var(--piv)} .glyph.insight{background:var(--ins)} .glyph.default{background:var(--def)}
+  .glyph.dead_end{background:var(--warn);color:#fff}
 
   /* ---- detail pane ---- */
   .dhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
-  .badge{font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;color:#0b0e12}
-  .badge.question{background:var(--q)} .badge.experiment{background:var(--exp)}
-  .badge.decision{background:var(--dec)} .badge.dead_end{background:var(--dead);color:#fff}
-  .badge.pivot{background:var(--piv)} .badge.insight{background:var(--ins)} .badge.default{background:var(--def)}
+  .badge{font-size:11px;font-weight:700;border-radius:6px;padding:2px 9px;color:var(--glyph-ink);background:var(--glyph-bg);text-transform:lowercase;letter-spacing:.02em}
+  .badge.dead_end{background:var(--warn);color:#fff}
   .pill{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:1px 9px;color:var(--muted)}
-  .pill.explicit{border-color:#2f6f3f;color:#79d18c} .pill.inferred{border-color:#7a6326;color:#e2c374}
-  .pill.iso{border-color:#5b4570;color:#caa6e6}
-  .dtitle{font-size:17px;font-weight:600;margin:6px 0 2px}
+  .pill.explicit{border-color:var(--ok);color:var(--ok)} .pill.inferred{border-color:#b08a3c;color:#9a7a2e}
+  .pill.iso{border-color:var(--iso-line);color:var(--iso-ink)}
+  .dtitle{font-size:20px;font-weight:600;margin:8px 0 4px;letter-spacing:-.01em;line-height:1.35}
   .did{color:var(--muted);font-family:ui-monospace,monospace;font-size:12px}
 
-  .block{border:1px solid var(--line);border-radius:10px;margin:14px 0;background:var(--panel)}
-  .block>summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px}
+  .block{border:1px solid var(--line);border-radius:11px;margin:14px 0;background:var(--panel)}
+  .block>summary{cursor:pointer;padding:11px 15px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px;color:var(--ink)}
   .block>summary::-webkit-details-marker{display:none}
-  .block>summary .tag{margin-left:auto;color:var(--muted);font-size:11px;font-weight:400}
-  .block .body{padding:0 14px 14px}
-  .lead{color:#cdd8e4}
-  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-  .chip{background:var(--chip);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:11.5px;color:#b9c6d4;font-family:ui-monospace,monospace}
-  .chip.ext{color:#9aa7b6}
+  .block>summary .tag{margin-left:auto;color:var(--muted);font-size:11px;font-weight:400;font-family:ui-monospace,monospace}
+  .block .body{padding:2px 15px 15px}
+  /* the primary reasoning block: larger, calmer, with an accent spine */
+  .block.reason{border-left:3px solid var(--accent);background:var(--reason-bg)}
+  .block.reason>summary{font-size:15px}
+  .block.reason .lead{font-size:15.5px;line-height:1.65;color:var(--ink)}
+  .didwhat{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:14px 0 3px}
+  .lead{color:#3c372e}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:var(--chip);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:11.5px;color:#5e5544;font-family:ui-monospace,monospace}
+  .chip.ext{color:var(--muted)}
 
-  .claim{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:10px 0;background:var(--panel2)}
+  .claim{border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin:10px 0;background:var(--panel2)}
   .claim h4{margin:0 0 6px;font-size:13.5px}
-  .claim .kv{font-size:12.5px;margin:3px 0;color:#c4d0dd}
-  .claim .kv b{color:#8fa0b2;font-weight:600}
+  .claim .kv{font-size:12.5px;margin:3px 0;color:#4a4438}
+  .claim .kv b{color:var(--muted);font-weight:600}
   .status{font-size:11px;border-radius:6px;padding:1px 7px;border:1px solid var(--line)}
-  .status.supported{color:#79d18c;border-color:#2f6f3f}
-  .status.refuted{color:#ffb3bd;border-color:#7a2f3a}
-  .status.hypothesis{color:#e2c374;border-color:#7a6326}
-  .prov{font-size:11px;color:#caa6e6}
+  .status.supported{color:var(--ok);border-color:var(--ok)}
+  .status.refuted{color:var(--warn);border-color:var(--warn)}
+  .status.hypothesis{color:#9a7a2e;border-color:#b08a3c}
+  .prov{font-size:11px;color:var(--iso-ink)}
 
-  .quote{border-left:3px solid #2f6f8f;background:#11202b;border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0;font-size:12.5px}
+  .quote{border-left:3px solid var(--accent);background:var(--panel2);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0;font-size:12.5px}
   .quote .ref{color:var(--muted);font-size:11px;font-family:ui-monospace,monospace;margin-top:4px}
   figure{margin:12px 0}
   figure img{max-width:100%;border:1px solid var(--line);border-radius:8px;background:#fff}
@@ -116,43 +125,52 @@
 
   table.md{border-collapse:collapse;width:100%;font-size:12.5px;margin:8px 0}
   table.md th,table.md td{border:1px solid var(--line);padding:5px 9px;text-align:left}
-  table.md th{background:var(--panel2);color:#c9d6e3}
-  pre.snip{background:#0c1014;border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow:auto;font-size:12px;color:#cdd8e4;white-space:pre-wrap}
+  table.md th{background:var(--panel2);color:var(--ink)}
+  pre.snip{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow:auto;font-size:12px;color:var(--ink);white-space:pre-wrap}
+
+  /* changed-code diff block */
+  pre.diff{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:8px 0;overflow:auto;font-size:12px;margin:10px 0;white-space:pre}
+  pre.diff .dl{display:block;padding:0 12px;border-left:3px solid transparent}
+  pre.diff .dl.add{background:var(--add-bg);color:var(--add-ink);border-left-color:var(--ok)}
+  pre.diff .dl.del{background:var(--del-bg);color:var(--del-ink);border-left-color:var(--warn)}
+  pre.diff .dl.hunk{color:var(--hunk);background:var(--panel2)}
+  pre.diff .dl.meta{color:var(--muted)}
+  pre.diff .dl.ctx{color:#4a4438}
+
   .ptr{font-size:12.5px;margin:6px 0}
-  .ptr .path{font-family:ui-monospace,monospace;color:#b9c6d4}
+  .ptr .path{font-family:ui-monospace,monospace;color:#5e5544}
   .truncated{color:var(--muted);font-size:11.5px;font-style:italic}
   .empty{color:var(--muted);font-size:12.5px}
   .none{color:var(--muted);padding:24px;text-align:center}
-  kbd{background:#0c1014;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:11px}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:11px}
 
-  /* ---- v1.1 enrichment layers (all inert unless the data is present) ---- */
-  .layerbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  /* ---- enrichment layers (all inert unless the data is present) ---- */
+  .layerbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .lbtn .cnt{color:var(--muted);font-size:11px}
-  .chiplabel{color:var(--muted);font-size:11px;margin:8px 0 2px}
+  .chiplabel{color:var(--muted);font-size:11px;margin:10px 0 2px}
   .chip.jump{cursor:pointer}
   .chip.jump:hover{border-color:var(--accent)}
-  .chip.dangle{color:#8b7d7d;text-decoration:line-through;cursor:not-allowed}
+  .chip.dangle{color:#a89c8c;text-decoration:line-through;cursor:not-allowed}
   .chip.infer{border-style:dashed}
-  .chip-built{border-color:#2f6f3f;color:#79d18c}
-  .chip-rej{border-color:#7a2f3a;color:#ffb3bd}
-  .chip-recipe{border-color:#3a567a;color:#9ec1ff}
+  .chip-built{border-color:var(--ok);color:var(--ok)}
+  .chip-rej{border-color:var(--warn);color:var(--warn)}
+  .chip-recipe{border-color:var(--accent);color:var(--accent)}
   .nmark{color:var(--muted);font-size:10px;margin-left:5px;font-family:ui-monospace,monospace}
-  .rel{font-size:11px;border-radius:6px;padding:1px 8px;color:#0b0e12;font-weight:600}
-  .rel.baseline{background:var(--def)} .rel.imports{background:var(--q)} .rel.extends{background:var(--exp)}
-  .rel.bounds{background:var(--dec)} .rel.refutes{background:var(--dead);color:#fff}
+  .rel{font-size:11px;border-radius:6px;padding:1px 8px;color:var(--glyph-ink);background:var(--glyph-bg);font-weight:600}
+  .rel.bounds,.rel.refutes{background:var(--warn);color:#fff}
   .rel.neutral{background:var(--chip);color:var(--ink);border:1px solid var(--line);font-weight:400}
-  .ribbon{border-left:3px solid var(--piv);background:#180f20;border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0;color:#caa6e6;font-size:12.5px}
-  .warn{border-left:3px solid var(--dead);background:#1f1115;border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0;font-size:12.5px}
+  .ribbon{border-left:3px solid var(--accent);background:var(--panel2);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0;color:#4a4438;font-size:12.5px}
+  .warn{border-left:3px solid var(--warn);background:var(--del-bg);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0;font-size:12.5px}
   .muted{color:var(--muted);font-size:11.5px}
   .math{font-family:ui-serif,Georgia,serif;font-style:italic}
   .gterm{border-bottom:1px dashed var(--accent);cursor:help}
-  #gpop{position:fixed;max-width:360px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;z-index:60;box-shadow:0 6px 24px #000a;font-size:12.5px;display:none}
+  #gpop{position:fixed;max-width:360px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;z-index:60;box-shadow:0 6px 24px var(--shadow);font-size:12.5px;display:none}
   #gpop h5{margin:0 0 5px;font-size:13px}
   #gpop .gp-open{color:var(--accent);cursor:pointer;font-size:11.5px;margin-top:6px;display:inline-block}
   .ov{position:fixed;inset:0;z-index:50}
   .ov[hidden]{display:none}
-  .ov-scrim{position:absolute;inset:0;background:#000a}
-  .ov-sheet{position:relative;margin:5vh auto;max-width:920px;max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  .ov-scrim{position:absolute;inset:0;background:var(--scrim)}
+  .ov-sheet{position:relative;margin:5vh auto;max-width:920px;max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px var(--shadow)}
   .ov-head{position:sticky;top:0;display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel);z-index:1}
   .ov-head #ov-title{font-weight:650;font-size:15px}
   .ov-head input[type=search]{flex:1;max-width:260px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:5px 9px;font-size:13px}
@@ -213,28 +231,33 @@
 /* __ARA_DATA_BEGIN__ */
 {
   "meta": {
-    "title": "ARA Trajectory — template demo",
-    "authors": ["(demo data — replaced by the visualizer skill)"],
+    "title": "Research Visualizer — template demo",
+    "authors": ["(demo data — replaced by the research-visualizer skill)"],
     "year": "", "venue": "", "ara_dir": "",
-    "abstract": "This bare template ships with 3 demo nodes so it opens standalone and shows an experiment, a dead end, and an isolated subtree. Running /visualizer on a real ARA overwrites this block."
+    "abstract": "This bare template ships with demo nodes so it opens standalone and shows the reasoning-first layout, a changed-code diff, an experiment, a dead end, and an isolated subtree. Running /research-visualizer on a real ARA overwrites this block."
   },
   "order": ["N01", "N02", "N03", "NV1"],
+  "artifacts": [
+    { "id":"A01","name":"encode.py @ baseline","path":"src/encode.py","sha256":"0000…base","original_location":"repo@main:src/encode.py" },
+    { "id":"A02","name":"encode.py @ variant","path":"src/encode.py","sha256":"1111…var","original_location":"repo@feat:src/encode.py" }
+  ],
   "nodes": [
-    { "id":"N01","type":"question","parent":null,"title":"Demo root question","body":"Is this template wired correctly end to end?","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:1-4"],
+    { "id":"N01","type":"question","parent":null,"title":"Is this template wired correctly end to end?","body":"","thinking":"Before trusting the renderer on real data, prove every node state (reasoning, diff, result, dead end, isolated) shows up from one fixed scaffold.","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:1-4"],
       "why":[], "result":{"sources":[],"figures":[],"tables":[],"data":[]}, "verified_by":[], "artifact":[] },
-    { "id":"N02","type":"experiment","parent":"N01","title":"A demo experiment with a result","body":"Render a node that carries a claim, a quote, a table and a figure.","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:10-22"],
-      "why":[{"id":"C01","statement":"A fixed scaffold the agent only feeds data into keeps every generated view structurally consistent.","status":"supported","conditions":"Holds whenever rendering logic is separated from data.","falsification":"If two ARAs produced structurally divergent views from the same template.","provenance":"ai-executed","dependencies":[]}],
+    { "id":"N02","type":"experiment","parent":"N01","title":"Precompute the field encoder once per type","body":"Replaced the per-call json.dumps path with a cached per-type encoder; output byte-identical.","thinking":"The profile said serialization dominates, and the dead end showed per-field reflection is the trap — so keep the hand-written encoding but pay its setup cost once, not per request.","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:10-22"],
+      "code_change":{ "base_artifact":"A01","variant_artifact":"A02","lang":"python","diff":"@@ -1,4 +1,5 @@\n def encode(rec):\n-    return json.dumps(rec)\n+    enc = encoder_for(type(rec))\n+    return enc(rec)" },
+      "why":[{"id":"C01","statement":"Paying per-type setup once instead of per call removes the hot-path cost without changing output.","status":"supported","conditions":"Holds when the type set is small and stable across calls.","falsification":"If amortized setup ever exceeds the per-call cost it replaces.","provenance":"ai-executed","dependencies":[]}],
       "result":{
-        "sources":[{"quote":"the mean crosses target at the submitted bin","ref":"figures/demo.md:14"}],
+        "sources":[{"quote":"p99 down 38%; output byte-identical to the baseline","ref":"figures/demo.md:14"}],
         "figures":[{"id":"F1","caption":"Demo figure (1×1 transparent placeholder)","kind":"quantitative_plot","img":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="}],
-        "tables":[{"id":"T1","caption":"Demo table","markdown":"| component | delta |\n|---|---|\n| keep | +0.0025 |\n| drop | -0.0001 |"}],
+        "tables":[{"id":"T1","caption":"Demo table","markdown":"| path | p99 |\n|---|---|\n| baseline | 100% |\n| cached encoder | 62% |"}],
         "data":[{"id":"D1","path":"evidence/data/demo.json","note":"raw data pointer"}]
       },
-      "verified_by":[{"id":"E01","title":"Demo verification plan","run":"src/artifacts.md → demo store","setup":"n/a","metrics":"delta-val"}],
+      "verified_by":[{"id":"E01","title":"Replay under load","run":"src/artifacts.md → demo store","setup":"n/a","metrics":"p99 latency"}],
       "artifact":[{"name":"demo family","pointer":"data/runs/demo (N runs)","what":"pointer index entry (not resolved in v1)"}] },
-    { "id":"N03","type":"dead_end","parent":"N01","title":"A demo dead end","body":"This approach was tried and failed; rendered first-class with a ✗.","support_level":"inferred","isolated":false,"depends_on":[],"source_refs":[],
-      "why":[], "result":{"sources":[{"quote":"did not reproduce on a second seed","ref":"notes.md:30"}],"figures":[],"tables":[],"data":[]}, "verified_by":[], "artifact":[] },
-    { "id":"NV1","type":"experiment","parent":null,"title":"Isolated subtree demo","body":"Nodes with isolated:true render in a separated dashed box.","support_level":"explicit","isolated":true,"depends_on":["N02"],"source_refs":[],
+    { "id":"N03","type":"dead_end","parent":"N01","title":"Reflection-based serializer","body":"","thinking":"I assumed a library would beat the hand-rolled path. It removed code but ran 1.4x slower — reflection moved work onto the hot path. 'Less code' is not 'less work'.","support_level":"inferred","isolated":false,"depends_on":[],"source_refs":[],
+      "why":[], "result":{"sources":[{"quote":"1.4x slower under load","ref":"notes.md:30"}],"figures":[],"tables":[],"data":[]}, "verified_by":[], "artifact":[] },
+    { "id":"NV1","type":"experiment","parent":null,"title":"Side quest: HTTP/2 multiplexing","body":"","thinking":"Curiosity branch, kept off the main line because it doesn't bear on the serialization hotspot.","support_level":"explicit","isolated":true,"depends_on":["N02"],"source_refs":[],
       "why":[], "result":{"sources":[],"figures":[],"tables":[],"data":[]}, "verified_by":[], "artifact":[] }
   ]
 }
@@ -264,6 +287,7 @@
 
   const nodes = DATA.nodes || [];
   const byId = new Map(nodes.map(n => [n.id, n]));
+  const artifactById = new Map((DATA.artifacts||[]).map(a => [a.id, a]));
   const kids = new Map();
   nodes.forEach(n => kids.set(n.id, []));
   let roots = [];
@@ -310,11 +334,28 @@
   }
 
   // ---- detail pane ----
-  function block(title, tag, inner, open){
-    return '<details class="block"'+(open?" open":"")+'><summary>'+esc(title)+
+  function block(title, tag, inner, open, cls){
+    return '<details class="block'+(cls?" "+cls:"")+'"'+(open?" open":"")+'><summary>'+esc(title)+
       (tag?'<span class="tag">'+esc(tag)+'</span>':'')+'</summary><div class="body">'+inner+'</div></details>';
   }
   function chips(arr, klass){ return arr&&arr.length ? '<div class="chips">'+arr.map(x=>'<span class="chip '+(klass||"")+'">'+esc(x)+'</span>').join("")+'</div>' : ""; }
+
+  // resolve an artifact id (src/artifacts.md) to a label + a shown-not-resolved pointer tooltip
+  function artLabel(id){ const a=artifactById.get(id); return a ? (a.name||a.path||id) : id; }
+  function artTip(id){ const a=artifactById.get(id); return a ? [a.path,a.sha256,a.original_location||a.original_path].filter(Boolean).join("  ·  ") : ""; }
+  function renderDiff(cc){
+    const head=[];
+    if(cc.base_artifact)    head.push('<span class="chip" title="'+esc(artTip(cc.base_artifact))+'">base: '+esc(artLabel(cc.base_artifact))+'</span>');
+    if(cc.variant_artifact) head.push('<span class="chip" title="'+esc(artTip(cc.variant_artifact))+'">variant: '+esc(artLabel(cc.variant_artifact))+'</span>');
+    if(cc.lang)             head.push('<span class="chip ext">'+esc(cc.lang)+'</span>');
+    const chiprow = head.length?'<div class="chips">'+head.join("")+'</div>':"";
+    if(cc.diff){
+      const lc = L => /^(\+\+\+|---|diff |index )/.test(L) ? "meta" : (L[0]==="+" ? "add" : (L[0]==="-" ? "del" : (/^@@/.test(L) ? "hunk" : "ctx")));
+      const body = String(cc.diff).split("\n").map(L=>'<span class="dl '+lc(L)+'">'+esc(L||" ")+'</span>').join("");
+      return chiprow+'<pre class="diff">'+body+'</pre>';
+    }
+    return chiprow+'<div class="empty">'+esc(cc.note||"Diff not available in this checkout — base/variant scripts not present; pointers only.")+'</div>';
+  }
 
   function renderDetail(n){
     const d = document.getElementById("detail");
@@ -324,16 +365,39 @@
       (n.isolated?'<span class="pill iso">isolated</span>':'')+'</div>';
     h += '<div class="dtitle">'+esc(n.title||"(untitled)")+'</div>';
 
-    // what
-    let what = (n.body?'<div class="lead">'+esc(n.body)+'</div>':'<div class="empty">No description.</div>');
-    if(n.depends_on&&n.depends_on.length) what += chips(n.depends_on.map(x=>"⇠ depends on "+x));
-    if(n.source_refs&&n.source_refs.length) what += chips(n.source_refs, "ext");
-    if(n.built_on&&n.built_on.length) what += chipRow("built on", n.built_on, "chip-built");
-    if(n.rejected_here&&n.rejected_here.length) what += chipRow("rejected here", n.rejected_here, "chip-rej");
-    if(n.recipe_refs&&n.recipe_refs.length) what += recipeChips(n.recipe_refs);
-    h += block("what", n.type, what, true);
+    // reasoning (primary, always open) — the agent's thinking IS the content of a step
+    let reason="";
+    if(n.thinking){
+      reason += '<div class="lead">'+esc(n.thinking)+'</div>';
+      if(n.body) reason += '<div class="didwhat">what it did</div><div>'+esc(n.body)+'</div>';
+    } else {
+      reason += n.body ? '<div class="lead">'+esc(n.body)+'</div>' : '<div class="empty">No description.</div>';
+    }
+    if(n.depends_on&&n.depends_on.length) reason += chips(n.depends_on.map(x=>"⇠ depends on "+x));
+    if(n.source_refs&&n.source_refs.length) reason += chips(n.source_refs, "ext");
+    if(n.built_on&&n.built_on.length) reason += chipRow("built on", n.built_on, "chip-built");
+    if(n.rejected_here&&n.rejected_here.length) reason += chipRow("rejected here", n.rejected_here, "chip-rej");
+    if(n.recipe_refs&&n.recipe_refs.length) reason += recipeChips(n.recipe_refs);
+    h += block(n.thinking?"reasoning":"what", n.type, reason, true, "reason");
 
-    // why (claims)
+    // changed code (unified diff) — open when present
+    if(n.code_change && (n.code_change.diff || n.code_change.base_artifact || n.code_change.variant_artifact || n.code_change.note)){
+      h += block("changed code", n.code_change.lang||"diff", renderDiff(n.code_change), true);
+    }
+
+    // result (the grounded payload) — open
+    const r = n.result||{};
+    if((r.sources&&r.sources.length)||(r.figures&&r.figures.length)||(r.tables&&r.tables.length)||(r.data&&r.data.length)){
+      let s="";
+      (r.figures||[]).forEach(f=>{ s+='<figure><img src="'+esc(f.img)+'" alt="'+esc(f.caption||f.id)+'"/>'+
+        (f.caption?'<figcaption>'+esc(f.caption)+'</figcaption>':'')+'</figure>'; });
+      (r.tables||[]).forEach(t=>{ s+=(t.caption?'<div class="empty">'+esc(t.caption)+'</div>':'')+renderMd(t.markdown); });
+      (r.sources||[]).forEach(q=>{ s+='<div class="quote">'+esc(q.quote)+(q.ref?'<div class="ref">← '+esc(q.ref)+'</div>':'')+'</div>'; });
+      (r.data||[]).forEach(x=>{ s+='<div class="ptr">⛁ <span class="path">'+esc(x.path)+'</span>'+(x.note?' — '+esc(x.note):'')+'</div>'; });
+      h += block("result", "", s, true);
+    }
+
+    // why (claims) — supporting detail, collapsed
     if(n.why&&n.why.length){
       const w = n.why.map(c=>{
         let s='<div class="claim"><h4>'+esc(c.id)+(c.title?' — '+esc(c.title):'')+'</h4>';
@@ -348,19 +412,7 @@
       h += block("why", n.why.map(c=>c.id).join(" · "), w);
     }
 
-    // result
-    const r = n.result||{};
-    if((r.sources&&r.sources.length)||(r.figures&&r.figures.length)||(r.tables&&r.tables.length)||(r.data&&r.data.length)){
-      let s="";
-      (r.figures||[]).forEach(f=>{ s+='<figure><img src="'+esc(f.img)+'" alt="'+esc(f.caption||f.id)+'"/>'+
-        (f.caption?'<figcaption>'+esc(f.caption)+'</figcaption>':'')+'</figure>'; });
-      (r.tables||[]).forEach(t=>{ s+=(t.caption?'<div class="empty">'+esc(t.caption)+'</div>':'')+renderMd(t.markdown); });
-      (r.sources||[]).forEach(q=>{ s+='<div class="quote">'+esc(q.quote)+(q.ref?'<div class="ref">← '+esc(q.ref)+'</div>':'')+'</div>'; });
-      (r.data||[]).forEach(x=>{ s+='<div class="ptr">⛁ <span class="path">'+esc(x.path)+'</span>'+(x.note?' — '+esc(x.note):'')+'</div>'; });
-      h += block("result", "", s, true);
-    }
-
-    // verified by (experiments)
+    // how verified (experiments) — supporting detail, collapsed
     if(n.verified_by&&n.verified_by.length){
       const v = n.verified_by.map(e=>'<div class="claim"><h4>'+esc(e.id)+(e.title?' — '+esc(e.title):'')+'</h4>'+
         (e.run?'<div class="kv"><b>run</b> <span class="path mono">'+esc(e.run)+'</span></div>':'')+
@@ -369,11 +421,11 @@
       h += block("how verified", n.verified_by.map(e=>e.id).join(" · "), v);
     }
 
-    // artifact / code pointer
+    // artifact pointers (src/artifacts.md) — collapsed
     if(n.artifact&&n.artifact.length){
       const a = n.artifact.map(x=>'<div class="ptr">▸ <b>'+esc(x.name)+'</b> — <span class="path">'+esc(x.pointer)+'</span>'+
         (x.what?'<div class="empty">'+esc(x.what)+'</div>':'')+'</div>').join("");
-      h += block("code / artifact", "pointer", a);
+      h += block("artifact", "pointer", a);
     }
 
     d.innerHTML = h;
@@ -397,14 +449,17 @@
     const row = document.createElement("div");
     row.className = "node "+(n.type==="dead_end"?"dead":"");
     row.dataset.id = n.id; row.dataset.type = n.type;
-    const nb=(n.built_on||[]).length, nr=(n.rejected_here||[]).length;
-    const mark=(nb||nr)?'<span class="nmark" title="built on / rejected here">'+(nb?"⊕"+nb:"")+(nr?(nb?" ":"")+"⊘"+nr:"")+'</span>':'';
+    // calmer than before: one glyph + id + (quiet) cross-edge marker; the ⊕/⊘ count soup is gone.
     row.innerHTML = '<span class="glyph '+cls(n.type)+'">'+glyph(n.type)+'</span>'+
       '<span><span class="meta"><span class="nid">'+esc(n.id)+'</span>'+
-      (n.depends_on&&n.depends_on.length?'<span class="dep">⇠ '+esc(n.depends_on.join(","))+'</span>':'')+
-      mark+
+      (n.depends_on&&n.depends_on.length?'<span class="dep" title="depends on '+esc(n.depends_on.join(", "))+'">⇠ '+esc(n.depends_on.join(","))+'</span>':'')+
       '</span><div class="ntitle">'+esc(n.title||n.body||"(untitled)")+'</div></span>';
     row.addEventListener("click", ()=>selectNode(n.id));
+    // hover a node to highlight its cross-edge targets (gentler than always-on connectors)
+    if(n.depends_on&&n.depends_on.length){
+      row.addEventListener("mouseenter", ()=>n.depends_on.forEach(t=>{ const el=document.querySelector('.node[data-id="'+CSS.escape(t)+'"]'); if(el) el.classList.add("deptarget"); }));
+      row.addEventListener("mouseleave", ()=>document.querySelectorAll(".node.deptarget").forEach(el=>el.classList.remove("deptarget")));
+    }
     return row;
   }
   function renderSubtree(id, container){
