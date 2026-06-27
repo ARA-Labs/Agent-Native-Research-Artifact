@@ -20,6 +20,9 @@ jobs:
         working-directory: packages/ara-skills
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so we can diff the push range and push the sync commit.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -32,18 +35,57 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Check if version already published
+      # Decide what version to publish.
+      #   - If a maintainer manually bumped past the published version (e.g. a
+      #     minor/major), respect it as-is.
+      #   - Else, if this push touched skills/** but nobody bumped, auto-increment
+      #     the PATCH from the *published* version. This means any contributor's
+      #     skill change ships automatically — no manual `npm version` required.
+      #   - Else, nothing to publish.
+      # The published npm version (not the repo's package.json) is the source of
+      # truth, so publishing stays correct even if the sync-back commit below is
+      # rejected by branch protection.
+      - name: Resolve version (auto-bump patch on skill changes)
         id: check
         run: |
           LOCAL=$(node -p "require('./package.json').version")
           PUBLISHED=$(npm view @ara-commons/ara-skills version 2>/dev/null || echo "0.0.0")
-          echo "local=$LOCAL"  >> "$GITHUB_OUTPUT"
-          echo "published=$PUBLISHED" >> "$GITHUB_OUTPUT"
-          if [ "$LOCAL" = "$PUBLISHED" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
+
+          # Did this push change any skill content?
+          BEFORE="${{ github.event.before }}"
+          SKILLS_CHANGED=false
+          if [ -n "$BEFORE" ] \
+            && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
+            && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            if git diff --name-only "$BEFORE" "${{ github.sha }}" | grep -q '^skills/'; then
+              SKILLS_CHANGED=true
+            fi
           fi
+
+          RESOLVED=$(node -e '
+            const [pub, loc, skills] = process.argv.slice(1);
+            const cmp = (a, b) => {
+              const x = a.split(".").map(Number), y = b.split(".").map(Number);
+              for (let i = 0; i < 3; i++) { if ((x[i]||0) !== (y[i]||0)) return (x[i]||0) - (y[i]||0); }
+              return 0;
+            };
+            let target;
+            if (cmp(loc, pub) > 0) target = loc;                                  // manual bump — respect it
+            else if (skills === "true") { const [a,b,c] = pub.split(".").map(Number); target = `${a}.${b}.${c+1}`; }
+            else target = loc;                                                    // no skill change, no manual bump
+            console.log(JSON.stringify({ target, skip: cmp(target, pub) === 0 }));
+          ' "$PUBLISHED" "$LOCAL" "$SKILLS_CHANGED")
+
+          TARGET=$(node -p "JSON.parse(process.argv[1]).target" "$RESOLVED")
+          SKIP=$(node -p "JSON.parse(process.argv[1]).skip"   "$RESOLVED")
+
+          echo "version=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "skip=$SKIP"      >> "$GITHUB_OUTPUT"
+
+          if [ "$SKIP" != "true" ]; then
+            npm version "$TARGET" --no-git-tag-version --allow-same-version >/dev/null
+          fi
+          echo "local=$LOCAL published=$PUBLISHED skillsChanged=$SKILLS_CHANGED -> target=$TARGET skip=$SKIP"
 
       - name: Publish
         if: steps.check.outputs.skip == 'false'
@@ -54,6 +96,25 @@ jobs:
       - name: Tag release
         if: steps.check.outputs.skip == 'false'
         run: |
-          git tag "ara-skills-v${{ steps.check.outputs.local }}"
-          git push origin "ara-skills-v${{ steps.check.outputs.local }}"
+          git tag "ara-skills-v${{ steps.check.outputs.version }}"
+          git push origin "ara-skills-v${{ steps.check.outputs.version }}"
         working-directory: ${{ github.workspace }}
+
+      # Keep the repo's package.json in step with what we just published.
+      # Best-effort: if main is protected and the push is rejected, the publish
+      # still stands and the version catches up on the next run (resolved from
+      # the published npm version).
+      - name: Sync version back to main (best-effort)
+        if: steps.check.outputs.skip == 'false'
+        working-directory: ${{ github.workspace }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/ara-skills/package.json
+          if git diff --cached --quiet; then
+            echo "package.json already at v${{ steps.check.outputs.version }} — nothing to sync."
+          else
+            git commit -m "chore(ara-skills): sync version to v${{ steps.check.outputs.version }} [skip ci]"
+            git push origin "HEAD:main" \
+              || echo "::warning::Could not push version sync to main (protected branch?). npm v${{ steps.check.outputs.version }} is published; package.json will catch up next run."
+          fi

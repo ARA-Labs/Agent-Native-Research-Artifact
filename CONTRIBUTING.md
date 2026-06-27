@@ -53,6 +53,21 @@ Before submitting a PR:
    - Why (what problem or improvement)
    - How you tested it
 
+## Publishing (how skills reach npm)
+
+You do **not** need npm credentials, and you do **not** need to be the package
+owner. Publishing is fully automated by CI (`.github/workflows/publish-ara-skills.yml`)
+using a repository secret — it runs the same for every contributor.
+
+- Land your skill change on `main` (push or merged PR).
+- CI detects the change under `skills/**` and **auto-bumps the patch version**,
+  then publishes `@ara-commons/ara-skills` to npm. You don't have to run
+  `npm version` yourself.
+- Want a deliberate **minor/major** bump instead of an auto patch? Manually set a
+  higher version in `packages/ara-skills/package.json` and CI will respect it.
+
+End users then pick up your change with `npx @ara-commons/ara-skills update`.
+
 ## Style
 
 - Write instructions for an AI agent, not a human. Be precise about expected outputs.
