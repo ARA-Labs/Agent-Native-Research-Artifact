@@ -19,20 +19,22 @@ logic/
                                     #   study_design / formalization / results / proofs /
                                     #   design / heuristics … — whatever fits THIS work
   related_work.md                   # ✓ Typed dependency graph (RDO)
-src/
+src/                                # the CODEBASE (code in ANY language — never judged by a .py suffix)
   environment.md                    # ✓ Data/software/hardware/protocols/seeds
+  artifacts.md                      # as warranted: pointer index to the codebase (every script/config/module)
   configs/                          # as warranted: hyperparameters / inference / deployment
-  execution/{module}.py             # as warranted: grounded code stub (or absent — see below)
+  execution/{module}.{ext}          # as warranted: transcribed/grounded code, any language (or absent — see below)
   prompts/, ...                     # as warranted: prompt templates, etc.
 data/                               # as warranted: dataset.md + preprocessing.md
 trace/
   exploration_tree.yaml             # ✓ Research DAG: nested YAML tree with typed nodes
-evidence/
+evidence/                           # derived + observed: diffs, run records, results, logs, tables, figures
   README.md                         # ✓ Index mapping every evidence file to claims
   tables/                           # ✓ every numbered Table: tableN.md + tableN.png
   figures/                          # ✓ every numbered Figure: figureN.md + figureN.png
+  results/                          # as warranted: per-node run records (run tables: run_id, params, metrics, export_id)
+  logs/                             # as warranted: log_pointers.md — direct per-run log pointers (by export_id)
   proofs/                           # as warranted: derivations / proofs
-  changes/                          # as warranted: per-node code-change unified diffs (Research Visualizer)
 rubric/requirements.md              # (Only if a rubric is provided)
 ```
 
@@ -364,13 +366,15 @@ pseudo-code — that information already lives in `logic/solution/`, and re-enco
 duplicates it.** A concrete artifact that IS raw "code" — e.g. a prompt or template — is different:
 store it verbatim in `src/prompts/`, don't paraphrase it. A hollow invented API is a hallucination.
 
-## src/artifacts.md  (the artifact index — comprehensive pointer file when the source persists externally)
+## src/artifacts.md  (the CODEBASE pointer index — code only, any language)
 
-`src/` must represent the implementation **losslessly**. When the work's artifacts **persist in a
-linkable external store** (a repo, a run database, a released tool/dataset), `artifacts.md` is the
-**comprehensive pointer index** — a link to **every** artifact (every run, config, log, script,
-released binary, dataset), grounded in the real files, nothing aggregated into a vague bucket and
-nothing copied. One block (or row) per artifact:
+`src/artifacts.md` is the **pointer index to the experiment's codebase** — the *code*: every script,
+config, and module, in **any language** (judged by content, never by a `.py` suffix). When the codebase
+persists in a linkable store (a directory of script variants, a released/versioned repo), point at every
+code artifact, grounded in the real files, nothing aggregated into a vague bucket and nothing copied.
+**Run records do NOT belong here** — per-run logs, metrics, and run tables are evidence
+(`evidence/results/`, `evidence/logs/log_pointers.md`), linked straight from trace/claims, not indexed in
+`artifacts.md`. One block (or row) per **code** artifact:
 
 **Capture is the fallback, not the default.** Transcribe a file into `src/execution/` only when it
 would otherwise be **lost** — code that lives solely inside the paper, or a source not externally
@@ -379,8 +383,6 @@ the winner, or files collapsed into a single directory link) is the failure.
 
 ```markdown
 ## {Artifact name}
-- **Anchor**: {stable short id — `A01`, `A02`, … — so a trace node's `code_change` can reference this artifact by id; optional, but required for the Research Visualizer's changed-code diffs}
-- **sha256**: {content hash of the file, when a code-change diff cites it}
 - **File(s) in repo**: {real path(s), verified to exist}
 - **Nature**: {what it is — tool / library / skill spec / system / dataset}
 - **What it does / contains**: {grounded description}
@@ -426,25 +428,31 @@ Reproducibility for any field. For purely analytical work, state so explicitly.
 
 ---
 
-## evidence/changes/{node-id}.diff.md  (Research Visualizer changed-code diffs)
+## evidence/results/{node-or-name}.md  (run records — the outputs of running the code)
 
-Per-experiment-node **unified diff** the step represents — a derived, grounded view (the whole scripts
-stay pointers in `src/artifacts.md`; this is NOT a copy of the artifact). One tracked file per node that
-has a resolvable code change:
+Per-experiment **run records**: the run table(s) a node produced. **This is where runs live**, not in
+`src/artifacts.md`. One file per experiment node (or per result group):
 
 ```markdown
-# Change {node-id}: {short description}
-- **Base**: A01   (→ src/artifacts.md anchor; path + sha256 + original location live there)
-- **Variant**: A07
-- **Language**: python
+# {Node/result}: {short description}
+- **Trace node**: N22
+- **Claim**: C04
 
-<unified diff fenced as ```diff … ``` — verbatim from the real scripts>
+| run_id | {params…} | metric | export_id |
+|--------|-----------|--------|-----------|
+| …      | …         | …      | …         |
 ```
 
-Rules: cite the two artifacts **by anchor id**, never paste their paths/sha here (those live once in
-`src/artifacts.md`). The diff text is verbatim. If the scripts can't be resolved at compile time
-(git-ignored store), omit this file and set the node's `code_change.note` instead (the visualizer shows a
-pointer chip, no diff). These sidecars MUST be tracked/committed (not swept by any store `.gitignore`).
+## evidence/logs/log_pointers.md  (direct per-run log pointers)
+
+A single index of **direct pointers to each run's log**, grouped by node — `<store>/<export_id>/<log>`
+(e.g. `train.log`, or the field's equivalent). Pointer-resolution only; do not transcribe logs:
+
+```markdown
+## N22: WD sweep (C04)
+- `data/train/00023-…/train.log`   — winning run
+- packet: v1-008
+```
 
 ---
 
@@ -502,7 +510,6 @@ tree:
     description: "{...}"
     # OPTIONAL enrichment (Research Visualizer; omit when absent):
     # thinking: "{verbatim agent deliberation — why it did/branched}"
-    # code_change: { base_artifact: A01, variant_artifact: A07, lang: python, diff_file: evidence/changes/N01.diff.md }
 ```
 
 Rules:
