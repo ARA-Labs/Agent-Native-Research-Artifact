@@ -170,11 +170,19 @@ whichever layer fits best, preserving the source's granularity. Never silently d
 or released form, *distinct from the prose that describes it*. `src/environment.md` is always
 required (reproducibility). Beyond it, one rule decides everything:
 
-> **Represent every concrete artifact losslessly. When it persists in a linkable external store (a
-> run database, a released/versioned repo), point to it — a comprehensive `src/artifacts.md` index,
-> one link per artifact (every run, config, log, script), nothing aggregated or copied. Capture it
-> into `src/execution/` only when it would otherwise be lost — code that lives solely inside the
-> paper, or a source not externally persisted. Never re-encode a prose-only description as code.**
+> **Represent every concrete artifact losslessly, and split it by KIND into the layer it belongs to:**
+> - **Codebase → `src/`.** The experiment's *code* — source files, scripts, configs — in **any
+>   language** (judged by content, **never** by a `.py` suffix: `.c`/`.cu`, `.js`/`.ts`, `.rs`, `.cpp`,
+>   `.jl`, `.go`, notebooks, shell, … all count). When the code persists in a linkable codebase (a
+>   directory of script variants, a released/versioned repo), `src/artifacts.md` is a **pointer index to
+>   that codebase** — one link per code artifact (every script/config/module), nothing aggregated or
+>   copied. Transcribe into `src/execution/` only when the code would otherwise be **lost** (lives solely
+>   inside the paper, or a source not externally persisted).
+> - **Run records → `evidence/`.** The *outputs* of running that code — per-run logs, metrics, run
+>   tables — are empirical **evidence, not code**: they live in `evidence/results/<node>.md` (run tables)
+>   + `evidence/logs/log_pointers.md` (direct per-run log pointers), linked straight from the trace/claims.
+>   **Never index runs or logs in `src/artifacts.md`** — `artifacts.md` is the codebase, not the run store.
+> Never re-encode a prose-only description as code.
 
 A concrete artifact is real content the cognitive layer doesn't already hold — capture it (grounded
 in the real repo/files when provided), in whatever directory fits. But a method conveyed only in
@@ -199,26 +207,7 @@ the source actually reveals — but the node count and types are **source-bounde
 never invent a dead end, decision, or experiment to hit a number. A paper that hides its failures
 yields a smaller, honest tree (Rule 9 wins).
 
-**Optional per-node changed-code (enrichment for the Research Visualizer).** When the work is a
-sequence of code edits and the scripts are resolvable at compile time, you MAY attach to an experiment
-node the **unified diff** it represents — never required, omitted when unclear:
-1. **Resolve node → representative variant — this link does NOT already exist; construct it.** From the
-   node's `source_refs` / its claims' cited `record_configs` → the run index (`runs.csv`/`runs.jsonl`)
-   row(s) whose family+purpose+bin match → the representative submitted script. Where this is empty or
-   ambiguous (most `decision`/`dead_end` nodes, or evidence that is only journal prose), **omit
-   `code_change`** — never guess a script.
-2. **Resolve node → diff base** from the lineage you already reconstruct for `solution/*` (wave baseline
-   or immediate-parent variant).
-3. **Index both scripts in `src/artifacts.md` under a stable anchor** (`A01`, `A02`, …) carrying real
-   path + sha256 + original location; compute the unified diff (variant vs base) and write it to a tracked
-   **`evidence/changes/<node-id>.diff.md`** sidecar (fenced ```diff, `**Source**` header citing the two
-   anchor ids). Set the node's `code_change: {base_artifact, variant_artifact, lang, diff_file}`. The whole
-   scripts stay pointers (Rule 14) — the diff is a derived, grounded view, like a `derived_subset` table.
-4. **Store-absent ⇒ pointers, not a diff.** If the scripts don't resolve on disk (git-ignored store),
-   still record `code_change` with the anchor ids + a `note`, omit `diff_file` — the visualizer shows a
-   pointer chip. Expected, not a failure.
-
-You MAY also attach `node.thinking` — the agent's deliberation — but **only verbatim** grounded
+You MAY attach `node.thinking` — the agent's deliberation — but **only verbatim** grounded
 journal/decision text; never compose new prose. No verbatim rationale ⇒ leave it absent.
 
 ### Step 3: Generate Files
@@ -271,10 +260,6 @@ Run ARA Seal Level 1. Check:
   heuristic `Code ref` → a real `src/execution/` file (when both exist); tree `evidence:` → claim IDs
 - Evidence: **every numbered table and figure is filed with BOTH a markdown file and a screenshot
   (.png)**; numbered objects not filed are accounted for in `evidence/README.md` with a reason
-- **Changed-code (only if emitted):** each `evidence/changes/<node>.diff.md` cites two `src/artifacts.md`
-  anchors (`base`/`variant`) that resolve; the diff is verbatim; the node's `code_change` points at the
-  sidecar via `diff_file` (or carries a `note` with no `diff_file` when the store was absent). Optional —
-  absent is fine; never invent a diff or a node→script mapping
 - Evidence files have **Source** fields; figures declare Figure type / Extraction method / Reading
   confidence; estimated readings marked `≈` (not `exact_from_labels`); diagrams/qualitative samples
   carry a visual description, not a fabricated table
@@ -322,7 +307,7 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
 12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
-14. **`src/` holds concrete artifacts, not re-encoded prose**: capture every concrete artifact the source actually contains, in its native form, grounded in real files. Three sides: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, so a `.py` just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work has one; (c) when the work's artifacts **persist in a linkable external store** (a run database, a released or versioned repo), represent them as a **comprehensive pointer index** in `src/artifacts.md` — one link per artifact (every run, config, log, script), nothing aggregated into a vague bucket, nothing copied; a lossy subset-copy is the failure. **Transcribe real source into `src/execution/` only when it would otherwise be lost** — code that lives solely inside the paper, or a source not externally persisted (then `# Grounding: transcribed`, cite path). No implementation in the input → neither applies.
+14. **`src/` holds the codebase (code), not run records and not re-encoded prose**: capture every concrete code artifact the source contains, in its native form — **any language, judged by content not by a `.py` extension** (`.c`/`.cu`, `.js`/`.ts`, `.rs`, `.cpp`, `.jl`, `.go`, notebooks, shell, … all count) — grounded in real files. Four sides: (a) never fabricate a code stub from a prose-only method — it already lives in `logic/`, so a stub just duplicates it; (b) never drop a concrete artifact that does exist — a lone `environment.md` is wrong when the work has one; (c) when the work's **codebase** persists in a linkable store (a directory of script variants, a released or versioned repo), index it as a **comprehensive pointer index** in `src/artifacts.md` — one link per code artifact (every script/config/module), nothing aggregated into a vague bucket, nothing copied; a lossy subset-copy is the failure; (d) **run records are NOT code** — per-run logs, metrics, and run tables are empirical evidence and live in `evidence/` (`evidence/results/<node>.md`, `evidence/logs/log_pointers.md`), linked straight from trace/claims, **never in `src/artifacts.md`**. **Transcribe real source into `src/execution/` only when it would otherwise be lost** — code that lives solely inside the paper, or a source not externally persisted (then `# Grounding: transcribed`, cite path). No implementation in the input → none applies.
 15. **Source-bounded minimums**: any count or required field is a target, never a license to invent. If the source supports fewer, produce what is real and note the shortfall; for an unstated field write "Not specified in paper" rather than guessing
 16. **Cite by verification, and ask on conflict**: a source reference (evidence `Source`, trace `source_refs`, claim `Proof`, a repo `file:line`/path) promises the cited location actually contains the claim — open it and confirm. Never transcribe a *description* of an artifact as a verified fact about it. **When the code repo and the paper disagree on a fact (line count, path, value, behavior), do NOT pick one silently — surface the conflict to the user and ask which source to follow.** If unverifiable and the user is unavailable, attribute it ("per §X") or omit. Carry a statistic's scope/denominator in its `Source`. **This extends to every load-bearing number in a claim/heuristic `Statement`/`Rationale`: it carries a `**Sources**` entry whose verbatim «quote» you opened and confirmed contains that value — a memory-filled value or a bare path is fabrication; use `[pending]` when you cannot open the source**
 

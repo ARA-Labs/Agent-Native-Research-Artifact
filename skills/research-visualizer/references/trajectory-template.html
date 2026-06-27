@@ -151,15 +151,6 @@
   table.md th{background:var(--panel2);color:var(--ink);font-weight:700;text-transform:uppercase;font-size:10.5px;letter-spacing:.04em}
   pre.snip{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow:auto;font-size:12px;color:var(--ink);white-space:pre-wrap}
 
-  /* changed-code diff block */
-  pre.diff{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:8px 0;overflow:auto;font-size:12px;margin:11px 0;white-space:pre}
-  pre.diff .dl{display:block;padding:0 12px;border-left:3px solid transparent}
-  pre.diff .dl.add{background:var(--add-bg);color:var(--add-ink);border-left-color:var(--ok)}
-  pre.diff .dl.del{background:var(--del-bg);color:var(--del-ink);border-left-color:var(--warn)}
-  pre.diff .dl.hunk{color:var(--hunk);background:var(--panel2)}
-  pre.diff .dl.meta{color:var(--muted)}
-  pre.diff .dl.ctx{color:#3a423c}
-
   .ptr{font-size:13px;margin:7px 0}
   .ptr .path{font-family:var(--mono);color:#46504a}
   .truncated{color:var(--muted);font-size:11.5px;font-style:italic}
@@ -267,18 +258,13 @@
     "title": "Research Visualizer — template demo",
     "authors": ["(demo data — replaced by the research-visualizer skill)"],
     "year": "", "venue": "", "ara_dir": "",
-    "abstract": "This bare template ships with demo nodes so it opens standalone and shows the reasoning-first layout, a changed-code diff, an experiment, a dead end, and an isolated subtree. Running /research-visualizer on a real ARA overwrites this block."
+    "abstract": "This bare template ships with demo nodes so it opens standalone and shows the reasoning-first layout, an experiment, a dead end, and an isolated subtree. Running /research-visualizer on a real ARA overwrites this block."
   },
   "order": ["N01", "N02", "N03", "NV1"],
-  "artifacts": [
-    { "id":"A01","name":"encode.py @ baseline","path":"src/encode.py","sha256":"0000…base","original_location":"repo@main:src/encode.py" },
-    { "id":"A02","name":"encode.py @ variant","path":"src/encode.py","sha256":"1111…var","original_location":"repo@feat:src/encode.py" }
-  ],
   "nodes": [
-    { "id":"N01","type":"question","parent":null,"title":"Is this template wired correctly end to end?","body":"","thinking":"Before trusting the renderer on real data, prove every node state (reasoning, diff, result, dead end, isolated) shows up from one fixed scaffold.","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:1-4"],
+    { "id":"N01","type":"question","parent":null,"title":"Is this template wired correctly end to end?","body":"","thinking":"Before trusting the renderer on real data, prove every node state (reasoning, result, dead end, isolated) shows up from one fixed scaffold.","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:1-4"],
       "why":[], "result":{"sources":[],"figures":[],"tables":[],"data":[]}, "verified_by":[], "artifact":[] },
     { "id":"N02","type":"experiment","parent":"N01","title":"Precompute the field encoder once per type","body":"Replaced the per-call json.dumps path with a cached per-type encoder; output byte-identical.","thinking":"The profile said serialization dominates, and the dead end showed per-field reflection is the trap — so keep the hand-written encoding but pay its setup cost once, not per request.","support_level":"explicit","isolated":false,"depends_on":[],"source_refs":["notes.md:10-22"],
-      "code_change":{ "base_artifact":"A01","variant_artifact":"A02","lang":"python","diff":"@@ -1,4 +1,5 @@\n def encode(rec):\n-    return json.dumps(rec)\n+    enc = encoder_for(type(rec))\n+    return enc(rec)" },
       "why":[{"id":"C01","statement":"Paying per-type setup once instead of per call removes the hot-path cost without changing output.","status":"supported","conditions":"Holds when the type set is small and stable across calls.","falsification":"If amortized setup ever exceeds the per-call cost it replaces.","provenance":"ai-executed","dependencies":[]}],
       "result":{
         "sources":[{"quote":"p99 down 38%; output byte-identical to the baseline","ref":"figures/demo.md:14"}],
@@ -320,7 +306,6 @@
 
   const nodes = DATA.nodes || [];
   const byId = new Map(nodes.map(n => [n.id, n]));
-  const artifactById = new Map((DATA.artifacts||[]).map(a => [a.id, a]));
   const kids = new Map();
   nodes.forEach(n => kids.set(n.id, []));
   let roots = [];
@@ -373,23 +358,6 @@
   }
   function chips(arr, klass){ return arr&&arr.length ? '<div class="chips">'+arr.map(x=>'<span class="chip '+(klass||"")+'">'+esc(x)+'</span>').join("")+'</div>' : ""; }
 
-  // resolve an artifact id (src/artifacts.md) to a label + a shown-not-resolved pointer tooltip
-  function artLabel(id){ const a=artifactById.get(id); return a ? (a.name||a.path||id) : id; }
-  function artTip(id){ const a=artifactById.get(id); return a ? [a.path,a.sha256,a.original_location||a.original_path].filter(Boolean).join("  ·  ") : ""; }
-  function renderDiff(cc){
-    const head=[];
-    if(cc.base_artifact)    head.push('<span class="chip" title="'+esc(artTip(cc.base_artifact))+'">base: '+esc(artLabel(cc.base_artifact))+'</span>');
-    if(cc.variant_artifact) head.push('<span class="chip" title="'+esc(artTip(cc.variant_artifact))+'">variant: '+esc(artLabel(cc.variant_artifact))+'</span>');
-    if(cc.lang)             head.push('<span class="chip ext">'+esc(cc.lang)+'</span>');
-    const chiprow = head.length?'<div class="chips">'+head.join("")+'</div>':"";
-    if(cc.diff){
-      const lc = L => /^(\+\+\+|---|diff |index )/.test(L) ? "meta" : (L[0]==="+" ? "add" : (L[0]==="-" ? "del" : (/^@@/.test(L) ? "hunk" : "ctx")));
-      const body = String(cc.diff).split("\n").map(L=>'<span class="dl '+lc(L)+'">'+esc(L||" ")+'</span>').join("");
-      return chiprow+'<pre class="diff">'+body+'</pre>';
-    }
-    return chiprow+'<div class="empty">'+esc(cc.note||"Diff not available in this checkout — base/variant scripts not present; pointers only.")+'</div>';
-  }
-
   function renderDetail(n){
     const d = document.getElementById("detail");
     let h = '<div class="dhead"><span class="badge '+cls(n.type)+'">'+esc(n.type)+'</span>'+
@@ -412,11 +380,6 @@
     if(n.rejected_here&&n.rejected_here.length) reason += chipRow("rejected here", n.rejected_here, "chip-rej");
     if(n.recipe_refs&&n.recipe_refs.length) reason += recipeChips(n.recipe_refs);
     h += block(n.thinking?"reasoning":"what", n.type, reason, true, "reason");
-
-    // changed code (unified diff) — open when present
-    if(n.code_change && (n.code_change.diff || n.code_change.base_artifact || n.code_change.variant_artifact || n.code_change.note)){
-      h += block("changed code", n.code_change.lang||"diff", renderDiff(n.code_change), true);
-    }
 
     // result (the grounded payload) — open
     const r = n.result||{};

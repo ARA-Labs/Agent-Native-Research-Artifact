@@ -107,13 +107,9 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
    base64-encode it and put the `data:` URI in `figures[].img`. Use Bash, e.g.
    `python3 -c "import base64,sys;print('data:image/png;base64,'+base64.b64encode(open(sys.argv[1],'rb').read()).decode())" <path>`.
    For data-only figure markdown (no raster), render its data table instead (as a `tables[]` entry).
-   **Also inline code diffs + the artifact index:** for each node with `code_change.diff_file`, read that
-   tracked `evidence/changes/<id>.diff.md` sidecar and inline its fenced diff text into `code_change.diff`
-   (parallel to figures); build the top-level `artifacts[]` index from `src/artifacts.md` so
-   `base_artifact`/`variant_artifact` ids resolve; carry each node's `thinking` (the plain-language
-   narrative from 5c) through.
-   Sanitize all three free-text fields per the Injection contract. The visualizer never computes a diff
-   itself and never opens the external store — it only inlines what the ARA already contains.
+   Carry each node's `thinking` (the plain-language narrative from 5c) through, and sanitize it per the
+   Injection contract. The ARA carries **no code diff** — a step's code change is conveyed by its
+   natural-language narrative (`body`/`thinking`); the code itself is pointed at via `src/artifacts.md`.
 7. **Assemble `ARA_DATA`** (exact schema in `references/binding.md`) and **inject** it: replace ONLY
    the JSON between `/* __ARA_DATA_BEGIN__ */` and `/* __ARA_DATA_END__ */` in the
    `<script id="ara-data">` block of a copy of the template. Write the result to the output path.
@@ -132,10 +128,6 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
   `/* __ARA_DATA_BEGIN__ */` / `/* __ARA_DATA_END__ */`. Escape any `<` in inlined markdown/text as `&lt;`
   (or `<`) — this also neutralizes `</script>`. (A bare `*/` inside a string value is harmless to
   `JSON.parse`; only the exact marker strings would be stripped.)
-- **The verbatim free-text fields `thinking` and `code_change.diff` are the high-risk carriers** (source
-  code routinely contains `/* … */`). If either marker token would appear in their text, break it (e.g.
-  insert a zero-width space inside `__ARA_DATA_…`) so the global marker-strip can't delete it from inside
-  a value. Re-validate: a node whose `thinking`/`diff` contains a marker token MUST round-trip intact.
 - Do not touch anything else in the template — only the bytes between the two markers.
 - After writing, re-validate: the file still parses (the embedded JSON loads). If a figure pushed the
   file very large, apply the size guards in `references/binding.md` (truncate logs/tables, keep figures).

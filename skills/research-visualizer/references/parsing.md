@@ -25,10 +25,6 @@ top-level nodes have `parent: null`.
 - `also_depends_on: [ids]` → emit as `depends_on` (DAG cross-edges).
 - `thinking` — verbatim agent deliberation, **passed straight through** (the primary reasoning block).
   Absent ⇒ omit. Never paraphrase or synthesize it.
-- `code_change` — when the compiler wrote one onto the node (`base_artifact` / `variant_artifact` /
-  `lang` / `diff_file`), **pass it through**. The `diff_file`→`diff` inlining and the top-level
-  `artifacts[]` index are done in the binding/inline step (binding.md); the visualizer never computes a
-  diff itself. Absent ⇒ omit.
 
 ## 3. Title + body normalization (the dialect bridge)
 
@@ -106,9 +102,6 @@ a `{thought, action, observation/result}`. Map it onto the tree:
 - `body` = what it actually did + what came back (action + observation).
 - `source_refs` = a pointer back to the log line(s) (shown, never resolved).
 - nesting via `children`; convergence via `also_depends_on`; a discarded branch via `isolated`.
-
-No `logic/` or `evidence/` is required; enrich the same tree later (via the compiler) to add claims,
-evidence, and per-node `code_change` diffs.
 
 # 8. The four `logic/` enrichment layers (all optional)
 

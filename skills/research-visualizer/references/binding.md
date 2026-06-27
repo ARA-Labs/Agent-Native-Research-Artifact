@@ -49,33 +49,12 @@ Fallback if no README row: scan the figure/table `.md` for an inline `Supports C
 - A figure's caption/title comes from the first heading or the `What it shows` section of its `.md`.
 
 ### What counts as "code" now
-There is usually no `src/execution/*.py`. Populate `artifact[]` from `src/artifacts.md` (the run-index
-row / `record_configs/` path / named submitted variant file) plus the relevant
-`logic/solution/*.md` recipe section. Only when a real transcribed `src/execution/*.py` exists
-(legacy / paper-only code) do you point at that file. **Never resolve the external store in v1** —
-the pointer text is the value.
-
-### The changed-code diff (`node.code_change`) — compiler-produced, visualizer-rendered
-A full ARA may carry, per experiment node, the **unified diff** the step represents. The addresses
-live in ONE place and are referenced by id (weak coupling):
-
-`node.code_change` → `evidence/changes/<node-id>.diff.md` (the diff **text**) → `artifacts[]` /
-`src/artifacts.md` entry (path + sha256 + original location) → the original repo.
-
-- The diff **text** is grounded by citing the two **artifact ids** (`base_artifact`, `variant_artifact`),
-  never an embedded path. Whole scripts stay pointers in `src/artifacts.md` (Rule 14) — the diff is a
-  derived, grounded view (≈ a `derived_subset` table), not a copy of the artifact.
-- **`diff_file` → `diff` inlining** (parallel to figures' `.md`→base64 `img`): on disk the node carries
-  `code_change.diff_file: "evidence/changes/<id>.diff.md"`; the visualizer reads that **tracked** sidecar
-  and inlines its fenced diff text into `code_change.diff` in `ARA_DATA`, so the rendered HTML stays
-  self-contained (the sidecar lives inside the ARA dir).
-- **`artifactById`**: the visualizer builds an `id → artifacts[] entry` map (parallel to `nodeByClaim`)
-  and resolves `base_artifact`/`variant_artifact` into the shown-not-resolved pointer chip under the diff.
-- **Degrade**: when the scripts don't resolve at compile time (store absent), the compiler emits
-  `code_change` with the artifact ids + a `note` but no diff; the viewer shows a pointer chip, not a diff.
-- **Marker safety**: `diff` is verbatim and `thinking` is authored prose; both are free-text, so the producer MUST ensure neither the literal
-  `/* __ARA_DATA_BEGIN__ */` / `/* __ARA_DATA_END__ */` tokens nor `</script>` appears in any inlined
-  string (escape `<`→`&lt;`; break the marker tokens). See SKILL.md "Injection contract".
+`src/artifacts.md` is the **codebase** pointer index — the code (scripts/configs/modules) in **any
+language** (never assume `.py`). Populate `artifact[]` from it plus the relevant `logic/solution/*.md`
+recipe section. The **run records** a node produced are NOT code — they arrive via `result` (from
+`evidence/results/` run tables + `evidence/logs/log_pointers.md`), never via `artifact[]`. Only when a
+real transcribed `src/execution/` file exists (legacy / paper-only code) do you point at it.
+**Never resolve the external store in v1** — the pointer text is the value.
 
 ## The `ARA_DATA` object (exact schema the scaffold reads)
 
@@ -91,13 +70,6 @@ live in ONE place and are referenced by id (weak coupling):
   // Traversal order for Replay and ← →. A flat list of node ids in the order to step through
   // (typically a pre-order DFS of the tree). If omitted, the scaffold derives a DFS from `parent`.
   "order": ["N01", "N02", "N03", "..."],
-
-  // OPTIONAL addressable artifact index (from src/artifacts.md). Each script the compiler points at
-  // gets a stable id so a node's code_change can reference it BY ID (no embedded path). Omit if absent.
-  "artifacts": [
-    { "id":"A01", "name":"<artifact name>", "path":"<repo-relative path>", "sha256":"<...>",
-      "original_location":"<store/repo ref>", "pointer":"<src/artifacts.md pointer text>" }
-  ],
 
   "nodes": [
     {
@@ -132,15 +104,7 @@ live in ONE place and are referenced by id (weak coupling):
 
       "artifact": [                // src/artifacts.md pointers + solution recipe refs (pointer text only)
         { "name":"<artifact / family name>", "pointer":"<src/artifacts.md pointer text>", "what":"pointer index entry" }
-      ],
-
-      "code_change": {             // OPTIONAL — the changed-code diff for this step (compiler-produced)
-        "base_artifact":"A01",     // → artifacts[].id (holds path+sha+original_location)
-        "variant_artifact":"A07",  // → artifacts[].id
-        "lang":"python",
-        "diff":"<unified-diff text, inlined by the visualizer from evidence/changes/<id>.diff.md>",
-        "note":""                  // set (with diff absent) when the scripts didn't resolve → pointer-only chip
-      }
+      ]
     }
     // ... one object per trace node
   ]
@@ -151,8 +115,8 @@ live in ONE place and are referenced by id (weak coupling):
 - Every node MUST have `id`, `type`, `title`, `parent` (or null). All other arrays default to `[]`,
   scalars to `null`/`""`. The scaffold tolerates missing optional fields.
 - Put **only what the source contains**. Empty `why`/`result`/`verified_by`/`artifact` is fine and
-  common (e.g. a bare `decision` node) — the viewer simply omits those blocks. `thinking` and
-  `code_change` are likewise optional; omit when absent (a payload without them is byte-compatible).
+  common (e.g. a bare `decision` node) — the viewer simply omits those blocks. `thinking` is likewise
+  optional; omit when absent (a payload without it is byte-compatible).
 - `status` is lower-cased by the viewer for styling; pass it as written (`Supported`, `hypothesis`, …).
 
 ### Size guards
