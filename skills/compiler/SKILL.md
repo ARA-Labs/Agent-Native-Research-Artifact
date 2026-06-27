@@ -16,7 +16,7 @@ allowed-tools: Read, Write, Edit, Bash(python *|git clone *|ls *|mkdir *), Glob,
 metadata:
   author: ara-commons
   category: research-tooling
-  version: "1.2.0"
+  version: "1.2.1"
   tags: [research, compilation, artifacts, knowledge-extraction]
 ---
 

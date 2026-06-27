@@ -22,7 +22,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *|base64 *|find *|ls 
 metadata:
   author: ara-commons
   category: research-tooling
-  version: "1.0.0"
+  version: "1.0.1"
   tags: [research, visualization, trajectory, exploration-tree, html]
 ---
 
