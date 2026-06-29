@@ -1,6 +1,6 @@
 # @ara-commons/ara-skills
 
-One-command installer for the four **Agent-Native Research Artifact (ARA)** skills:
+One-command installer for the five **Agent-Native Research Artifact (ARA)** skills:
 
 | Skill | Invoke | What it does |
 |-------|--------|--------------|
@@ -8,6 +8,7 @@ One-command installer for the four **Agent-Native Research Artifact (ARA)** skil
 | `research-manager` | `/research-manager`        | Post-session recorder that captures decisions, dead ends, and claims |
 | `rigor-reviewer`   | `/rigor-reviewer <dir>`    | ARA Seal Level 2 semantic epistemic review across six dimensions |
 | `research-visualizer` | `/research-visualizer <dir>` | Render an ARA into one interactive, self-contained trajectory.html |
+| `submit-ara`       | `/submit-ara <dir>`        | Validate/compile, visualize, publish to your GitHub, and list on the ARA Hub |
 
 ## Quick start
 
@@ -65,4 +66,4 @@ In dev mode the CLI reads skills from the sibling `../../skills/` directory. On 
 
 ## Upstream source of truth
 
-The four skill directories live at the repo root under `skills/`. Edit them there — never edit the copy inside this package, which is created on demand by `prepack`.
+The five skill directories live at the repo root under `skills/`. Edit them there — never edit the copy inside this package, which is created on demand by `prepack`.

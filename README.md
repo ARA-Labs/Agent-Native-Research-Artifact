@@ -1,7 +1,7 @@
 # Agent-Native Research Artifact (ARA)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-4%20skills-green)](skills/)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-5%20skills-green)](skills/)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.24658-b31b1b.svg)](https://arxiv.org/abs/2604.24658)
 [![Poster](https://img.shields.io/badge/Poster-PDF-orange.svg)](docs/poster.pdf)
 [![Demo](https://img.shields.io/badge/Demo-ARA--Demo-purple.svg)](https://github.com/ARA-Labs/ARA-Demo)
@@ -47,9 +47,9 @@ Research is rarely a straight line; it is a messy graph of pivots and dead ends.
 
 Supervising AI scientists shouldn't require reading endless terminal outputs. The system translates complex agent behaviors and exploration graphs into a clean, minimalist interface. It lets human researchers maintain high-level oversight, seamlessly stepping in to course-correct or guide the AI's behavior with zero friction.
 
-## 🛠️ Quickstart: The Four Core Skills
+## 🛠️ Quickstart: The Five Core Skills
 
-To operationalize these design principles, ARA provides four specialized agent skills. You can install them via:
+To operationalize these design principles, ARA provides five specialized agent skills. You can install them via:
 
 ```bash
 npx @ara-commons/ara-skills
@@ -65,6 +65,7 @@ Then reach for a skill by what you need:
 | **Compile** an existing paper, repo, or notes into a structured ARA | **compiler** | `/compiler <path>` |
 | **Verify** an artifact's epistemic rigor before you trust, publish, or submit it | **rigor-reviewer** | `/rigor-reviewer <dir>` |
 | **Observe** the full research trajectory in an interactive process map | **research-visualizer** | `/research-visualizer <ara-dir>` |
+| **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
 
 **Make capture automatic.** Append this to your agent's system-prompt file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) so the record fills itself in every session:
 
@@ -78,7 +79,8 @@ See each skill's `SKILL.md` for the full specification:
 [research-manager](skills/research-manager/SKILL.md) ·
 [compiler](skills/compiler/SKILL.md) ·
 [rigor-reviewer](skills/rigor-reviewer/SKILL.md) ·
-[research-visualizer](skills/research-visualizer/SKILL.md)
+[research-visualizer](skills/research-visualizer/SKILL.md) ·
+[submit-ara](skills/submit-ara/SKILL.md)
 
 ---
 

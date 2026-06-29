@@ -1,0 +1,3 @@
+[submodule "docs/ara-hub"]
+	path = docs/ara-hub
+	url = https://github.com/ARA-Labs/ara-hub.git

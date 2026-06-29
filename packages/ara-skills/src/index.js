@@ -17,7 +17,7 @@ ${chalk.bold('Usage:')}
 
 ${chalk.bold('Install options:')}
   --all                         Install every skill (default if no --skill given)
-  --skill <id>                  Install one skill (repeatable). Ids: compiler, research-manager, rigor-reviewer, research-visualizer
+  --skill <id>                  Install one skill (repeatable). Ids: compiler, research-manager, rigor-reviewer, research-visualizer, submit-ara
   --agent <id>                  Target one agent (repeatable). Default: auto-detect, else claude-code
   --local                       Install into ./<agent>/skills instead of $HOME
   --force                       Overwrite existing installations
