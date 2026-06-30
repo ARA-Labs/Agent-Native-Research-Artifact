@@ -232,8 +232,34 @@ Collect all issues found across the six dimensions into a single findings list. 
 - **observation**: what you found (factual)
 - **reasoning**: why it matters (analytical)
 - **suggestion**: how to fix or improve it (constructive)
+- **fix_class**: how the suggestion can be carried out — one of:
+  - `authoring-auto` — a wording/scope/structure fix needing NO new data (reword a claim, soften an
+    over-claim, move a mechanism from Statement to Interpretation, split/merge a tree node, add a
+    cross-ref, fix terminology). Downstream-auto-executable.
+  - `data-derivable-auto` — a new evidence file/table whose every value already exists in a source
+    the ARA cites (an evidence file, the trace, a repo file). Downstream-auto-executable; REQUIRES
+    `fix_action.source_for_data`.
+  - `compute-bound-defer` — needs a NEW run, rerun, ablation, paired-seed protocol, or measurement
+    not already in the data. Human/compute only.
+  - `external-defer` — needs fetching a URL/paper/repo not in the ARA.
+  - `judgment-defer` — a research decision the author must make (which contradictory result to keep,
+    a scope call).
+  Decision test for derivable-vs-defer: *can every cell of the proposed fix be quoted from a source
+  already in the ARA?* Yes → an `-auto` class; any cell needs running something → a `-defer` class.
+  When unsure, choose a `-defer` class (a missed auto-fix is cheap; a fabricated one is fatal).
+- **fix_action** (REQUIRED when fix_class ends in `-auto`; omit otherwise): a structured,
+  deterministic instruction so a remediation agent applies the fix without re-deriving it —
+  `{ "op": "reword_claim | add_evidence_table | split_tree_node | add_cross_ref | scope_tighten |
+  move_to_interpretation | add_attribution", "target": "<file>:<entity>", "source_for_data":
+  "<exact source ref — MANDATORY for data-derivable-auto, proves no fabrication>", "spec":
+  "<concrete new wording or table rows>" }`
 
 Sort findings by severity: critical first, then major, minor, suggestion.
+
+This per-finding triage drives the optional remediation step (Step 8): if the user authorizes
+fixing, you apply the `-auto` findings yourself **strictly per `references/remediation.md`** (the
+Seal Level 3 contract — fabrication firewall, re-seal after each round, defer the rest). Populating
+`fix_class`/`fix_action` honestly is what makes that remediation deterministic and fabrication-safe.
 
 ### Step 6: Compute Overall Grade
 
@@ -255,7 +281,7 @@ Write `level2_report.json` to the artifact root:
 {
   "artifact": "<name>",
   "artifact_dir": "<path>",
-  "review_version": "3.0.0",
+  "review_version": "3.1.0",
   "prerequisite": "Level 1 passed",
 
   "overall": {
@@ -295,7 +321,44 @@ Write `level2_report.json` to the artifact root:
       "evidence_span": "**Baselines**: No random or retrieval-only baseline reported",
       "observation": "E03 evaluates four LLMs on research ideation but includes no non-LLM baseline.",
       "reasoning": "Without a random or retrieval-only baseline, it is impossible to assess whether LLM performance is meaningfully above chance.",
-      "suggestion": "Add a retrieval-only baseline (e.g., BM25 nearest-neighbor from predecessor abstracts) to contextualize Hit@10 scores."
+      "suggestion": "Add a retrieval-only baseline (e.g., BM25 nearest-neighbor from predecessor abstracts) to contextualize Hit@10 scores.",
+      "fix_class": "compute-bound-defer",
+      "fix_action": null
+    },
+    {
+      "finding_id": "F02",
+      "dimension": "D3_scope_calibration",
+      "severity": "minor",
+      "target_file": "logic/claims.md",
+      "target_entity": "C05",
+      "evidence_span": "no isolated optimizer-side mechanism ... broke below ~3000 steps",
+      "observation": "C05's Statement reads as scale-general while its evidence is one model/batch/data regime.",
+      "reasoning": "A reader skimming the Statement may over-generalize beyond the tested scale.",
+      "suggestion": "Echo the 'this scale only' bound from the Interpretation into the Statement.",
+      "fix_class": "authoring-auto",
+      "fix_action": {
+        "op": "scope_tighten",
+        "target": "logic/claims.md:C05",
+        "spec": "Prepend 'At this scale only (124M / 524K batch / FineWeb / <=3500-step horizon),' to the Statement and add a sentence that the claim is not asserted at other scales."
+      }
+    },
+    {
+      "finding_id": "F03",
+      "dimension": "D1_evidence_relevance",
+      "severity": "major",
+      "target_file": "logic/claims.md",
+      "target_entity": "C09",
+      "evidence_span": "Aurora hyperparameters do not transfer across base stacks",
+      "observation": "C09 is grounded only in trace narrative; no filed evidence table captures the cross-stack HP sweep.",
+      "reasoning": "A methodological claim should be as inspectable as the positive claims.",
+      "suggestion": "File a cross-stack Aurora HP table from the already-recorded sweep numbers.",
+      "fix_class": "data-derivable-auto",
+      "fix_action": {
+        "op": "add_evidence_table",
+        "target": "evidence/tables/table_aurora_hp.md",
+        "source_for_data": "v3/claude-code/scratchpad/THREAD.md (2026-05-12 Aurora HP sweep cells)",
+        "spec": "One row per swept cell (base, axis=value, n, mean, margin), tag Extraction type: derived_subset; wire into C09 Evidence basis + evidence/README ledger; render sibling PNG."
+      }
     }
   ],
 
@@ -307,6 +370,36 @@ Write `level2_report.json` to the artifact root:
   "read_order": ["PAPER.md", "logic/claims.md", "..."]
 }
 ```
+
+### Step 8: Offer to fix the auto-fixable findings
+
+After the report is written, look at the findings you just produced and count those whose
+`fix_class` ends in `-auto` (`authoring-auto` or `data-derivable-auto`) — the ones fixable now from
+the ARA's own data, with no new compute. Then:
+
+- **If there is ≥1 auto-fixable finding**, ask the user — via the harness `AskUserQuestion` tool —
+  whether to apply them now. Keep it to one concise question; surface the counts and what stays
+  deferred. Suggested shape:
+  - question: e.g. *"Review done — grade {grade} ({mean}). I found {A} auto-fixable issue(s) (no new
+    compute) and {D} that need experiments/judgment. Fix the auto ones now?"*
+  - options:
+    - **"Yes — auto-fix now (Recommended)"** → **read `references/remediation.md` and apply the
+      `-auto` findings strictly per that contract** (fabrication firewall; re-run Seal Level 1 after
+      each round via `references/seal1_check.py`; record every edit with provenance; defer the rest).
+      Then report what was fixed vs deferred.
+    - **"No — just leave the report"** → stop; the findings stay in `level2_report.json` as the
+      author's worklist.
+    - (optionally) **"Show me the auto-fixable findings first"** → print the `-auto` findings (id,
+      target, suggestion, fix_action) and re-ask.
+  - Be explicit that `-defer` findings (compute/experiment/external/judgment) will NOT be touched
+    either way — they always require the human.
+- **If there are zero auto-fixable findings**, do NOT prompt. Just report the grade and the deferred
+  worklist (prompting with nothing to do is noise).
+
+Honor the result: only remediate on an affirmative first-person answer ("yes" / "fix them"). Do not
+auto-fix on silence or a hedged reply. Once authorized, **follow `references/remediation.md` exactly
+— every constraint there is binding**; do not improvise fixes outside it (in particular, never file a
+`data-derivable-auto` table without a `source_for_data`, the fabrication firewall).
 
 ---
 
@@ -326,8 +419,13 @@ Write `level2_report.json` to the artifact root:
 
 7. **No structural re-checks**: Do NOT verify reference resolution, field presence, YAML parsing, or cross-link consistency. Level 1 has already validated all of this. Focus entirely on whether the *content* is epistemically sound.
 
+8. **Consent before fixing; auto only**: never modify the ARA during review. Offer remediation only after the report is written (Step 8), only when ≥1 auto-fixable finding exists, and only proceed on an explicit first-person "yes." `-defer` findings (compute/experiment/external/judgment) are never auto-applied — they always go to the human worklist.
+
 ---
 
 ## Reference
 
-See `references/review-dimensions.md` for scoring anchor details and check inventories per dimension.
+- `references/review-dimensions.md` — scoring anchor details and check inventories per dimension.
+- `references/remediation.md` — the Seal Level 3 remediation contract; load and obey it **only**
+  after the user authorizes fixing in Step 8 (fabrication firewall, re-seal, defer rules).
+- `references/seal1_check.py` — portable Seal Level 1 validator; run after each remediation round.
