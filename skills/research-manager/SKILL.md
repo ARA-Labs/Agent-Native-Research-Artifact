@@ -343,6 +343,12 @@ ara/
 
 Nested DAG. Each node may have `children:`. Use `also_depends_on: [N{XX}]` for cross-edges.
 
+The tree's shape stays recoverable from a flat append log through two fields you already write: mark
+each level/phase **boundary** as a `pivot` (or `question`) node (it opens a new branch), and list what
+a node builds on in `also_depends_on`. Only when a node resumes an **earlier** branch — rather than
+continuing the step right before it — add an explicit `parent: N{XX}` to point back; in the common
+case its place is already implied and no extra field is needed.
+
 ```yaml
 tree:
   - id: N01
@@ -363,6 +369,8 @@ tree:
     to: ""            # pivot
     trigger: ""       # pivot
     status: open | resolved | unresolved   # unresolved used for contradiction-decision nodes
+    also_depends_on: []  # cross-edges (ids) — what this node builds on
+    parent: N{XX}        # OPTIONAL — only to point back to an earlier branch; omit when implied
     children:
       - { ... }
 ```
