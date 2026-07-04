@@ -1,6 +1,6 @@
 {
   "name": "@ara-commons/ara-skills",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Install Agent-Native Research Artifact (ARA) skills — compiler, research-manager, rigor-reviewer, research-visualizer, submit-ara — into Claude Code, Cursor, OpenCode, Gemini CLI, Codex, and more.",
   "type": "module",
   "bin": {
