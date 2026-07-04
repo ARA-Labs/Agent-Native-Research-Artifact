@@ -8,12 +8,13 @@ import { listSkills } from '../src/skills.js';
 import { SUPPORTED_AGENTS, getAgentById } from '../src/agents.js';
 import { install, uninstall, update, listInstalled } from '../src/installer.js';
 
-test('listSkills discovers the five ARA skills', () => {
+test('listSkills discovers the six ARA skills', () => {
   const ids = listSkills().map((s) => s.id).sort();
   assert.deepEqual(ids, [
     'compiler',
     'research-manager',
     'research-visualizer',
+    'research-world-model',
     'rigor-reviewer',
     'submit-ara',
   ]);
