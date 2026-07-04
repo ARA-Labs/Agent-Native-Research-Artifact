@@ -12,7 +12,7 @@ metadata:
   category: world-model-engine
   layer: L2-predictor
   binds-to: CONTRACT.md §0, §2, §3, §4
-  version: "3.0.0"
+  version: "1.0.0"
 ---
 
 # Predictor — Grounded Answering over One ARA (PREDICT.md)

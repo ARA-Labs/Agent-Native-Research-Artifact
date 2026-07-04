@@ -12,6 +12,11 @@ description: >
   forecast the loss curve, will this help, why did this work, what should I try next,
   is this claim sound, compare these, retrieve precedent, what precedent surfaces.
 allowed-tools: Read, Grep, Glob
+metadata:
+  author: ara-commons
+  category: research-tooling
+  version: "1.0.0"
+  tags: [research, world-model, retrieval, prediction, grounded-answering]
 ---
 
 # research-world-model — the ARA World Model

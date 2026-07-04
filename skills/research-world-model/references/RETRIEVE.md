@@ -11,7 +11,7 @@ metadata:
   category: world-model-engine
   layer: L2-retriever
   binds-to: CONTRACT.md §0, §1, §2, §3, §4
-  version: "2.0.0"
+  version: "1.0.0"
 ---
 
 # Retriever — Agentic Retrieval over One ARA (RETRIEVE.md)
