@@ -11,8 +11,28 @@ Accept both:
 - `tree:` → a **list** of root nodes (canonical).
 - `root:` → a **single** root node. Treat it as a one-element root list.
 
-Children nest under each node's `children:` list. A node's `parent` is the nearest enclosing node;
-top-level nodes have `parent: null`.
+Children nest under each node's `children:` list — that physical nesting is **authoritative**. But
+most append-only artifacts are written turn-by-turn and stay **flat**: every node sits at the top
+level and lineage is carried only by `also_depends_on`. Taken literally that renders as N parallel
+roots (one box per node, no indentation). So derive each node's `parent` (the single **spine** edge
+that drives indentation) by this precedence — **first match wins**:
+
+1. **Physically nested** under a `children:` list → `parent` = the nearest enclosing node.
+2. **Declared spine** — the node carries an explicit `parent: <id>` field → use it verbatim.
+3. **Boundary node** — `type` ∈ {`pivot`, `question`} → it roots a section: `parent` = the root
+   question (the first `question` node in document order), else `null`. A pivot is *by definition* a
+   new branch — never hang it off its `also_depends_on`.
+4. **Continuation node** (any other type) → `parent` = its **primary antecedent**: among
+   `also_depends_on`, the **most-recent earlier node** (latest `timestamp`; tiebreak highest id) that
+   (a) resolves to a node in this tree, (b) isn't the node itself, (c) isn't a forward reference. Skip
+   non-node refs (claim ids like `C14`, prose). If none qualifies → the nearest preceding
+   `pivot`/`question` (the section it falls under), else `null`.
+
+Steps 1–2 are **authoritative** (the spine was recorded at write time); 3–4 are a **best-effort
+spanning tree** for flat legacy artifacts and must never contradict a recorded `children`/`parent`.
+After assignment, **break cycles**: if `parent` pointers ever loop, sever the back-edge to `null`.
+A top-level node has `parent: null`. The non-spine `also_depends_on` edges still render as
+`depends_on` cross-chips (§2 below) — nothing is lost, only one edge is promoted to the spine.
 
 ## 2. Node identity & type
 
