@@ -1,5 +1,5 @@
 ---
-name: research-world-model
+name: research-foresight
 description: >
   ARA World Model — read-only reasoning engine over ONE Agent-Native Research Artifact (ARA), run
   LOCALLY with Claude Code itself as the LLM (no SDK, no API key). Given an ARA directory and a
@@ -19,7 +19,7 @@ metadata:
   tags: [research, world-model, retrieval, prediction, grounded-answering]
 ---
 
-# research-world-model — the ARA World Model
+# research-foresight — the ARA World Model
 
 You (Claude Code) are the LLM that runs the engine — no SDK, no API key, no network call. The
 engine is three reference contracts under this skill's `references/` directory (quote every path;

@@ -47,9 +47,9 @@ Research is rarely a straight line; it is a messy graph of pivots and dead ends.
 
 Supervising AI scientists shouldn't require reading endless terminal outputs. The system translates complex agent behaviors and exploration graphs into a clean, minimalist interface. It lets human researchers maintain high-level oversight, seamlessly stepping in to course-correct or guide the AI's behavior with zero friction.
 
-## 🛠️ Quickstart: The Five Core Skills
+## 🛠️ Quickstart: The Six Core Skills
 
-To operationalize these design principles, ARA provides five specialized agent skills. You can install them via:
+To operationalize these design principles, ARA provides six specialized agent skills. You can install them via:
 
 ```bash
 npx @ara-commons/ara-skills
@@ -66,6 +66,32 @@ Then reach for a skill by what you need:
 | **Verify** an artifact's epistemic rigor before you trust, publish, or submit it | **rigor-reviewer** | `/rigor-reviewer <dir>` |
 | **Observe** the full research trajectory in an interactive process map | **research-visualizer** | `/research-visualizer <ara-dir>` |
 | **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
+| **Ask** an ARA anything — what to try next, why something worked, what happens if you change X | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
+
+### Ask your artifact: `research-foresight`
+
+The ARA is not just a record — it is a **world model** your agent can query. `research-foresight`
+turns any coding agent into a read-only reasoning engine over one ARA: it retrieves precedent from
+the artifact's native files (claims, trace nodes, dead ends, evidence), then answers the question
+you actually asked — grounded in citations, with the speculative part labelled. No SDK, no API key;
+the agent itself is the LLM.
+
+```text
+/research-foresight ./ara "what if I double the warmup steps?"
+```
+
+It returns the **answer** plus an honesty envelope:
+
+- `basis` — the native refs it actually read (`trace:N31`, `logic/claims.md#C05`, …)
+- `grounded_inference` vs `speculative_leap` — what follows from the artifact vs the named extrapolation beyond it
+- `confidence` + `confidence_reason` — how much to trust it, and the real limiting factor
+- `falsifiable` — the concrete observation that would overturn the answer
+
+Forward prediction is the marquee case, but any question works: *why did this ablation help? is
+claim C07 still sound? compare the two optimizer branches; what should I try next?* Ruled-out
+directions (dead ends, refuted claims) are surfaced and honoured rather than silently repeated.
+The engine is read-only by construction (`allowed-tools: Read, Grep, Glob`) — it never writes to
+the artifact.
 
 **Make capture automatic.** Append this to your agent's system-prompt file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) so the record fills itself in every session:
 
@@ -80,7 +106,8 @@ See each skill's `SKILL.md` for the full specification:
 [compiler](skills/compiler/SKILL.md) ·
 [rigor-reviewer](skills/rigor-reviewer/SKILL.md) ·
 [research-visualizer](skills/research-visualizer/SKILL.md) ·
-[submit-ara](skills/submit-ara/SKILL.md)
+[submit-ara](skills/submit-ara/SKILL.md) ·
+[research-foresight](skills/research-foresight/SKILL.md)
 
 ---
 

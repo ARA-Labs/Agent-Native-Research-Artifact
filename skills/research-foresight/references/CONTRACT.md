@@ -44,7 +44,7 @@
 ## 1. Engine layout
 
 ```
-research-world-model/                # ENGINE — the skill, all-English contracts, no per-ARA data
+research-foresight/                  # ENGINE — the skill, all-English contracts, no per-ARA data
   SKILL.md                           # entry point: retrieve precedent, then answer the question
   references/
     CONTRACT.md                      # this file — the foundation both contracts bind to

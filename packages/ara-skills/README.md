@@ -8,7 +8,7 @@ One-command installer for the six **Agent-Native Research Artifact (ARA)** skill
 | `research-manager` | `/research-manager`        | Post-session recorder that captures decisions, dead ends, and claims |
 | `rigor-reviewer`   | `/rigor-reviewer <dir>`    | ARA Seal Level 2 semantic epistemic review across six dimensions |
 | `research-visualizer` | `/research-visualizer <dir>` | Render an ARA into one interactive, self-contained trajectory.html |
-| `research-world-model` | `/research-world-model <dir> "<query>"` | Ask the ARA anything and get a grounded, falsifiable answer — read-only, no API key |
+| `research-foresight` | `/research-foresight <dir> "<query>"` | Ask the ARA anything and get a grounded, falsifiable answer — read-only, no API key |
 | `submit-ara`       | `/submit-ara <dir>`        | Validate/compile, visualize, publish to your GitHub, and list on the ARA Hub |
 
 ## Quick start

@@ -12,9 +12,9 @@ test('listSkills discovers the six ARA skills', () => {
   const ids = listSkills().map((s) => s.id).sort();
   assert.deepEqual(ids, [
     'compiler',
+    'research-foresight',
     'research-manager',
     'research-visualizer',
-    'research-world-model',
     'rigor-reviewer',
     'submit-ara',
   ]);
