@@ -7,7 +7,7 @@ description: >
   equally why-did-this-work, what-should-I-try, is-this-sound, how-do-these-compare, or anything
   else — by retrieving precedent from the ARA's native files (references/RETRIEVE.md) and answering
   as the Predictor (references/PREDICT.md): a bold, grounded, falsifiable Answer shaped to what the
-  question actually calls for. Forward prediction is the marquee case, not the only one.
+  question actually calls for.
   TRIGGERS: ask the world model, wm predict, predict with the world model, what if I change X,
   forecast the loss curve, will this help, why did this work, what should I try next,
   is this claim sound, compare these, retrieve precedent, what precedent surfaces.

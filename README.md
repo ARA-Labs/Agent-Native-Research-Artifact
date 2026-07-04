@@ -87,8 +87,8 @@ It returns the **answer** plus an honesty envelope:
 - `confidence` + `confidence_reason` — how much to trust it, and the real limiting factor
 - `falsifiable` — the concrete observation that would overturn the answer
 
-Forward prediction is the marquee case, but any question works: *why did this ablation help? is
-claim C07 still sound? compare the two optimizer branches; what should I try next?* Ruled-out
+Any question works: *why did this ablation help? is claim C07 still sound? compare the two
+optimizer branches; what should I try next?* — the answer takes whatever shape the question calls for. Ruled-out
 directions (dead ends, refuted claims) are surfaced and honoured rather than silently repeated.
 The engine is read-only by construction (`allowed-tools: Read, Grep, Glob`) — it never writes to
 the artifact.

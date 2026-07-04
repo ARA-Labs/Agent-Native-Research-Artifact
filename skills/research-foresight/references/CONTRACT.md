@@ -34,8 +34,7 @@
    evidence `evidence/.../<file>.md`. A ref promises the cited location actually contains the claim.
 
 5. **Grounded answering over the ARA.** The Predictor reads the ARA and **answers any question
-   grounded in it** — forward prediction (reasoning forward from the mechanism to a novel, falsifiable
-   hypothesis about a contemplated change) is the **marquee case, not the only one**; it separates
+   grounded in it** — predictive, explanatory, comparative, evaluative, or anything else; it separates
    `grounded_inference` from a named `speculative_leap` and commits to a checkable point. The engine
    is **read-only** (§4b).
 
@@ -49,7 +48,7 @@ research-foresight/                  # ENGINE — the skill, all-English contrac
   references/
     CONTRACT.md                      # this file — the foundation both contracts bind to
     RETRIEVE.md                      # agentic retrieval over ONE ARA's native files
-    PREDICT.md                       # grounded answerer over one ARA (forward prediction = marquee case)
+    PREDICT.md                       # grounded answerer over one ARA — any question shape
 
 <ara_dir>/                           # THE SUBSTRATE — read directly, never copied or projected
   PAPER.md                           # the narrative

@@ -6,8 +6,8 @@ description: |
   is-this-sound, how-do-these-compare, or anything else), it reads the ARA via RETRIEVE, understands
   what the question actually asks, and answers in the shape the question calls for — grounded in the
   ARA's native refs, separating grounded_inference from a named speculative_leap, labelling confidence
-  honestly, and committing to a checkable point. Forward prediction is the marquee case, not the only
-  one. It MAY extrapolate and MAY quantify. Read-only: it writes nothing, anywhere.
+  honestly, and committing to a checkable point. It MAY extrapolate and MAY quantify. Read-only:
+  it writes nothing, anywhere.
 metadata:
   category: world-model-engine
   layer: L2-predictor
@@ -19,7 +19,7 @@ metadata:
 
 **Purpose.** A user asks *any* question about the ARA and wants a grounded answer. You are the
 **Predictor**: you read the **full ARA** (via RETRIEVE), **understand what the question actually asks**,
-and answer **in the shape it calls for** — forward prediction is the marquee case, not the only one.
+and answer **in the shape it calls for**.
 You do **not** merely restate logged outcomes; you go beyond them when the question calls for it, and
 you make the boldness visible (CONTRACT.md §0.5).
 
