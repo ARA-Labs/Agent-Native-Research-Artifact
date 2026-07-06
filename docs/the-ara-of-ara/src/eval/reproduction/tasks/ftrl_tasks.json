@@ -1,0 +1,254 @@
+[
+  {
+    "task_id": "ftrl_T01",
+    "goal": "Implement the NetHack environment, LSTM model architecture, data pipeline, and APPO training infrastructure. Set up the NetHack environment from NLE, implement the 30M LSTM architecture (ReLU, hidden dim 1738), acquire the Tuyls et al. (2023) pre-trained checkpoint, construct the NLD-AA dataset (8000 Human Monk games), and configure APPO training with all hyperparameters from Table 1 (ADAM optimizer with specified betas, lr 0.0001, weight decay 0.0001, batch size 128, gradient clipping 4, discount 0.999999, rollout size 32, clip 0.1, baseline cost 1.0, entropy cost 0.001, reward clipping +-10). Implement the critic head pre-training for 500M steps and encoder freezing during fine-tuning. Also implement the evaluation protocol (average return, rollout termination conditions, max dungeon level tracking).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C04: Knowledge retention methods mitigate FPC \u2014 requires correct NetHack infrastructure as prerequisite"
+    ],
+    "rubric_requirement_ids": [
+      "e38df225-da05-4d47-9eb1-fb7694e82620",
+      "9f015c64-e1fb-4a5c-a5d2-1cea580ab5cf",
+      "3ec91367-616b-4c59-b25b-bcc451e79d81",
+      "acfc8769-18c6-4860-9807-1e2e3af5e0a2",
+      "47b7bf81-b897-4266-8255-67f4cda736be",
+      "556adc51-d77a-415b-af74-d6ccff113bab",
+      "4fa5d4b0-1c36-4794-b3f2-b7b227c67359",
+      "aa4932c4-8089-4b83-9c3b-08371f4e5854",
+      "3ccae3d0-b213-4df7-8e4f-268d68833042",
+      "e31bc54b-fc4e-417d-92d1-7c344e28e925",
+      "d63bf606-7095-470e-bb04-cd401e82ca9e",
+      "506f55fb-2d28-437f-b8cd-0452b3494fb5"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "ftrl_T02",
+    "goal": "Implement the three knowledge retention methods for NetHack fine-tuning: Kickstarting (KS), Behavioral Cloning (BC), and Elastic Weight Consolidation (EWC). For KS, implement the KL-divergence auxiliary loss on online policy trajectories with coefficient 0.5 and exponential decay 0.99998. For BC, build the static buffer from 8000 NLD-AA trajectories with pre-trained model labels, and implement the KL-divergence auxiliary loss with coefficient 2.0 (no decay). For EWC, compute the diagonal Fisher matrix over 10000 batches from the NLD-AA subset and implement the Fisher-weighted L2 penalty with regularization coefficient 2e6. Disable entropy for all KR methods and ensure KR is applied only to actor parameters (not critic).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: Knowledge retention methods mitigate FPC \u2014 requires correct KR implementation",
+      "C05: The choice of KR method depends on the type of FPC instance \u2014 different methods have fundamentally different mechanisms"
+    ],
+    "rubric_requirement_ids": [
+      "b13b89e2-5111-4ad5-9a6d-9bbd73a02d29",
+      "5bd83334-172e-4ee8-a984-a7270dca5f78",
+      "bc514fb5-8efd-4998-be2d-aec7057164a1",
+      "294d8931-c699-4722-8836-1979b4c6289c",
+      "1f53c387-fe05-407c-9ccf-08fcc23957c2",
+      "623ba7fa-b4a0-4a78-b384-131a85d8c018",
+      "eb4004f8-f230-4d97-b94a-7054f8e9e0d8",
+      "88c2362c-c9ad-4d4d-960c-44c0f6c50343",
+      "eb31b5b8-9523-47d3-96a2-90f818fa36d4",
+      "fb4230d6-f469-482c-88db-63590988a152",
+      "d0fc7e3c-6ee4-4e34-b46c-8eb28b783748"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "ftrl_T03",
+    "goal": "Train and evaluate all five NetHack conditions (from scratch, vanilla FT, FT+EWC, FT+BC, FT+KS) with 5 seeds each and verify the Section 4 performance results (Figure 3a). Confirm that: (1) the frozen pre-trained baseline achieves ~4.5k average return; (2) FT+KS achieves the highest return (~11k); (3) FT+BC is second highest; (4) vanilla FT degrades to ~1k; (5) FT+EWC roughly matches the frozen baseline. This task covers training execution and result verification for the NetHack main experiment.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: Vanilla fine-tuning causes catastrophic forgetting of pre-trained capabilities",
+      "C03: Imperfect cloning gap causes FPC in NetHack",
+      "C04: Knowledge retention methods mitigate FPC \u2014 KS achieves SOTA on NetHack (10588 vs 5218)"
+    ],
+    "rubric_requirement_ids": [
+      "2009038f-9266-4622-b14f-ac3bf4699090",
+      "b51f7910-31ac-4aa3-a099-a198e7738432",
+      "f34e4f40-2d0b-4298-a316-743b9b5844d0",
+      "636f6d6a-b310-4597-b1fe-7fc57a6564ed",
+      "64b22962-21b0-41b7-b5b8-119a025d16be",
+      "64b28c7a-e2ba-49a6-addb-c5502ff616dd",
+      "07ad38d0-dd5b-40eb-85eb-568bd0f03ffa",
+      "c6231bba-d504-491d-974d-1af400aea535",
+      "9c5f4433-bdae-49d6-98a2-818a0ce7d96c",
+      "1aeb1f08-19c1-42a2-b919-dfe45fdc2276",
+      "7516943c-f5e0-45fd-ae07-6fd5415cf9ad",
+      "b9a9dcfc-69cd-4bca-93f3-41e53fee223e"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "ftrl_T04",
+    "goal": "Implement the NetHack per-level evaluation infrastructure and verify Section 5 forgetting results (Figures 3b-c). Set up AutoAscend to generate 200 game saves from Level 4 and 200 from the first Sokoban level. Implement per-level evaluation: load saved games, run the trained agent, measure incremental score every 25M steps. Verify that: (1) FT+KS and FT+BC achieve higher Level 4 return than the frozen baseline; (2) EWC matches baseline on Level 4; (3) vanilla FT and from-scratch score lower on Level 4; (4) FT+BC matches baseline on Sokoban; (5) FT+KS and FT+EWC score below baseline on Sokoban; (6) vanilla FT and from-scratch achieve near-zero Sokoban scores (~0.1); (7) FT+KS visits deeper dungeon levels than pre-trained, but AutoAscend visits deeper still.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: Vanilla fine-tuning causes forgetting of FAR-state performance (Level 4, Sokoban)",
+      "C04: Knowledge retention methods preserve FAR-state capabilities",
+      "C05: KS best for imperfect cloning gap; BC best at preserving specific pre-trained skills (Sokoban)"
+    ],
+    "rubric_requirement_ids": [
+      "5b808a19-e687-4331-8661-9626b1ba66a0",
+      "03f1e111-3743-444b-82d3-fe9e547ec0c5",
+      "832dc72d-1813-4ffc-9f5d-c977cacb42e6",
+      "c039593c-3c80-4de1-8600-83b19cc56246",
+      "b3967331-d908-4027-8f7b-ca21bc84cdd9",
+      "14de6420-98b4-44d7-b5cb-dce7cce2bda3",
+      "b1075dca-9054-4829-948a-55a15ce059cf",
+      "c1894983-c61c-49b3-8058-7b21e4a7cbfc",
+      "ee8c8b60-c658-4e6c-b85f-401d69482295",
+      "f552f42a-8ccc-42c6-9946-995584a9aee9",
+      "46d4aab1-ef64-4c99-9c3b-47ef97551bd1",
+      "3391c6e9-9821-4c25-98a8-c44dafe8b926",
+      "60d7694f-b063-4fee-8a87-7bba5db7db94",
+      "7a1c8f49-1828-4188-bda3-da0e9a7c4d8d",
+      "6b8bbb64-94b1-421b-87a8-a925f2727177"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "ftrl_T05",
+    "goal": "Implement the Montezuma's Revenge environment, CNN+RND model architecture, PPO training pipeline, and knowledge retention methods (BC and EWC). Set up the Atari environment from the RND reference implementation with the CNN architecture, RND target/prediction networks outputting 512-dim vectors. Configure PPO with all Table 2 hyperparameters. Implement BC (KL loss on 500-trajectory buffer from a pre-trained agent reaching ~7000 reward) and EWC (Fisher-weighted L2 penalty computed from 500 trajectories). Ensure KR is applied only to actor parameters. Implement evaluation metrics: average return and Room 7 success rate (computed every 5M steps).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C02: State coverage gap is a primary instance of FPC",
+      "C05: BC is best for state coverage gap scenarios (outperforms KS)"
+    ],
+    "rubric_requirement_ids": [
+      "d8ea9cf5-62c3-4c5a-8a87-7cbe3b1da390",
+      "44ecfe05-4fdd-4d47-8eef-2ffae202e802",
+      "5a67161e-54c8-47a9-90b6-97161b2f9e7e",
+      "3ab393d2-ea35-4823-a8e3-cd9cbad6666b",
+      "14dc7245-8122-4df9-b30e-efcf93e882de",
+      "ca6edffa-53a0-4ed1-bbb5-8d3c18ee135c",
+      "a6ed1e61-c7e6-49e7-ab24-cdc6fa3d947f",
+      "c37de5ab-6e92-445f-b4a1-a50c3b07dd45",
+      "1c8fecd4-b73c-41f7-97b5-135d28466d22",
+      "4bc41c97-3296-430c-aa1c-d69d52831c9d",
+      "13a214e6-97a1-48a0-92c9-c2be11afbf7b",
+      "dcff0bef-8fe9-4c37-a4de-3f5455faf10f",
+      "de1df70e-cc0e-464a-a55f-1cab6b269eda"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "ftrl_T06",
+    "goal": "Train and evaluate all four Montezuma's Revenge fine-tuning conditions (from scratch, vanilla FT, FT+BC, FT+EWC) with 5 seeds each and verify the Section 4 and Section 5 results (Figures 5-6). Pre-train a PPO+RND agent from Room 7 onward until ~7000 reward, collect 500 BC trajectories. Run all conditions and track average return and Room 7 success rate. Verify that: (1) FT+BC achieves highest return (~6000); (2) all FT methods outperform from-scratch; (3) EWC return converges around 5e7 steps; (4) vanilla FT Room 7 success drops to ~0.55 after 2e7 steps; (5) BC and EWC maintain stable Room 7 success (~0.75); (6) vanilla FT has lowest Room 7 success rate.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: Vanilla fine-tuning causes catastrophic forgetting of FAR-state capabilities",
+      "C02: State coverage gap is a primary instance of FPC",
+      "C04: Knowledge retention methods mitigate FPC in Montezuma's Revenge"
+    ],
+    "rubric_requirement_ids": [
+      "3b3d3de8-a0bc-4340-a437-013369856085",
+      "74684ac6-0b8b-451f-9375-5c0bcdc09571",
+      "402dc442-cd70-4a56-b95f-6beafa4f0da3",
+      "832e0bdc-ffc2-413a-9f44-8db993d87b51",
+      "9e59fb14-df00-4eba-898b-dd5723cba91e",
+      "a7204cbc-a0d9-413f-8964-f551b8b339f2",
+      "2176d442-e673-4c06-ac7f-921ea8a3004c",
+      "ca63a2e9-64de-4cc1-b6b3-dbce2f6e9c95",
+      "637c9dff-84db-425f-b2c8-d039e9bfc072",
+      "deb0db6c-d6b5-4103-9a8b-3f1817db4da1",
+      "c075713f-b928-4810-99c3-1e37b282c61f",
+      "91e46a34-9df9-4f0f-a355-464086e8d264",
+      "b69054fc-82e8-408b-aff8-29a11c161bc3"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "ftrl_T07",
+    "goal": "Implement the RoboticSequence (Meta-World) environment and SAC training infrastructure. Define RoboticSequence as a 4-stage sequential task (hammer, push, peg-unplug-side, push-wall) with random starting positions and goal conditions, one-hot stage ID encoding, normalized timestep, max 200 steps, and reward augmentation on success (beta=1.5). Implement the 4-layer MLP (256 neurons, Leaky-ReLU, layer norm after first layer) for both policy and Q-function. Set up SAC with auto-tuned entropy, stage-conditioned output heads, 100k replay buffer, correct terminal signal handling, per-stage success tracking, Adam optimizer (lr 1e-3), and batch size 128.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: State coverage gap is a common instance of FPC \u2014 requires correct RoboticSequence environment"
+    ],
+    "rubric_requirement_ids": [
+      "3cf52c19-88b7-4f00-b414-502c28620ad7",
+      "37617d8a-54c3-4b52-878a-7650cd59ace3",
+      "2b588e8e-c095-4c32-baea-31e184887a08",
+      "1b2f259d-15d1-42a7-94a4-1d037978a849",
+      "6c9f6163-b8c7-4a68-86d5-3afbd45982b2",
+      "4d94457b-2701-4606-8d2c-3b4d1752f004",
+      "1468553f-f209-4f42-977e-9f99c1c81d99",
+      "24ca90a0-b671-4f67-a1cb-47bae0d77f4b",
+      "9e0dc336-a256-4b28-8b2b-19841db7adce",
+      "09f91c0f-88c1-42d3-b23e-35a6388a1eba",
+      "01a729bf-31bd-421b-8057-9567fffda4b9",
+      "415909bb-96be-4051-9930-167a9443a924",
+      "377dd263-55bd-4184-86ea-a3a9d4c98123"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "ftrl_T08",
+    "goal": "Implement the three knowledge retention methods for RoboticSequence fine-tuning: EWC, BC, and Episodic Memory (EM). For EWC, compute the diagonal Fisher matrix analytically using 2560 replay buffer samples with clipping at 1e-5, implement the Fisher-weighted L2 penalty with actor reg coef 100 and critic reg coef 0. For BC, implement the expert data buffer construction at end of each task, KL-divergence actor loss and L2 critic loss with actor reg coef 1 and critic reg coef 0. For EM, set up the 100k replay buffer pre-loaded with 10k pre-trained transitions. Ensure KR methods are not applied to critic parameters. Implement the evaluation metrics: overall success rate, log-likelihood tracking every 50k steps on push-wall expert trajectories, and 2D PCA projections of log-likelihoods.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C04: Knowledge retention methods mitigate FPC \u2014 requires correct RoboticSequence KR implementation",
+      "C06: Forgetting is irreversible \u2014 PCA analysis requires correct log-likelihood computation"
+    ],
+    "rubric_requirement_ids": [
+      "8a8f1d29-90ad-405d-a928-77d1b20fe9d7",
+      "ccc41e40-5e1d-4231-af78-1caa1d293201",
+      "70f0fef8-1025-402c-8f67-f0aa7e44f4bf",
+      "bea5ee41-084b-43e3-bddd-bb8b76cd8709",
+      "4d4773c7-db8c-48c2-8892-12c8bb57f7e2",
+      "6e7fab7d-1af9-455f-ad04-d151d0e0086f",
+      "5d88c498-191d-479e-a5a3-75af55c47539",
+      "d77a7704-e037-4560-ab89-a0c4fb6d20e8",
+      "1f96ce79-377c-435f-a1ad-c101a35971fa",
+      "13ae6f4b-61c9-4ccd-b227-47378478f165",
+      "df3e311a-290d-4124-9bd1-be966f74d674",
+      "d7690cb7-4d51-4cf2-af8c-68c8af68d323",
+      "c9ac831b-ac39-4645-baa2-ef5e3c5a4ba4",
+      "395a870b-8258-4e98-96a8-893c7bcc8321",
+      "47c00516-26f3-41e5-bca6-575a6505e9a0"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "ftrl_T09",
+    "goal": "Train all five RoboticSequence conditions (from scratch, vanilla FT, FT+EWC, FT+BC, FT+EM) with 20 seeds each and verify the Section 4 overall performance results (Figure 4). Pre-train SAC on the last two stages (peg-unplug-side, push-wall) until 100% success. Run all conditions and verify that: (1) BC and EM achieve similar overall success rate (~80%); (2) BC and EM achieve higher success than all other methods; (3) EWC outperforms vanilla FT; (4) vanilla FT matches from-scratch performance; (5) BC achieves ~0.8 success at 1e6 steps and plateaus.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Vanilla fine-tuning causes forgetting of pre-trained FAR-stage capabilities",
+      "C02: Knowledge retention methods mitigate FPC in RoboticSequence",
+      "C05: BC is best for state coverage gap (RoboticSequence)"
+    ],
+    "rubric_requirement_ids": [
+      "795dc510-8197-4f66-9ff2-dc0fc924af63",
+      "68b4ae69-d78f-48b4-aa06-fae54e63d5de",
+      "077c51ef-1a36-4e1f-b4fb-a8e689adafb6",
+      "9037e949-9828-4594-b5bf-32bb82df021d",
+      "a77dae72-76db-4f2e-8b12-e9bf65845d0c",
+      "6dd3c5b1-a5a6-4ca9-b131-57d2e4e1a236",
+      "290e0d26-dd99-4fe6-b85a-46867726c2f4",
+      "3413b8ea-1a06-4512-a074-d22f567b6d84",
+      "b483620e-492e-4646-a088-66f65afec59e",
+      "e28e4430-9d22-4539-ab35-2a8fa9c95240",
+      "2bcf4f7f-f91f-404e-b558-7c63c6b6ae2b"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "ftrl_T10",
+    "goal": "Evaluate per-stage forgetting dynamics and representation analysis for RoboticSequence (Section 5, Figures 7-8). Using all five conditions with 20 seeds each, track per-stage success rates throughout training and compute log-likelihood/PCA analysis. Verify that: (1) all methods reach >90% hammer success within 1e6 steps; (2) all methods reach >80% push success, FT methods learn faster; (3) BC never drops below 90% on peg-unplug-side or push-wall; (4) EM initially drops below 20% on peg-unplug-side but recovers to >90%; (5) EWC drops below 65% on peg-unplug-side but recovers; (6) vanilla FT push-wall success drops to near 0 after 100k steps then recovers above 0.8 by 4M steps; (7) PCA projections confirm the re-learned solution is qualitatively different from the pre-trained one.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Vanilla fine-tuning causes catastrophic forgetting on push-wall (drops to ~0)",
+      "C02: Different knowledge retention methods preserve FAR-stage performance at different rates",
+      "C06: Internal representations change irreversibly during early fine-tuning"
+    ],
+    "rubric_requirement_ids": [
+      "4778e195-5563-45b3-b8c3-9326cae8ec3f",
+      "c455e8ed-8c85-45d5-99de-bf45f6a5f461",
+      "a8b6b1ec-47b0-4fe8-915b-7b8c0b38890e",
+      "4870459d-7c84-4688-9167-e80f10ade926",
+      "9586bf60-aa4e-43f0-81da-d26753840164",
+      "463556ff-577e-4cce-997e-040c38895134",
+      "063cde22-1f33-4917-8a50-1efc29f9b2dd",
+      "5f3570bd-9a40-4bd8-b5cb-ad43be18482c",
+      "98f86761-deff-4bcd-bd44-09e4981986cc",
+      "c2d77e0d-1af8-41da-8512-79fbd2386228",
+      "720064ae-29b7-4f28-bd99-5496e7579358",
+      "18e0442a-b3e1-4871-8fc7-e70a5f3bdee5",
+      "cfafddf9-f5a1-4bec-bab3-c131ee9b3cf6",
+      "f7eb45e0-800c-4acc-92f5-7b95d6806545"
+    ],
+    "n_requirements": 14
+  }
+]

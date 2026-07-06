@@ -1,0 +1,239 @@
+[
+  {
+    "task_id": "bam_T1",
+    "goal": "Implement the Batch and Match (BaM) algorithm for variational inference with full-covariance Gaussian families, following Algorithm 1. Implement the batch step (sampling from the current Gaussian, computing target scores, accumulating score statistics per equations 6-7) and the match step (constructing U and V matrices per equations 10-11, solving the quadratic matrix equation for the covariance update, and updating the mean per equations 12-13). Include the optional low-rank solver for B < D (Lemma B.3). The implementation should accept batch size, inverse regularization (learning rate), target score function, initial mean, and initial covariance as inputs.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: The BaM match step has a unique closed-form solution via a quadratic matrix equation, enabling gradient-free parameter updates"
+    ],
+    "rubric_requirement_ids": [
+      "bam-interface-output",
+      "bam-batch-sampling",
+      "bam-batch-score-computation",
+      "bam-batch-statistics",
+      "bam-qm-equation",
+      "bam-updated-mean",
+      "bam-low-rank-solver-optional",
+      "6320b786-5d6a-40bd-ac47-deb3c3cff4e4"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "bam_T2",
+    "goal": "Implement the three baseline variational inference algorithms: (1) ADVI with ELBO estimation via the reparameterization trick and ADAM-based gradient updates (Algorithm 2); (2) ADVI Score variant using score-based divergence loss instead of ELBO; (3) ADVI Fisher variant using Fisher divergence loss instead of ELBO; and (4) Gaussian Score Matching (GSM) with per-sample rank-1 covariance updates and partial-update averaging (Algorithm 3). All algorithms should operate on full-covariance Gaussian variational families.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C03: The score-based divergence provides a principled alternative to ELBO that can be optimized in closed form for Gaussians",
+      "C05: BaM's closed-form updates converge faster than gradient-based ADVI and GSM baselines"
+    ],
+    "rubric_requirement_ids": [
+      "advi-setup",
+      "advi-sampling-step",
+      "advi-elbo-estimation",
+      "advi-update-step",
+      "advi-has-followed-algo2",
+      "28288cd0-0d49-4215-aaff-a59eb10f50a5",
+      "2b23a5ca-0606-463c-838e-b95f1e69253c",
+      "gsm-interface-output",
+      "gsm-iteration-loop",
+      "gsm-score-computation",
+      "c8d8bf97-af2f-46be-b070-e5e128586a3a",
+      "gsm-partial-updates",
+      "gsm-has-followed-algo3"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "bam_T3",
+    "goal": "Implement the Gaussian target experiment infrastructure for Figure 5.1. Create Gaussian target distributions at D=4 and D=16, compute their score functions (analytically or via autodiff), implement forward and reverse KL divergence measurement between estimated and target Gaussians, and set up the experimental harness for BaM with learning rate lambda=BD, 10 seeded runs, and at least 10,000 iterations per run.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C02: For Gaussian targets with infinite batch, BaM variational parameters converge exponentially quickly, provably stable for any lambda > 0"
+    ],
+    "rubric_requirement_ids": [
+      "50edd5b6-1d84-4a50-9e2f-9825a51b4c6a",
+      "92c9368d-79c0-4811-bac5-4f5c013433a3",
+      "d6b2f005-796b-4dc9-9b8e-4b3aeb195ae4",
+      "c7b901f3-450e-41c3-b843-ab635890be05",
+      "337c5085-020c-41ec-b709-ad49ad7dd776",
+      "62a0b2d7-6925-465d-8a76-f56a15dbb1a4",
+      "39daebb5-af71-4d2e-a031-5379296040f0",
+      "71097d28-3052-4d89-8810-3d88cde79c5a",
+      "3e177584-01ab-47bf-80c3-ee4c2d54091b",
+      "40da5875-e968-42dd-86bc-eed6c375b427"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "bam_T4",
+    "goal": "Run BaM on 4-dimensional Gaussian targets at batch sizes B=2 and B=5 with constant learning rate lambda=BD for at least 10,000 iterations over 10 seeded runs. Measure forward and reverse KL divergence at each iteration. Verify that BaM converges to near-zero KL, and that larger batch size (B=5) converges faster than smaller batch size (B=2), consistent with the paper's exponential convergence theory (Theorem 4.1).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: For Gaussian targets with infinite batch, BaM variational parameters converge exponentially quickly, provably stable for any lambda > 0",
+      "C06: Larger batch sizes improve BaM convergence stability"
+    ],
+    "rubric_requirement_ids": [
+      "c5574df9-467c-4e54-916e-3b5a7796d089",
+      "1876119e-93f1-4ec8-a2bf-efa33f9ecb14",
+      "116b2cae-d3f9-4f0a-a378-ef8e58ebce13",
+      "4c09eede-b39e-4176-9447-c97837d19d0e",
+      "8f83d494-95a9-4ad0-af53-ab20deed1801",
+      "db63a034-717a-4b21-8b9b-5fdaec6af548",
+      "fbdb544e-f50f-470a-8119-2db6b615bf83",
+      "09e0158e-3be8-43be-8f47-789b7fa5b524",
+      "7e41d3f2-2c68-460f-bbfb-da5ee396dac2",
+      "723c33ff-c364-4a99-8a72-2ecf33ff0fc3",
+      "927f15c3-23a9-4b8a-b609-c09ecca3b943",
+      "c9e6dd41-bbb8-40db-9ba7-52a5246d2af8",
+      "afaa90e8-f1f1-46b9-a4d6-0dc0352a4179"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "bam_T5",
+    "goal": "Run ADVI (ELBO) with ADAM at grid-searched optimal learning rate on 4-dimensional Gaussian targets at batch size B=2 for at least 10,000 iterations over 10 seeded runs. Measure forward and reverse KL divergence at each iteration. Compare against BaM results from T4 to verify that BaM converges to near-zero KL in significantly fewer gradient evaluations than ADVI, often by orders of magnitude.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C05: BaM converges faster than ADVI on Gaussian targets in terms of gradient evaluations, often by orders of magnitude",
+      "C02: BaM's exponential convergence outperforms ADVI's gradient-based convergence on Gaussian targets"
+    ],
+    "rubric_requirement_ids": [
+      "e7325915-a008-4954-be0e-5901babcf792",
+      "a6f9be76-1337-4d55-be38-09686b2fe584",
+      "f032d17c-4130-4ec1-8c53-84352d28a0d0",
+      "e7397fe9-b5fb-4473-beb9-6104e66f8d5a",
+      "61156dc6-1267-4e9e-b920-d98b26a9fbc7",
+      "a315b608-8665-46b8-a89f-92f9d3c1dd0d",
+      "379a38a5-13eb-4712-b7a2-c83bef621dc9",
+      "24ec6ae5-963d-4eba-876f-c2bc84fc70b9",
+      "ef371648-4dfb-42fa-99fd-e488c79464ea",
+      "b1ce0df4-588b-4ff9-8f37-e8cd8256e8fd"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "bam_T6",
+    "goal": "Run BaM on 10-dimensional sinh-arcsinh non-Gaussian targets with skew s=0.2 (easy) and s=1.8 (hard) at batch sizes B=5 and B=10 with decaying learning rate lambda_t=BD/(t+1). Measure forward and reverse KL divergence over 10 seeded runs of at least 10,000 iterations each. Verify that (a) BaM converges on both easy and hard non-Gaussian targets, and (b) larger batch size B=10 provides more stable convergence than B=5, especially for high skew s=1.8.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C06: Larger batch sizes improve BaM convergence stability, unlike GSM and ADVI",
+      "C07: BaM handles non-Gaussian target distributions with varying difficulty"
+    ],
+    "rubric_requirement_ids": [
+      "ff269cb7-a37d-4a14-8960-ccd93e603f80",
+      "82a1992c-1068-4323-a51b-b770b583b878",
+      "5b909bab-d557-4f11-9d59-1ba13436b0d0",
+      "a1e6e69f-5c8c-4c2c-a647-d0b82de248e8",
+      "9dad0b0e-0c6b-40c5-835d-dd2ab6bafb51",
+      "18ac0834-f755-44cd-a0c5-6fb1a1b23aa2",
+      "6c1197c7-b2fa-488b-aeda-ec8adf3005cb",
+      "28d977ff-e0dc-42bf-a9ff-e6494f3345ec",
+      "f4f43f48-a6bd-4ee7-a332-5a69f2ac85ab",
+      "47bfc7bf-c5ee-4d76-991f-315508529cbe",
+      "d8e5e825-3ff9-4d46-a4a6-4186741e372c",
+      "99eb13b1-01c5-44c8-bfb5-442331d2996e",
+      "c4c35868-4073-4be0-a26d-3a4a08eb09fc",
+      "9f8f0bec-6419-425f-92d9-8f5d7ef45fcf"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "bam_T7",
+    "goal": "Run GSM on 10-dimensional sinh-arcsinh non-Gaussian targets with skew s=1.8 at batch size B=5 for at least 10,000 iterations over 10 seeded runs. Measure forward and reverse KL divergence. Compare against BaM results from T6 to verify that GSM's reverse KL diverges for high skew s=1.8 while BaM remains stable, demonstrating BaM's superior robustness on difficult non-Gaussian targets.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C07: BaM outperforms GSM on non-Gaussian target distributions, particularly for high-skew targets where GSM diverges",
+      "C03: The score-based divergence is more robust than GSM's score matching objective for difficult targets"
+    ],
+    "rubric_requirement_ids": [
+      "d712e1e2-19c1-4c18-a578-87e8c0251fa5",
+      "744581d5-a97d-4383-b7cf-69cac8983134",
+      "12437269-d581-4bf0-b7a3-d5dc97d1b39e",
+      "a98484f2-0c87-4ca1-b229-be8faba6cd8d",
+      "0f5315a6-07f7-4949-9595-db791452a0a8",
+      "fa911b45-5cb2-4029-9aa4-2e52ef3909d8",
+      "4299c0e1-1c75-4acc-b007-9e039946bab6",
+      "773b436c-49b8-46ed-a113-31c235976a4c",
+      "71fd6df1-5b42-4f6d-8933-641ffb8b7ba4",
+      "bec65857-cc6a-419d-b5e0-1c78f235f062"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "bam_T8",
+    "goal": "Reproduce the posteriorDB posterior inference experiment (Figure 5.3). Load the arK (D=7) and eight-schools-centered (D=10) Stan models, obtain HMC reference posteriors, then run BaM at batch sizes B=8 and B=32 with decaying learning rate lambda_t=BD/(t+1). Compute relative mean error and relative SD error versus gradient evaluations over 5 seeded runs. Verify that BaM with B=32 converges faster and more stably than BaM with B=8.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C06: Larger batch sizes improve BaM convergence stability on real Bayesian models",
+      "C07: BaM achieves low relative mean error on hierarchical Bayesian model posteriors"
+    ],
+    "rubric_requirement_ids": [
+      "f9f9945c-075b-4c5b-8dad-e17f4f855210",
+      "6ffc9f02-6602-426a-b5d8-cf007613e8aa",
+      "7239250f-8ba2-4dc1-8b7a-55d21f0ce3c9",
+      "c840a1e2-a7e5-48f3-a962-11624499939a",
+      "5afd823b-fe2e-43cc-96c6-74e61e317389",
+      "8cb1d179-bf13-4d66-976f-4fefc362dfa4",
+      "709db886-9aa9-417e-9a16-ceebfd811410",
+      "497dfe00-c70d-47bb-91d9-3587ddbf8091",
+      "f7954dbd-e5b3-474a-854b-8919c0b410d9",
+      "ed644299-7e44-4414-93cc-cf8bc6f7d32f",
+      "5c51279d-cd45-4eee-8ec1-b9bfa4ea9d65",
+      "42b6b19f-73e5-481c-8c88-9295630c0ce8",
+      "24d3f024-2e96-4084-b860-add43b233edd",
+      "b686ecb8-9b9c-405c-bffd-004e4881c42d",
+      "5822d5a9-72f1-4730-a255-e40a31415d18"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "bam_T9",
+    "goal": "Implement and pre-train a 5-layer convolutional VAE on CIFAR-10 with Gaussian likelihood (sigma^2=0.1, latent D=256) for 100 epochs following the architecture described in the addendum. Sample a test image and implement the posterior score function s(z)=nabla_z log p(z|x), the MSE metric for image reconstruction, and the decoder pipeline to convert variational mean estimates into reconstructed images.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: The deep generative model experiment setup requires correct VAE training and posterior score computation to enable meaningful comparison of VI methods"
+    ],
+    "rubric_requirement_ids": [
+      "6679061e-6501-4e0f-8e1a-ca8470bdcd2e",
+      "8789e782-2545-4758-a973-0f751ae6ea49",
+      "b8517162-bb66-404a-af9c-39dcced08412",
+      "fd19a4f4-ca51-4978-bcb4-73b45e2aa418",
+      "c8f3e04d-9187-4949-91f9-8f363785ffc3",
+      "a8db3546-d879-4a06-b6a8-ffc58050515c",
+      "5bcc62df-5cf7-4978-9fd8-b581f66848ed",
+      "479536e1-9e0e-4673-8f51-f3988503c024",
+      "81ac357b-830a-4bad-9305-04a91ed77285",
+      "1d9d9df5-f7a5-40e4-800a-705d831371af",
+      "7beb3412-0366-4f3f-93c6-814a5968ca47",
+      "fb40e7cd-4686-4df4-a152-9f787361db7d",
+      "30cfc3c2-025c-427d-9e7f-abc61292eaeb"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "bam_T10",
+    "goal": "Run BaM at batch size B=300 with grid-searched learning rate on the pre-trained CIFAR-10 VAE posterior (D=256) for 1000 iterations. Measure reconstruction MSE versus iterations. Also run amortized VI (trained encoder) as a baseline. Verify that BaM with B=300 converges to lower MSE than amortized VI, demonstrating full-covariance VI advantage over factorized Gaussian on deep generative models.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C07: BaM outperforms amortized VI on deep generative model posteriors",
+      "C06: BaM with sufficient batch size (B=300 relative to D=256) converges effectively on high-dimensional posteriors"
+    ],
+    "rubric_requirement_ids": [
+      "4b88bdfd-4056-4cf0-bfc7-86c59aea7047",
+      "c447e67b-342e-47b4-bd00-a434bfd9bbbc",
+      "9136b526-737a-452d-9b48-221ac549d532",
+      "65d88f8d-7c64-46cc-8a72-04e72441e024",
+      "50ae9c10-4481-4a89-9944-f71198459a83",
+      "f3ebd402-acf6-4b4b-b157-c29070429970",
+      "0bd5bc5f-610c-4d6b-8a25-eff36993c3d7",
+      "143b6d2d-7745-4a54-9106-0c57610de19d",
+      "ad5934b0-78aa-4783-95c0-15e05c702d3a",
+      "97ed714b-be12-420d-8cec-37c94e7c1c82",
+      "1a663a4f-d707-48d1-9a22-5bcf121b6fd3",
+      "9d3ca042-2b68-42b1-9c2b-8d5b75137e12",
+      "949cbdd8-617b-4f85-8da4-79bfcb35ab5f",
+      "d520be6a-63e5-4dcc-94af-e9cb5e094b1c"
+    ],
+    "n_requirements": 14
+  }
+]

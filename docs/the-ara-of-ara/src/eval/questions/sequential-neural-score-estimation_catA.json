@@ -1,0 +1,101 @@
+{
+  "paper_id": "sequential-neural-score-estimation",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 7,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "sequential-neural-score-estimation_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What percentage of valid summary statistics did TSNPSE achieve in the final round of the Pyloric network experiment?",
+      "gold_answer": "81%",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What is the HPR truncation threshold ε used in TSNPSE, and how many posterior samples are generated to estimate the HPR at each round?",
+      "gold_answer": "ε = 5×10⁻⁴ (0.0005); 20,000 posterior samples are generated via ODE to estimate the HPR at each round.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A03",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What learning rate and optimizer are used to train the score networks in all experiments?",
+      "gold_answer": "Adam optimizer with a learning rate of 10^-4 (1e-4)",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "In the TSNPSE algorithm, how is the proposal distribution p̃^r(θ) defined in round r, and what key theoretical condition ensures that the loss function is still minimized at the score of the true posterior?",
+      "gold_answer": "The proposal distribution is defined as p̃^r(θ) = (1/r) * sum_{s=0}^{r-1} p̄^s(θ), where p̄^s(θ) is a truncated version of the prior restricted to the highest (1-ε) probability region of the previous round's posterior approximation. The key condition is that the true posterior support Θ_obs must be contained within HPR_ε(p^s_ψ(θ|x_obs)) for all s ≥ 1, ensuring the proposal is proportional to the prior within the posterior's support and no correction is needed.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What batch sizes are used during training, and how do they differ between sequential and non-sequential settings and across simulation budgets?",
+      "gold_answer": "For non-sequential experiments with N ≤ 10,000: batch size = 50. For sequential experiments with N ≤ 10,000: batch size = 200. For both sequential and non-sequential experiments with N = 100,000: batch size = 500.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A06",
+      "category": "design_rationale",
+      "difficulty": "T2_scattered",
+      "question": "Why does TSNPSE not require an importance weight correction to recover samples from the true posterior, whereas SNPSE-A, SNPSE-B, and SNPSE-C all do?",
+      "gold_answer": "TSNPSE uses a truncated prior p̄^r(θ) ∝ p(θ)·I{θ ∈ HPR_ε} as its proposal, which is proportional to the true prior within the support of the true posterior. This means the proposal posterior coincides with the true posterior within that support, so the score matching objective is still minimized at the true posterior score without any correction. The other methods use the approximate posterior from the previous round as the proposal, creating a mismatch between the proposal posterior and the true posterior that requires importance-weight or score-space corrections introducing bias or high variance.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "What happens to SNPSE-C in the sequential variant comparison experiment, and what are the main failure modes of SNPSE-A and SNPSE-B?",
+      "gold_answer": "SNPSE-C fails completely, producing C2ST scores near 1.0 (worst possible) and is omitted from Figure 6, because approximation errors in estimating the proposal prior score propagate into the score-space correction. SNPSE-A is limited by inaccurate importance weights when there is significant mismatch between the true and learned proposal posteriors, making the post-hoc SIR correction unreliable. SNPSE-B suffers from high-variance importance weights in the loss function, leading to unstable training and poor performance.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A08",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What are the total simulation budget and round structure for the Pyloric network experiment, and which SDE type was used for it?",
+      "gold_answer": "The Pyloric experiment uses R=9 rounds: 30,000 simulations in round 1 and 20,000 per subsequent round (rounds 2–9), giving approximately 190,000 total simulations. VP SDE was used for this experiment (31 parameters, high-dimensional).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why is the probability flow ODE used for posterior sampling in TSNPSE rather than the reverse-time SDE, and what computational disadvantage does this introduce compared to TSNPE?",
+      "gold_answer": "The probability flow ODE is preferred because it enables exact log-density evaluation via the instantaneous change-of-variables formula, which is required to compute the HPR threshold at each round (evaluating log-densities of 20,000 posterior samples). The reverse-time SDE is stochastic and does not admit density evaluation. However, this introduces a computational disadvantage: the ODE requires multiple forward passes for sampling and expensive ODE integration for density evaluation, whereas TSNPE uses a discrete normalizing flow requiring only single forward/backward passes. A proposed mitigation is an energy-based parameterization of the score network.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "sequential-neural-score-estimation_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the wall-clock training time per sequential round for TSNPSE on the SLCP benchmark at a simulation budget of 10,000, and how does it compare to TSNPE?",
+      "gold_answer": "This information is not provided in the paper. The paper does not report wall-clock training times or per-round computational costs for any benchmark experiment, and no direct runtime comparison between TSNPSE and TSNPE is given.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

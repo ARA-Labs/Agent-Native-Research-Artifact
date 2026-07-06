@@ -1,0 +1,101 @@
+{
+  "paper_id": "mechanistic-understanding",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 9,
+  "n_from_ara": 1,
+  "questions": [
+    {
+      "id": "mechanistic-understanding_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What toxicity score does GPT2 (No Op) achieve on the REALTOXICITYPROMPTS challenge subset, according to Table 2?",
+      "gold_answer": "0.453",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What optimizer and learning rate are used for DPO training in this paper?",
+      "gold_answer": "RMSProp optimizer with a learning rate of 1e-6",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How are the toxic MLP value vectors (MLP.vToxic) identified, and how many are extracted to form the SVD decomposition?",
+      "gold_answer": "Toxic value vectors are identified by finding all value vectors with the highest cosine similarity to the toxicity probe vector WToxic. N=128 such vectors are extracted, stacked into a 128×d matrix, and SVD is applied to obtain decomposed singular vectors SVD.UToxic.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does the toxicity score achieved by scaling MLP.kToxic (un-aligning GPT2DPO) compare to the original GPT2 toxicity score, and what does this imply about the alignment mechanism?",
+      "gold_answer": "Scaling MLP.kToxic achieves a toxicity score of 0.458, which is nearly identical to GPT2's original score of 0.453. This implies that DPO did not remove toxic capabilities but merely bypassed them, and simply enlarging the toxic key vector activation regions restores the original toxic behavior.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How is the pairwise preference dataset for DPO constructed, and how many pairs does it contain?",
+      "gold_answer": "Wikitext-2 sentences are used as prompts. For each prompt, a positive (nontoxic) sample is generated via greedy sampling with GPT2, while a negative (toxic) sample is generated using PPLM guided by the toxic probe WToxic as the attribute classifier. A total of 24,576 pairs are created, and training stops after approximately 6,000 sample pairs when validation loss converges.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A06",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why do the shifts in MLP value vectors (δMLP.v) end up contributing in the same direction as the residual stream shift (δx) even though they have negative cosine similarity with δx?",
+      "gold_answer": "Because GPT2 uses GeLU activations and MLP neurons are sparse, most neurons are inactive during a forward pass and thus have small negative activation values. When the shifted value vectors (which point opposite to δx) are multiplied by these negative activation scalings, the direction flips, causing the net contribution to align with the δx direction.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Under what condition does the un-alignment method (scaling key vectors) succeed without degrading perplexity, and why does the direct residual stream subtraction intervention not share this property?",
+      "gold_answer": "Scaling key vectors (MLP.kToxic) enlarges the activation regions without directly modifying the residual stream, so perplexity remains at ~23.30, essentially unchanged from GPT2DPO. In contrast, directly subtracting toxic vectors from the residual stream manipulates the hidden state directly, which degrades perplexity (e.g., to ~23.56 for WToxic subtraction). The key difference is that key vector scaling operates through the gating mechanism rather than directly altering the residual stream.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why do the authors hypothesize that DPO produces minimal, distributed weight changes across all layers rather than large localized changes in late layers, and what role does the KL-divergence term play?",
+      "gold_answer": "The KL-divergence regularization term in DPO's loss discourages any single weight from shifting too drastically, forcing changes to be small and spread across all layers. In contrast, standard fine-tuning (without KL divergence) allows the model to make large, localized changes (e.g., only in late layers). The KL term thus preserves pre-trained capabilities while still achieving the alignment objective.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A09",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "What are the toxicity, perplexity, and F1 scores for GPT2DPO, and how do they compare to the baseline GPT2 (No Op) on the same metrics?",
+      "gold_answer": "GPT2DPO achieves toxicity=0.208, PPL=23.34, F1=0.195. Compared to GPT2 (No Op) with toxicity=0.453, PPL=21.7, F1=0.193. DPO reduces toxicity substantially (0.453→0.208) with a modest increase in perplexity (21.7→23.34) and nearly unchanged F1 (0.193→0.195).",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "mechanistic-understanding_A10",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does activation patching fail to correctly identify causal components in a transformer circuit, and what are the main confounds?",
+      "gold_answer": "Activation patching can fail when: (1) components are functionally redundant, so patching one doesn't affect output even if it normally contributes; (2) the corrupted and clean inputs differ in ways that make patched activations semantically inconsistent with surrounding context; (3) there is compensation/rerouting where other components adjust to maintain output; (4) the patching intervention itself is unnatural and triggers out-of-distribution behavior in downstream components.",
+      "grading_type": "checklist",
+      "source": "ara"
+    }
+  ]
+}

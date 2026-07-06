@@ -1,0 +1,119 @@
+{
+  "paper_id": "sapg",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "sapg_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the leader-follower data sampling procedure in SAPG: (a) According to rubric/requirements.md, what exact requirement does R17 specify about how many samples the leader policy must contribute to its own update batch of size N? (b) Which ARA file in src/execution/ contains the implementation of this sampling logic, and what function or class structure handles the split? (c) Given that R18 requires the remaining N/2 samples to come from follower policies, what does this imply about how the importance sampling weights must be applied when the leader is updated — and which requirement (R12 or R20) specifically mandates that the off-policy follower data be weighted by importance sampling?",
+      "gold_answer": "(a) R17 states exactly: 'Code has been written to collect N/2 samples from the leader policy from a batch size of N samples, to be used to update the leader.' This means exactly half the update batch for the leader must be on-policy data collected by the leader itself. (b) The file src/execution/sapg.py contains the SAPG training loop and handles the leader-follower sampling split; it is the primary execution file where batch construction logic for leader updates would be implemented. (c) Since the leader's update batch is half on-policy (from R17) and half off-policy from followers (R18), importance sampling weights must correct for the distribution mismatch between the leader policy and the follower policies that collected the off-policy data. Both R12 and R20 specify this requirement; R12 states 'Code has been written to update the leader with PPO using on-policy and off-policy data. The off-policy data is weighted by importance sampling.' and R20 states the same requirement under the leader-follower aggregation parent context. Both requirements carry weight 1 and are flagged as partial due to 'incomplete_equation' and 'vague_description' gaps.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R17 as specifying N/2 on-policy samples from the leader for the leader's update batch",
+        "Correctly names src/execution/sapg.py as the ARA file implementing the sampling logic",
+        "Correctly identifies that importance sampling weights are required for the off-policy follower data in the leader update",
+        "Correctly references both R12 and R20 (or at least one) as mandating importance-sampling-weighted off-policy updates for the leader"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/sapg.py"
+      ],
+      "rubric_requirement_id": "R17",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sapg_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding diversity mechanisms in SAPG: (a) According to rubric/requirements.md, what does R21 require about the entropy term added to follower losses, and what does R22 require that distinguishes the leader's loss from the followers'? (b) Which ARA file under src/execution/ or src/configs/ would contain the entropy coefficient hyperparameter settings, and what specific values does R54 say the entropy coefficient must be set to for SAPG? (c) Given that R55 requires entropy coefficient 0 for ShadowHand, AllegroHand, Regrasping, and Throw tasks, while R56 requires 0.005 for Reorientation, what does this asymmetry imply about the role of entropy regularization across task difficulty levels, and how does the architecture described in src/execution/policy.py need to accommodate per-task entropy coefficient configuration?",
+      "gold_answer": "(a) R21 states exactly: 'Code has been written to add an entropy term to the loss of each follower with hyper-parameter sigma as a coefficient.' R22 states exactly: 'Code has been written for the leader's loss, which, unlike the followers, does not have an entropy term.' The key distinction is that entropy regularization is applied only to followers, not the leader, enforcing diversity among followers while the leader focuses on pure performance maximization. (b) The file src/configs/training.md contains training hyperparameter configurations including entropy coefficient settings. R54 states: 'Code has been written to set the entropy coefficient to either 0.0, 0.003, or 0.005 for SAPG.' These three discrete values are the only valid entropy coefficients for SAPG. (c) The asymmetry — 0 entropy for four tasks but 0.005 for Reorientation — implies that entropy regularization is selectively needed only for more complex manipulation tasks requiring greater behavioral diversity. The policy implementation in src/execution/policy.py must support a configurable entropy coefficient per experiment/task that can be set to zero (effectively disabling the entropy term for followers in most tasks) or a small positive value, and must distinguish between leader and follower loss computation to omit the entropy term from the leader regardless of task.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R21 (entropy term with coefficient sigma for each follower) and R22 (leader has no entropy term)",
+        "Correctly identifies src/configs/training.md and names the three valid entropy coefficient values {0.0, 0.003, 0.005} from R54",
+        "Correctly states R55 sets entropy to 0 for ShadowHand/AllegroHand/Regrasping/Throw and R56 sets 0.005 for Reorientation",
+        "Correctly infers that policy.py must support per-task entropy coefficient configuration and separate leader/follower loss computation"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/policy.py",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R21",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sapg_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the PPO batch size saturation experiment: (a) According to rubric/requirements.md, what exact values does R57 specify for the seven batch sizes used to train PPO on the Shadow Hand task, and what does R58 specify for the Allegro Kuka Throw task? (b) Which ARA evidence file documents the results of this batch saturation experiment, and what does the figure described there show about PPO performance as batch size increases? (c) R53 specifies that 16 steps of experience are collected per environment instance before every PPO update — given the batch size range in R57/R58 and this 16-step rollout length, what does this imply about the minimum and maximum number of parallel environment instances that must have been used in the batch saturation experiment, and does the evidence file support the conclusion that PPO saturates?",
+      "gold_answer": "(a) R57 states exactly: 'Code has been written to train PPO for 7 different batch sizes ranking in the approximate values of {1500, 3125, 6250, 12500, 25000, 50000, 100000}.' R58 states the identical set of values for the Allegro Kuka Throw task: 'Code has been written to train PPO for 7 different batch sizes ranking in the approximate values of {1500, 3125, 6250, 12500, 25000, 50000, 100000}.' (b) The ARA evidence file evidence/figures/fig2_ppo_batch_saturation.md (or the equivalent figure2_ppo_batch_saturation.md) documents this experiment, showing PPO performance (success rate) as a function of batch size for both Shadow Hand and Allegro Kuka Throw tasks. The figure shows that PPO performance saturates and stops improving beyond a certain batch size threshold. (c) With 16 steps per environment and batch sizes ranging from ~1500 to ~100000, the number of parallel environments ranges from approximately 1500/16 ≈ 94 at the low end to 100000/16 ≈ 6250 at the high end. Since R24/R25/R26 specify 24576 parallel environments for the main tasks, the batch saturation experiment uses a subset of environments. The evidence file supports the saturation conclusion — PPO does not benefit from batch sizes beyond approximately 25000-50000, motivating SAPG's approach of using multiple diverse policies rather than simply scaling batch size.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes both R57 and R58 with the exact seven batch size values {1500, 3125, 6250, 12500, 25000, 50000, 100000}",
+        "Correctly identifies evidence/figures/fig2_ppo_batch_saturation.md as the relevant ARA evidence file",
+        "Correctly computes the implied environment count range (~94 to ~6250) from the 16-step rollout requirement in R53",
+        "Correctly infers that the evidence supports PPO saturation, motivating SAPG's multi-policy approach"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/figures/fig2_ppo_batch_saturation.md"
+      ],
+      "rubric_requirement_id": "R57",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sapg_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the neural network architecture used to measure policy diversity in Figure 8: (a) According to rubric/requirements.md, what does R37 specify about the exact architecture of the neural network used to reconstruct inputs for the diversity metric — including number of layers, neuron range, activation function, optimizer, and loss type? (b) Which ARA file under src/execution/ implements the model architecture used in SAPG, and does it contain any components that relate to or could be reused for this reconstruction network? (c) Given that R36 requires either implementing or importing PCA for Figure 7, and R37 requires this specific reconstruction network for Figure 8, what does the combined use of PCA (Figure 7) and reconstruction error (Figure 8) imply about the two complementary approaches to measuring behavioral diversity among SAPG's policies, as documented in the evidence files evidence/figures/fig7_pca_diversity.md and evidence/figures/fig8_mlp_diversity.md?",
+      "gold_answer": "(a) R37 states exactly: 'Code has been written to implement a neural network that reconstructs the input. The neural network is made up of two layers, and the size of the layers vary from 8 to 64 neurons. The activation function is ReLU, and Adam is used as optimizer. The loss is the L2 reconstruction error of predicted state transitions.' This is a small two-layer MLP autoencoder with layer sizes in [8, 64], ReLU activations, Adam optimizer, and L2 loss on state transition reconstruction. (b) The file src/execution/models.py implements the neural network model architectures for SAPG (backbone, actor head, critic head). While models.py focuses on policy networks, its MLP building blocks (linear layers, ReLU activations) are architecturally related to the reconstruction network required by R37, though the reconstruction network is a separate small autoencoder used only for evaluation/diversity measurement. (c) PCA (R36, Figure 7) provides a linear dimensionality reduction view of policy diversity by projecting policy parameters or behaviors into a 2D/3D space to visualize spread. The reconstruction network (R37, Figure 8) measures diversity through a functional lens — different policies produce different state transitions, and higher L2 reconstruction error indicates more distinct behavioral patterns. Together, they provide geometric (PCA) and functional (reconstruction error) evidence that SAPG produces genuinely diverse policies, as shown in evidence/figures/fig7_pca_diversity.md and evidence/figures/fig8_mlp_diversity.md.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R37's full architecture specification: two layers, 8-64 neurons, ReLU activation, Adam optimizer, L2 reconstruction loss on state transitions",
+        "Correctly identifies src/execution/models.py as the ARA file for model architecture, noting it contains related MLP components",
+        "Correctly identifies R36 as requiring PCA for Figure 7 and R37 as requiring the reconstruction network for Figure 8",
+        "Correctly describes the complementary nature of PCA (geometric/parameter-space diversity) vs reconstruction error (functional/behavioral diversity) as evidenced by the two figure files"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/models.py",
+        "evidence/figures/fig7_pca_diversity.md",
+        "evidence/figures/fig8_mlp_diversity.md"
+      ],
+      "rubric_requirement_id": "R37",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sapg_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the shared backbone architecture for diversity via latent conditioning: (a) According to rubric/requirements.md, what does R13 require about the actor backbone B_theta and how it is conditioned, and what does R14 require about the critic backbone C_psi — specifically how does the conditioning mechanism differ between actor and critic according to these two requirements? (b) Which ARA file documents the architecture design decisions for SAPG, and which file in src/execution/ implements the shared backbone with hanging parameters — what evidence is there in those files that phi_j parameters are per-policy and distinct from the shared backbone weights? (c) Given that R33 requires six different policies for SAPG, and R13/R14 require shared backbones conditioned on per-policy hanging parameters phi_j, what does this imply about the parameter count efficiency of SAPG compared to training six fully independent policies — and how does the logic/solution/architecture.md file describe this design choice?",
+      "gold_answer": "(a) R13 states exactly: 'Code has been written to share the backbone B_theta between the actor policies, conditioned on each policy's hanging parameters phi_j.' R14 states exactly: 'Code has been written to share the backbone C_psi between the actor and critic, conditioned on each policy's hanging parameters phi_j.' The key distinction is that R13 addresses the actor backbone B_theta shared across actor policies, while R14 addresses the critic backbone C_psi shared between both actor AND critic (not just among critics), both conditioned on the same per-policy hanging parameters phi_j. R14 thus implies a single backbone serves both actor and critic roles through the same conditioning mechanism. Both requirements are flagged as partial with gaps 'vague_description' and 'ambiguous_specification'. (b) The file logic/solution/architecture.md documents the architectural design of the shared backbone with hanging parameters. The file src/execution/models.py implements this architecture; evidence of per-policy phi_j parameters would appear as separate parameter tensors (one per policy index j) that are concatenated or otherwise combined with the shared backbone's hidden representations, while B_theta/C_psi weights are shared across all j. (c) With six policies (R33) and shared backbones, SAPG avoids storing six independent full networks. Instead, only one copy of B_theta and C_psi exists, plus six small phi_j hanging parameter vectors. This is significantly more parameter-efficient than six independent policies. The architecture.md file describes this as enabling diversity through latent conditioning — each phi_j steers the shared backbone toward a different behavioral mode — rather than through entirely separate networks, balancing diversity with computational efficiency.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R13 (actor backbone B_theta shared, conditioned on phi_j) and R14 (critic backbone C_psi shared between actor AND critic, conditioned on phi_j), noting the actor-critic sharing distinction in R14",
+        "Correctly identifies logic/solution/architecture.md and src/execution/models.py as the relevant ARA files",
+        "Correctly states that R33 requires six policies and that shared backbones with small phi_j vectors are more parameter-efficient than six independent networks",
+        "Correctly explains that phi_j are per-policy hanging parameters that condition the shared backbone, enabling diversity without full parameter duplication"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/models.py",
+        "logic/solution/architecture.md"
+      ],
+      "rubric_requirement_id": "R13",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

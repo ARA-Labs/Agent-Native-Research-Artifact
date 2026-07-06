@@ -1,0 +1,24 @@
+session:
+  id: "2026-03-21_002"
+  timestamp: "2026-03-21T04:00"
+  summary: "Context-restore session: verified baseline rust_codecontests definitive scores (validation 0.6410, test 0.6000) are intact in RESULT.md; no new experiments run"
+
+events_logged:
+  - type: observation
+    id: "verification"
+    provenance: ai-executed
+    summary: "Confirmed RESULT.md at code/eval/extension/results/rust_codecontests_baseline_seed10/ reflects definitive full-set scores (0.6410 validation, 0.6000 test) written in prior session (2026-03-20_003)"
+
+ai_actions:
+  - action: "Verified results directory contains all expected files: RESULT.md, solution_v6.py, test_full_v6.log, valid_full_v6_run2.log, valid_full_v6.log, solution_v1-v5.py"
+    provenance: ai-executed
+    files_changed: []
+
+claims_touched: []
+
+open_threads:
+  - "Compare baseline (0.6000 test) vs ARA seed10 (0.6485 test) in the extension experiment paper section"
+  - "rust_codecontests extension experiment needs additional ARA seeds for statistical significance"
+  - "Paper section on Extension evaluation needs updating with rust_codecontests full-set numbers"
+
+ai_suggestions_pending: []

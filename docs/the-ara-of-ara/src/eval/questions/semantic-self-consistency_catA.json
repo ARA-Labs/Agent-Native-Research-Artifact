@@ -1,0 +1,101 @@
+{
+  "paper_id": "semantic-self-consistency",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 7,
+  "n_from_ara": 9,
+  "questions": [
+    {
+      "id": "semantic-self-consistency_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "By how much did Semantic Consensus Weighting (SCW) improve Llama 2 7B accuracy on StrategyQA compared to the self-consistency baseline, as reported in Table 1?",
+      "gold_answer": "+13.53 percentage points (SCW accuracy: 62.44% vs SC baseline: 48.91%)",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "semantic-self-consistency_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What is the default number of sampled responses (k) used in all experiments unless stated otherwise?",
+      "gold_answer": "k = 10",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "semantic-self-consistency_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Which featurizer models are used for which datasets, what are their parameter sizes, and what average inter-response Euclidean distances do they produce on arithmetic tasks?",
+      "gold_answer": "SciBERT (110M parameters) is used for AQuA-RAT and SVAMP (mathematical reasoning datasets), producing avg distance 45.281. MathBERT produces avg distance 45.892. RoBERTa (125M parameters) is used for StrategyQA (commonsense reasoning) because it is a general-purpose model suited for commonsense tasks; it produces avg distance 48.697 on arithmetic tasks.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "semantic-self-consistency_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the complete step-by-step algorithm for Centroid Proximity Weighting (CPW), including how the final answer is selected.",
+      "gold_answer": "1) Compute the centroid as the mean of all n embedding vectors. 2) Compute each vector's Euclidean distance to the centroid. 3) Normalize distances by dividing each by the sum of all distances. 4) Assign weights as the inverse of each normalized distance (weights[i] = 1 / normalized_distances[i]). 5) Sum weights for all responses sharing the same unique answer. 6) Select the answer with the highest total weight (argmax).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "semantic-self-consistency_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What is the best-performing outlier detection method averaged across all models and datasets, what average accuracy does it achieve, and what are its best hyperparameter settings?",
+      "gold_answer": "Isolation Forest achieves the best average accuracy at 58.56% across all models and datasets. Best config: n_estimators=200, contamination=auto, max_samples=auto.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "semantic-self-consistency_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "For the N-gram weighting experiment on AQuA-RAT with Llama 2 7B, what is the accuracy drop compared to the SC baseline, and what does the paper conclude this implies about N-gram weighting as a substitute for semantic embedding weighting?",
+      "gold_answer": "N-gram weighting achieves 15.5% accuracy vs the SC baseline of 24.80%, a drop of 9.3 percentage points. The paper concludes that N-gram weighting is an ineffective substitute for semantic embedding-based weighting, as it substantially underperforms even the baseline self-consistency method.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "semantic-self-consistency_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does Centroid Proximity Weighting (CPW) improve performance on arithmetic datasets (AQuA-RAT, SVAMP) but degrade performance on StrategyQA, given the nature of the two task types?",
+      "gold_answer": "CPW assumes the centroid of the embedding space corresponds to the consensus (correct) reasoning. For arithmetic tasks, correct reasoning paths tend to be structurally similar and cluster tightly, so the centroid is a meaningful proxy for quality. For commonsense reasoning (StrategyQA), reasoning paths are more diverse with no single dominant cluster, so the centroid does not represent meaningful consensus — paths near the centroid are not necessarily more correct, causing CPW to misweight responses and degrade accuracy (e.g., -1.63% average, -7.28% for Mistral 7B).",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "semantic-self-consistency_A08",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does the semantic self-consistency framework (CPW and SCW) fail to reliably improve over the baseline, based on experimental results and stated assumptions?",
+      "gold_answer": "The framework fails or underperforms when: (1) sample size is below k=7–10, as there are insufficient responses to define meaningful embedding clusters; (2) reasoning paths are highly diverse with no clear semantic cluster (e.g., StrategyQA for CPW); (3) the featurizer is mismatched to the domain, producing poorly discriminative embeddings; (4) dimensionality reduction (PCA/t-SNE) is applied before weighting, causing instability; (5) the task involves subtle numerical/symbolic distinctions not captured in embedding space (overly similar or subtly different generations).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "semantic-self-consistency_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the paper recommend against applying dimensionality reduction (PCA or t-SNE) to embeddings before computing CPW or SCW weights, even though such techniques are commonly used to improve clustering?",
+      "gold_answer": "Ablation experiments showed that applying PCA or t-SNE before weighting produced unstable and inconsistent results. The raw full-dimensional embeddings (768-dimensional BERT vectors) are more reliable for computing distances and cosine similarities because dimensionality reduction can distort the geometric relationships between embeddings that the weighting methods depend on. t-SNE in particular is non-linear and optimized for visualization rather than preserving distances. The paper recommends using dimensionality reduction only for visualization purposes.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "semantic-self-consistency_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the exact grid search range of n_estimators values tested for the Isolation Forest hyperparameter optimization, and what was the runner-up configuration's average accuracy?",
+      "gold_answer": "The paper does not specify the exact range of n_estimators values tested in the grid search, nor does it report the accuracy of any runner-up Isolation Forest configuration. Only the best configuration (n_estimators=200, contamination=auto, max_samples=auto) and its average accuracy (58.56%) are reported.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

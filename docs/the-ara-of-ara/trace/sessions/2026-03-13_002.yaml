@@ -1,0 +1,55 @@
+session:
+  id: "2026-03-13_002"
+  timestamp: "2026-03-13T01:00"
+  summary: "Strengthened Datasets & Motivation (5 data improvements) and wrote complete Understanding eval plan (5-step workflow, ~$162, ~105 min)"
+
+events_logged:
+  - type: experiment
+    id: N35
+    provenance: ai-executed
+    summary: "Applied 5 improvements to eval §5.1: median 113x ratio, token/cost split table, per-benchmark breakdown, annotation confidence, Dataset Acquisition detail"
+  - type: experiment
+    id: N36
+    provenance: ai-executed
+    summary: "Wrote understanding_eval_plan.md: 5-step workflow (inventory → questions → agents → judging → analysis) for 31 papers × 20 questions"
+  - type: observation
+    id: O18
+    provenance: ai-executed
+    summary: "22/23 PaperBench papers lack ARAs — critical blocker for full evaluation"
+  - type: observation
+    id: O19
+    provenance: ai-suggested
+    summary: "Category B rubric-gap question design is a novel fair-but-adversarial methodology"
+  - type: observation
+    id: O20
+    provenance: ai-suggested
+    summary: "RE-Bench baseline is task-spec+code, not PDF+GitHub — framing mismatch to acknowledge"
+
+ai_actions:
+  - action: "Applied 5 improvements to paper/sections/evaluation.tex (Table 3 restructured, median ratio, per-benchmark, annotation confidence, Dataset Acquisition)"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+  - action: "Updated discussion.tex to reference 113x median ratio"
+    provenance: ai-executed
+    files_changed: ["paper/sections/discussion.tex"]
+  - action: "Wrote code/eval/plans/understanding_eval_plan.md (complete experiment workflow)"
+    provenance: ai-executed
+    files_changed: ["code/eval/plans/understanding_eval_plan.md"]
+  - action: "Wrote code/eval/plans/datasets_motivation_plan.md (improvement checklist)"
+    provenance: ai-executed
+    files_changed: ["code/eval/plans/datasets_motivation_plan.md"]
+  - action: "Full inventory of 13 ARA artifacts, 26 PDFs, 3 question files, all eval scripts"
+    provenance: ai-executed
+    files_changed: []
+
+claims_touched: []
+
+open_threads:
+  - "Generate 22 missing PaperBench ARAs via Universal Ingestor (Step 0.2)"
+  - "Generate Category A/B/C questions for all papers (Step 1)"
+  - "Run full Understanding evaluation pipeline (Steps 2-5)"
+  - "Address O20: clarify RE-Bench baseline framing in paper"
+
+ai_suggestions_pending:
+  - "Consider running a pilot of the full Understanding pipeline on 3 papers (1 per benchmark) before scaling to all 31"
+  - "The existing generate_questions.py only handles Category A (standard understanding). Need to write generators for Category B (rubric-gap) and Category C (failure knowledge)"

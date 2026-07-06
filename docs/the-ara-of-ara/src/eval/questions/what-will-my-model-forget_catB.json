@@ -1,0 +1,115 @@
+{
+  "paper_id": "what-will-my-model-forget",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "what-will-my-model-forget_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the pre-training dataset construction requirements in rubric/requirements.md: (a) What does R01 specify about the composition of $D_{PT}$, and what does R02 add about the number of examples per task? (b) Which file in the ARA artifact's src/execution/ directory is most directly responsible for implementing this data pipeline? (c) Given that R02 specifies 100 examples per task and R01 specifies 36 tasks, what is the total maximum size of $D_{PT}$, and what does the data_pipeline implementation imply about whether sampling is done with or without replacement from the P3 train split?",
+      "gold_answer": "R01 states: 'Code has been implemented for creating the pre-training dataset $D_{PT}$ so that it is composed of 36 tasks from the training split of the Public Pool of Prompts (P3) dataset.' R02 states: 'Code has been implemented for creating the pre-training dataset $D_{PT}$, such that each task in the pre-training dataset $D_{PT}$ will contain 100 examples randomly drawn from the original task in the P3 train split.' The relevant ARA file is src/execution/data_pipeline.py. The total maximum size of $D_{PT}$ is 36 tasks × 100 examples = 3,600 examples. R02 specifies the examples are 'randomly drawn,' implying random sampling; the data_pipeline.py implementation should reflect random (without replacement) sampling from each task's P3 train split to populate the 100 examples per task. The rubric does not explicitly state replacement policy, making this an 'absent' detail requiring inference from the data_pipeline.py code.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes or closely paraphrases R01 (36 tasks from P3 training split) and R02 (100 examples randomly drawn per task)",
+        "Identifies src/execution/data_pipeline.py as the cross-referenced ARA artifact file",
+        "Correctly computes total $D_{PT}$ size as 3,600 examples (36 × 100)",
+        "Notes that the sampling strategy (with/without replacement) is not fully specified in the rubric and must be inferred from data_pipeline.py"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/data_pipeline.py"
+      ],
+      "rubric_requirement_id": "R02",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "what-will-my-model-forget_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "R25 in rubric/requirements.md describes a specific data preparation step for the trainable logit-based forecasting method. (a) What exact process does R25 require for creating $\\hat{D}_{PT}$ when using FLAN-T5_{3B}? (b) Which src/execution/ file in the ARA artifact implements this logit-based forecasting pipeline, and what does that file reveal about how Exact Match grading is applied to filter $D_{PT}$ into $\\hat{D}_{PT}$? (c) R25 is rated 'partial' with gap type 'missing_hyperparameter' — what hyperparameter detail is implied to be missing from the rubric specification for this step, and how would the logit_forecasting.py file need to address it?",
+      "gold_answer": "R25 states: 'Code has been written to generate predictions on the pre-training dataset $D_{PT}$ using FLAN-T5_{3B} and graded using the Exact Match score to create the dataset of correct pre-training samples, $\\hat{D}_{PT}$, as described in Section 2 -- Forecasting Forgetting.' The relevant ARA file is src/execution/logit_forecasting.py. This file implements the logit-based forecasting pipeline, and the filtering step involves running FLAN-T5_{3B} inference on $D_{PT}$, computing Exact Match between model predictions and ground-truth answers, and retaining only samples where EM=1 to form $\\hat{D}_{PT}$. The 'missing_hyperparameter' gap implies that the rubric does not specify the inference configuration for FLAN-T5_{3B} (e.g., beam search vs. greedy decoding, max generation length, batch size) needed to generate predictions. The logit_forecasting.py file would need to define or hard-code these generation hyperparameters to produce deterministic and reproducible predictions for the EM grading step.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes or closely paraphrases R25's exact requirement text including FLAN-T5_{3B}, Exact Match scoring, and $\\hat{D}_{PT}$ creation",
+        "Identifies src/execution/logit_forecasting.py as the cross-referenced ARA artifact file",
+        "Explains that $\\hat{D}_{PT}$ is formed by filtering $D_{PT}$ to samples where the model's prediction achieves EM=1",
+        "Identifies the missing hyperparameter as generation/inference configuration (e.g., decoding strategy, max length) not specified in the rubric"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/logit_forecasting.py"
+      ],
+      "rubric_requirement_id": "R25",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "what-will-my-model-forget_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R44 and R45 in rubric/requirements.md specify the composition of two evaluation splits. (a) What are the exact task lists specified by R44 for P3-Test_{ID} and by R45 for P3-Test_{OOD}? (b) Cross-referencing evidence/tables/table2_ood_generalization.md, do the tasks reported in that table align with the R44/R45 split definitions, and are all specified tasks represented? (c) Given that R45 lists 'winograde-xl' (note the spelling) as an OOD task, what implementation implication does this have for src/execution/evaluation.py, and what ambiguity does the rubric's info-gap analysis flag about this requirement?",
+      "gold_answer": "R44 states: 'The code is implemented such that The P3-Test_{ID} dataset will be comprised of the test splits of the SuperGlue-Cb, SuperGlue-RTE, SuperGLUE-wsc.fixed, SuperGlue-Copa and SuperGlue-wic tasks from the P3 dataset.' R45 states: 'The code is implemented such that The P3-Test_{OOD} dataset will be comprised of the test splits of the storycloze, hellaswag, anli, winograde-xl tasks from the P3-Test dataset.' Cross-referencing evidence/tables/table2_ood_generalization.md should show OOD generalization results across these tasks; any discrepancy between reported tasks and R45's list indicates a gap. The spelling 'winograde-xl' (vs. the standard 'winogrande') creates an implementation ambiguity in src/execution/evaluation.py — the code must resolve which dataset identifier to use when loading from P3/HuggingFace. The info-gap analysis flags this requirement as having 'missing_url' and 'ambiguous_specification' gaps, meaning the exact data source URL and canonical task name spelling are not definitively specified in the rubric, leaving reproducers to infer the correct dataset handle.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly lists all 5 P3-Test_{ID} tasks from R44 (SuperGlue-Cb, SuperGlue-RTE, SuperGLUE-wsc.fixed, SuperGlue-Copa, SuperGlue-wic) and all 4 P3-Test_{OOD} tasks from R45 (storycloze, hellaswag, anli, winograde-xl)",
+        "Cross-references evidence/tables/table2_ood_generalization.md and notes whether the OOD tasks in the table match R45's specification",
+        "Identifies the 'winograde-xl' spelling ambiguity as an implementation concern for src/execution/evaluation.py",
+        "Notes the rubric info-gap flags of 'ambiguous_specification' and/or 'missing_url' for this requirement"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table2_ood_generalization.md"
+      ],
+      "rubric_requirement_id": "R45",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "what-will-my-model-forget_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirements R05 through R40 in rubric/requirements.md all share an identical requirement text about dataset splitting. (a) What is the exact shared requirement text for these requirements (e.g., R05), and why does the rubric repeat this requirement so many times across different parent contexts? (b) Cross-referencing src/execution/forecasting.py, how is the 60/40 split for $D_R^{Train}$ and $D_R^{Test}$ implemented, and is a random seed specified? (c) The info-gap analysis flags some instances of this requirement as 'absent' with gaps 'missing_hyperparameter, vague_description' — what specific implementation detail is absent from the rubric that would be critical for reproducibility of this split?",
+      "gold_answer": "R05 (and R06–R40) states: '$D_R$ is randomly split into 60% and 40% subsets to create the $D^{Train}_R$ and $D^{Test}_R$.' The requirement is repeated because it appears as a sub-requirement under many different parent contexts — one for each combination of model (BART0_{Large}, FLAN-T5_{Large}, FLAN-T5_{3B}) and forecasting method being evaluated, ensuring that each experimental configuration independently satisfies the correct split. Cross-referencing src/execution/forecasting.py should reveal the splitting implementation; the critical absent detail flagged by the info-gap analysis is the random seed used for the split. Without a fixed random seed, the 60/40 split is non-deterministic across runs and across different model/method combinations, making exact reproduction of Table 1 results impossible. The 'missing_hyperparameter' gap specifically refers to this absent seed value, and 'vague_description' refers to the lack of specification about whether the split is stratified by task or purely random.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes the exact shared requirement text: '$D_R$ is randomly split into 60% and 40% subsets to create the $D^{Train}_R$ and $D^{Test}_R$'",
+        "Explains why the requirement is repeated (one instance per model/method combination parent context)",
+        "Identifies src/execution/forecasting.py as the cross-referenced file and describes the split implementation",
+        "Identifies the absent random seed as the critical missing hyperparameter for reproducibility, as flagged by the info-gap 'absent' rating"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/forecasting.py"
+      ],
+      "rubric_requirement_id": "R05",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "what-will-my-model-forget_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "R48 in rubric/requirements.md is a Code Execution requirement linking dataset generation to a specific results table. (a) What does R48 require, and which three datasets does it specifically name as needing to be generated? (b) Cross-referencing evidence/tables/table11_validation_splits.md, what does that ARA artifact file reveal about how validation splits interact with the $D_R^{train}$, $D_R^{test}$, and $D_{PT}$ datasets required for Table 2, and does it surface any discrepancy with R48's specification? (c) R48 is categorized under 'Code Execution' rather than 'Code Development' — what does this distinction imply about how an LLM agent should verify compliance with R48, and how does this relate to the evidence/ directory's role in the ARA artifact structure?",
+      "gold_answer": "R48 states: 'The $D_R^{train}$, $D_R^{test}$ and $D_{PT}$ datasets required for Table 2 have been generated.' The three datasets named are $D_R^{train}$, $D_R^{test}$, and $D_{PT}$. Cross-referencing evidence/tables/table11_validation_splits.md should reveal information about how validation splits are constructed and potentially how they relate to the train/test splits of $D_R$ used in Table 2's OOD generalization experiments; any mismatch between the validation split structure described there and R48's dataset requirements would indicate a gap. The 'Code Execution' vs. 'Code Development' distinction is critical: Code Development requirements verify that code exists and is correctly written, while Code Execution requirements verify that the code was actually run and produced the required outputs (i.e., the datasets exist as artifacts). This implies an LLM agent must check not just that data_pipeline.py implements the correct logic, but that the datasets have actually been materialized. The evidence/ directory in the ARA artifact serves precisely this role — providing evidence of execution outputs (tables, figures) that can be cross-checked against Code Execution requirements like R48.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R48's requirement text and names all three required datasets ($D_R^{train}$, $D_R^{test}$, $D_{PT}$) in the context of Table 2",
+        "Cross-references evidence/tables/table11_validation_splits.md and describes its content's relationship to the dataset generation requirement",
+        "Explains the semantic difference between 'Code Execution' and 'Code Development' rubric categories in terms of what must be verified",
+        "Connects the evidence/ directory's purpose to verifying Code Execution requirements like R48 (i.e., demonstrating that datasets were actually generated, not just that code exists)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table11_validation_splits.md"
+      ],
+      "rubric_requirement_id": "R48",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

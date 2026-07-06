@@ -1,0 +1,115 @@
+{
+  "paper_id": "sample-specific-masks",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "sample-specific-masks_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the frequency distribution computation required by the rubric: (a) What does requirement R15 specify about how the matrix d is initialized, including its exact dimensions in terms of label sets? (b) Which ARA file (from src/execution/) implements this label mapping algorithm, and what variable or data structure in that file corresponds to the matrix d? (c) Given that R16 further specifies how each sample's output label is computed using the visual reprogramming model, what does this imply about the ordering of operations — specifically, must the reprogramming transformation be applied before or after the pre-trained model's forward pass when building the frequency distribution?",
+      "gold_answer": "(a) R15 states: 'When computing the frequency distribution of the dataset, a matrix d is initialized with zeros; d ← {0}^{|Y^P| × |Y^T|}, where Y^T are the labels of the target task, and Y^P are the labels of the pre-trained task.' The matrix has dimensions |Y^P| (pre-trained task labels) by |Y^T| (target task labels), initialized to all zeros. (b) The implementing file is src/execution/label_mapping.py. In that file, the frequency distribution matrix d corresponds to a 2D array/matrix indexed by predicted pre-trained labels (rows) and target task labels (columns), typically initialized with zeros before iterating over the training set. (c) R16 specifies: 'for each sample in the training set, the output label is computed as ŷ_i^P ← f_P(f_in(x_i^T | θ)), where f_P is the pre-trained model, and f_in(·|θ) is the visual reprogramming model.' This means the visual reprogramming transformation f_in must be applied FIRST to the input image, and only then is the result passed through the pre-trained model f_P to obtain the predicted label. The reprogramming step precedes the pre-trained model's forward pass.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states R15 matrix d dimensions as |Y^P| × |Y^T| and initialized to zeros",
+        "Identifies src/execution/label_mapping.py as the implementing ARA file",
+        "Correctly identifies that f_in (reprogramming model) is applied before f_P (pre-trained model) per R16",
+        "Cites the exact formula ŷ_i^P ← f_P(f_in(x_i^T | θ)) from R16"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/label_mapping.py"
+      ],
+      "rubric_requirement_id": "R15",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sample-specific-masks_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Concerning the data sampling requirement for the Feature Space Visualization experiments: (a) What does requirement R24 specify about how training data should be sampled for the SVHN and EuroSAT datasets, including the exact sample count and the source split? (b) Which ARA evidence file documents the results or setup for these visualization experiments, and does it confirm the 5000-sample constraint? (c) What does the 'separately' qualifier in R24 imply for the implementation — should a single shared sample pool be drawn for both datasets, or must independent sampling be performed for each?",
+      "gold_answer": "(a) R24 states: '5000 samples are (separately) randomly selected from the training sets of the SVHN and EuroSAT datasets.' The exact count is 5000 samples, drawn from the training split (not the test split) of each dataset. (b) The relevant ARA evidence file is evidence/tables/table11_estimation_error.md, which covers estimation error results tied to the feature space visualization subsection and references the dataset sampling used. (c) The word 'separately' in R24 explicitly requires independent sampling for each dataset — a distinct random draw of 5000 samples must be performed for SVHN and another distinct random draw of 5000 samples for EuroSAT. They must not share a common sample pool or be drawn jointly. Each dataset's 5000-sample subset is independently and randomly selected.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies the sample count as exactly 5000 per dataset from R24",
+        "Correctly identifies the source as the training set (not test set) for both SVHN and EuroSAT",
+        "Identifies evidence/tables/table11_estimation_error.md as a relevant ARA evidence file for these experiments",
+        "Correctly interprets 'separately' as requiring independent random sampling for each dataset"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table11_estimation_error.md"
+      ],
+      "rubric_requirement_id": "R24",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sample-specific-masks_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric specifies distinct image resizing requirements for different methods. (a) Compare what R22 requires for SSM image resizing versus what R23 requires during SSM training batches — are these the same target size, and what exact interpolation method is specified in both? (b) Cross-reference src/execution/smm.py or src/execution/smm_core.py: which file contains the resize logic, and does it use the interpolation method mandated by the rubric? (c) R22 states resizing is to match 'the expected size of the mask generator' while R23 says resizing is done 'if they do not match the expected input shape of the pre-trained model' — what does this distinction imply about the architecture of SSM, specifically regarding whether the mask generator and pre-trained model share the same expected input size?",
+      "gold_answer": "(a) R22 states: 'For SSM, each input image is resized using bilinear interpolation to match the expected size of the mask generator.' R23 states: 'When training a model using the SSM method, for each training batch, each image is first resized using bilinear interpolation if they do not match the expected input shape of the pre-trained model.' Both requirements mandate bilinear interpolation as the interpolation method. However, R22 targets the mask generator's expected size while R23 targets the pre-trained model's expected input shape. (b) The resize logic is found in src/execution/smm.py and/or src/execution/smm_core.py; the implementation should use bilinear interpolation (e.g., torch's interpolate with mode='bilinear' or PIL's BILINEAR) as mandated. (c) The distinction implies that the mask generator and the pre-trained model do NOT necessarily share the same expected input size. The mask generator may operate at a different spatial resolution than the pre-trained model. SSM's architecture must therefore accommodate two potentially different spatial dimensions: one for the mask generator (used in R22) and one for the pre-trained model (used in R23), meaning the patch-wise interpolation module bridges these two resolutions.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies bilinear interpolation as the mandated method in both R22 and R23",
+        "Notes that R22 targets the mask generator's size while R23 targets the pre-trained model's input shape",
+        "Identifies src/execution/smm.py or src/execution/smm_core.py as containing the resize logic",
+        "Correctly infers that the mask generator and pre-trained model may have different expected input sizes, requiring separate resize operations"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/smm_core.py"
+      ],
+      "rubric_requirement_id": "R22",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sample-specific-masks_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R17 and R18 together define the Narrow baseline's data processing pipeline. (a) What does R17 specify about image resizing for the Narrow baseline, and what does R18 specify about how the learned pattern is applied — quoting both requirements exactly? (b) Cross-reference src/execution/baselines.py: what evidence is there that both the bilinear resize (R17) and the mask-gated pattern addition (R18) are implemented, and in what order do these operations appear? (c) R18 states the pattern is added 'only where the mask permits' for a narrow padding binary mask of width 28 pixels — what does this imply about pixel regions inside the central image area versus the border padding in terms of the mask's binary values, and how does this differ from the Full baseline defined by R21 and R27?",
+      "gold_answer": "(a) R17 states exactly: 'For the Narrow baseline, each input image is resized using bilinear interpolation to match the expected size of the pre-trained model.' R18 states exactly: 'For the Narrow baseline, the pattern is added to the input image only where the mask permits.' Together, the image is first resized via bilinear interpolation, then the additive noise/pattern is applied only at mask-permitted locations. (b) In src/execution/baselines.py, the Narrow baseline class or function should first apply a bilinear resize transform to the input image, then compute the masked addition of the learned pattern using element-wise multiplication with the binary mask before feeding to the model. Both operations should appear, with resize preceding the masked pattern addition. (c) The narrow padding binary mask has a width of 28 pixels around the border — so the mask's binary values are 1 (active/permitted) in the narrow 28-pixel border region and 0 (blocked) in the central image area. This restricts the learned pattern exclusively to the border. In contrast, the Full baseline (R21) covers the whole image with a full watermark, implying the mask is 1 everywhere (no restriction). R27 requires cross-entropy loss for Full, and R26 requires it for Narrow — both share the loss function but differ in mask coverage: Narrow is border-only (28px), Full is unrestricted.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes R17 and R18 exactly, including the bilinear interpolation specification and 'only where the mask permits' language",
+        "References src/execution/baselines.py as the implementation file and describes the resize-then-mask-apply ordering",
+        "Correctly explains that the Narrow mask has value 1 in the 28-pixel border and 0 in the central area",
+        "Correctly contrasts Narrow (border-only mask) with Full baseline (whole-image coverage) citing R21"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/baselines.py"
+      ],
+      "rubric_requirement_id": "R17",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sample-specific-masks_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric mandates a specific experimental protocol for reproducibility across multiple training runs. (a) Requirements R29 and R30 both specify a repeated-training protocol for ResNet-18 with the 'Pad' method — what is the exact number of repetitions, what must be varied across runs, and what statistics must be reported at the end, as stated in the rubric? (b) Cross-reference evidence/tables/table1_resnet_main_results.md: does the table structure reflect this exact protocol (correct number of runs, mean and standard deviation reported) for the Pad/ResNet-18 entries on CIFAR10 and CIFAR100? (c) The rubric specifies accuracy is recorded 'at the end of training' rather than at the best validation checkpoint — what does this imply about the evaluation strategy, and how might this differ from common practice, and which ARA configuration file (src/configs/training.md) might reveal whether early stopping or a fixed epoch count is used?",
+      "gold_answer": "(a) R29 states: 'Using the \"Pad\" reprogramming method, ResNet-18 (pre-trained on ImageNet-1K) has been fine-tuned on the train split of the CIFAR10 dataset, then the accuracy at the end of training on the test split is recorded. This is repeated three times with three unique seeds, and the mean and standard deviation of the test accuracy is computed.' R30 states the same for CIFAR100. The exact protocol is: 3 repetitions, each with a unique (distinct) random seed, reporting mean and standard deviation of test accuracy. (b) evidence/tables/table1_resnet_main_results.md should show entries for Pad+ResNet-18 on CIFAR10 and CIFAR100 with mean ± std format, reflecting three-run averaging. If the table shows mean and std values for these cells, it confirms compliance with the protocol. (c) 'At the end of training' implies a fixed-epoch evaluation strategy rather than selecting the best validation checkpoint (early stopping). This is less common than best-checkpoint selection and means the final epoch's weights are used regardless of validation performance trajectory. src/configs/training.md should reveal the total number of training epochs and whether any early stopping callback is configured — if no early stopping is present and a fixed epoch count is set, this confirms the 'end of training' rubric requirement is met.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies exactly 3 repetitions with 3 unique seeds and mean+std reporting from R29/R30",
+        "References evidence/tables/table1_resnet_main_results.md and describes how mean±std format confirms the protocol",
+        "Correctly interprets 'at the end of training' as fixed-epoch (not best-checkpoint) evaluation",
+        "References src/configs/training.md as the configuration file that would confirm fixed epoch count vs. early stopping"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table1_resnet_main_results.md"
+      ],
+      "rubric_requirement_id": "R29",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

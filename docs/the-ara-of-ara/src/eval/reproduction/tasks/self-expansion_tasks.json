@@ -1,0 +1,254 @@
+[
+  {
+    "task_id": "self-expansion_T01",
+    "goal": "Implement the SEMA architecture components: functional adapter (down-projection, ReLU, up-projection), representation descriptor (linear encoder to 128 dims, LeakyReLU, linear decoder), and router (learnable linear mapping + softmax). Integrate these into a frozen ViT-B/16-IN1K backbone so that the output of the second normalization layer feeds the adapters, descriptors, and router, and the weighted adapter mixture is added as a residual to the FC-layer + residual output of the transformer block. Implement the combined cross-entropy + reconstruction loss. Set up the CIFAR-100 and ImageNet-R datasets with proper class-incremental splits (10 classes per task).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: The SEMA architecture components (adapter, descriptor, router) can be correctly integrated into a frozen ViT"
+    ],
+    "rubric_requirement_ids": [
+      "5b88aaa9-8bf2-4346-ad0d-4656eb6a0dd9",
+      "3aabf7f3-3079-4a8b-8953-37ad230f8992",
+      "3964f08d-b6c6-4b00-ad76-1e736728aa94",
+      "638c80be-8c5f-43a4-b24a-33bba041660d",
+      "dc0de847-ec32-40f3-9f7b-3b056ba43a3e",
+      "2da70bdf-21c8-487f-83b5-091929ce056c",
+      "6c7fab21-2130-4f8e-a472-1722b8fa8643",
+      "f76f7de8-b0f0-4bf6-ad9c-5c45bdf027aa",
+      "b990c55b-8d9b-47e5-ba2a-ab8050e26eb9",
+      "c1e41bb2-f119-4577-ab3b-6ea9cb4d7467",
+      "8f70800b-dc7b-4ad2-845e-78966f029223",
+      "7cf18f2c-1622-477d-b5b4-2c3359bec297",
+      "061cf57d-6d29-4850-85eb-99934f8e65b3",
+      "5b0fa5b0-bd67-47d4-be6b-f90527f85a49",
+      "7c152eab-cdfd-4c02-8107-8f72fff4006b"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-expansion_T02",
+    "goal": "Implement the SEMA training loop: z-score-based expansion decision logic (running statistics over 500 samples, scanning layers shallowest-to-deepest), the freeze/unfreeze protocol when new adapters are added (new adapter learnable, all others frozen; new descriptor learnable, others frozen; new router weights learnable, others frozen), and classification head expansion for new classes. Set up ImageNet-A and VTAB datasets with proper splits. Use the specified hyperparameters: SGD optimizer, lr=0.005 for adapters, lr=0.01 for descriptors, cosine annealing, batch size 32, 5 epochs for adapters, 20 epochs for descriptors, self-expansion in last 3 layers, adapter bottleneck dim 48. Implement the average accuracy and average incremental accuracy metrics.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H2: The z-score expansion mechanism and freeze/unfreeze protocol can be implemented to match the paper specification",
+      "H3: The SEMA training loop with correct hyperparameters converges"
+    ],
+    "rubric_requirement_ids": [
+      "b4553344-eb16-4a4d-a410-216a1d413a99",
+      "f727d425-215a-486a-b0ef-9fe5b2057e23",
+      "505dd960-6d1e-4a62-8627-5da5b3b51043",
+      "186e1f6a-31bb-4df7-b44e-41544010b083",
+      "85768b74-9fe9-470f-9166-490c2a6f6eb2",
+      "3345ee1d-7c91-4f35-a34d-cc884f7381c7",
+      "4b3a8b1d-e03e-4f93-aab0-db267899e2a1",
+      "ddf48454-e7b6-41ea-8133-4accd720eee6",
+      "ac81c23b-6d25-457b-be95-e20264c29e1b",
+      "f3854228-889d-4a91-8d17-399677173729",
+      "2d34ab6a-eae2-4df9-845f-6d0c680dacc5",
+      "ede350f7-1ac5-4f6b-ad2c-3f97d24881f4",
+      "9aeec6b6-c3c2-40a1-b1f7-c56fda9c4983",
+      "9b147fe2-16a2-4976-8242-e175b390510b",
+      "db420a9d-1f89-4455-b1e3-5224229785e7"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-expansion_T03",
+    "goal": "Implement the baseline methods for continual learning comparison: Finetune Adapter (single adapter per layer, continual fine-tuning with frozen ViT), L2P, DualPrompt, CODA-P (all from LAMDA-PILOT repo), SimpleCIL (from RevisitingCIL repo), and ADAM with Adapter (from RevisitingCIL repo). Configure all baselines with proper hyperparameters from Section 4.1: SGD optimizer, lr=0.005 for adapters, lr=0.01 for descriptors, cosine annealing, batch size 32, 5 epochs for adapters, 20 epochs for descriptors.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H4: All baseline methods can be faithfully implemented from their official repositories"
+    ],
+    "rubric_requirement_ids": [
+      "821e4ced-2ead-46e8-bd3b-80a6b5ab3d98",
+      "213fe0b4-346f-4c1f-b7b2-23f198b3e03e",
+      "033c6646-e283-4075-923b-e16e70c3320e",
+      "2522988f-d45e-4537-94a9-c4748671883e",
+      "e40c9f90-3815-4876-a944-68673586aa1e",
+      "65005d38-e4e9-44c5-a08c-d05e9856ed20",
+      "258321d1-3921-4d88-a955-42c4d6a75683",
+      "897aae5d-6cef-4135-9266-b432afef1cf7",
+      "06cd5080-8910-4fe1-88e7-6d75b10c6ddb",
+      "256cc0e7-eb7b-4514-8a17-821098949e4e",
+      "4b60235a-76f2-4412-933b-37b370fb319d",
+      "5ecb2fba-990a-4b97-b510-7e26d3eb257f",
+      "81f71ca5-7f2b-45b9-9c44-a8ee5da1563b",
+      "ed1f909f-6dbd-4622-8307-fe24e0fd22e2",
+      "3be032fb-a0c4-47c1-9311-f17a0dcd1fd1"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-expansion_T04",
+    "goal": "Train and evaluate SEMA and all baselines (Finetune Adapter, L2P, DualPrompt, CODA-P, SimpleCIL, ADAM) on CIFAR-100 and ImageNet-R. For each method on each dataset, compute the average accuracy after all tasks and the average incremental accuracy. Verify that SEMA achieves the highest or near-highest accuracy on both datasets.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H5: SEMA outperforms all baselines on CIFAR-100",
+      "H6: SEMA outperforms all baselines on ImageNet-R"
+    ],
+    "rubric_requirement_ids": [
+      "192d5f0a-8465-42bd-8ec6-b7e71ca5f33f",
+      "26ae9c3c-3e90-453e-9f31-5a80bd455213",
+      "69a418f5-05c9-44b5-8d69-5b0a94573144",
+      "d4e485c4-a554-4ea1-8e6a-fb608e945b24",
+      "e8a269ed-6bc4-4cfc-90b0-64790b6bec74",
+      "05874696-8483-4a4b-b7ac-7c1cbe1a6b60",
+      "2bc9441f-5df1-4692-b9c4-bca597a7431f",
+      "dc6a493b-e6bf-4128-a9ed-873356a99669",
+      "cdc7db5a-0ee4-486a-b646-a37e9f3c5cc4",
+      "765a25a3-5d23-47ef-9cf5-3c409f042b94",
+      "13629fa4-e6ad-41ca-bd64-8628db83706a",
+      "6d2442b9-4c78-4c63-ab0e-604abbfbd4cf"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "self-expansion_T05",
+    "goal": "Train and evaluate SEMA and all baselines (Finetune Adapter, L2P, DualPrompt, CODA-P, SimpleCIL, ADAM) on ImageNet-A and VTAB. For each method on each dataset, compute the average accuracy after all tasks and the average incremental accuracy. Verify that SEMA achieves the highest or near-highest accuracy and incremental accuracy across methods and throughout training, confirming the main claim of the paper (Section 4.2, Table 1).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H7: SEMA outperforms all baselines on ImageNet-A and VTAB",
+      "H8: SEMA's advantage persists throughout training (incremental accuracy)"
+    ],
+    "rubric_requirement_ids": [
+      "13236aed-6725-40b8-b833-a0dc8a806bf6",
+      "16c22564-007b-4b6a-b462-3d7ab9014c3d",
+      "0a7f5caf-0714-4bd9-b575-c0f0e59d48eb",
+      "9a243585-d2da-42cf-ba6e-e514a39012b6",
+      "cd6d6a59-bcbe-4a9a-9aa6-6bde44b1df1a",
+      "8f54e2fe-1a5e-4306-8d09-0a19f71f25ce",
+      "ace39db2-a349-4196-a76f-94d4d0240ad4",
+      "1dfccd39-cef3-4ad8-823e-4183d4092d85",
+      "40ac1b84-a97c-4674-8e65-084f83bed434",
+      "bb23038c-38fc-4c86-8ad2-e29aaad62285",
+      "fd1aa6e8-bf99-4cfa-a437-b866cd7baf77",
+      "5392a57b-f0a3-4e29-b0d1-14c6daa85946",
+      "f88415b6-2fea-48f9-a543-2af0f15b1825"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "self-expansion_T06",
+    "goal": "Implement the six ablation variants for the expansion/routing study (Section 4.3, Table 2): (1) No Expansion (single adapter, no expansion after task 1), (2) Average Weighting (uniform router weights), (3) Random Weighting (random weights per sample), (4) Top-1 Selection (hardmax at train and inference), (5) Random Selection (random single adapter per sample), (6) Top-1 Selection at Inference only (soft mixture training, hardmax inference). Train the No Expansion variant plus full SEMA on ImageNet-A and VTAB, and verify that SEMA outperforms all variants overall while Top-1 Inference is second-best.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H9: Self-expansion improves over no-expansion",
+      "H10: Learned soft mixture routing outperforms hard selection and fixed weighting",
+      "H11: Top-1 Inference variant is second-best after full SEMA"
+    ],
+    "rubric_requirement_ids": [
+      "f4446727-6b06-4e68-b065-367ce9d5161e",
+      "3ebfcc70-eabc-42b3-bfce-610813252204",
+      "55756009-1626-491e-8875-d7ccb8b80778",
+      "952bbc57-c7f9-45e3-b440-825ad0ea994d",
+      "a5959da9-798c-4eb0-9579-c3a92e23191c",
+      "4eed6ff6-738b-4515-a0fb-dfddd356b957",
+      "aecc19c4-4c4c-4929-a596-52080af9f789",
+      "02c22ec6-80c7-4bd1-b709-213d921c70dd",
+      "ef33c6a5-add3-4836-a25e-a9bf30ae2b5f",
+      "960373b2-6408-411f-87f0-a02c35013f1a",
+      "5e45d561-3737-4289-baa0-8555670e27dc",
+      "8f05eab2-286f-44a8-ac9e-968219c2b35e",
+      "4d764fd4-0c3c-4284-98aa-7774ce363af7",
+      "32f0f139-2d20-48f0-b58f-f540ef3c7c27"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "self-expansion_T07",
+    "goal": "Train and evaluate the remaining ablation routing variants (Average Weighting, Random Weighting, Top-1 Selection, Random Selection, Top-1 Selection Inference) on both ImageNet-A and VTAB (Section 4.3, Table 2). For each variant on each dataset, compute average accuracy and incremental accuracy after all tasks. This completes the full ablation table by providing execution results for all routing strategy variants.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H12: All routing variants produce meaningful accuracy metrics on both datasets",
+      "H13: Learned soft mixture routing with expansion is consistently the best strategy"
+    ],
+    "rubric_requirement_ids": [
+      "135f6fdc-ee33-40f1-ae9f-164625f2f755",
+      "f7de59e1-a4c2-4986-bc01-706fb0238a50",
+      "1bc09532-d65f-4e7f-87db-ee875ad0a28c",
+      "50cb9235-3350-4290-9814-827121ddcd05",
+      "1d30f56d-b0c8-4b5e-845e-153ee9a723ed",
+      "1325a4b3-1e03-493a-9b59-fc0ba78a3b89",
+      "4f01fac3-3bb3-456d-851d-541b77d26186",
+      "8c9ebd55-9b06-4251-95d0-1d4c5cf787e4",
+      "70e161eb-5840-4210-8c38-eb7c66844a36",
+      "6bd258ed-e7c4-401d-a496-390255ec65cf",
+      "0cf9f0b3-7cc6-4175-823f-b3fc04f2eda7",
+      "7bf23f28-f39e-4f0f-a458-fe136c2f9490"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "self-expansion_T08",
+    "goal": "Reproduce the expansion threshold sensitivity analysis (Section 4.3, Figure 3). Train SEMA with expansion thresholds from 1.0 to 2.0 (in 0.1 increments) on ImageNet-A, and from 1.0 to 2.0 (in 0.1 increments) on VTAB. For each threshold, record the final average accuracy and the number of adapters in each of the last three transformer layers. Verify: (a) accuracy remains stable across threshold range [1.0, 2.0] on ImageNet-A, (b) adapter count decreases monotonically as threshold increases, (c) VTAB accuracy is higher with low thresholds than with high thresholds.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H14: The z-score expansion threshold is robust over [1.0, 2.0] on ImageNet-A",
+      "H15: Lower thresholds yield more adapters (monotonic decrease)"
+    ],
+    "rubric_requirement_ids": [
+      "e416a999-41de-489d-9df7-54edfd80b866",
+      "bb921111-8c41-401a-b96d-f71da28178f0",
+      "9254bba9-cd1d-4d1b-a51a-1e5585a0b9ba",
+      "2d255c7d-aca3-4032-93e5-87606f0a272e",
+      "1a82caf9-c8cd-4e7e-ac8f-925b10ef676c",
+      "9e2e9c35-5b31-4c23-ada6-25cadcb089b3",
+      "db0f6083-9914-49e6-91d8-5d7552307fa8",
+      "cac935d6-0663-4748-92e0-6f91b32e6a35",
+      "b1205f44-85ca-4494-a143-eb9e5a362521",
+      "a50983cd-2b51-4f3d-8b7a-934ebf53813b",
+      "a302cd1d-26d1-498c-a96f-3691052e040c",
+      "e9857488-805e-4c0b-b6ee-445ae79380cf",
+      "d91d9aa5-72fd-4d78-b923-df6bc4510d7e"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "self-expansion_T09",
+    "goal": "Reproduce the dynamic expansion process analysis and adapter usage analysis (Section 4.3, Figures 4 and 5). Train SEMA on VTAB (5 tasks) with self-expansion limited to the final transformer layer only, logging per-batch reconstruction error from each representation descriptor. Verify: (a) each descriptor's reconstruction loss decreases during training and oscillates around a stable value, (b) reconstruction loss spikes during the detection phase at the start of each new task, (c) exactly 3 descriptors are present after all 5 tasks, (d) no new descriptors are added during tasks 4 and 5. Compute adapter usage by averaging routing weight vectors from test-set samples per task and normalizing. Verify first 3 adapters dominate their introducing tasks, task 4 reuses adapter 1, and task 5 reuses adapter 3.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H16: Expansion creates new descriptors only when distribution shift is detected",
+      "H17: Later tasks reuse existing adapters rather than always expanding"
+    ],
+    "rubric_requirement_ids": [
+      "c35a2668-8fd3-4a0c-8012-ecbf780f84a9",
+      "8e458cfa-d612-4672-99e3-c8996d3d0882",
+      "30c33054-c83b-432e-b942-fc35a06beaea",
+      "22377755-0ce5-4de4-bda0-cbc476c6a4ee",
+      "4c514efc-422d-4f91-b5d0-0d1c6767a281",
+      "afdd1870-f248-48c6-8da0-80ee80c2a249",
+      "041c37ec-dec0-46a8-9641-b88963ccda3f",
+      "8e1377c2-0b2f-4aa8-b3f9-476e7f7a8b09",
+      "4e89af61-b259-4c12-a179-26a3651a8f50",
+      "3dc20642-dc33-4467-b5bf-f1b9a528cbdd",
+      "88dcf9d6-bd8b-4427-b00f-fdcd087fa3c9"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "self-expansion_T10",
+    "goal": "Reproduce the multi-layer expansion analysis (Section 4.3, Table 4) and the adapter variant comparison (Section 4.3, Table 3). For multi-layer: train SEMA on ImageNet-A and VTAB with varying numbers of expansion-eligible layers (last 2, last 3, last 4). Verify that more expansion-eligible layers yields higher accuracy and more adapters. For adapter variants: implement LoRA and Convpass adapters as drop-in replacements, train SEMA with each adapter type (Adapter, LoRA, Convpass) on ImageNet-A and VTAB, and verify all variants achieve competitive accuracy within 4% of each other.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H18: More expansion-eligible layers improve accuracy",
+      "H19: SEMA is compatible with different adapter architectures (LoRA, Convpass)",
+      "H20: All adapter types achieve competitive accuracy within 4%"
+    ],
+    "rubric_requirement_ids": [
+      "df30022a-2ae3-4cbf-a303-a0b599a06978",
+      "0a1ec651-be06-442d-b56a-6b5bd11c4a4f",
+      "1fac6183-d19f-4061-baaa-5879a87781db",
+      "7960f0dc-ff3d-483c-ac44-74865510d7fb",
+      "14696e47-fa4c-4f3f-9557-2e22ba3825f1",
+      "bf0ca018-644d-41a7-b0a1-8d1d54690e51",
+      "2fc5dc38-c1b5-419d-a2ea-4629b27b85b2",
+      "7fa8715e-3ab6-4116-be67-eb1baeb1d8de",
+      "e0aa0321-72f7-447b-b98d-06527a5fa4bf",
+      "6329ed8e-e09f-4736-910e-b8a71402fde8",
+      "4a7122fc-b365-4bc7-ad97-346be8b23f78",
+      "5ca4eec8-4f2d-495a-9565-669aa37b0483"
+    ],
+    "n_requirements": 12
+  }
+]

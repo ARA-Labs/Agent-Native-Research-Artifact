@@ -1,0 +1,71 @@
+session:
+  id: "2026-03-12_012"
+  timestamp: "2026-03-12T22:00"
+  summary: "Complete rewrite of evaluation section: discarded 3-tier framework, replaced with 5 experiments aligned to user's new design"
+
+events_logged:
+  - type: decision
+    id: N24
+    provenance: user
+    summary: "Discarded old 3-tier evaluation framework; replaced with 5 experiments (reproduction cost, negative results, extensibility, info retrieval, common pitfalls)"
+  - type: decision
+    id: N25
+    provenance: user
+    summary: "Info retrieval experiment uses understanding layer (6 categories incl. failure conditions + unanswerable) and execution layer (4 categories), done over ExpBench ARAs"
+  - type: decision
+    id: N26
+    provenance: user
+    summary: "Reproduction cost experiment will use EXP-Bench with PaperBench rubrics; placeholder for now"
+  - type: decision
+    id: N27
+    provenance: user
+    summary: "Negative results experiment leverages MALT/speedrun data; placeholder for ablation"
+  - type: experiment
+    id: N28
+    provenance: ai-executed
+    summary: "Populated evaluation section with existing data: info gap (23 papers, 8,921 reqs), MALT (24K runs), pilot A/B (Andes), RIC (FOA paper)"
+
+ai_actions:
+  - action: "Rewrote paper/sections/evaluation.tex from scratch (302 lines → 260 lines)"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+  - action: "Updated paper/sections/introduction.tex contribution bullet for new eval framing"
+    provenance: ai-executed
+    files_changed: ["paper/sections/introduction.tex"]
+  - action: "Updated paper/sections/discussion.tex paragraphs to reference new eval structure"
+    provenance: ai-executed
+    files_changed: ["paper/sections/discussion.tex"]
+  - action: "Updated paper/sections/appendix.tex cross-references"
+    provenance: ai-executed
+    files_changed: ["paper/sections/appendix.tex"]
+  - action: "Added kon2025expbench and PLACEHOLDER_foa2024 to references.bib"
+    provenance: ai-executed
+    files_changed: ["paper/references.bib"]
+
+claims_touched:
+  - id: C09
+    action: confirmed
+    provenance: ai-executed
+  - id: C11
+    action: confirmed
+    provenance: ai-executed
+  - id: C12
+    action: confirmed
+    provenance: ai-executed
+  - id: C13
+    action: confirmed
+    provenance: ai-executed
+  - id: C14
+    action: confirmed
+    provenance: ai-executed
+
+open_threads:
+  - "Run full A/B info retrieval eval across ExpBench corpus"
+  - "Run reproduction cost experiment on ExpBench"
+  - "Complete negative results ablation (ARA-full vs ARA-no-trace vs PDF)"
+  - "Design extensibility experiment using RE-Bench ARAs"
+  - "Design common pitfall quantification methodology"
+
+ai_suggestions_pending:
+  - "Failure-condition questions will be ARA-exclusive advantage — expect PDF to score 0% on these"
+  - "RIC shows Ingestor fidelity (not format) as bottleneck — could improve Ingestor before full eval"

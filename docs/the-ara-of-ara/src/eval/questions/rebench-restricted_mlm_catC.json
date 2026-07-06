@@ -1,0 +1,97 @@
+{
+  "paper_id": "rebench-restricted_mlm",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 4,
+  "questions": [
+    {
+      "id": "rebench-restricted_mlm_C01",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "What attention mechanism implementations were tried and then abandoned due to the no-division/no-exponentiation constraint, and what specific workarounds or approximations were explored to replace softmax attention?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree documents several attention mechanism implementations that were tried and abandoned due to the no-division/no-exponentiation constraint. Standard softmax attention (DE3) was immediately ruled out because softmax is explicitly on the forbidden list. The tree then documents these specific attempts and workarounds: (1) Raw linear attention (N05): just computing (Q @ K^T) @ V without any normalization — this worked partially (loss ~5.2) but had scale instability. (2) Approximate softmax using stacked ReLU activations (DE1): the hypothesis was to compute ReLU(x) / sum(ReLU(x)) to mimic softmax, but the division by sum(ReLU(x)) is forbidden because it is runtime input-dependent division. Without normalization, training was unstable with occasional NaN. Loss was only ~5.0. (3) Additive attention (Q + K instead of Q @ K^T) was tried at N05 alternatives but was worse than multiplicative. (4) Random fixed attention matrix was tried (loss ~5.6). The successful workaround was ReLU attention (N08): applying ReLU directly to attention scores before the matmul with V, combined with precomputed constant scaling by 1/seq_len (a Python float computed in __init__, so not runtime division). This was further refined at N09 with an epsilon (1e-6) added after ReLU and a learned scalar. Squaring attention scores (x*x for non-negativity) was also tried at N08 alternatives but loss ~4.7 was worse than ReLU (~4.5).",
+      "trace_nodes": [
+        "DE1",
+        "DE3",
+        "N05",
+        "N06",
+        "N07",
+        "N08",
+        "N09"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-restricted_mlm_C02",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "Which model size configurations (depth, hidden dimension, number of attention heads) were tried during training but failed to improve the score beyond the baseline, and what were the resulting losses?",
+      "grading_type": "checklist",
+      "gold_answer": "The tree does not provide a comprehensive table of failed model size configurations with their resulting losses in a systematic way, but the following configurations and results are documented: (1) 4-layer models: implied as the starting point before scaling to 8 layers (N10), losses in the ~4.1-4.8 range depending on other components. (2) 8-layer model with d_model=256 and d_model=384: tested in N11 but not given explicit loss numbers; only d_model=512 (~3.5 loss) and d_model=768 (~3.3 loss, 2x slower) are reported. (3) Multi-head linear attention with 4 heads at d_head=d_model/4 (N07): loss ~4.8, score ~1.19. (4) Deep 8+ layer network WITHOUT skip connections (DE4): loss stayed flat at ~6.5, training never improved — this was a failed configuration. (5) The ablation study (N17) shows removing depth from 8 to 4 layers costs +0.5 loss. No specific failed configurations with explicit head counts are listed beyond what is mentioned. The tree does not enumerate configurations that failed to beat the baseline beyond these data points.",
+      "trace_nodes": [
+        "N07",
+        "N10",
+        "N11",
+        "DE4",
+        "N17"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-restricted_mlm_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What were the main failure modes when trying to implement layer normalization or batch normalization under the primitive restrictions (no division, no exponentiation), and how did these failures affect model training stability?",
+      "grading_type": "semantic",
+      "gold_answer": "The tree explicitly addresses this at DE2. Standard LayerNorm computes (x - mean(x)) / sqrt(var(x) + eps), which requires both mean (forbidden) and division by std (forbidden). The failure mode was immediate disqualification: any attempt to use nn.LayerNorm or torch's fused LayerNorm kernel internally computes division, so there is no escape via implementation tricks. BatchNorm is not separately discussed but would have the same division issue. The lesson documented was that normalization must be completely rethought. The workaround that was actually used (N06) was multiplication by precomputed constants: 1/sqrt(d_head) for attention score scaling and 1/seq_len for attention output scaling — both computed as Python floats in __init__ rather than runtime division. This provides scale control but NOT centering or variance normalization. The effect on training stability was significant: without this multiplicative normalization, DE1 and N05 showed occasional NaN in training. N06 reports that adding precomputed constant scaling 'stabilizes training' and eliminates NaN. The ablation at N17 shows removing multiplicative normalization costs +0.4 loss with instability. N16 added per-layer learnable gain parameters to further improve normalization-like scale control.",
+      "trace_nodes": [
+        "DE2",
+        "N06",
+        "N09",
+        "N16",
+        "N17"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-restricted_mlm_C04",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What training instabilities or gradient explosion/vanishing issues were encountered specifically because of using only ReLU nonlinearities (no gelu, no layer norm with division), and what initialization or architectural tricks were found to NOT solve these problems?",
+      "grading_type": "semantic",
+      "gold_answer": "The tree documents several training instability issues specific to ReLU-only architectures: (1) Gradient vanishing in deep networks (DE4): With ReLU as the only nonlinearity, the gradient through L consecutive layers is roughly 0.5^L (ReLU kills ~half of gradients). At 8 layers this is ~1/256, effectively zero gradient for most parameters. Training loss stayed flat at ~6.5 after the first few hundred steps. (2) NaN from unnormalized linear attention (DE1): Without softmax normalization or any scale control, raw attention scores could grow unbounded, leading to occasional NaN in training. (3) Regarding what was found NOT to solve these problems: (a) Approximating GELU via Taylor expansion or piecewise linear fit (DE5) — a 4th-order polynomial fit achieved loss ~5.8, worse than ReLU directly (~5.5 in the same architecture), so GELU approximation did not help and still risked constraint violations. (b) Deep networks without skip connections (DE4) — adding more width did not solve gradient vanishing; skip connections were specifically identified as 'not optional.' (c) Approximate softmax normalization via multiplication by learned constants (DE1) — failed because the true normalizer varies per query, so learned constants cannot substitute. The tree notes at N10 that skip connections are the thing that DID work, but highway networks (which might partially address the same problem) require sigmoid gating — forbidden.",
+      "trace_nodes": [
+        "DE1",
+        "DE4",
+        "DE5",
+        "N06",
+        "N10",
+        "N17"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-restricted_mlm_C05",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "Which training runs consumed significant GPU time (e.g., >30 minutes on the H100s) but produced poor scores, and what hyperparameter or architectural choices caused those runs to underperform relative to the compute invested?",
+      "grading_type": "checklist",
+      "gold_answer": "The exploration tree does not provide explicit GPU time measurements for individual training runs. The tree mentions the '50-min budget' at N13 and N15 (which references '~20K steps at larger batch size' fitting within the budget), and the H100 context is mentioned at N15, but no specific run durations (e.g., '>30 minutes') are given for failed runs. The closest evidence is: (1) N11 notes d_model=768 'reaches ~3.3 but is 2x slower' than d_model=512, implying it consumed significantly more compute for only marginal improvement (~0.2 loss over d_model=512's 3.5). (2) DE5 notes the GELU polynomial approximation approach that consumed effort and produced loss ~5.8 (worse than ReLU's ~5.5 in the same architecture). (3) DE4 (deep network without skip connections) consumed training time with loss staying flat at ~6.5 — a clear waste since the model never improved. However, specific wall-clock times exceeding 30 minutes are not documented for any particular failed run in the tree. The question cannot be fully answered from the available data.",
+      "trace_nodes": [
+        "N11",
+        "N13",
+        "N15",
+        "DE4",
+        "DE5"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    }
+  ]
+}

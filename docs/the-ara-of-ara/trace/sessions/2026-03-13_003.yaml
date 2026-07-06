@@ -1,0 +1,89 @@
+session:
+  id: "2026-03-13_003"
+  timestamp: "2026-03-13T18:00"
+  summary: "Full Understanding evaluation: 465 questions, 31 papers, ARA wins Cat C 92.5%, PDF wins Cat A 37.1%, Cat B tied"
+
+events_logged:
+  - type: experiment
+    id: N37
+    provenance: ai-executed
+    summary: "Generated all 22 missing PaperBench ARAs (19/22 pass Seal L1, all 22 have key files)"
+  - type: experiment
+    id: N38
+    provenance: ai-executed
+    summary: "Generated 465 questions: 310 Cat A (lossless), 115 Cat B (detail), 40 Cat C (failure)"
+  - type: experiment
+    id: N39
+    provenance: ai-executed
+    summary: "Full Understanding eval: Cat A PDF wins 37.1%, Cat B tied, Cat C ARA wins 92.5%"
+  - type: observation
+    id: O21
+    provenance: ai-executed
+    summary: "ARA hallucination rate 19.4% vs PDF 3.0% — structured format encourages overconfident inference"
+  - type: observation
+    id: O22
+    provenance: ai-executed
+    summary: "Difficulty reversal: ARA loses T2 (scattered 25-56) but wins T3 (implicit 72-54)"
+  - type: observation
+    id: O23
+    provenance: ai-executed
+    summary: "Cat B near-parity confirms Ingestor is reformatter not augmenter"
+  - type: observation
+    id: O24
+    provenance: ai-executed
+    summary: "RE-Bench Cat A worse than PaperBench — Ingestor restructuring loses verbatim detail"
+
+ai_actions:
+  - action: "Created paper_registry.json mapping all 31 papers/tasks to paths"
+    provenance: ai-executed
+    files_changed: ["code/eval/paper_registry.json"]
+  - action: "Wrote generate_catB_questions.py (rubric-gap question generator)"
+    provenance: ai-executed
+    files_changed: ["code/eval/generate_catB_questions.py"]
+  - action: "Wrote generate_catC_questions.py (failure-knowledge question generator)"
+    provenance: ai-executed
+    files_changed: ["code/eval/generate_catC_questions.py"]
+  - action: "Wrote run_question_generation.py (master batch runner for all 3 categories)"
+    provenance: ai-executed
+    files_changed: ["code/eval/run_question_generation.py"]
+  - action: "Wrote run_understanding_eval.py (Steps 2-4: answer, judge, analyze)"
+    provenance: ai-executed
+    files_changed: ["code/eval/run_understanding_eval.py"]
+  - action: "Generated 62 question files (31 catA + 23 catB + 8 catC)"
+    provenance: ai-executed
+    files_changed: ["code/eval/questions/"]
+  - action: "Ran 62 agent answering calls (31 ARA + 31 baseline), 4 retries for incomplete ARA responses"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/answers/"]
+  - action: "Ran 31 blinded Opus judge calls with randomized A/B position assignment"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/judging/"]
+  - action: "Computed metrics and generated understanding_eval_report.json"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/understanding_eval_report.json", "code/eval/results/understanding/analysis/"]
+  - action: "Updated evaluation.tex with Understanding results table and analysis"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+
+claims_touched:
+  - id: C04
+    action: weakened
+    provenance: ai-executed
+  - id: C06
+    action: confirmed
+    provenance: ai-executed
+  - id: C16
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "Run Layer 2 (Reproduction) evaluation on PaperBench papers"
+  - "Run Layer 3 (Extension) evaluation on RE-Bench tasks"
+  - "Investigate ARA hallucination rate (19.4% vs PDF 3.0%) — Ingestor calibration improvement"
+  - "Consider revising C04 statement from 'lossless' to 'near-parity with trade-offs'"
+  - "Statistical significance tests (scipy needed for McNemar + paired t-test)"
+
+ai_suggestions_pending:
+  - "The difficulty reversal (T2 PDF wins, T3 ARA wins) could be a central narrative point: structured formats sacrifice verbatim fidelity for reasoning coherence"
+  - "Cat B parity suggests ARA's real value is not in better storage of existing info but in storing NEW info (traces, failures) — reframe the paper's value proposition around Cat C, not Cat A/B"
+  - "RE-Bench Cat A weakness (PDF 40 vs ARA 13) needs acknowledgment — the task description baseline is artificially strong because it reads the same source material"

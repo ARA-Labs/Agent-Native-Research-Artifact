@@ -1,0 +1,115 @@
+{
+  "paper_id": "pinn",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "pinn_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the MLP weight initialization for the Convection problem: (a) What does R04 in rubric/requirements.md specify about how the MLP weights must be initialized, including the exact formula and bias treatment? (b) Which ARA source file implements the PINN model architecture, and what does that file reveal about whether Xavier normal initialization is correctly applied? (c) What does this initialization requirement imply about the variance scaling used compared to a standard normal distribution?",
+      "gold_answer": "(a) R04 (Rubric ID: 60faf3ea-b819-467d-972d-834a88c11eea) states: 'The MLP for solving the Convection problem has been implemented such that the MLP's weights can be initialized using Xavier normal initialization, i.e. W ~ N(0, 2/(fan_in + fan_out)) where fan_in = number of input units for the layer and fan_out = number of output units for the layer. The biases are initialized as 0.' (b) The relevant ARA file is src/execution/pinn_model.py, which contains the PINN model implementation. This file should show weight initialization using torch.nn.init.xavier_normal_ or an equivalent manual implementation with the specified variance formula, and bias initialization to zero via torch.nn.init.zeros_ or similar. (c) The implication is that the variance is scaled by 2/(fan_in + fan_out), which differs from a standard normal (variance=1) and from He initialization (2/fan_in). Xavier normal balances the variance of activations and gradients across layers, which is particularly important for tanh activations used in this MLP. The formula ensures that as layer width increases (larger fan_in/fan_out), the weight magnitudes decrease proportionally.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly quotes R04's exact formula: W ~ N(0, 2/(fan_in + fan_out)) with fan_in and fan_out defined as input/output units",
+        "Answer identifies biases are initialized as 0 per R04",
+        "Answer identifies src/execution/pinn_model.py as the cross-referenced ARA file",
+        "Answer explains variance scaling implication distinguishing Xavier from standard normal or He initialization"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/pinn_model.py"
+      ],
+      "rubric_requirement_id": "R04",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "pinn_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Concerning the optimizer switching schedule for training the reaction problem MLP: (a) What do R13 and R15 in rubric/requirements.md specify about the two different Adam+L-BFGS switching schedules that must be supported, and how do they differ? (b) Which ARA file in src/configs/ documents the training configuration and what evidence does it provide about whether both schedules are configured? (c) What does the existence of two distinct switching thresholds (1k vs 31k steps) imply about the experimental design for studying optimizer behavior on the reaction problem?",
+      "gold_answer": "(a) R13 (Rubric ID: 93c89866-fd8f-4c05-bc46-99d497e8db6e, weight 2) states: 'Code has been implemented such that when training an MLP to solve the reaction problem, the optimizer can be set to be Adam for the first 1k steps after which it can be switched to L-BFGS for the remainder of training.' R15 (Rubric ID: feb30a99-bab7-41f1-b56c-e0ba49ab69bd, weight 2) states: 'Code has been implemented such that when training an MLP to solve the reaction problem, the optimizer can be set to be Adam for the first 31k steps after which it can be switched to L-BFGS for the remainder of training.' They differ only in the Adam phase duration: 1,000 steps vs 31,000 steps. (b) The relevant ARA file is src/configs/training.md, which documents training hyperparameters and optimizer configurations. This file should show entries or parameters for adam_steps (or equivalent) taking values 1000 and 31000, controlling the Adam-to-L-BFGS handoff point. (c) The two schedules enable an ablation study: by comparing 1k vs 31k Adam pre-training before switching to L-BFGS, the paper can examine whether longer Adam warm-up helps or hurts final convergence on the reaction problem, revealing how much initial first-order optimization is beneficial before invoking the second-order L-BFGS method.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly identifies both R13 (1k steps) and R15 (31k steps) with their exact requirement text",
+        "Answer notes both R13 and R15 have weight=2, indicating higher importance",
+        "Answer identifies src/configs/training.md as the cross-referenced ARA file",
+        "Answer explains the experimental design implication of comparing 1k vs 31k Adam pre-training as an ablation on warm-up duration"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R13",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "pinn_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the Hessian spectral density estimation with L-BFGS preconditioning: (a) What do R26 and R27 in rubric/requirements.md specify about how the L-BFGS-preconditioned Hessian spectral density must be computed, and what algorithms are referenced? (b) Which ARA file in src/execution/ implements this preconditioned spectral density computation, and what algorithmic steps does it contain? (c) What does the requirement to unroll the L-BFGS update (R26) as a prerequisite for the preconditioned spectral density (R27) imply about the mathematical relationship between L-BFGS and Hessian preconditioning in this paper?",
+      "gold_answer": "(a) R26 (Rubric ID: 8401ecfc-532f-4777-9ad3-ff7f66bc4204) states: 'Code has been implemented such that the L-BFGS update can be unrolled as outlined in Algorithm 2 in Appendix C.2.' R27 (Rubric ID: 899a3913-f178-4c62-a8da-07951f13603e) states: 'Code has been implemented such that the spectral density of the hessian of a loss function w.r.t. model parameters after L-BFGS preconditioning can be estimated as outlined in Algorithm 3 in Appendix C.2.' R26 is a prerequisite sub-step for R27; Algorithm 2 (L-BFGS unrolling) feeds into Algorithm 3 (preconditioned spectral density). (b) The relevant ARA file is src/execution/preconditioned_hessian.py, which implements the preconditioned Hessian computation. This file should contain the L-BFGS two-loop recursion unrolling and the subsequent spectral density estimation using the preconditioned operator, likely via stochastic Lanczos quadrature or similar. (c) The implication is that L-BFGS implicitly approximates the inverse Hessian via its curvature pairs (s, y), and by unrolling this update one can construct an explicit matrix representation of the L-BFGS preconditioner. Applying this preconditioner to the Hessian effectively shows what the loss landscape looks like after L-BFGS conditioning, explaining why Figure 3 demonstrates improved spectral clustering under L-BFGS compared to Adam.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly quotes R26 referencing Algorithm 2 and R27 referencing Algorithm 3, both in Appendix C.2",
+        "Answer identifies src/execution/preconditioned_hessian.py as the cross-referenced ARA file",
+        "Answer explains that R26 (L-BFGS unrolling) is a mathematical prerequisite for R27 (preconditioned spectral density)",
+        "Answer explains the implication that L-BFGS implicitly encodes an inverse Hessian approximation via curvature pairs, enabling spectral analysis of the preconditioned landscape"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/preconditioned_hessian.py"
+      ],
+      "rubric_requirement_id": "R27",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "pinn_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Concerning the NNCG optimizer's core subroutines: (a) What do R28, R29, and R30 in rubric/requirements.md specify about the three subroutines that must be implemented, and which appendix algorithms do they each reference? (b) Which ARA file in src/execution/ implements the full NNCG optimizer including these subroutines, and what does that file reveal about how the Armijo line search integrates with the Nystrom PCG step? (c) What does R31 add beyond R28–R30, and what does this hierarchical requirement structure imply about the relationship between the subroutines and the top-level NNCG algorithm?",
+      "gold_answer": "(a) R28 (Rubric ID: 64647c33-91fd-4a2f-bff1-b7bcf98220a8) states: 'The RandomizedNystromApproximation subroutine has been implemented as outlined in Appendix E and Algorithm 5.' R29 (Rubric ID: 7d2ca353-ba0b-49b5-b6f5-e5571c0eac6b) states: 'The NystromPCGsubroutine has been implemented as outlined in Appendix E and Algorithm 6.' R30 (Rubric ID: 080778c3-6988-461e-a04e-9c2c3fe1a457) states: 'The Armijo soubroutine has been implemented as outlined in Appendix E and Algorithm 7.' These map to Algorithms 5, 6, and 7 respectively in Appendix E. (b) The relevant ARA file is src/execution/nncg_optimizer.py (or src/execution/nys_newton_cg.py), which contains the full NNCG implementation. This file should show the Armijo backtracking line search being called after the NystromPCG step computes a descent direction, with the step size determined by Armijo's sufficient decrease condition applied to the Newton-CG iterate. (c) R31 (Rubric ID: 3d63db7e-2eb9-49e4-83e4-780652b825e7) states: 'NNCG has been implemented such that it follows the steps outlined in Algorithm 4 in Appendix E.' This adds the requirement that the three subroutines are correctly orchestrated according to Algorithm 4's control flow — R28–R30 verify component implementations while R31 verifies their correct integration into the outer optimization loop.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly quotes all three subroutine requirements (R28=Alg5, R29=Alg6, R30=Alg7) with their exact requirement text",
+        "Answer identifies src/execution/nncg_optimizer.py or src/execution/nys_newton_cg.py as the cross-referenced ARA file",
+        "Answer correctly quotes R31 and explains it tests integration of subroutines via Algorithm 4",
+        "Answer explains the hierarchical implication: R28–R30 test components in isolation while R31 tests their orchestration in the full NNCG loop"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/nncg_optimizer.py"
+      ],
+      "rubric_requirement_id": "R31",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "pinn_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the training data sampling procedure for the Convection problem: (a) What does R42 in rubric/requirements.md specify about the exact number and type of training points used, the sampling strategy, and how points relate to the problem domain defined in Appendix A.1? (b) Which ARA file in src/execution/ implements PINN training and what does it reveal about whether the fixed-sampling strategy (sample once before training, keep fixed) is correctly implemented versus re-sampling each iteration? (c) What does the combination of 10,000 residual points from a 255×100 grid, 257 initial condition points, and 101 boundary condition points imply about the ratio of interior-to-boundary supervision and its effect on the loss function defined in R05?",
+      "gold_answer": "(a) R42 (Rubric ID: fb60b9d3-3671-4da5-bb6c-a79b2ef05200) states: 'Code has been executed such that when training a three-hidden-layer MLP with a layer width of 50 to solve the Convection problem using the Adam optimizer with a learning rate of 1E-3, at each iteration the MLP is trained on a fixed set of 10000 residual points randomly sampled from a 255x100 grid on the interior of the problem domain, 257 equally spaced points for each initial condition and 101 equally spaced points for each boundary condition. The sampling is done once, before training begins, and the sampled points are kept fixed throughout training. Domain, boundaries and initial conditions should match Appendix A.1.' Key specifics: 10,000 interior residual points from 255×100=25,500 possible grid points; 257 IC points; 101 BC points; all sampled once and fixed. (b) The relevant ARA file is src/execution/pinn_training.py, which implements the training loop. This file should show data sampling occurring outside/before the training loop (not inside it), with tensors for collocation, IC, and BC points created once and reused across all 41,000 iterations — contrasting with adaptive or re-sampled collocation strategies. (c) With 10,000 residual points versus 257+101=358 boundary/IC points, approximately 96.5% of the supervision signal comes from interior PDE residuals. This heavily weights the PDE physics term in the loss function (R05, nonlinear least squares), meaning the optimizer primarily minimizes PDE violation rather than boundary/IC fitting. The fixed sampling (rather than adaptive) also means the optimizer cannot escape difficult regions by re-drawing points, which can contribute to training failures studied in the paper.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly quotes R42's exact sampling specification: 10,000 residual points from 255×100 grid, 257 IC points, 101 BC points, sampled once and fixed",
+        "Answer identifies src/execution/pinn_training.py as the cross-referenced ARA file and notes fixed pre-training sampling vs per-iteration re-sampling",
+        "Answer computes the 10,000 vs 358 ratio (~96.5% interior) and connects this to the loss weighting in R05",
+        "Answer explains the implication that fixed sampling prevents adaptive escape from difficult collocation regions, linking to the paper's study of PINN training failures"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/pinn_training.py"
+      ],
+      "rubric_requirement_id": "R42",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+session:
+  id: "2026-03-13_004"
+  timestamp: "2026-03-13T19:30"
+  summary: "Replaced blinded relative judging with absolute correctness scoring; re-ran full Understanding eval — ARA 72.3%, PDF 76.6%, Cat C +75pp"
+
+events_logged:
+  - type: decision
+    id: N40
+    provenance: user
+    summary: "Replace blinded A/B relative judging with absolute correctness scoring (binary correct/incorrect per agent)"
+  - type: experiment
+    id: N41
+    provenance: ai-executed
+    summary: "Re-ran Understanding eval with absolute grading: Cat A ARA 80.6%/PDF 97.1%, Cat B parity 43.5%/42.6%, Cat C ARA 90.0%/PDF 15.0%"
+  - type: observation
+    id: O25
+    provenance: ai-executed
+    summary: "Absolute scoring reveals PDF near ceiling on Cat A (97.1%) — old relative scoring masked this behind 41.6% ties"
+  - type: observation
+    id: O26
+    provenance: ai-executed
+    summary: "Difficulty reversal persists: T2 ARA -20.1pp, T3 ARA +10.2pp — asymmetric, ARA loses more on scattered than gains on implicit"
+
+ai_actions:
+  - action: "Rewrote step3_judge() in run_understanding_eval.py — replaced blinded A/B comparison with GRADER_SYSTEM absolute correctness prompt and _grade_answers() function"
+    provenance: ai-executed
+    files_changed: ["code/eval/run_understanding_eval.py"]
+  - action: "Rewrote step4_analyze() — absolute success rates, McNemar test, per-paper breakdown replacing win/loss/tie metrics"
+    provenance: ai-executed
+    files_changed: ["code/eval/run_understanding_eval.py"]
+  - action: "Deleted old judging results and re-ran judge pipeline (31 papers, 62 Opus grading calls)"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/judging/"]
+  - action: "Ran step4_analyze to compute new absolute success rate metrics and report"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/understanding_eval_report.json", "code/eval/results/understanding/analysis/"]
+  - action: "Updated evaluation.tex: new protocol paragraph (absolute correctness), new Table 5 (4-column success rates), new results prose with absolute numbers"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+
+claims_touched:
+  - id: C04
+    action: advanced
+    provenance: ai-executed
+  - id: C06
+    action: advanced
+    provenance: ai-executed
+  - id: C16
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "Run Layer 2 (Reproduction) evaluation on PaperBench papers"
+  - "Run Layer 3 (Extension) evaluation on RE-Bench tasks"
+  - "Install scipy for McNemar statistical significance tests"
+  - "Consider revising C04 statement from 'lossless' to 'near-parity with fidelity trade-off'"
+
+ai_suggestions_pending:
+  - "Cat B low absolute rates (43-43%) reflect the info gap itself, not format limitation — both formats lack this information. This reframes Cat B from 'ARA parity' to 'shared ceiling imposed by information gap'"
+  - "The RE-Bench Cat A gap (ARA 52.9% vs PDF 97.1%) is the strongest evidence that restructuring loses verbatim info. Consider whether RE-Bench Cat A should be excluded from aggregate Cat A reporting since the baseline is fundamentally different (task description, not paper PDF)"

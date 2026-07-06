@@ -1,0 +1,117 @@
+{
+  "paper_id": "all-in-one",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "all-in-one_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the classifier-based two-sample test used for evaluation: (a) According to rubric/requirements.md, what does R71 (or the ABSENT requirement about the classifier) specify about the classifier architecture and evaluation methodology? (b) Which ARA file in src/execution/ implements this evaluation, and what does it contain? (c) What does the rubric's 'absent' rating for this requirement imply about what an agent relying only on the PDF/repo would miss when implementing the C2ST metric?",
+      "gold_answer": "(a) The rubric/requirements.md marks the C2ST classifier requirement as ABSENT with gaps 'missing_hyperparameter, vague_description'. The requirement specifies: 'Given inputs X and Y, the classifier-based two-sample test accuracy between X and Y is measured as the 5-fold cross-validated accuracy' and 'The classifier is a random forest classifier with 100 trees.' These two specific details — 5-fold cross-validation and 100-tree random forest — are rubric-exclusive and not available in the PDF or GitHub repo. (b) The ARA file src/execution/c2st.py implements this evaluation. It contains the C2ST implementation including the random forest classifier configuration, cross-validation setup, and the logic for computing two-sample test accuracy between model-generated and reference posterior samples. (c) The 'absent' rating means that an agent using only the PDF and repo would lack the exact hyperparameters: the number of CV folds (5) and the number of trees (100). These are critical for reproducing the exact numerical C2ST scores reported in the paper. Without them, an agent might use a different classifier or validation strategy, yielding non-comparable results to Tables in evidence/tables/benchmark_c2st_posterior.md and evidence/tables/benchmark_c2st_all_cond.md.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies both ABSENT requirements: 5-fold cross-validated accuracy and random forest classifier with 100 trees",
+        "Correctly identifies src/execution/c2st.py as the cross-referenced ARA file",
+        "Explains that 'absent' rating means these hyperparameters are rubric-exclusive and not in the PDF/repo",
+        "Notes the downstream implication for reproducibility of evidence/tables/benchmark_c2st_posterior.md results"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/c2st.py"
+      ],
+      "rubric_requirement_id": "R71",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "all-in-one_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the tokenizer's condition state embedding: (a) What does the ABSENT requirement R08 in rubric/requirements.md specify about how condition state values are embedded in the Simformer tokenizer? (b) Which ARA file src/execution/simformer.py covers this, and what does the correct implementation look like structurally? (c) Given that R09 specifies the concatenation order as 'identifier, value, metadata (if used), and condition state', what would be the consequence of swapping the condition state embedding incorrectly (e.g., using a non-zero vector for False instead of zeros)?",
+      "gold_answer": "(a) R08 states: 'The tokenizer uses learnable vector embeddings to embed each value in a condition state - True values are mapped to a shared learnable vector embedding, whereas False values are mapped to zeros (of the desired dimensionality).' This is rated ABSENT with gaps 'missing_code_detail, vague_description', meaning this asymmetric embedding scheme (learnable for True, zeros for False) is not recoverable from the PDF or repo alone. (b) src/execution/simformer.py implements the Simformer including the tokenizer. The correct structural implementation requires: a single learnable embedding vector for the True condition state, a hard-coded zero vector of matching dimensionality for False, and these being applied element-wise per token based on the condition mask M_C. (c) R09 specifies the concatenation order as 'identifier, value, metadata (if used), and condition state in that order.' If False values were mapped to a non-zero learnable vector instead of zeros, the model would not be able to distinguish between conditioned and unconditioned variables in a mask-consistent way, corrupting the (un)conditional score learning objective described in R19 and R20. The zero embedding for False is essential because it allows the model to learn conditioning purely from the presence of the True embedding, preserving the marginal score targeting described in the loss function.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R08: True values → shared learnable embedding, False values → zeros of desired dimensionality",
+        "Correctly identifies src/execution/simformer.py as the cross-referenced ARA file",
+        "References R09's concatenation order (identifier, value, metadata, condition state) correctly",
+        "Explains that using non-zero embeddings for False would corrupt the conditional/unconditional score learning objective (R19/R20)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/simformer.py"
+      ],
+      "rubric_requirement_id": "R08",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "all-in-one_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the VESDE diffusion term and its role in the loss weighting: (a) What does R02 in rubric/requirements.md specify as the exact formula for the VESDE diffusion term g(t), and what does R22 specify about how g(t) enters the training loss? (b) Which ARA files src/execution/sde.py and logic/solution/algorithm.md are relevant, and what role does each play? (c) What is the implicit consequence for training if the weighting function λ(t) = g(t)² is not correctly derived from the VESDE diffusion coefficient — specifically, how does an error in σ_min or σ_max propagate?",
+      "gold_answer": "(a) R02 states: 'The diffusion term for Variance Exploding SDE is defined as g(t) = σ_min · (σ_max/σ_min)^t · √(2 log(σ_max/σ_min)).' R22 states: 'The total Simformer loss per mini-batch is given by a weighted sum, as given by a positive weighting function λ(t) e.g. λ(t)=g(t)² where g(t) is the diffusion coefficient of the VESDE.' R22 is rated PARTIAL with gaps 'vague_description, implicit_assumption', meaning the connection between g(t) and λ(t) is not fully explicit outside the rubric. (b) src/execution/sde.py implements the VESDE including the drift (R01: f(x,t)=0), diffusion term g(t), and perturbation kernel (R03). logic/solution/algorithm.md describes the algorithmic structure including how the SDE parameters feed into training. Together they confirm that g(t) must be computed identically in both the SDE forward process and the loss weighting. (c) If σ_min or σ_max are wrong, g(t)² = σ_min² · (σ_max/σ_min)^(2t) · 2log(σ_max/σ_min) is miscalibrated. Since λ(t) reweights the score matching loss across diffusion timesteps, an incorrect λ(t) would over- or under-weight high-noise timesteps relative to low-noise ones, degrading the quality of learned scores and ultimately worsening C2ST metrics as seen in evidence/tables/benchmark_c2st_posterior.md. The SDE parameters in evidence/tables/sde_params.md provide the correct σ_min and σ_max values that must be used consistently.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R02 formula: g(t) = σ_min · (σ_max/σ_min)^t · √(2 log(σ_max/σ_min))",
+        "Correctly quotes R22: λ(t) = g(t)² where g(t) is the VESDE diffusion coefficient",
+        "Identifies both src/execution/sde.py and logic/solution/algorithm.md as relevant ARA files with their distinct roles",
+        "Explains how σ_min/σ_max errors in g(t) propagate to λ(t) miscalibration and degraded C2ST scores"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/sde.py",
+        "evidence/tables/sde_params.md"
+      ],
+      "rubric_requirement_id": "R02",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "all-in-one_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the Simformer architecture's diffusion time embedding: (a) What does R12 in rubric/requirements.md specify about how diffusion time is embedded and where it is injected in the transformer, and what does R48 add about the dimensionality? (b) Which ARA file src/execution/simformer.py covers this, and how does the injection point (feed-forward block output) differ from standard transformer time conditioning? (c) R48 is rated ABSENT in the info gap analysis — what specific numerical value does it provide that cannot be found in the PDF, and why would using a different dimensionality (e.g., 128 instead of 256) affect model performance?",
+      "gold_answer": "(a) R12 states: 'Diffusion time is embedded as a random Gaussian Fourier embedding, and a linear projection of diffusion time is added to the output of each feed-forward block in the transformer.' R48 states: 'In all Simformers, the random Gaussian Fourier embedding used for diffusion time has 256 dimensions.' R48 is rated ABSENT with gap 'missing_hyperparameter', meaning the 256-dimension value is rubric-exclusive. (b) src/execution/simformer.py implements this. Standard transformers typically inject conditioning signals via cross-attention or as a prefix token, whereas here the diffusion time conditioning is injected additively at every feed-forward block output — a design choice specific to score-based diffusion models that ensures every layer is time-aware. (c) R48 specifies exactly 256 dimensions for the Fourier time embedding. Using 128 dimensions instead would reduce the expressivity of the time representation, potentially causing the model to conflate nearby diffusion timesteps and produce worse score estimates. This is particularly important because the Simformer must accurately predict scores across the full range of t ∈ [0,1] for the VESDE. Note that R47 separately specifies 128 dimensions for the metadata Fourier embedding — conflating these two values would be a specific error enabled by the rubric's disambiguation.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R12: random Gaussian Fourier embedding added to each feed-forward block output as linear projection",
+        "Correctly states R48's rubric-exclusive value: 256 dimensions for diffusion time Fourier embedding",
+        "Identifies src/execution/simformer.py as the cross-referenced ARA file",
+        "Distinguishes R48 (256 dims, diffusion time) from R47 (128 dims, metadata) and explains why using wrong dimensionality degrades score estimation"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/simformer.py"
+      ],
+      "rubric_requirement_id": "R48",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "all-in-one_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding guided diffusion for interval conditioning: (a) What do requirements R25, R26, and R27 in rubric/requirements.md collectively specify about the three components needed for interval conditioning — the self-recurrence parameter, the constraint function, and the scaling function? (b) Which ARA file src/execution/guided_diffusion.py or src/execution/guidance.py implements Algorithm 1, and how do these three components interact in the algorithm? (c) R27 defines s(t) = 1/σ(t)², making it inversely proportional to variance — what does this imply for the strength of the constraint guidance at early versus late diffusion timesteps, and how does this connect to the VESDE perturbation kernel in R03?",
+      "gold_answer": "(a) R25 states: 'For conditioning on intervals, the self-recurrence is implemented such that a mutable hyperparameter r specifies how many times future points undergo a forward diffusion step followed by a reverse step, incrementally refining each sample.' R26 states: 'For conditioning on intervals, the constraint function is defined as c(x̂) = x̂ - u, where u is a mutable hyperparameter.' R27 states: 'For conditioning on intervals, the scaling function s(t) is defined as s(t) = 1/σ(t)², i.e., inversely proportional to the variance.' Together these define the full parameterization of Algorithm 1's interval conditioning. (b) src/execution/guided_diffusion.py implements Algorithm 1 (R28: 'Algorithm 1 has been fully implemented to sample from conditions specified by the constraint function'). src/execution/guidance.py implements the guidance computation. The three components interact as: at each reverse diffusion step, the score is modified by adding s(t) · ∇c(x̂) = (1/σ(t)²) · 1 = 1/σ(t)², and the self-recurrence r controls how many refinement cycles are applied to progressively satisfy the interval constraint c(x̂) = x̂ - u ≤ 0. (c) From R03, the VESDE perturbation kernel has σ(t) = σ_min · (σ_max/σ_min)^t, so σ(t)² grows exponentially with t. Therefore s(t) = 1/σ(t)² is large at early (low-noise, t≈0) timesteps and small at late (high-noise, t≈1) timesteps. This means constraint guidance is strongest when the sample is already near its final clean value, providing precise corrections at low noise levels while allowing broader exploration at high noise levels — a principled design that prevents the constraint from dominating the diffusion dynamics when the sample is far from the data manifold.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes all three requirements: R25 (self-recurrence r), R26 (constraint c(x̂) = x̂ - u), R27 (scaling s(t) = 1/σ(t)²)",
+        "Identifies src/execution/guided_diffusion.py as implementing Algorithm 1 (R28) and src/execution/guidance.py as computing guidance",
+        "Explains the interaction: score modification = s(t)·∇c(x̂) with r refinement cycles per step",
+        "Correctly derives from R03 that σ(t)² grows exponentially so s(t) is strongest at low-noise timesteps, explaining the guidance schedule's physical rationale"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/guided_diffusion.py",
+        "src/execution/guidance.py"
+      ],
+      "rubric_requirement_id": "R27",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

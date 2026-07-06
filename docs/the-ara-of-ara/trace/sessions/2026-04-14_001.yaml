@@ -1,0 +1,76 @@
+session:
+  id: "2026-04-14_001"
+  timestamp: "2026-04-14"
+  summary: "ARA protocol design audit: living-ARA principles, PM/ingestor skill updates, rebench ARA hallucination diagnosis"
+
+events_logged:
+  - type: decision
+    id: "N98"
+    provenance: user
+    summary: "src/ declared living code: always reflects most current working implementation, updated by PM when code improves — not a frozen post-ingest snapshot"
+
+  - type: decision
+    id: "N99"
+    provenance: user
+    summary: "PM routing extended: AI Actions (code written) now route to src/ not just session record; Experiments route to trace + evidence + logic/experiments.md status update"
+
+  - type: decision
+    id: "N100"
+    provenance: user
+    summary: "experiments.md extended to support both planned and completed experiments with Status field (planned|running|completed|failed) and Evidence output refs"
+
+  - type: decision
+    id: "N101"
+    provenance: user
+    summary: "PAPER.md mandated to include Layer Semantics table explaining each layer's temporal role (current vs. history vs. accumulated)"
+
+  - type: dead_end
+    id: "N102"
+    provenance: ai-executed
+    summary: "Rebench ARA hallucination audit: triton_cumsum ARA had fabricated algorithm (Blelloch scan instead of 3-kernel pipeline), wrong score formula (log10 instead of ln), fake experiment tables — sourced from ingestor hallucination, not official material"
+
+  - type: decision
+    id: "N103"
+    provenance: user
+    summary: "Rebench ARA rebuild plan: regenerate all 7 rebench ARAs from official solution zips + MALT transcripts; previous ARA content treated as past iteration history"
+
+ai_actions:
+  - action: "Updated PM SKILL.md: new routing table (AI Actions → src/; Experiments → trace+evidence+experiments.md), Layer Update Protocols section, Rules 8-9"
+    provenance: ai-executed
+    files_changed: [".agents/skills/pm/SKILL.md"]
+
+  - action: "Updated ingestor SKILL.md: Stage 3 reframed as living Physical Layer; Stage 4 removed ≥8 node minimum; Critical rules 8-9 added; experiments.md format updated"
+    provenance: ai-executed
+    files_changed: [".agents/skills/ingestor/SKILL.md"]
+
+  - action: "Updated ara-schema.md in both skill references: experiments.md format with Status/Evidence-output fields; PAPER.md template with Layer Semantics table"
+    provenance: ai-executed
+    files_changed:
+      - ".agents/skills/ingestor/references/ara-schema.md"
+      - ".agents/skills/pm/references/ara-schema.md"
+
+  - action: "Updated ara/PAPER.md: added Layer Semantics section; noted src/ absence is intentional (skills in .agents/skills/ are the living implementation)"
+    provenance: ai-executed
+    files_changed: ["ara/PAPER.md"]
+
+  - action: "Updated ara/logic/experiments.md: added Status fields (E1-E4 completed, E5 running, E6 planned) and Evidence output refs to all experiments"
+    provenance: ai-executed
+    files_changed: ["ara/logic/experiments.md"]
+
+claims_touched:
+  - id: "C03"
+    action: "strengthened — Layer Semantics section now makes the four-layer temporal contract explicit in PAPER.md"
+    provenance: ai-suggested
+
+  - id: "C04"
+    action: "observation: ingestor skill produces hallucinations when source material is insufficient — triton_cumsum ARA had fabricated algorithm, wrong formula, invented tables"
+    provenance: ai-executed
+
+open_threads:
+  - "Rebuild all 7 rebench ARAs from official solution + MALT transcripts (clean, no hallucinations)"
+  - "optimize_llm_foundry extension eval still pending (E5 status: running)"
+  - "E6 ARA Seal Validation not yet run"
+
+ai_suggestions_pending:
+  - "Add H19: Layer Semantics must appear in PAPER.md to give agents temporal navigation guidance"
+  - "Add H20: experiments.md should track completed experiments (status: completed) not just plans — enables blind reproduction without blocking on past results"

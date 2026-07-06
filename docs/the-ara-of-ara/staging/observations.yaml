@@ -1,0 +1,748 @@
+observations:
+  - id: O01
+    timestamp: "2026-03-12T23:00"
+    provenance: ai-suggested
+    content: "All evaluation tables (Tier 1, 2, 3) have TODO placeholders — no experimental results have been filled in yet. The paper structure is complete but data-empty."
+    context: "PM audit of paper progress"
+    potential_type: unknown
+    promoted: false
+
+  - id: O02
+    timestamp: "2026-03-12T23:00"
+    provenance: ai-suggested
+    content: "The introduction's PaperBench information gap analysis (TODO% coverage) depends on results from pdf_information_gap.py which has been built and run on 3 papers, but results haven't been aggregated into the paper text yet."
+    context: "PM audit of paper progress"
+    potential_type: claim
+    promoted: true
+    promoted_to: "C09 — now supported with full 23-paper data (45.3% median sufficient)"
+
+  - id: O03
+    timestamp: "2026-03-12T23:00"
+    provenance: ai-suggested
+    content: "The ARA-native review system (Appendix E) is marked as 'brainstorm draft, to be revised' but is already quite detailed (700+ lines). May be overclaiming for appendix scope."
+    context: "PM audit of paper progress"
+    potential_type: decision
+    promoted: false
+
+  - id: O04
+    timestamp: "2026-03-12T23:00"
+    provenance: ai-suggested
+    content: "Two PLACEHOLDER_ citations exist in references.bib (PLACEHOLDER_jimenez2024swebench, PLACEHOLDER_scienceagentbench2024) — these need verification."
+    context: "PM audit of paper progress"
+    potential_type: unknown
+    promoted: false
+
+  - id: O05
+    timestamp: "2026-03-12T23:00"
+    provenance: ai-suggested
+    content: "Live PM section (Section 5) includes open-source release plan as a TODO — this is a contribution claim without implementation evidence."
+    context: "PM audit of paper progress"
+    potential_type: claim
+    promoted: false
+
+  - id: O06
+    timestamp: "2026-03-12T23:00"
+    provenance: ai-suggested
+    content: "The paper's own ara/ directory serves as proof-of-concept for the Live PM (C08), but the ara/ was mostly empty until this session — only the exploration tree had 2 entries."
+    context: "PM audit of paper progress"
+    potential_type: unknown
+    promoted: false
+
+  - id: O07
+    timestamp: "2026-03-12T11:00"
+    provenance: ai-suggested
+    content: "pinn is an extreme outlier at 94.2% sufficient (next best: 74.2%). Its rubric is 92.5% Code Execution with highly specific 'run this config' checks. The paper is a systematic empirical study where the contribution IS the experimental grid — narrative purpose perfectly aligns with reproduction needs. This is the rare case, not the norm."
+    context: "Full 23-paper info gap analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O08
+    timestamp: "2026-03-12T11:00"
+    provenance: ai-suggested
+    content: "Negative correlation (-0.76) between rubric size (n_requirements) and pct_sufficient. Larger, more granular rubrics expose more gaps. This suggests the gap is even larger than our numbers show — coarser rubrics mask missing detail."
+    context: "Full 23-paper info gap analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O09
+    timestamp: "2026-03-12T11:00"
+    provenance: ai-suggested
+    content: "Dataset and Model Acquisition is 5.4% sufficient across ALL papers (25.5% entirely absent). This is the single worst fine-grained category. No paper consistently provides download URLs for pretrained models or datasets. This is a universal structural failure of the PDF format."
+    context: "Full 23-paper info gap analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O10
+    timestamp: "2026-03-12T11:00"
+    provenance: ai-suggested
+    content: "The existing RIC evaluation (Exp B) scored PDF at 98.2% — wildly overestimating coverage because it treated any mention as 'found'. The strict evaluation (sufficient/partial/absent) reveals the true gap: 45% sufficient. The difference highlights that leniency in evaluation design can mask the information gap entirely."
+    context: "Comparing old vs new evaluation methodology"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O11
+    timestamp: "2026-03-12T17:30"
+    provenance: ai-executed
+    content: "RE-Bench shows extreme score variance within same (task, model): Claude 4 Opus on fix_embedding scores [0.00, 0.70, 0.97, 1.00]. Even Claude Opus 4.6 on scaling_law: [0.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00]. Identical agent, identical task, lottery-like outcomes. This directly supports ARA Exploration Graph: if run #1's graph were shared, run #2 wouldn't need to rediscover dead ends."
+    context: "METR eval-analysis-public RE-Bench analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O12
+    timestamp: "2026-03-12T17:30"
+    provenance: ai-executed
+    content: "Model progression on RE-Bench: GPT-4 (2023-03) avg=0.037 → o1-preview (2024-09) avg=0.072 → Claude 3.7 Sonnet (2025-02) avg=0.442 → Claude Opus 4.6 (2025-12) avg=0.974. 26x improvement in 2.5 years, but even the best model has individual runs that fail completely. Capability is necessary but insufficient — structured knowledge transfer is the missing piece."
+    context: "METR eval-analysis-public model comparison"
+    potential_type: claim
+    promoted: false
+
+  - id: O13
+    timestamp: "2026-03-12T17:30"
+    provenance: ai-executed
+    content: "Difficulty cliff is dramatic and consistent: agent success drops from 89.8% (easy, <1h human) to 49.9% (1-2h) to 12.1% (2-4h) to 7.8% (>16h). The cliff is at ~2h human time — exactly where RE-Bench showed agents plateau. Above this threshold, 96-98% of compute cost is wasted on failed exploration."
+    context: "METR eval-analysis-public difficulty analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O14
+    timestamp: "2026-03-12T17:30"
+    provenance: ai-suggested
+    content: "AIDE's tree search scaffold outperforms Modular's linear context on RE-Bench because it maintains implicit exploration structure (each solution is a node, patches spawn children). But this tree is agent-internal and not in the trace. ARA externalizes this — making exploration structure inspectable, portable, and auditable. AIDE already proved structure helps; ARA makes it a first-class artifact."
+    context: "RE-Bench scaffold comparison analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O15
+    timestamp: "2026-03-12T17:30"
+    provenance: ai-executed
+    content: "16.6% of (task, model) pairs show 'mixed outcomes' — same model on same task sometimes succeeds, sometimes fails, with median 50% success rate (coin flip). These 750 pairs account for 3,891 runs. This lottery effect is the direct cost of non-deterministic exploration without knowledge sharing."
+    context: "METR eval-analysis-public outcome variance analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O16
+    timestamp: "2026-03-12T22:00"
+    provenance: ai-suggested
+    content: "RIC evaluation on test-time-model-adaptation shows PDF (0.982) outperforming ARA (0.942). The gap is Ingestor fidelity, not format limitation — ARA schema CAN represent all info, but current Ingestor doesn't always extract exhaustively. 17 partial matches concentrate in Code Development where appendix-level detail is summarized. This is an Ingestor improvement opportunity, not a format problem."
+    context: "Populating new evaluation section with existing RIC data"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O17
+    timestamp: "2026-03-12T22:00"
+    provenance: ai-suggested
+    content: "Old evaluation section had 302 lines of meticulously structured prose — all with TODO placeholders for every single number. New section is 260 lines with ~60% of data points populated from existing results. The pivot from speculative framework to data-grounded experiments is a significant quality improvement."
+    context: "Evaluation rewrite"
+    potential_type: unknown
+    promoted: false
+
+  - id: O18
+    timestamp: "2026-03-13T01:00"
+    provenance: ai-executed
+    content: "22 of 23 PaperBench papers lack ARA artifacts — only test-time-model-adaptation has one. This is the critical blocker for the full Understanding evaluation (Cat A needs ARAs for all 31 papers, Cat B needs ARAs for 23 PaperBench papers). Estimated ~$100 and ~45 min to generate all 22 missing ARAs via the Universal Ingestor."
+    context: "Artifact inventory during experiment planning"
+    potential_type: decision
+    promoted: false
+
+  - id: O19
+    timestamp: "2026-03-13T01:00"
+    provenance: ai-suggested
+    content: "Category B question generation from PaperBench rubrics is a novel methodological contribution: by selecting requirements rated 'partial' or 'absent' in the info gap analysis, we create questions that are DESIGNED to favor ARA — but fairly, because the gold_answer comes from ground truth (the rubric), not from ARA itself. This is an intentionally adversarial setup for the PDF baseline."
+    context: "Designing Category B question protocol"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O20
+    timestamp: "2026-03-13T01:00"
+    provenance: ai-suggested
+    content: "For RE-Bench/Speedrun baseline agent, the 'PDF' is actually a task description README + starter code, NOT a research paper PDF. This is a conceptually different baseline than PaperBench and should be acknowledged in the paper. The framing 'PDF+GitHub' doesn't quite apply to RE-Bench — it's more 'task spec + code'."
+    context: "Designing baseline protocol for RE-Bench Category C evaluation"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O21
+    timestamp: "2026-03-13T18:00"
+    provenance: ai-executed
+    content: "ARA hallucination rate is 19.4% vs PDF 3.0% across all 465 questions. The structured format appears to encourage overconfident inference — ARA agents attempt answers where PDF agents conservatively abstain. This is partly a scoring artifact (attempting an answer risks hallucination penalty; abstaining avoids it) but also a genuine Ingestor calibration issue. Future Ingestor should mark inferred vs explicit information."
+    context: "Understanding evaluation hallucination analysis"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O22
+    timestamp: "2026-03-13T18:00"
+    provenance: ai-executed
+    content: "Difficulty reversal: ARA loses on T2 (scattered) questions 25-56 but wins on T3 (implicit) questions 72-54. T1 (explicit) is exactly tied 22-22. The Ingestor's restructuring hurts verbatim retrieval (T2 requires assembling scattered info) but helps inference (T3 benefits from organized structure). This creates a natural trade-off: the more structured the representation, the better it is for reasoning but worse for verbatim recall."
+    context: "Understanding evaluation difficulty breakdown"
+    potential_type: claim
+    promoted: false
+
+  - id: O23
+    timestamp: "2026-03-13T18:00"
+    provenance: ai-executed
+    content: "Category B (detail recovery) shows near-parity (ARA 20.9% vs PDF 19.1%, 60% ties). Despite targeting rubric gaps where PDFs are known to be deficient, the Ingestor doesn't add new information — it restructures what the PDF contains. The configs/ layer consolidates scattered hyperparameters but can't invent missing ones. This confirms the Ingestor is a reformatter, not an information augmenter."
+    context: "Understanding evaluation Cat B analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O24
+    timestamp: "2026-03-13T18:00"
+    provenance: ai-executed
+    content: "RE-Bench Cat A shows PDF winning 40 vs ARA 13 — much worse than PaperBench Cat A (PDF 72 vs ARA 49). The RE-Bench ARAs were generated from task descriptions not PDFs, and the baseline reads the same task descriptions. The Ingestor adds structure but may lose verbatim details in the conversion. For RE-Bench, the ARA is a restructured version of what the baseline reads directly."
+    context: "Understanding evaluation per-benchmark analysis"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O25
+    timestamp: "2026-03-13T19:30"
+    provenance: ai-executed
+    content: "Absolute correctness scoring reveals PDF near ceiling on Cat A (97.1% success) vs ARA 80.6%. The old relative scoring (37.1% PDF wins, 41.6% ties) masked the severity — most 'ties' were cases where both answered correctly. Absolute scoring is more informative: it shows the true success rate gap rather than obscuring it behind relative comparisons where both formats often succeed."
+    context: "Understanding evaluation methodology change — relative to absolute"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O26
+    timestamp: "2026-03-13T19:30"
+    provenance: ai-executed
+    content: "The difficulty reversal persists under absolute scoring and is now more precisely quantified: T2 (scattered) ARA 66.7% vs PDF 86.8% (-20.1pp), T3 (implicit) ARA 68.0% vs PDF 57.8% (+10.2pp). The reversal is asymmetric — ARA loses more on scattered than it gains on implicit. This explains the overall Cat A gap: there are more T2 questions (159) than T3 (206) in terms of impact."
+    context: "Difficulty breakdown under absolute scoring"
+    potential_type: claim
+    promoted: false
+    stale: true
+
+  - id: O27
+    timestamp: "2026-03-13T22:30"
+    provenance: ai-executed
+    content: "Rubric supplementation dramatically improves ARA quality for understanding eval. Papers re-ingested with rubrics showed massive score improvements: sample-specific-masks 2/15 → 12/15, sapg 5/15 → 13/15, self-composing-policies 1/15 → 14/15. The rubric provides structured reproduction requirements that the Ingestor uses to generate more complete artifacts. This validates the apple-to-apple comparison design: ARA should contain everything the baseline has, just restructured."
+    context: "Understanding eval re-run after rubric-supplemented re-ingestion"
+    potential_type: claim
+    promoted: false
+
+  - id: O28
+    timestamp: "2026-03-13T22:30"
+    provenance: ai-executed
+    content: "Cat B ARA advantage (54.8% vs 46.1%, +8.7pp) contradicts earlier parity observation (O23). The improvement comes from rubric-supplemented ARAs: the Ingestor now extracts more hyperparameters and configuration details when given explicit rubric requirements as guidance. This means the Ingestor IS an information augmenter when given richer input, not just a reformatter."
+    context: "Understanding eval Cat B results after rubric re-ingestion"
+    potential_type: claim
+    promoted: false
+
+  - id: O29
+    timestamp: "2026-03-13T22:30"
+    provenance: ai-executed
+    content: "Dual-source question generation eliminated the Cat A gap almost entirely: old single-source (PDF-only) questions produced ARA 80.6% vs PDF 97.1% (-16.5pp); new dual-source questions produce ARA 83.5% vs PDF 82.9% (+0.6pp). The old gap was largely an artifact of question bias, not true information loss. This is a methodological insight: evaluation design matters as much as the system being evaluated."
+    context: "Comparing old vs new Cat A results"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O30
+    timestamp: "2026-03-14T22:00"
+    provenance: ai-suggested
+    content: "Speedrun Cat C (n=5) is too small for stable LLM judge evaluation. Across 3 runs: PDF scored 80% (4/5), then 60% (3/5), then 100% (5/5). Single question judge flips cause 20pp swings. RE-Bench Cat C (n=35) is the reliable signal. Future eval design should either increase Speedrun sample size or note instability."
+    context: "Understanding eval re-run after ARA trimming — speedrun judgment inconsistency"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O31
+    timestamp: "2026-03-14T22:00"
+    provenance: ai-suggested
+    content: "The enrichment-trimming cycle reveals a fundamental tension in ARA design: richer Physical Layer content improves implementation comprehension (Cat A +10pp on RE-Bench) but dilutes Exploration Graph retrieval (Cat C -22.5pp). This maps to the paper's dual-mode discussion: Kernel mode minimizes code footprint to prioritize Cognitive/Trace layers; Repository mode maximizes code detail. For eval artifacts, the 'minimal kernel' (notes.md + configs) appears to be the right balance."
+    context: "Post-trimming eval results analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O32
+    timestamp: "2026-03-15T06:00"
+    provenance: ai-suggested
+    content: "ARA over-assertion pattern: in 2/10 PDF-win cases (pinn B01, B04), the ARA agent confidently stated ambiguous details 'as fact' from artifact configs when the gold answer says it is unconfirmed/implied. The structured format gives agents false confidence — they treat any information present in the artifact as explicitly stated by the paper, even when the ingestor inferred it. Future ingestor should mark inferred vs explicit information."
+    context: "Question-level analysis of new ingestor Understanding eval"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O33
+    timestamp: "2026-03-15T06:00"
+    provenance: ai-suggested
+    content: "PDF agent's dominant failure mode on Cat B is 'the paper does not provide this information' for details that ARE in the paper but buried in appendices or implementation details. 7 of 9 ARA wins are Cat B questions where the PDF agent couldn't locate the detail. ARA's structured format makes these findable. This is the core Cat B value proposition."
+    context: "Question-level analysis of new ingestor Understanding eval"
+    potential_type: claim
+    promoted: false
+
+  - id: O34
+    timestamp: "2026-03-15T11:00"
+    provenance: ai-suggested
+    content: "Rubric sizes: adaptive-pruning 123 leaves (884 lines, 57KB), bam 789 leaves (5546 lines, 405KB), lbcs 916 leaves (6441 lines, 559KB). The large bam/lbcs sizes reflect massive Code Execution sections with per-run hyperparameter configurations. An eval agent reading these in full may consume significant context. Consider: (a) pagination/grep-based navigation, (b) summary header with R-number index at top, (c) separate index file. adaptive-pruning at 123 reqs is manageable; bam/lbcs need a navigation strategy."
+    context: "Created rubric/requirements.md for 3 eval papers via sub-agent — confirmed counts"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O35
+    timestamp: "2026-03-15T10:30"
+    provenance: ai-executed
+    content: "Latent ingestor bug discovered: run_ingest.py CLI had --repo argument and passed repo_path=args.repo to ingest(), but ingest() function signature only had rubric_path — no repo_path parameter. GitHub repo support was scaffolded in the CLI but never wired through to the agent. The bug was silent (Python **kwargs mismatch raises TypeError at call time). Fixed by adding repo_path to ingest() signature."
+    context: "Implementing ingestor repo tool changes"
+    potential_type: unknown
+    promoted: false
+
+  - id: O36
+    timestamp: "2026-03-16T00:00"
+    provenance: ai-suggested
+    content: "rust_codecontests is inherently confounded for extension eval: the ARA trace was built from gpt-3.5-turbo experiments but the current environment uses gpt-5-mini (reasoning model with different API constraints). Implementation-level heuristics (temperature, n-parameter, token limits) don't transfer across model families. triton_cumsum is a cleaner comparison — GPU kernel optimization with no external LLM dependency."
+    context: "Extension experiment early signal — analyzing ARA vs baseline results"
+    potential_type: decision
+    promoted: false
+
+  - id: O37
+    timestamp: "2026-03-16T00:00"
+    provenance: ai-suggested
+    content: "ARA agent on rust_codecontests spends 4-6 early turns reading PAPER.md, exploration_tree.yaml, heuristics.md, architecture.md before writing any code. Baseline agent starts coding by turn 3-4. This 'cognitive load' overhead may explain part of the ARA performance gap (0.50 vs 0.80) — the agent burns budget on trace navigation instead of solution iteration. At 1M token budget, this is ~15-20% of effective budget lost to reconnaissance."
+    context: "Extension experiment — comparing turn usage patterns between conditions"
+    potential_type: claim
+    promoted: false
+
+  - id: O38
+    timestamp: "2026-03-16T00:00"
+    provenance: ai-suggested
+    content: "Baseline achieved identical 0.80 on both seeds despite different solution approaches (v3 vs v4 across seeds). ARA seed 2 (with temperature fix) achieved 0.50 with best score at v2 (turn 29), then regressed to 0.4 on v3. Score trajectories suggest baseline converges more reliably while ARA's trace-informed over-engineering produces more complex but less reliable solutions."
+    context: "Extension experiment — score trajectory analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O39
+    timestamp: "2026-03-17T02:00"
+    provenance: ai-suggested
+    content: "ARA agent made better tactical decisions than baseline: when Julia/diffeqtorch failed, ARA agent quickly pivoted to scipy fallback (guided by structured environment.md listing alternatives). Baseline agent spent 20+ turns persisting with Julia without recognizing the dead end. The structured artifact's heuristics layer may be enabling faster dead-end recognition."
+    context: "Pilot reproduction comparison — sequential-neural-score-estimation"
+    potential_type: claim
+    promoted: false
+
+  - id: O40
+    timestamp: "2026-03-17T02:30"
+    provenance: ai-executed
+    content: "Implementation tasks (T02-T07) scored 100% under ARA — the structured artifact's algorithm pseudocode, architecture specs, and hyperparameter configs enabled pixel-perfect reproduction. The gap appeared only at experimental execution (T08-T10) where the agent couldn't debug posterior quality issues (C2ST ~1.0 vs expected ~0.6). This suggests ARA's value is strongest for 'what to build' but current artifacts don't sufficiently help with 'how to debug when it doesn't work'."
+    context: "ARA condition judge results analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O41
+    timestamp: "2026-03-17T03:00"
+    provenance: ai-suggested
+    content: "Mega-task cumulative token accounting (sum of all per-turn input tokens) is misleading for PDF-heavy baselines. The baseline's 123k-token PDF gets cached and re-sent every turn. With 59% cache hit rate, the effective new-information throughput per turn is similar, but the cumulative counter charges for cached reads. This creates an apples-to-oranges comparison when both conditions share the same cumulative budget. Solution: either per-subtask mode (fresh budget per task) or discount cached tokens in accounting."
+    context: "Baseline condition post-mortem — token budget exhaustion at 68 turns"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O42
+    timestamp: "2026-03-17T03:30"
+    provenance: ai-executed
+    content: "The run_agent.py _read_agent_outputs function only globbed *.py at the top level, missing all code in src/ subdirectory. This caused the first judge call to fail (empty input). Fixed by switching to rglob('*.py'). This is a robustness issue in the evaluation pipeline that would silently degrade judge quality for any agent that organizes code in subdirectories."
+    context: "Judge pipeline debugging"
+    potential_type: unknown
+    promoted: false
+
+  - id: O43
+    timestamp: "2026-03-17T05:00"
+    provenance: ai-suggested
+    content: "ARA agent reached 0.60 at turn 12 (1 turn earlier than baseline's turn 13) and continued iterating to 0.607 (full-val), while baseline plateaued at 0.60 after recovering from regressions. The ARA advantage is visible not just in final score but in stability of improvement — ARA produced a monotone improvement trajectory (v1→v3) while baseline oscillated (0.60 → 0.0 → 0.0 → 0.0 → 0.60). This is consistent with C06: failure knowledge supports more directed search."
+    context: "rust_codecontests seed 0 parallel run (2026-03-17)"
+    potential_type: claim
+    promoted: false
+
+  - id: O44
+    timestamp: "2026-03-17T05:00"
+    provenance: ai-suggested
+    content: "API reliability is a first-class threat to the extension experiment's validity. Both new runs ended in API crashes (baseline: connection timeout at turn 38; ARA: content filter + API timeouts blocking v4 scoring). The partial results are usable but the 'completed=false' flag and missing RESULT.md mean these are lower bounds, not final scores. Future runs should implement: (1) checkpoint-and-resume so a crash doesn't lose all progress, (2) per-problem fallback on content_filter errors, (3) exponential backoff with partial scoring on timeout."
+    context: "rust_codecontests seed 0 parallel run (2026-03-17)"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O45
+    timestamp: "2026-03-17T05:00"
+    provenance: ai-suggested
+    content: "The ARA agent's early turns show qualitatively different behavior from baseline: it opened 6 artifact files in the first 5 turns (PAPER.md, exploration_tree.yaml, heuristics.md, architecture.md, starter solution, utils) before writing any code. The baseline went directly to code. Despite this 5-turn overhead, ARA's first scored solution (v1 at turn 12) matched baseline's first solution (turn 13). This suggests the artifact reading is efficiently amortized — the agent builds a complete mental model before acting, trading turn latency for solution quality."
+    context: "ARA agent behavior analysis, rust_codecontests seed 0 v2"
+    potential_type: claim
+    promoted: false
+
+  - id: O46
+    timestamp: "2026-03-17T10:00"
+    provenance: ai-suggested
+    content: "Claude Sonnet 4.6 as fallback for Azure gpt-5-mini content-filter rejections on competitive programming data is a natural design: Anthropic's content filters have different calibration from Azure's. Competitive programming problems that trigger Azure's sexual/medium heuristic (e.g., problems involving counting objects with anthropomorphic descriptions) are unlikely to trigger Anthropic's filters. The sanitize=True path (stripping problem description to I/O examples only) provides a second defense layer."
+    context: "Designing Fix 4 — Claude fallback in local_score.py"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O48
+    timestamp: "2026-03-19T13:30"
+    provenance: ai-suggested
+    content: "BAM is the first reproduction paper where baseline outperforms ARA (93.2% vs 88.2% weighted). BAM is a well-documented VI paper with clear Algorithm 1/2/3 pseudocode, explicit hyperparameter tables, and straightforward experimental setup. When the PDF itself is high quality, ARA's structural advantage diminishes. This suggests ARA's value is inversely correlated with PDF documentation quality — consistent with C09's finding that 45% median sufficiency creates the opportunity for ARA."
+    context: "BAM reproduction pilot results"
+    potential_type: claim
+    promoted: false
+
+  - id: O49
+    timestamp: "2026-03-19T13:30"
+    provenance: ai-suggested
+    content: "ARA agent consumed 47% more tokens (12.6M vs 8.6M) and took 60% more time (6.9h vs 4.3h) on BAM. The artifact reading overhead (PAPER.md, logic/, src/, rubric/) adds ~2-4 turns of context loading at the start plus periodic re-reading. For well-documented papers, this overhead isn't compensated by downstream savings. On mechanistic-understanding (ARA won), ARA was faster (5.3h vs 8.1h) — suggesting the overhead is amortized only when it prevents dead-end exploration."
+    context: "BAM reproduction token/time comparison"
+    potential_type: claim
+    promoted: false
+
+  - id: O50
+    timestamp: "2026-03-19T13:30"
+    provenance: ai-suggested
+    content: "ARA won T6 (non-Gaussian) 10/10 vs baseline 8.5/10. The ARA artifact had explicit sinh-arcsinh parameters (s=0.2, s=1.8, B=5, B=10) in configs/training.md. The baseline agent misinterpreted the PDF and ran extra parameterizations (s=0.0 with t=0.1/0.9/1.7) that were not in the paper's experimental design. This confirms ARA's value for precise hyperparameter specification — even well-written papers can have ambiguous parameter descriptions."
+    context: "BAM per-subtask comparison — ARA advantage on T6"
+    potential_type: claim
+    promoted: false
+
+  - id: O51
+    timestamp: "2026-03-19T13:30"
+    provenance: ai-suggested
+    content: "ARA evidence/ directory was blocked for the ARA condition (by design, to prevent result leakage). Evidence tables had useful hyperparameter configs (e.g., deep_generative_learning_rates.md with BaM/ADVI LRs). This may have cost the ARA agent points on T9 (VAE: 10/15 vs baseline 12/15) and T8 (posteriorDB: 7/10 vs baseline 9.5/10). Consider: should evidence/ blocking be reconsidered for reproduction eval, or is preventing result leakage more important than fair hyperparameter access?"
+    context: "BAM ARA evidence blocking analysis"
+    potential_type: decision
+    promoted: true
+    promoted_to: "Confirmed by BAM v2 rerun: moving configs to src/configs/ recovered +5.4pp. Ingestor pipeline updated with setup-vs-results rule."
+
+  - id: O52
+    timestamp: "2026-03-19T13:30"
+    provenance: ai-suggested
+    content: "Baseline agent symlinked CIFAR-10 data from the ARA output directory (cifar10_data -> /home/.../bam_ara_seed0/cifar10_data). This is a workspace isolation leak — the baseline agent should not have access to ARA's output. The data itself is public (CIFAR-10 via torchvision), so this didn't affect fairness, but the isolation mechanism should be fixed for future runs."
+    context: "BAM baseline workspace isolation audit"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O53
+    timestamp: "2026-03-20T06:00"
+    provenance: ai-executed
+    content: "BAM ARA v2 (fix+reflection) flips the result: ARA 93.6% vs baseline 93.2% (+0.4pp). Moving hyperparameter configs from evidence/ (blocked) to src/configs/ (accessible) was the primary driver. The setup-vs-results misclassification in the ingestor pipeline was a systemic issue — evidence/ should only contain measured outcomes, not prescriptive experiment setup."
+    context: "BAM ARA v2 rerun after artifact and ingestor fix"
+    potential_type: claim
+    promoted: false
+
+  - id: O54
+    timestamp: "2026-03-20T06:00"
+    provenance: ai-executed
+    content: "T09 posteriorDB was the biggest single improvement: +4.0 pts (10→14/15). In v1, agent missed ADVI comparison entirely and only ran 5 seeds. In v2, agent installed posteriordb+bridgestan package (following reproduction_notes.md tip), ran all 3 models with BaM+ADVI+GSM at B=8 and B=32. Only remaining miss: 5 seeds instead of 10 (costs 1 pt)."
+    context: "BAM v1→v2 per-subtask analysis"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O55
+    timestamp: "2026-03-20T06:00"
+    provenance: ai-suggested
+    content: "T08 non-Gaussian s=0 varying-tail experiments remain missed in both v1 and v2 (7/10 both times). The experiments.md clearly states 'varying tails τ ∈ {0.1, 0.9, 1.7} with s=0' but the agent consistently runs only the skew-varying panel. This suggests the agent doesn't fully parse two-panel experiment descriptions — a potential reproduction_notes item or a prompt engineering opportunity."
+    context: "BAM v2 persistent failure analysis"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O56
+    timestamp: "2026-03-20T06:00"
+    provenance: ai-suggested
+    content: "O51 (evidence blocking cost ARA points) is now confirmed and promoted: after fix, ARA recovered +5.4pp weighted. O48 (ARA value inversely correlated with PDF quality) is now weakened — BAM's baseline lead was partly an artifact of the evidence misclassification, not purely PDF quality. With the fix, ARA leads even on well-documented BAM."
+    context: "Maturity check on prior BAM observations"
+    potential_type: unknown
+    promoted: false
+
+  - id: O57
+    timestamp: "2026-03-20T06:30"
+    provenance: ai-suggested
+    content: "ARA artifact reference code contained alpha=1.0 in ranking_nce_loss(), which over-regularizes the NCE loss (scores^2 term dominates). Baseline independently chose alpha=0.01 and achieved dramatically better training convergence (loss 0.14 vs 2.93, ranking accuracy 99% vs 52%). This is the first case where trusting artifact code verbatim hurt training quality. Suggests ARA artifacts need hyperparameter validation, not just mathematical correctness."
+    context: "BBOX reproduction — adapter training quality comparison"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O58
+    timestamp: "2026-03-20T06:30"
+    provenance: ai-suggested
+    content: "API-dependent papers (bbox requires gpt-5-mini for LLM candidate generation) compress the ARA-baseline gap on rubric scoring. ~31% of bbox's 131 requirements need real API calls, and these are identically blocked for both conditions. On non-API requirements only: ARA 85.7% vs baseline 84.6% (+1.1pp), comparable to stochastic-interpolants (+1.0pp flat)."
+    context: "BBOX scoring analysis — API vs non-API requirements"
+    potential_type: claim
+    promoted: false
+
+  - id: O59
+    timestamp: "2026-03-20T06:30"
+    provenance: ai-suggested
+    content: "Baseline agent independently invented better training engineering than ARA agent despite less structured information: gradient accumulation (micro=4, accum=16, effective=64), fp16 mixed precision, smaller max_length=128. ARA agent hit OOM at batch=64 and fell back to batch=16 without considering grad accum. This suggests ARA's structured info helps with what-to-implement but not how-to-optimize."
+    context: "BBOX reproduction — agent behavior comparison"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O60
+    timestamp: "2026-03-20T06:30"
+    provenance: ai-suggested
+    content: "Despite much worse simulated training (52% vs 99% ranking accuracy), ARA adapter achieved 100% selection accuracy on real gpt-5-mini candidates vs baseline's 95.8%. Possible explanation: ARA's alpha=1.0 regularization produces better-calibrated score distributions for discriminating between real LLM candidates (which are closer in quality), while baseline's near-perfect simulated training may have overfit to the easy simulated task."
+    context: "BBOX API evaluation — adapter-guided inference with real LLM"
+    potential_type: claim
+    promoted: false
+
+  - id: O61
+    timestamp: "2026-03-20T06:30"
+    provenance: ai-executed
+    content: "gpt-5-mini CoT baseline on StrategyQA is only 34% (vs paper's 67% with gpt-3.5-turbo). This is because Azure gpt-5-mini forces temperature=1.0 (no override supported), producing diverse but often incorrect reasoning. The high diversity benefits adapter selection (72-73% base accuracy with k=3 candidates) but hurts single-candidate CoT."
+    context: "BBOX API evaluation — unexpected CoT performance"
+    potential_type: observation
+    promoted: false
+
+  - id: O62
+    timestamp: "2026-03-20T17:00"
+    provenance: ai-suggested
+    content: "Private and generated test sets add ~30% overhead beyond public test tracking for rust_codecontests. Our internal 'Perfect at candidate 0!' logging only tracks public tests. The official evaluate_rust_code checks public + private + generated tests. Solutions that pass all public tests still fail ~35% of the time on private/generated tests. This explains why the partial 83-problem run showed 79/83 (95.2%) internal success but the official 20-problem score was 0.65 (65%)."
+    context: "Comparing internal tracking vs official scorer output during baseline v6 validation"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O63
+    timestamp: "2026-03-20T17:00"
+    provenance: ai-suggested
+    content: "Serial execution (max_workers=1) eliminates all 429 thundering-herd effects for the rust_codecontests baseline without requiring complex rate limiter coordination logic. With only one coroutine awaiting the rate limiter at a time, the asyncio.Lock never needs to queue multiple waiters, and there is no burst risk after a cooldown period. The leaky bucket still enforces MIN_INTERVAL=7.5s pacing, but the queue depth never exceeds 1."
+    context: "Settling on batch_size=5, max_workers=1 as the reliable configuration for baseline scoring"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O64
+    timestamp: "2026-03-20T17:00"
+    provenance: ai-executed
+    content: "asyncio.as_completed() timeout does NOT propagate cancellation to coroutines blocked inside asyncio.sleep() in Python 3.12. When the timeout fires, the TimeoutError is raised on the iterator's __anext__ call, but already-running coroutines continue sleeping. This caused the batch_size=117 run to stall: 34 coroutines were mid-sleep() in the rate limiter's acquire() when the 7200s timeout should have triggered, but they continued sleeping indefinitely while the process stayed alive with 0% CPU."
+    context: "Debugging the stalled batch_size=117 validation run (PID 76494) — lsof confirmed active TCP connections to Azure but no output for 1h42m"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O65
+    timestamp: "2026-03-21T03:00"
+    provenance: ai-executed
+    content: "The rust_codecontests scorer's semaphore (asyncio.Semaphore controlled by --max_workers) is the correct and minimal rate-limiting primitive for solution modules. With max_workers=3, each call_llm() acquires the semaphore before the API call and releases it after — exactly 3 concurrent API calls at any time. Combined with backoff retry for 429s, this eliminates the need for any custom rate limiter. 9 different custom approaches (token bucket, module semaphore, sleep, sequential candidates) all failed before this insight."
+    context: "ARA seed10 rust_codecontests — solution_final.py achieving 0.6154 validation / 0.5818 test"
+    potential_type: heuristic
+    promoted: true
+    promoted_to: "H18 — harness semaphore as correct rate-limiting primitive for eval solution modules"
+
+  - id: O66
+    timestamp: "2026-03-21T03:18"
+    provenance: ai-executed
+    content: "rust_codecontests ARA seed10 v9 final scores: 0.6838 validation (80/117), 0.6485 test (107/165). The test failure correction loop (feed failed sample test cases back to the model after successful compilation) added +6.7pp on the test set vs solution_final. This is 5.0x the reference score of 0.13. The test set run took 3h25m across 17 batches with 7 timeouts. The timeouts are expected given competing processes sharing the same Azure API key."
+    context: "ARA seed10 rust_codecontests — v9 test set run completed (PID 80566)"
+    potential_type: claim
+    promoted: false
+
+  - id: O67
+    timestamp: "2026-03-21T03:18"
+    provenance: ai-suggested
+    content: "ARA seed10 (0.6485 test) underperforms ARA seed8's checkpoint result (0.6585, 164/165 problems from test_results_checkpoint.jsonl). Both use the same core architecture (scorer semaphore + backoff + compile-retry + test-fix). The gap may reflect different gpt-5-mini API conditions across sessions, or seed8's slightly more patient parameters (batch_size=5, max_workers=2, max_time_per_batch=1000 vs seed10's batch_size=10, max_workers=3, max_time_per_batch=600)."
+    context: "Comparing ARA seed10 vs seed8 test set scores"
+    potential_type: observation
+    promoted: false
+
+  - id: O68
+    timestamp: "2026-03-22T08:00"
+    provenance: ai-suggested
+    content: "Self-expansion ARA agent wrote a single comprehensive Python script (subtask1_threshold_sensitivity.py, 8069 chars) that ran the entire INA+VTAB threshold sweep (22 configurations) in one bash command. This extreme token efficiency (only ~64K tokens for subtask 1 at turn 30) contrasts sharply with v1's approach of reimplementing SEMA from scratch across 100+ turns. The real source code in the artifact enabled 'copy-and-adapt' rather than 'reimplement-from-description'."
+    context: "Self-expansion ARA v2 rerun — subtask 1 execution pattern"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O69
+    timestamp: "2026-03-22T16:00"
+    provenance: ai-suggested
+    content: "After training process timeout, agent entered a polling loop checking for 22 result JSON files every 60s with 14400s timeout. Since the training was dead, this wasted ~30min of GPU idle time before manual intervention (kill). The framework should detect when child training processes die and immediately surface the timeout to the agent instead of polling."
+    context: "Self-expansion ARA v2 — poll loop antipattern after training timeout"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O70
+    timestamp: "2026-03-22T20:00"
+    provenance: ai-suggested
+    content: "ARA artifact src/ layer quality is the decisive factor for reproduction: v1 (pseudocode, 1624 lines in src/execution/) produced 38% INA and only 1/10 subtasks. v2 (real SEMA-CL repo code, 8591 lines in src/code/) produced 65.82% INA, 94.69% VTAB, 10/10 subtasks. Same agent model, same token budget, same rubric. The only variable was pseudocode vs real source code. This is the strongest evidence yet for C05."
+    context: "Self-expansion v1 vs v2 comparison — src/ layer quality"
+    potential_type: claim
+    promoted: false
+
+  - id: O71
+    timestamp: "2026-03-22T20:00"
+    provenance: ai-suggested
+    content: "ARA v2 self-expansion results exceed paper-reported numbers: INA 65.82% vs paper ~55%, VTAB 94.69% vs paper 91.3%. This may be due to different pretrained ViT-B/16-IN1K weight versions (timm library updates), or the agent's hyperparameter choices (5 func epochs, 20 RD epochs matching the paper but with potentially different optimizer details). The numbers should be noted as 'reproduction with potentially different pretrained weights' rather than exact replication."
+    context: "Self-expansion ARA v2 — results exceed paper"
+    potential_type: observation
+    promoted: false
+
+  - id: O72
+    timestamp: "2026-03-22T20:00"
+    provenance: ai-suggested
+    content: "Subtask 9 (CIFAR-100 + ImageNet-R) was only partially completed due to 18M token budget exhaustion at turn 147. Training-heavy multi-dataset subtasks with 20 tasks each need more compute time. The 12/12 rubric items scored PARTIALLY MET. Higher token budgets (25M+) or per-subtask mode would fix this. This echoes the v1 observation from session 2026-03-21_001 (O66) that training-heavy papers need more budget."
+    context: "Self-expansion ARA v2 — subtask 9 budget constraints"
+    potential_type: observation
+    promoted: false
+
+  - id: O73
+    timestamp: "2026-03-22T17:00"
+    provenance: ai-suggested
+    content: "Baseline agent trapped in escalating timeout loop on FTRL RL training: 1h→2h→6h→8h. The agent repeatedly increased bash timeout because training timed out before reaching evaluation checkpoints. This depth-first behavior consumed 90%+ of the 26.7h runtime on a single method (scratch then BC) without advancing to other subtasks. ARA agent avoided this by running 20k-step proof-of-concept runs and moving on."
+    context: "FTRL reproduction pilot — baseline behavioral analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O74
+    timestamp: "2026-03-22T17:00"
+    provenance: ai-suggested
+    content: "Baseline FTRL agent obtained meaningful RL training curves: scratch (800k steps) learned hammer=1.0/push=1.0 but never FAR stages, confirming state coverage gap. BC (700k steps) learned peg-unplug=1.0 at 500k then forgot it at 700k, confirming FPC forgetting. These are qualitative reproductions of the paper's central claims, something ARA's 20k PoC runs could not achieve."
+    context: "FTRL reproduction pilot — baseline qualitative results"
+    potential_type: claim
+    promoted: false
+
+  - id: O75
+    timestamp: "2026-03-22T22:00"
+    provenance: ai-suggested
+    content: "Both FTRL conditions scored 0% on all 5 training-dependent subtasks (65/129 requirements = 50% of rubric). RL papers create a compute ceiling where neither ARA nor baseline can complete training within the agent's time/token budget. This fundamentally compresses the scoring gap. Contrast with mechanistic-understanding (+13pp ARA) and sequential-neural (+60pp ARA) where training was lighter. Hypothesis: ARA advantage inversely correlates with training compute requirements."
+    context: "FTRL reproduction pilot — cross-paper analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O76
+    timestamp: "2026-03-26T00:00"
+    provenance: ai-suggested
+    content: "ARA extension agent found n_embd=552 (optimal=554, error 0.0002) for small_scaling_law but predicted loss=3.28 (actual=3.64, error 0.356). Near-perfect hyperparameter guidance from ARA artifact but terrible loss calibration. If loss prediction were correct, score would be 0.996 instead of 0.644. The ARA artifact's evidence/exploration trace guided the agent to the correct hyperparameter region, but the agent couldn't properly calibrate its loss estimate. This suggests ARA's structured knowledge is most useful for discrete decisions (which hyperparams) but less helpful for continuous estimation (what loss to expect)."
+    context: "small_scaling_law extension v2 — ARA condition analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O77
+    timestamp: "2026-03-26T00:00"
+    provenance: ai-executed
+    content: "Score extraction regex in run_extension.py produced false positives by matching 'Score = 1 - [(interpolation_error)...]' in README text as score 1.0. The Pattern 2 regex '[Ss]core[\\s:=]+(-?[\\d.]+)' captured the '1' after 'Score = '. Fixed by restricting score extraction to only run when the bash command invokes the scorer (_looks_like_scoring check). This bug affected small_scaling_law baseline where the best_score was incorrectly recorded as 1.0."
+    context: "small_scaling_law extension v2 — harness bug fix"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O78
+    timestamp: "2026-04-18T23:00"
+    provenance: ai-executed
+    content: "First end-to-end smoke of new extension-from-reference protocol on triton_cumsum: agents start from the official reference solution (~score 0.47 nominal, ~0.64 measured on H100) and try to beat it. Two arms run in parallel (paper-only docs vs full ARA dir mounted as ./reference/), seed=0, 500K token budget, sonnet-4-5. Both completed cleanly: paper arm 17:27 wall / 99 turns / $2.67, ARA arm 14:27 wall / 61 turns / $1.82. Smoke verified: venv, score.sh, score.py, claude-agent-sdk loop, JSONL trace, baseline+final scoring all work end-to-end. Run artifacts: extension-runs/triton_cumsum_{paper,ara}_seed0_job6572{827,835}/."
+    context: "Extension-from-reference protocol — first triton run, seed 0"
+    potential_type: observation
+    promoted: false
+
+  - id: O79
+    timestamp: "2026-04-18T23:00"
+    provenance: ai-executed
+    content: "Mid-run vs final-state gap on extension-from-reference triton, seed 0: ARA arm reached score 0.520 (~1.68 ms, ~12% latency cut over 0.648 ref) at one point during exploration but its final_score.json records 0.641 (basically tied with ref). Paper arm peaked at 0.637 (~0.6% gain) and ended at 0.641. Agent ran 18-34 score invocations per arm and threw away its best variant. The harness's final_score is the agent's last edit, not its best — the headline number undersells the agent's true exploration ceiling. Need to either (a) report best-of-trace as the canonical headline, or (b) instruct the agent in the system prompt to checkpoint improving variants and restore the best at session end."
+    context: "Extension-from-reference triton seed 0 — score trajectory analysis"
+    potential_type: observation
+    promoted: false
+
+  - id: O80
+    timestamp: "2026-04-18T23:00"
+    provenance: ai-executed
+    content: "Sonnet 4.5 surrenders early on triton_cumsum extension. Both arms stopped with stop_reason='end_turn' (voluntary completion) at 14-17 min, despite having ~470K tokens of input/output budget unused and ~45 min of SLURM wall time remaining. Agent decided 'I have nothing more useful to try' rather than fighting to budget exhaustion. Suggests either the system prompt's 'stop early if you cannot improve' clause is over-permissive, or that Sonnet 4.5 has low task persistence on hard kernel-optimization problems where local edits don't immediately yield gains."
+    context: "Extension-from-reference triton seed 0 — agent persistence behavior"
+    potential_type: observation
+    promoted: false
+
+  - id: O81
+    timestamp: "2026-04-18T23:00"
+    provenance: ai-executed
+    content: "Harness token counter is broken. Claude Agent SDK emits one AssistantMessage event per content block (ThinkingBlock + TextBlock + ToolUseBlock) and clones the same usage dict onto each event. The harness was naively summing per-event, triple-counting input/output. Worse, the per-event output_tokens field appears to be the streaming-start sentinel (typically 2) rather than the final total: real output for triton ARA run was 38,322 tokens vs harness-reported 244 (off by ~157x). Fix: use ResultMessage.usage as ground truth at completion, dedup mid-run by message_id for live monitoring. Net effect: 500K hard-cap budget never fired and would not have fired even at 100K — token-budget enforcement is currently nominal only."
+    context: "Extension-from-reference triton seed 0 — harness instrumentation bug"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O82
+    timestamp: "2026-04-18T23:00"
+    provenance: ai-executed
+    content: "Suggestive but not significant single-seed comparison on triton_cumsum extension: ARA arm explored less (61 vs 99 turns, 18 vs 34 scores) yet found a much larger one-shot improvement (0.520 vs 0.637 best). Could mean ARA's evidence/trace dirs surfaced a kernel variant the polished paper writeup hides, or could be seed-0 noise. Need >=3 seeds per arm before reading any signal. Logged here as a hypothesis to test, not a result."
+    context: "Extension-from-reference triton seed 0 — paper vs ara hypothesis"
+    potential_type: claim
+    promoted: false
+
+  - id: O83
+    timestamp: "2026-04-24T01:00"
+    provenance: ai-executed
+    content: "Cross-task ARA-vs-paper gap pattern (sonnet-4-6, seed 0, post-resume where applicable): rust_codecontests paper 33/165 (best of 0/0/33) vs ara 85/165 (parent 78 + score-only confirm) = ara ~2.6x paper. nanogpt_chat_rl paper 0.609 baseline + 0.7432 after resume vs ara 0.830 = ara +0.087. fix_embedding paper 0.2506 (after resume restored Phase D) vs ara 0.2363 = ara wins by 0.014 (5.6% relative). triton_cumsum sonnet-4-5 paper 0.6355 (matches reference) vs ara 0.4327 = ara 35% relative speedup. Pattern: ARA gap is largest where the task admits a discoverable engineering trick (rust library lookup, triton kernel variant), modest where domain expertise is the bottleneck (nanogpt RL training, fix_embed val-loss tuning)."
+    context: "ARA-paper extension comparison snapshot 2026-04-24, sonnet-4-6 across 4 tasks"
+    potential_type: claim
+    promoted: false
+
+  - id: O84
+    timestamp: "2026-04-24T01:00"
+    provenance: ai-executed
+    content: "Benchmark-validity caveat for rust_codecontests: the 165-problem test set is a fixed batch of publicly-known CodeForces problems (named, e.g., '1604_E. Extreme Extension') with public editorials accessible via WebSearch (which the task allows). The dominant strategy that emerges is a hand-coded SOLUTIONS dict (problem_name -> Rust algorithm) with public-test gating. ARA materials surface this as heuristic H12; paper-arm agent did not pivot to the library approach in 2.5h+ and plateau'd at 33/165 (~2x baseline). The library strategy is NOT reward hacking (each entry is a real algorithm validated against private+generated tests, not a lookup table of test outputs), but it IS exploiting the publicness of the problem set rather than measuring novel coding ability. Paper should note this as a task-design caveat: rust_codecontests measures agent engineering throughput on a fixed problem set, not generalization to unseen problems."
+    context: "Comparing rust paper s0 7798926 strategy vs ara s0 7600566+resume strategy"
+    potential_type: claim
+    promoted: false
+
+  - id: O85
+    timestamp: "2026-04-24T01:00"
+    provenance: ai-executed
+    content: "Triton kernel optimization has a sharp expertise ceiling for sonnet-4-5/4-6. Paper plateaus at the reference solution score (~0.65) without breakthrough; ARA plateaus at one variant beyond reference (~0.43, ~35% speedup) then iterates for 3+ hours without further measurable improvement. Both arms find the easy first-order tricks (autotune sweeps, block sizing, num_warps tuning) and then exhaust their idea space. Pushing further requires deep GPU knowledge the model lacks: register pressure, shared-memory tiling, warp-level intrinsics, instruction overlap. ARA helps the agent reach the first-trick ceiling fast but cannot supply kernel-level expertise the model itself does not have."
+    context: "triton_cumsum sonnet-4-5 paper s0 6754693 + ara s2 6848032 plateau analysis"
+    potential_type: claim
+    promoted: false
+
+  - id: O86
+    timestamp: "2026-04-24T01:00"
+    provenance: ai-executed
+    content: "Resume vs fresh-rerun heuristic from observed agent failures: (a) Resume helps when the run died from a stop-loop / silent-stuck failure mode and the agent's solution is still well below its capability ceiling (e.g., paper s0 fix_embedding 7591645 stuck after Phase D revert -> resume 7729813 recovered to 0.2506 final). The forceful resume prompt 'you ended in stop loop, work remains' snaps the agent out of premature termination. (b) Fresh rerun is better when the agent ran to its actual capability ceiling and ran out of ideas (e.g., triton ara s2 6848032 spent 3h post-plateau iterating without gains -- resume would inherit the same ideas-exhaustion). (c) Score-only sbatch is the right move when the agent's solution is good but the harness's final-scoring step crashed (e.g., rust resume 7720567 TIMEOUT mid-final -> score-only 7760733 confirmed 85/165 from existing solution_final.py)."
+    context: "Cross-task post-mortem of resume vs fresh decisions during 2026-04-23/24 eval push"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O87
+    timestamp: "2026-04-24T01:00"
+    provenance: ai-executed
+    content: "Three harness-level failure modes invalidated multiple paper-vs-ara comparisons until fixed: (1) Claude Agent SDK hardcoded 1MB stdin/stdout JSON message buffer crashed mlm ara s0 7079165 at t=5h32m mid-iteration on a single large tool result, losing 2.5h of effective work (paper s0 ran full 8h to 0.69; ara crashed at 1.03 plateau). Fix: max_buffer_size=16*1024*1024 in ClaudeAgentOptions. (2) end_turn pushback ceiling of 40 (and trigger only on end_turn) let agents go silent for 6+ hours after self-declaring 'session complete' (triton paper s0 6754693 went silent at t=104min, SLURM ran 8h idle). Fix: max_end_turn_pushbacks=1000, triggers expanded to {end_turn, stop_sequence, max_tokens, pause_turn}. (3) Default 300s score timeout killed final-scoring on tasks with compile+benchmark loops (triton ara s2 6848032 final-scoring timed out, no final_score.json). Fix: per-task timeouts (triton 1200s/1800s, rust 7200s/10800s). All three fixes shipped; future runs are substantially more robust."
+    context: "Harness post-mortem 2026-04-24 — three SDK/timeout/pushback issues that invalidated April runs"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O88
+    timestamp: "2026-04-24T01:00"
+    provenance: ai-executed
+    content: "Score-extraction methodology for plotting requires per-task discipline. Naive 'find any score: X' regex catches per-batch tournament win-rates (nanogpt), per-step training loss (mlm), and agent commentary (all tasks), inflating attempt counts 5-30x with non-scoring noise. The defensible signal is the canonical scorer JSON output in user (tool_result) messages: {\"score\": X, \"loss\": Y, \"compliant\": ...} for mlm/fix_embed; {\"score\": X, \"win_vs_gpt2-alpaca\": Y, \"win_vs_gpt2-xl\": Z} for nanogpt; {\"score\": X, \"n_problems\": 165, \"n_successes\": N} for rust. Plot in two layers: (a) faded background dots = training-internal val_loss (biased low, agent's own train scripts), (b) highlighted circles = canonical scorer outputs (real submitted scores). Best-so-far line drawn through scorer events only. fix_embed plot established this convention; mlm v2 / nanogpt / rust plots updated to match."
+    context: "Plot script audit + rewrite across all 4 extension tasks 2026-04-24"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O89
+    timestamp: "2026-04-26T03:00"
+    provenance: ai-discovery
+    content: "Canonical scoring events live in TWO places per run, not just trace.jsonl. Both paper and ARA agents wrap long-running scorer calls in Claude Task subagents (e.g., bash score.sh on the rust 165-problem test set takes ~2h, so the agent delegates to a subagent rather than blocking its own loop). The subagent's tool outputs persist at ~/.claude/tmp/<sid>/<workdir-slug>/<uuid>/tasks/*.output, NOT in the parent agent's trace.jsonl. Older plot scripts that read only trace.jsonl undercounted ARA-rust canonical events 5x (showed 1 of 5 actual full-test events). All 5 case-study plots now read both sources, dedupe by canonical (n_succ, n_problems) or (round(t,1), round(score,4)), and clamp tmp-event mtimes to within run wall-clock end + 5min slack to filter stale writes. This dual-source pattern should be standard for any agent-eval analysis on Claude Code SDK with subagent scoring."
+    context: "Discovered while debugging missing rust ARA scoring events in plot 2026-04-26"
+    potential_type: heuristic
+    promoted: false
+
+  - id: O90
+    timestamp: "2026-04-26T03:00"
+    provenance: ai-derived
+    content: "Pushback-ceiling exhaustion is an under-explored agent failure mode in our nanogpt paper-arm parent run. Paper-4.6 (job 7517443) terminated at 4h25min (only 55% of 8h SLURM allocation) with stop_reason=stop_sequence after exactly 1000 end-turn pushbacks (the harness's max_end_turn_pushbacks ceiling). End-turn rate was 3.77 pushbacks/min vs ARA-4.6's 0.088/min — a 43x difference. Only $36 of $50 budget consumed when terminated. The plausible mechanism: when paper agent's DPO+SFT training-script rewrites converged to 'this approach didn't help', the natural agent reaction was 'I'm done'; harness pushed back; agent re-attempted end_turn; ceiling hit. The ARA arm's continuation-and-orchestration strategy produced naturally-coherent action chains (run step, score, keep best, restart, sweep variant) with no obvious local stopping point until budget exhaustion. ARA used 38/40 of its (older) pushback ceiling across 7h11min — not just lower in absolute count but two orders of magnitude lower in rate. Suggests: trace's empirical anchors give the agent a continuation criterion that prevents the I'm-done attractor; without one, agent fatigue compounds to harness termination."
+    context: "nanogpt paper-vs-ARA case study analysis 2026-04-26"
+    potential_type: claim
+    promoted: false
+
+  - id: O91
+    timestamp: "2026-04-26T03:00"
+    provenance: ai-derived
+    content: "MLM cross-model flip (Sonnet 4.5 ARA wins 0.73 vs paper 1.03; Sonnet 4.6 paper wins 0.69 vs ARA 1.02) is attributable to ARA's heuristic-named architecture alternatives failing in implementation under the newer model. ARA heuristics H07 (MLPMixer) and H11 (ReLU-attention) were derived from prior MALT runs by Claude-4 Sonnet base, where these architectures beat reference. In Sonnet 4.6's loss landscape these same architectures empirically fail to beat the simpler ConvMLM: ARA-4.6 implemented all named alternatives (model.py grew to 47KB across 6+ classes including ConvMLMWithReLUAttn, MLPMixerWithBiBigrams, ConvMLMWithLinearGlobal, ReLUAttentionMLM), and the regression spikes on the score-vs-time plot ARE these failed alternative trainings being scored and rolled back. Paper-4.6 (no menu) committed to ConvMLMDilated and fine-tuned for 8h continuous, reaching 0.69. The mechanism is documented-option currency: trace claims of the form 'prior model class beat reference with X' lose validity when read by an agent in a successor model class with a different optimization landscape. Suggests: trace nodes should record (model_version, attempt_outcome) tuples rather than bare 'this approach worked' claims, so successor agents can apply temporal discounting."
+    context: "MLM 4.5/4.6 cross-model case-study analysis 2026-04-26 — counterpoint to triton-4.6 anchoring effect"
+    potential_type: claim
+    promoted: false
+
+  - id: O92
+    timestamp: "2026-04-26T03:00"
+    provenance: ai-derived
+    content: "Clean-attribution methodology established for paper-vs-ARA case studies: every comparison runs same model + same seed + same harness + same workdir scaffold, with reference/ contents as the only systematic input difference. This rules out model variance, seed luck, infrastructure differences, and API throttling as confounders. Concrete confounder-rejection examples: (1) On nanogpt, Replicate API 429 mentions across trace.jsonl — ARA 684 vs paper 179 — environmental rate-limit pressure was equal or worse on ARA, NOT driving the score gap. (2) On fix_embed, both arms reach ~0.25 by t=180min (same architectural ceiling, same algorithmic understanding); divergence happens entirely after both cross 0.26 reference. With confounders ruled out, behavioral differences attribute cleanly to specific reference-content elements: heuristics H11/H13 (forbid permutation_recovery, which paper-fix_embed tries twice and ARA-fix_embed never tries), evidence/tables/malt_attempts.md (ARA-rust at t=49.8min cites supplement_run_5 verbatim), heuristic H08 (names the degenerate-winner filter that ARA-nanogpt agent's continuation script implements). Each behavioral signature maps onto a specific failure-record element present in ARA bundle and absent in paper.md."
+    context: "Methodological framing established across 5 case studies 2026-04-26"
+    potential_type: claim
+    promoted: false
+
+  - id: O93
+    timestamp: "2026-04-26T03:00"
+    provenance: ai-derived
+    content: "Cross-task synthesis: ARA's mechanism of help differs by task class, all consistent with the same root cause (failure-record preservation). (a) triton-4.5: heuristic empirical anchors steer autotune knobs (NUM_STAGES=4-8 sweet spot from H01), enabling 58% relative speedup over paper's over-pipelined attempts. (b) rust: heuristics H12 (prescriptive: hand-coded library wins) + H15 (prohibitive: gpt-3.5 generator ceiling) reframe under-reference MALT data as a launchpad; ARA reaches the strategy at t=9min, paper independently rediscovers at t=395min after 6.5h of failed prompt engineering. (c) nanogpt: trace's empirical anchor ('no MALT reached 0.85') gives ARA a continuation criterion preventing the I'm-done attractor; paper hit 1000-pushback ceiling at 55% of budget. (d) fix_embed: trace's failure record (H11/H13) prevents ARA from trying permutation_recovery (which paper tries TWICE, forgetting own t=19min failure at t=350min); trace's empirical anchor enables late-phase post-reference continuation that paper does not pursue. (e) mlm-4.5: heuristic-as-ranked-list lets ARA commit depth to ConvMLM, paper plateaus from lack of confidence anchor. The unifying root cause: paper.md preserves the official method but DISCARDS the failure record; ARA preserves both. The exception (mlm-4.6 paper wins) confirms the same root cause via a counterpoint: when failure-record entries lose validity across model classes, a strong agent that diligently attempts each named option pays a fragmentation cost."
+    context: "Cross-task synthesis prep 2026-04-26 — 5 case studies completed, synthesis section deferred"
+    potential_type: claim
+    promoted: false
+
+  - id: O94
+    timestamp: "2026-04-26T03:00"
+    provenance: ai-discovery
+    content: "Independent rediscovery as evidence pattern: paper-arm agents on rust-codecontests (t=395min) and (less cleanly) on nanogpt (resume v14 with reference-style training) eventually rediscovered the same strategy class that ARA-arm agents committed to early. This is methodologically important for the ARA value proposition: it demonstrates that ARA's contribution is timing acceleration, not content uniqueness. The same agent intelligence finds the same productive strategy in either condition; ARA changes WHEN the agent finds it, not WHETHER. Rust is the cleanest demonstration: paper-4.6 spent 6.5h on prompt-engineering, then noticed the existing few_shots/ cache mechanism while inspecting the workdir, reverse-engineered the cache JSON format from solve_code_contests_rust.py source, and started populating it with hand-coded solutions in the final 45min — reaching 68/165. ARA-4.6 reached the same SOLUTIONS-dict strategy at t=9min via heuristic H12 reading. The 6.4h delta is the trace's contribution. This framing should anchor the cross-task synthesis: the question is not 'does ARA enable strategies paper agents cannot find' but 'how much agent time does ARA save compared to independent rediscovery.'"
+    context: "Independent-rediscovery cross-task observation 2026-04-26"
+    potential_type: claim
+    promoted: false

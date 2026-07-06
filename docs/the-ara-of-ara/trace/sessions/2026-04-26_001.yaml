@@ -1,0 +1,50 @@
+session:
+  id: "2026-04-26_001"
+  timestamp: "2026-04-26T03:00"
+  summary: "§7.4 rewrite: 5 trace-grounded extension case studies (triton 4.5+4.6, rust 4.6, nanogpt 4.6, fix_embedding 4.6, restricted_mlm 4.5+4.6). Replaced placeholder Results block with descriptive per-task case studies anchored on redrawn 2-panel score-vs-time + score-vs-cost figures. Established clean-attribution methodology: same model + same harness + same seed + same workdir except reference/ contents, isolating artifact representation as the only systematic input difference. Surfaced cross-task synthesis insights including the MLM cross-model flip (counterpoint case) and the role of subagent-tmp scoring sources."
+
+events_logged:
+  - type: methodology
+    id: "subagent-tmp-scoring-source"
+    provenance: ai-discovery
+    summary: "Both paper and ARA agents wrap long-running scorer calls in Claude Task subagents; the canonical scoring events therefore live in TWO places per run: the agent's own trace.jsonl AND the Task subagent task-output files at ~/.claude/tmp/<sid>/<workdir-slug>/<uuid>/tasks/*.output. Older plot scripts read only trace.jsonl and undercounted ARA-rust events 5x (showed 1 of 5 actual full-test events). All 5 case-study plots now read both sources and dedupe by canonical (n_succ, n_problems) or (round(t,1), round(score,4))."
+
+  - type: case-study
+    id: "case-study-triton"
+    provenance: ai-executed
+    summary: "triton_cumsum case study: 2 regimes by model. Sonnet 4.5 both arms autotune-only on official 3-pass kernel; ARA-4.5 chose conservative NUM_STAGES={4,8} (cited heuristic H01 verbatim at t=4.3min), paper-4.5 chose aggressive {1,24,32,48,64,96} and over-pipelined to 0.628. Sonnet 4.6 both arms broke into algorithmic redesign; paper-4.6 invented int8 input compression at t=47.7min (task-specific bandwidth optimization), ARA-4.6 implemented decoupled lookback (textbook scan optimization named in heuristics). ARA-4.6 had 26-min head start (first score t=11min vs paper t=37min) but paper crossed at t=75min and pulled ahead. Trace acts as initialization early and anchor late."
+
+  - type: case-study
+    id: "case-study-rust"
+    provenance: ai-executed
+    summary: "rust_codecontests case study: ARA's heuristics H12 (prescriptive: hand-coded library wins) + H15 (prohibitive: gpt-3.5 generator ceiling 0.05-0.10) reframe MALT supplement_run_5's under-reference 0.097 from a failure into an under-explored productive direction. ARA-4.6 commits to library at t=9min, builds 73 SOLUTIONS by t=226min. Paper-4.6 spends t=8-395min on prompt engineering plateau 33-39/165, then independently discovers the few_shots/ cache mechanism by inspecting workdir at t=395min, hand-codes for 45min, reaches 68/165. Same final strategy class; ARA changes WHEN the right strategy is tried (~6h timing acceleration), not WHAT the strategy is."
+
+  - type: case-study
+    id: "case-study-nanogpt"
+    provenance: ai-executed
+    summary: "nanogpt_chat_rl case study: paper-4.6 commits at t=7.6min to rewriting training algorithm (DPO+SFT, 7 versions v2-v7, then v8-v13, then v18_dpo in resume); ARA-4.6 commits at t=6.3min to running reference recipe with checkpoint orchestration (continuation script + best-checkpoint rollback). Both hit same regression bug (degenerate-winner training, named in ARA heuristic H08); paper hit 1000-pushback ceiling at t=265min and was terminated early (only $36/$50 budget used). Paper end-turn rate 3.77/min vs ARA 0.088/min (43x). Trace's empirical anchor (no MALT reached 0.85) gave ARA continuation criterion preventing the I'm-done attractor."
+
+  - type: case-study
+    id: "case-study-fix-embedding"
+    provenance: ai-executed
+    summary: "fix_embedding case study (cleanest attribution): same Sonnet 4.6 + same seed + same harness + same workdir. Only difference is reference/ contents. Paper has paper.md (134 lines, 5 distinct files, 14 reads); ARA has 22 files / 5887 lines including evidence/tables/malt_attempts.md (282 lines record of 19 prior MALT attempts) + heuristics H11-H22 (MALT-derived dead ends absent from paper.md). Three observable late-phase signatures: (1) paper tries permutation_recovery at t=19min (fails, abandons) and AGAIN at t=350min, forgetting own failure; ARA never tries it (H11/H13 explicitly forbid). (2) ARA late variants stay in H06 LR region; paper invents Phase E-I + SWA + permutation_recovery. (3) ARA at t=147.3min cites 'no MALT run beat 0.26' as launchpad; paper has no analogous data point. Final 0.236 vs 0.250 (6% relative)."
+
+  - type: case-study
+    id: "case-study-mlm-counterpoint"
+    provenance: ai-executed
+    summary: "restricted_mlm case study (counterpoint): cross-model flip — Sonnet 4.5 ARA wins (0.73 vs 1.03), Sonnet 4.6 paper wins (0.69 vs 1.02). Same heuristics file in both ARA arms. ARA-4.5 reads heuristics as ranked list (verbatim at t=25.6: 'ReLU-attention is a backup strategy if I want to aim higher'), commits depth to ConvMLM. ARA-4.6 reads same heuristics as menu of options, implements 6+ named architectures (ConvMLMWithReLUAttn, MLPMixerWithBiBigrams, ConvMLMWithLinearGlobal, ConvMLMWithGlobalContext, ReLUAttentionMLM, ExtendedBiBigramMLM); model.py grows to 47KB vs paper-4.6's 6.3KB. Critically: NONE of the named alternatives outperform basic ConvMLM in ARA-4.6's hands; the regression spikes on the score plot ARE these failed alternative architectures. The trace's H07/H11 were derived from prior MALT runs by Claude-4 Sonnet base; in Sonnet 4.6's loss landscape these architectures fail to beat the simpler ConvMLM. Strong agent's diligent attempts pay a fragmentation cost paper-4.6 (no menu) avoids."
+
+  - type: methodology
+    id: "clean-attribution-framing"
+    provenance: ai-derived
+    summary: "Established the case-study attribution framing: every paper-vs-ARA divergence we observe is run with same model + same seed + same harness + same workdir, so the only systematic input difference is reference/ contents. This rules out model variance, seed luck, infrastructure differences, and API throttling as confounders (Replicate 429 mentions: ARA 684 vs paper 179 across nanogpt — environmental pressure was equal or worse on ARA, not driving the score difference). Each case study attempts to map observed behavioral differences onto specific reference-content elements (heuristics, MALT failure records, evidence tables) present in ARA and absent in paper.md."
+
+  - type: synthesis-prep
+    id: "trace-claim-currency"
+    provenance: ai-derived
+    summary: "Cross-task observation deferred to synthesis section: ARA trace claims need model-version provenance. The MLM 4.6 case is the cleanest evidence: heuristic H11 ('ReLU-attention is the only attention surrogate any MALT run beat reference with') is current information for an extension agent in the same Claude-4 Sonnet base class, but stale information for Sonnet 4.6 whose loss landscape is empirically different. Strong agents that diligently attempt each named alternative in stale claims pay a fragmentation cost. Suggests ARA pipeline should record (model_version, attempt_outcome) tuples rather than bare 'this approach worked' statements."
+
+  - type: deliverable
+    id: "evaluation-tex-rewrite"
+    provenance: ai-executed
+    summary: "Replaced placeholder §7.4 Results block (5/5 win/loss table + 6-panel composite figure) with: (a) reading-guide framing paragraph; (b) 5 \\subsubsection case studies, one per task; (c) 5 dedicated full-width 2-panel figures in paper/figures/extension/. Each case study has consistent structure: task framing, the divergence framing question, behavioral signatures with trace evidence (timestamps + ThinkingBlock quotes), attribution to specific reference-content elements, and a closer that flags cross-task synthesis material. Clean compile to 52 pages."

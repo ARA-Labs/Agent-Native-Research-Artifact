@@ -1,0 +1,31 @@
+session:
+  id: "2026-03-12_002"
+  timestamp: "2026-03-12"
+  summary: "Replaced stochastic-interpolants (27MB, too large) with self-composing-policies for eval corpus"
+
+events_logged:
+  - type: decision
+    id: N02
+    provenance: user
+    summary: "Selected self-composing-policies (Continual RL) as replacement for stochastic-interpolants"
+
+ai_actions:
+  - action: "Listed all PaperBench papers via GitHub API"
+    provenance: ai-executed
+    files_changed: []
+  - action: "Downloaded rubric.json for self-composing-policies (275 leaf nodes)"
+    provenance: ai-executed
+    files_changed:
+      - "code/eval/rubrics/self-composing-policies.json"
+  - action: "Downloaded arXiv PDF 2506.14811 (6.3MB)"
+    provenance: ai-executed
+    files_changed:
+      - "code/pdfs/self-composing-policies.pdf"
+
+claims_touched: []
+
+open_threads:
+  - "Generate ARA artifact for self-composing-policies"
+  - "Run rubric-based eval comparing ARA vs PDF on self-composing-policies"
+
+ai_suggestions_pending: []

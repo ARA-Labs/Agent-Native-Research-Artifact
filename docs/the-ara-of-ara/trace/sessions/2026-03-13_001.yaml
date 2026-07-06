@@ -1,0 +1,64 @@
+session:
+  id: "2026-03-13_001"
+  timestamp: "2026-03-13T00:00"
+  summary: "Complete evaluation restructure: 3-layer framework (Understanding/Reproduction/Extension) replacing 5-experiment design"
+
+events_logged:
+  - type: decision
+    id: N30
+    provenance: user
+    summary: "Restructured eval into 3 layers: Understanding, Reproduction, Extension — preceded by Datasets & Motivation section"
+  - type: decision
+    id: N31
+    provenance: user
+    summary: "Understanding layer: 3 question categories (A: lossless 10q, B: detail 5q, C: failure 5q) with increasing strength hypotheses"
+  - type: decision
+    id: N32
+    provenance: user
+    summary: "Reproduction layer: 5 tasks per PaperBench paper, ARA-only vs PDF+GitHub, ground truth rubrics"
+  - type: decision
+    id: N33
+    provenance: user
+    summary: "Extension layer: RE-Bench full ARA vs polished ARA (traces stripped), measure improvement and redundant exploration"
+  - type: experiment
+    id: N34
+    provenance: ai-executed
+    summary: "Rewrote evaluation.tex with 3-layer structure, updated intro + discussion refs, clean compile at 36 pages"
+  - type: claim
+    id: C16
+    provenance: user
+    summary: "Three-layer evaluation captures full ARA value proposition (understand → reproduce → extend)"
+
+ai_actions:
+  - action: "Rewrote paper/sections/evaluation.tex with complete 3-layer structure"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+  - action: "Updated introduction contribution bullet to reflect 3-layer evaluation"
+    provenance: ai-executed
+    files_changed: ["paper/sections/introduction.tex"]
+  - action: "Updated discussion cross-references to new section labels"
+    provenance: ai-executed
+    files_changed: ["paper/sections/discussion.tex"]
+  - action: "Updated appendix cross-references to new evaluation labels"
+    provenance: ai-executed
+    files_changed: ["paper/sections/appendix.tex"]
+  - action: "Added PLACEHOLDER_mlebench citation to references.bib"
+    provenance: ai-executed
+    files_changed: ["paper/references.bib"]
+
+claims_touched:
+  - id: C16
+    action: created
+    provenance: user
+
+open_threads:
+  - "Generate question sets for all 3 categories across PaperBench/RE-Bench/Speedrun"
+  - "Curate 5 reproduction tasks per PaperBench paper with ground truth"
+  - "Construct polished ARA variants (trace-stripped) for 7 RE-Bench tasks"
+  - "Run full Understanding evaluation (20 questions × N papers)"
+  - "Run Reproduction evaluation (5 tasks × N papers)"
+  - "Run Extension evaluation (7 RE-Bench tasks)"
+
+ai_suggestions_pending:
+  - "Consider adding a pilot result for Category C (failure questions) using existing RE-Bench artifacts to strengthen the paper before full evaluation"
+  - "MLE-bench Speedrun needs ARA artifacts generated — currently only nanogpt-speedrun exists"

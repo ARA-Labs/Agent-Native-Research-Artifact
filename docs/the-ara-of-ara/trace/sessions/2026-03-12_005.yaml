@@ -1,0 +1,88 @@
+session:
+  id: "2026-03-12_005"
+  timestamp: "2026-03-12T17:00"
+  summary: "Analyzed 24K METR agent runs — quantified exploration waste (59% tokens, 90% cost wasted), RE-Bench failure patterns, difficulty cliff"
+
+events_logged:
+  - type: decision
+    id: N15
+    provenance: user
+    summary: "Decided to analyze METR trace data for ARA exploration-waste evidence"
+  - type: dead_end
+    id: N16
+    provenance: ai-executed
+    summary: "MALT dataset gated on HuggingFace — pivoted to eval-analysis-public"
+  - type: experiment
+    id: N17
+    provenance: ai-executed
+    summary: "24,008-run exploration waste analysis: 59% tokens wasted, 113x failed/success ratio"
+  - type: claim
+    id: C13
+    provenance: ai-executed
+    summary: "59% of agent compute is exploration waste (dead ends + redundancy)"
+  - type: claim
+    id: C14
+    provenance: ai-executed
+    summary: "Failed runs consume 113x more tokens than successful ones (median)"
+  - type: observation
+    id: O11
+    provenance: ai-executed
+    summary: "RE-Bench lottery-like score variance within same (task, model)"
+  - type: observation
+    id: O12
+    provenance: ai-executed
+    summary: "Model progression GPT-4→Opus 4.6: 26x in 2.5yr but still individual failures"
+  - type: observation
+    id: O13
+    provenance: ai-executed
+    summary: "Difficulty cliff at ~2h human time, 96-98% cost wasted above threshold"
+  - type: observation
+    id: O14
+    provenance: ai-suggested
+    summary: "AIDE tree search outperforms linear context — ARA externalizes this structure"
+  - type: observation
+    id: O15
+    provenance: ai-executed
+    summary: "16.6% of (task,model) pairs are coin-flip outcomes — lottery effect"
+
+ai_actions:
+  - action: "Wrote download_subset.py to attempt MALT dataset download (failed — gated)"
+    provenance: ai-executed
+    files_changed: ["code/eval/malt_analysis/download_subset.py"]
+  - action: "Cloned METR/eval-analysis-public, analyzed runs.jsonl (24,008 runs)"
+    provenance: ai-executed
+    files_changed: []
+  - action: "Wrote analyze_runs.py — failure rates, token waste, difficulty analysis"
+    provenance: ai-executed
+    files_changed: ["code/eval/malt_analysis/analyze_runs.py"]
+  - action: "Wrote deep_analysis.py — RE-Bench detail, scaling, model comparison"
+    provenance: ai-executed
+    files_changed: ["code/eval/malt_analysis/deep_analysis.py"]
+  - action: "Wrote redundancy_analysis.py — cross-run redundancy, exploration tax"
+    provenance: ai-executed
+    files_changed: ["code/eval/malt_analysis/redundancy_analysis.py"]
+
+claims_touched:
+  - id: C13
+    action: created
+    provenance: ai-executed
+  - id: C14
+    action: created
+    provenance: ai-executed
+  - id: C01
+    action: advanced
+    provenance: ai-suggested
+  - id: C06
+    action: advanced
+    provenance: ai-suggested
+
+open_threads:
+  - "Apply for MALT dataset access on HuggingFace to get full DAG transcripts"
+  - "Write exploration waste findings into paper (Introduction motivation or new Experiment section)"
+  - "Design trace-tax experiment: reconstruct exploration graph from flat MALT traces"
+  - "Connect difficulty cliff data to Progressive Disclosure (H02) argument"
+
+ai_suggestions_pending:
+  - "O11-O15 contain potential new claims about exploration lottery, difficulty cliff, and AIDE structure — user should confirm before promoting"
+  - "The 59% waste number could be the lead statistic in the Introduction alongside the 45% information gap"
+  - "Consider a Figure showing difficulty cliff (agent success vs human time) as visual for the paper"

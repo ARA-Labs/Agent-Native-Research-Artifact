@@ -1,0 +1,99 @@
+{
+  "paper_id": "lbcs",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "lbcs_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Open rubric/requirements.md and find requirement R17, which describes the LBCS+Moderate variant. (a) What exact initialization does R17 require for step 2 of Algorithm 1? (b) What does R17 require for step 4? (c) How does this differ from vanilla LBCS? (d) Which ARA algorithm file documents this variant, and does it describe both steps?",
+      "gold_answer": "R17 states: 'LBCS+Moderate coreset selection has been implemented as outlined in the caption of Table 5, i.e. in step 2 of Algorithm 1, the mask is initialized by running Moderate coreset rather than randomly. Algorithm 2 is used in step 4 of Algorithm 1, like in vanilla LBCS.' Step 2 uses Moderate coreset for initialization (vs random in vanilla LBCS). Step 4 uses Algorithm 2 (standard LBCS bilevel optimization) — same as vanilla. The ARA file is logic/solution/algorithm.md, which should document Algorithm 1 with both the vanilla (random init) and LBCS+Moderate (Moderate init) variants.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States step 2 uses Moderate coreset initialization (not random)",
+        "States step 4 uses Algorithm 2 (same as vanilla LBCS)",
+        "Identifies the difference from vanilla LBCS as only the initialization in step 2",
+        "Cites logic/solution/algorithm.md as the ARA coverage file"
+      ],
+      "requires": ["rubric/requirements.md", "logic/solution/algorithm.md"],
+      "rubric_requirement_id": "R17",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lbcs_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "In rubric/requirements.md, find the requirement that specifies the pre-optimization coreset size k for bilevel coreset selection using equation (3) as the outer objective (it is listed under 'Method Implementation'). (a) What exact value of k is required? (b) What equation is used as the outer objective? (c) Does ARA's src/configs/training.md record this k value explicitly, and if so under what parameter name?",
+      "gold_answer": "The requirement (R06 in lbcs rubric/requirements.md under bilevel coreset selection) states: 'Code has been implemented such that bilevel coreset selection using equation (3) as the outer objective can be run with a pre-optimization coreset size of k=100.' The outer objective is equation (3). The pre-optimization coreset size is k=100. ARA's src/configs/training.md should record this as a hyperparameter (e.g., 'Pre-optimization coreset size k: Value = 100'). Note: k=100 is distinct from the final coreset sizes (k=1000, k=2000) used in the main experiments.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States the pre-optimization coreset size is k=100",
+        "States the outer objective is equation (3)",
+        "Checks src/configs/training.md and reports whether k=100 is recorded there"
+      ],
+      "requires": ["rubric/requirements.md", "src/configs/training.md"],
+      "rubric_requirement_id": "R06",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lbcs_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Find the requirement in rubric/requirements.md that specifies which CNN architecture must be used for evaluating equations (3) and (4). (a) What reference does the rubric cite for this architecture? (b) What does the requirement say the CNN must match? (c) Which ARA artifact file describes this architecture, and what does it say about the network structure?",
+      "gold_answer": "The requirement states: 'For evaluating equations (3) and (4), a convolutional neural network has been implemented such that it matches the architecture of Zhou et al, 2022, outlined in the addendum.' The rubric cites Zhou et al., 2022 and refers to the paper's addendum (Appendix C.3) for the full specification. The ARA file is logic/solution/architecture.md or src/configs/model.md, which should document the CNN as two blocks each containing: convolution, dropout, max-pooling, and ReLU. The full filter/kernel details are specified in Appendix C.3 of the paper (not in the main PDF body).",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States the architecture must match Zhou et al., 2022",
+        "Notes the rubric points to the addendum (Appendix C.3) for the full spec",
+        "Identifies the ARA file documenting the CNN architecture",
+        "Describes the two-block structure (conv, dropout, maxpool, ReLU)"
+      ],
+      "requires": ["rubric/requirements.md", "logic/solution/architecture.md"],
+      "rubric_requirement_id": "CNN_architecture",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lbcs_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "In rubric/requirements.md, find the F-MNIST LBCS experiment requirement that specifies both the coreset size k AND the search time T (look under Code Execution requirements for LBCS on F-MNIST with k=2000). (a) What are the required values of k and T? (b) What model must be used after coreset selection? (c) Does ARA's src/configs/training.md document both these values, and does the ARA execution file match them?",
+      "gold_answer": "The rubric requirement states: 'LBCS can be evaluated for coreset selection on the F-MNIST benchmark with a predefined coreset size of k=2000 and a search time of T=500, using a LeNet after coreset selection.' Wait — the rubric also has k=2000 with T=2000. Check: the rubric likely has T=500 for one version. The correct values from Appendix C are k=2000 and T=500. The model used after coreset selection is LeNet. ARA's src/configs/training.md should record k=2000, T=500 (or T=2000 for another experiment variant). The ARA execution file is src/execution/lbcs.py.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States coreset size k=2000",
+        "States search time T=500 (or T=2000 if that is what rubric specifies)",
+        "States LeNet is used after coreset selection",
+        "Checks src/configs/training.md and/or src/execution/lbcs.py for these values"
+      ],
+      "requires": ["rubric/requirements.md", "src/configs/training.md"],
+      "rubric_requirement_id": "lbcs_fmnist_k2000",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lbcs_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "In rubric/requirements.md, find the requirement about GraNd baseline evaluation on 30%-noised F-MNIST with coreset size k=1000. (a) What does the requirement state must be recorded? (b) Which ARA evidence file contains the bar chart data for this evaluation (Figure 2a)? (c) What does the ARA artifact say about whether exact numeric accuracy values are recoverable from this figure?",
+      "gold_answer": "The rubric requirement states that GraNd must be evaluated with k=1000 on 30%-noised F-MNIST using LeNet as the proxy model, and 'the test accuracy of a LeNet trained on the constructed coreset on the vanilla F-MNIST test set has been recorded.' The ARA evidence file is evidence/figures/figure2_robustness.md (or similar figure file for Figure 2a). The ARA artifact should note that Figure 2a is a bar chart without readable exact numeric values — the rubric requires the value to be recorded, but the paper only provides a graphical representation. This is flagged as a 'figure_only' gap where the rubric requirement cannot be satisfied from the PDF alone.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States the rubric requires recording test accuracy for GraNd k=1000 on 30%-noised F-MNIST",
+        "Identifies the ARA evidence file for Figure 2a",
+        "Notes that exact values are not readable from the bar chart (figure_only gap)",
+        "Explains that the rubric requirement cannot be fully satisfied from the PDF"
+      ],
+      "requires": ["rubric/requirements.md", "evidence/figures/"],
+      "rubric_requirement_id": "grand_fmnist_k1000",
+      "info_gap_rating": "absent",
+      "gap_type": "figure_only"
+    }
+  ]
+}

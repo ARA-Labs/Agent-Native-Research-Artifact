@@ -1,0 +1,115 @@
+{
+  "paper_id": "mechanistic-understanding",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "mechanistic-understanding_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the DPO fine-tuning setup for GPT-2 in this ARA artifact: (a) What does requirement R32 in rubric/requirements.md specify about the exact hyperparameters required for DPO training, including optimizer choice and early stopping? (b) Which ARA file under src/execution/ implements this DPO training, and what is its filename? (c) Given R32's specification of a validation loss decrease patience of 10 epochs and RMSProp optimizer, what does this imply about how the training loop must differ from a standard Adam-based DPO fine-tuning implementation?",
+      "gold_answer": "R32 states: 'The code for fine-tuning GPT2 using DPO has been implemented. The training uses the following hyper-parameters: a learning rate of 1e-6, batch-size of 4, max gradient norm of 10, and DPO beta hyper-parameter value of 0.1. The validation loss decrease patience is set at 10 epochs, and RMSProp is used as the optimizer.' The ARA file implementing this is src/execution/dpo_training.py (or dpo_train.py / dpo_alignment.py — one of the three dpo execution files). The implication is that the implementation must use RMSProp (not Adam/AdamW which is the default in most DPO libraries), must implement an early stopping callback monitoring validation loss with a patience of exactly 10 epochs, must clip gradients at a max norm of 10, set beta=0.1, lr=1e-6, and batch_size=4. This is a non-standard combination since Hugging Face TRL's DPO trainer defaults to Adam, so explicit optimizer override is required.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes or closely paraphrases R32's full hyperparameter list: lr=1e-6, batch-size=4, max gradient norm=10, DPO beta=0.1, patience=10, RMSProp optimizer",
+        "Identifies the correct ARA src/execution/ file (dpo_training.py, dpo_train.py, or dpo_alignment.py) as the implementing file",
+        "Notes that RMSProp is non-default for DPO and requires explicit override of the standard Adam optimizer",
+        "Notes the early stopping patience=10 epochs requirement and its implication for a custom training loop or callback"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/dpo_training.py"
+      ],
+      "rubric_requirement_id": "R32",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "mechanistic-understanding_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Concerning the toxicity measurement infrastructure in this ARA: (a) What does requirement R45 in rubric/requirements.md specify about which model or tool must be used to measure toxicity, and what gap type is flagged for it in the info gap analysis? (b) Which ARA file under src/execution/ is most directly responsible for toxicity evaluation, and what does its name suggest about its scope? (c) What does R45's specification of 'unbiased-toxic-roberta' imply about the evaluation pipeline when cross-referenced with R47 (use of RealToxicityPrompts) and R48 (measuring toxicity for GPT2)?",
+      "gold_answer": "R45 states: 'The code for measuring toxicity has been implemented using unbiased-toxic-roberta.' It is flagged as 'ABSENT' in the info gap analysis with gap types 'vague_description' and 'missing_code_detail' — meaning this specific model name does not appear in the original PDF or GitHub repo and is only available in the rubric. The ARA file most directly responsible is src/execution/evaluation.py (or toxic_probe.py), with evaluation.py being the primary evaluation harness. The implication from cross-referencing R45 with R47 (RealToxicityPrompts used to elicit toxic outputs) and R48 (toxicity, perplexity, F1 measured for GPT2) is that the evaluation pipeline must: (1) generate continuations using RealToxicityPrompts, (2) pass those continuations through 'unbiased-toxic-roberta' specifically (not Perspective API or other toxicity classifiers), and (3) average the toxicity scores across generated tokens/sequences to populate Table 2 results. The 'unbiased' prefix implies the chosen model corrects for demographic bias in toxicity classification.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R45: 'The code for measuring toxicity has been implemented using unbiased-toxic-roberta' and notes it is flagged ABSENT in the info gap analysis",
+        "Identifies src/execution/evaluation.py as the relevant ARA execution file for evaluation",
+        "Notes that 'unbiased-toxic-roberta' is the specific required model (not Perspective API or generic toxicity scorer) and this information is absent from the PDF/repo",
+        "Explains that cross-referencing R45+R47+R48 implies the pipeline: RealToxicityPrompts → GPT2 generation → unbiased-toxic-roberta scoring → Table 2 results"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/evaluation.py"
+      ],
+      "rubric_requirement_id": "R45",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "mechanistic-understanding_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the unalignment experiment in this ARA artifact: (a) What does requirement R28 in rubric/requirements.md specify about the exact mechanism and scale factor used to unalign GPT2-DPO, and how many vectors are involved? (b) Which ARA file under src/execution/ implements this unalignment procedure? (c) Cross-referencing R28 with R29 (which specifies using the toxic key vector from W), what does this imply about the distinction between the unalignment method in R28 versus R29, and what does this mean for how src/execution/unalignment.py must handle two different vector types?",
+      "gold_answer": "R28 states: 'The code for un-aligning the GPT2 by scaling by 10 the 7 MLP vector with highest cosine similarity to the toxic matrix W has been implemented.' This specifies: scale factor of 10, exactly 7 MLP vectors, and selection criterion of highest cosine similarity to toxic matrix W. The implementing ARA file is src/execution/unalignment.py. Cross-referencing with R29 ('GPT2 fine-tuned with DPO has been unaligned using the toxic key vector from W') reveals two distinct unalignment approaches: R28 uses MLP value vectors scaled by 10, while R29 uses the toxic key vector from the linear probe weight matrix W. This implies src/execution/unalignment.py must implement at least two separate unalignment functions or modes: one that identifies and scales the top-7 MLP value vectors by a factor of 10, and another that applies the toxic key vector from W directly. The distinction between value vectors (MLP internal weights) vs. the probe's W matrix key vector is mechanistically important and both must be supported to reproduce Table 4.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R28 specifying: scale factor of 10, exactly 7 MLP vectors, cosine similarity to toxic matrix W as selection criterion",
+        "Identifies src/execution/unalignment.py as the implementing ARA file",
+        "Correctly identifies R29 as specifying a different vector type (toxic key vector from W) versus R28 (MLP value vectors)",
+        "Explains the implication that unalignment.py must support two distinct unalignment modes corresponding to R28 and R29 respectively"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/unalignment.py"
+      ],
+      "rubric_requirement_id": "R28",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "mechanistic-understanding_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Concerning the F1 metric definition and its evaluation context in this ARA: (a) What does requirement R43 in rubric/requirements.md specify about how precision and recall are defined for the F1 metric in continuation evaluation — provide the exact token-level definitions? (b) Which ARA evidence file documents the results of Table 2 where F1 is reported, and what does that file contain? (c) Cross-referencing R43 with R46 (which specifies 2,000 Wikipedia sentences as prompts for F1 evaluation), what does this imply about the evaluation protocol — specifically, why Wikipedia sentences are used for F1 but RealToxicityPrompts are used for toxicity scores?",
+      "gold_answer": "R43 states: 'The code for measuring F1 in continuations has been implemented. Precision is measured as the fraction of generated tokens contained in the continuation, and recall is the fraction of tokens in the continuation contained in the generated tokens.' This is a token-overlap F1 (similar to ROUGE-1 recall/precision) where: Precision = |generated_tokens ∩ reference_continuation_tokens| / |generated_tokens|, and Recall = |generated_tokens ∩ reference_continuation_tokens| / |reference_continuation_tokens|. The ARA evidence file documenting Table 2 results is evidence/tables/table2_intervention_results.md (or table2_interventions.md / table2_interventions_results.md), which contains the toxicity score, perplexity, and F1 columns for each intervention. Cross-referencing R43 with R46 ('2,000 Wikipedia sentences have been used as prompts for evaluation of continuations F1 scores, and Wikitext-2 was used for perplexity') implies a deliberate split in evaluation datasets: Wikipedia sentences have known non-toxic continuations that serve as reference texts for token-overlap F1, measuring fluency/coherence preservation, while RealToxicityPrompts are adversarially chosen toxic prompts better suited to measuring toxicity reduction. Using Wikipedia for F1 ensures the fluency measurement is on neutral, well-formed text.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R43's exact definitions: precision = fraction of generated tokens in continuation, recall = fraction of continuation tokens in generated tokens",
+        "Identifies the correct evidence/tables/ ARA file for Table 2 results (table2_intervention_results.md or equivalent)",
+        "Correctly states R46's specification of 2,000 Wikipedia sentences for F1 and Wikitext-2 for perplexity",
+        "Explains the logical rationale for using Wikipedia (known reference continuations) for F1 vs. RealToxicityPrompts (adversarial toxic prompts) for toxicity scoring"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table2_intervention_results.md"
+      ],
+      "rubric_requirement_id": "R43",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "mechanistic-understanding_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the mean activation analysis for toxic value vectors in this ARA: (a) What does requirement R63 in rubric/requirements.md specify about the exact computation required — including the number of prompts, tokens per prompt, and which vectors are analyzed? (b) Which ARA file under src/execution/ implements this activation computation, and which evidence figure file visualizes the result? (c) Cross-referencing R63 with R66 (which requires the same computation for GPT2-DPO using pre-DPO toxic vectors) and R67, what does this imply about how src/execution/mechanistic_analysis.py must be structured to support both the base GPT2 and DPO-fine-tuned model while keeping the vector identities fixed from the pre-DPO model?",
+      "gold_answer": "R63 states: 'Code has been implemented such that the mean activation in GPT-2, measured across the 20 tokens generated for each of the 1199 prompts from the RealToxicityPrompts challenge set (so across 20*1199 points), can be computed for each of the top 5 most toxic value vectors in GPT-2.' This requires: 1199 prompts from RealToxicityPrompts challenge set, 20 tokens generated per prompt, total of 23,980 activation measurements, computed for exactly the top 5 most toxic value vectors. The implementing ARA file is src/execution/mechanistic_analysis.py (or residual_analysis.py), and the visualizing evidence file is evidence/figures/figure2_mean_activations.md. Cross-referencing R63 with R66 ('Code has been implemented such that the mean activation in GPT-2 fine tuned with DPO, measured across the 20 tokens generated for each of the 1199 prompts from the RealToxicityPrompts challenge set (so across 20*1199 points), can be computed for each of the top 5 most toxic value vectors in GPT (pre-DPO)') reveals a critical design constraint: when computing activations for GPT2-DPO, the toxic vector identities (which 5 vectors are 'most toxic') must be determined from the pre-DPO GPT2 model and held fixed. This means mechanistic_analysis.py must: (1) first identify top-5 vectors from base GPT2, (2) store their indices, (3) then probe those same indexed vectors in the DPO model. This fixed-index approach is necessary to make the comparison meaningful — otherwise the DPO model's own 'most toxic' vectors might differ.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R63 specifying: 1199 prompts, 20 tokens per prompt, 20*1199 total points, top 5 most toxic value vectors in GPT-2",
+        "Identifies src/execution/mechanistic_analysis.py and evidence/figures/figure2_mean_activations.md as the relevant ARA files",
+        "Correctly identifies R66's requirement to use pre-DPO GPT2 vector identities when measuring DPO model activations",
+        "Explains the implication that vector indices must be fixed from pre-DPO model and reused for DPO model to enable valid comparison in Figure 2"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/mechanistic_analysis.py"
+      ],
+      "rubric_requirement_id": "R63",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

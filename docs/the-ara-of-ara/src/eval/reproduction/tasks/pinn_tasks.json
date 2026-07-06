@@ -1,0 +1,223 @@
+[
+  {
+    "task_id": "pinn_T01",
+    "goal": "Implement a PINN for the convection equation (beta=40). Build a 3-hidden-layer MLP with tanh activations and Xavier normal initialization, supporting widths in {50, 100, 200, 400}. Implement the PINN loss function as the non-linear least squares objective from section 2.1, with the relevant differential operator and boundary/initial condition operators from Appendix A.1. Implement the data sampling scheme: 10000 residual points randomly sampled from a 255x100 grid, 257 initial condition points, and 101 boundary condition points (sampled once before training). Implement support for training with the Adam optimizer for 41000 iterations across 5 random seeds, with learning rate grid-searchable over {1e-5, 1e-4, 1e-3, 1e-2, 1e-1}. Implement final loss and L2RE measurement.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Near-zero training loss is necessary for accurate PINN solutions (implementation enables testing the loss-L2RE relationship)"
+    ],
+    "rubric_requirement_ids": [
+      "a6ce62f7-ba57-4a59-a1cc-05194018c0d4",
+      "f4b24398-d78b-475c-9d54-81a190ff3e69",
+      "5c307e8d-8d94-4c8c-b9b9-232880bcc218",
+      "60faf3ea-b819-467d-972d-834a88c11eea",
+      "342b68e9-6f71-4e92-9de7-aae61aa5e0d6",
+      "a3c75cd0-6f87-4ec3-9c58-ca924e601a5b",
+      "f479ecec-03d4-49ed-a822-91ee07766b47",
+      "0447a800-ea47-4f77-af99-441f9dcb3419",
+      "7936a6fe-7ef6-4022-a768-c0c0a15e98d0",
+      "09f36ab9-7e8e-4d6c-a1d0-77b81dfe575f",
+      "d93ee7b8-3d2a-47bf-810f-a6f760706ea1",
+      "657521ec-4b4d-44a5-9bb8-ee72cfff6171"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "pinn_T02",
+    "goal": "Implement PINNs for the reaction and wave equations. For each PDE, build a 3-hidden-layer MLP with tanh activations and Xavier normal initialization, supporting widths in {50, 100, 200, 400}. Implement the PINN loss function as the non-linear least squares objective from section 2.1, with the relevant differential operators from Appendix A.2 (reaction) and A.3 (wave). Implement data sampling, 41000-iteration training support, 5-seed repetition, and final loss plus L2RE measurement for each PDE domain.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Near-zero training loss is necessary for accurate PINN solutions (extending implementation to reaction and wave PDEs)"
+    ],
+    "rubric_requirement_ids": [
+      "510d01fa-f2e1-4ead-b0b1-af9d0103ca1e",
+      "11811fd7-4e42-4e34-a89e-03b301446394",
+      "5c307e8d-8d94-4c8c-b9b9-232880bcc217",
+      "60faf3ea-b819-467d-972d-834a88c11eeb",
+      "7f76f889-7181-40da-9dbb-ffd7f5efd974",
+      "f09e6209-524d-466b-95cb-3ff2b5894852",
+      "20e48ec9-91c2-4a45-b42b-36624a5b4d98",
+      "b1adc8d3-00d7-42f4-9331-8f812157a6cf",
+      "37f3734c-c484-4b5e-ae9e-4fdc2d4ee671",
+      "ba0d26b5-8f7b-450e-a795-af5ef2666c1d"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "pinn_T03",
+    "goal": "Train and evaluate PINNs with the Adam optimizer on the convection equation. Run a scoped sweep with network width 100 across 3 learning rates {1e-4, 1e-3, 1e-2}, training for 41000 iterations with 5 random seeds each. For each (lr, seed) configuration, measure final training loss and L2 relative error (L2RE) against the analytical solution. Record all results to verify the loss-L2RE relationship across the learning rate sweep.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: Near-zero loss is necessary for accurate PINN solutions (loss vs L2RE correlation across learning rates)",
+      "C05: Baseline Adam performance for later comparison with L-BFGS and Adam+L-BFGS"
+    ],
+    "rubric_requirement_ids": [
+      "e26aa4a5-1b8e-444f-8b45-6f4b1840d023",
+      "089dfd68-7b0d-4796-b530-6b008f638dcd",
+      "7b8cbc27-fb2e-4ef6-b2a5-df48a8eafd74",
+      "8de8647a-9dd9-44f7-a550-041892f1b856",
+      "080093e3-ff07-4a35-88ed-888f0149cd32",
+      "6529bc3a-0d0b-49d0-8af8-340aa258e877",
+      "23fce3c7-c707-4aa1-86de-e41fc2696388",
+      "cb417ae1-9fdd-4eab-8b2b-b4ab42baa160",
+      "33629705-ed71-475d-ac29-1b65e7ef148d",
+      "dacf0520-f273-4bea-8fb2-6c88e5125481",
+      "1fbe9746-03f7-4342-a405-4b408ef4fc05",
+      "814ef0de-9fe7-4461-b8c7-86ba3ba3dce5"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "pinn_T04",
+    "goal": "Implement the L-BFGS optimizer and Adam+L-BFGS(1k) combined training strategy for the convection equation. For L-BFGS, implement training with lr=1.0, history size (memory)=100, and strong Wolfe line search. For Adam+L-BFGS(1k), implement the schedule that trains with Adam for the first 1000 iterations then switches to L-BFGS for the remaining 40000 iterations, with the same L-BFGS hyperparameters. Verify the implementation supports the full convection training pipeline.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C04: L-BFGS preconditioning is beneficial for PINN training (implementation of the quasi-Newton component)",
+      "C05: Adam+L-BFGS combined strategy outperforms either alone (implementation of the combined schedule)"
+    ],
+    "rubric_requirement_ids": [
+      "878b5031-e085-4838-a6c3-9172d2989fe4",
+      "cd0861d3-b2cc-4239-9030-2024af80b0ed",
+      "5208b0d8-3f89-40a0-8042-087d65bd4338",
+      "1ba289ae-0c83-4909-9639-f43c3576f89c",
+      "2170e804-0ed7-42ea-b421-347ed44367ba",
+      "dbeb4056-ffb5-4610-9da3-618bf0f3c052",
+      "7055f1bb-7682-46ee-b055-2d904596e042",
+      "a0a7f42f-095c-489d-8c57-5489511add23",
+      "98934fc8-49c5-4316-8c0e-4bda4e2d0f99",
+      "8650cd8f-c8de-43d2-ac05-0a1a47cdbde4"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "pinn_T05",
+    "goal": "Train the full optimizer comparison sweep on the reaction equation and reproduce the aggregate optimizer ranking (Table 1 / Figure 8 / Figure 2). Implement Adam, L-BFGS, and Adam+L-BFGS(1k) for the reaction PDE. Run sweeps across widths and learning rates. Produce the scatter plot of final loss vs L2RE across all (optimizer, width, seed) combinations (Figure 2), confirming the monotone loss-L2RE relationship. Verify that when selecting the best learning rate per optimizer-width pair, Adam+L-BFGS achieves the lowest final loss and L2RE (Table 1 / Figure 8).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: Near-zero loss is necessary for accurate PINN solutions (loss vs L2RE scatter, Figure 2)",
+      "C05: Adam+L-BFGS outperforms Adam or L-BFGS alone on loss and L2RE (Table 1 / Figure 8)"
+    ],
+    "rubric_requirement_ids": [
+      "c6a729a2-3a2c-458d-a012-005cacd61dc9",
+      "369f1a10-928a-4317-a45e-87e34073c230",
+      "762501f9-2392-4545-bbbe-80dee87b3b87",
+      "b5124c53-1e6b-4abb-9cf2-c55c326a3f88",
+      "d783df52-80fb-4f89-bb95-f4d383dc170f",
+      "17620733-5dd0-4d6d-9f81-7caa68c47eff",
+      "e8863305-ebb0-4966-8f74-da6a5f9f05c1",
+      "fe1c592c-e03f-49ff-be09-1df0d5c18532",
+      "93c89866-fd8f-4c05-bc46-99d497e8db6e",
+      "835d353d-7509-42b9-9698-820dfd62a3f9",
+      "f5c37a0a-1b82-498f-8888-d324e82a7751",
+      "327e7ab9-ff9c-4536-bb1d-f255f7191239",
+      "81e9e6a6-41bb-47d0-8bc8-7ee7f6bccc01"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "pinn_T06",
+    "goal": "Implement stochastic Lanczos quadrature (SLQ) for Hessian spectral density estimation and run the total-loss Hessian analysis (Section 5.1). For the best trained model on each PDE (convection, reaction, wave), estimate the spectral density of the total PINN loss Hessian. Confirm that all three PDEs show (1) significant spectral density near eigenvalue zero and (2) large outlier eigenvalues (>1e3), indicating severe ill-conditioning of the PINN loss landscape.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C02: The PINN loss landscape is ill-conditioned with condition number >10^4"
+    ],
+    "rubric_requirement_ids": [
+      "87fa24bb-d4f1-4c63-9003-dd1700192e88",
+      "b2308687-812e-4589-8d80-f11a40fd9203",
+      "39e34f7c-a777-46e5-a131-1a5ea8605121",
+      "9e32ac3c-78db-4b4f-a829-7230bd3904e4",
+      "6c752611-db97-42ce-93bb-71820d6f88f4",
+      "c73838b8-83ac-487f-b13a-bcdc20a79c59"
+    ],
+    "n_requirements": 6
+  },
+  {
+    "task_id": "pinn_T07",
+    "goal": "Run the per-component Hessian spectral density analysis (Section 5.2) on the convection and reaction PDEs. Decompose the PINN loss into residual, initial condition, and boundary condition components. For the best trained model on each PDE, estimate the Hessian spectral density of each component separately. Confirm that (1) the residual component is the most ill-conditioned (largest maximum eigenvalue) and (2) the residual differential operator is the dominant source of the overall ill-conditioning, for both convection and reaction problems.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: The PINN loss landscape is ill-conditioned due to the residual differential operator",
+      "C03: Residual loss (differential operator term) is the dominant source of ill-conditioning"
+    ],
+    "rubric_requirement_ids": [
+      "7807ef1d-0c8d-49da-997d-58135d90e37e",
+      "8350eee7-8cff-4527-8b82-2013f2978a91",
+      "777acb6b-30e9-4d39-879a-1c9931c6fd82",
+      "562c8925-e28b-416e-b6a5-810cd6a6ad52",
+      "b099274f-5763-4f68-add1-481ce1ee8d34",
+      "95f3f58c-adcf-4417-b06c-d79700e44ee9",
+      "3816a6ca-b54a-4e78-a70b-2ef756c5f1b4",
+      "54bbcad9-15fa-4e54-b3f3-7a8a946099aa",
+      "164ad07f-3b7b-447b-a656-da06eae220a6",
+      "ef770d5c-7e29-42ce-925f-5b90ca21be55"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "pinn_T08",
+    "goal": "Implement L-BFGS preconditioner unrolling (Algorithm 2 from Appendix C.2) and reproduce the preconditioned Hessian spectral density analysis (Section 5.3 / Figure 7). Save L-BFGS directions, steps, and inverse inner products at end of training. Estimate the preconditioned Hessian spectral density (H_k * H_L) for all three PDEs, confirming at least 1000x reduction in maximum eigenvalue magnitude compared to the unpreconditioned Hessian. Additionally, run the per-component preconditioned analysis on the wave PDE, verifying reduced ill-conditioning for each loss component after preconditioning.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: L-BFGS preconditioning reduces the PINN Hessian condition number by at least 1000x",
+      "C03: Residual ill-conditioning is mitigated by L-BFGS preconditioning"
+    ],
+    "rubric_requirement_ids": [
+      "9bbde4e1-c5bc-4955-bfce-310e828a713e",
+      "8401ecfc-532f-4777-9ad3-ff7f66bc4204",
+      "899a3913-f178-4c62-a8da-07951f13603e",
+      "726fac50-3dd8-4ed3-b042-b65ffc9f8ced",
+      "f715505f-e13e-43e2-8a69-088278c240d3",
+      "c4956a9e-f386-4c6d-8d17-4e5b4bac5e1f",
+      "64500f58-bc2b-4c0a-ace9-59e750d40469",
+      "d6b2f36e-7e05-44cb-b391-453a6ff2a70f",
+      "b3ae9334-ec64-44e9-90c1-c493db58c6ca",
+      "ca411097-44b6-4deb-9ee8-a0214afdfd80",
+      "270c3033-46f5-4a27-851e-efcb3fa316b8"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "pinn_T09",
+    "goal": "Implement the NysNewton-CG (NNCG) optimizer and run the fine-tuning experiment (Section 7.3 / Table 2 / Figure 5). Implement the four NNCG components: RandomizedNystromApproximation (Algorithm 5), NystromPCG (Algorithm 6), Armijo line search (Algorithm 7), and the full NNCG loop (Algorithm 4). Implement gradient descent (GD) fine-tuning as a baseline. Starting from the best Adam+L-BFGS checkpoint for each PDE (convection, reaction, wave), run 2000 additional steps with both NNCG and GD. Verify that NNCG reduces loss by >10x while GD produces no improvement, confirming the benefit of second-order optimization where first-order methods stall.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C06: NNCG significantly reduces loss and L2RE beyond Adam+L-BFGS",
+      "C06: GD applied after Adam+L-BFGS fails to improve loss or L2RE",
+      "C07: Second-order methods achieve condition-number-independent convergence (empirical evidence via NNCG's success where GD fails)"
+    ],
+    "rubric_requirement_ids": [
+      "64647c33-91fd-4a2f-bff1-b7bcf98220a8",
+      "7d2ca353-ba0b-49b5-b6f5-e5571c0eac6b",
+      "080778c3-6988-461e-a04e-9c2c3fe1a457",
+      "3d63db7e-2eb9-49e4-83e4-780652b825e7",
+      "3176afb0-f283-42de-9e96-ed2e011eac68",
+      "1172349c-d59e-4be0-ab37-23fdb0f07abc",
+      "e9d9db2b-ff61-4890-91d1-e8c42edf7afd",
+      "62ba517c-fb7b-4896-8281-3fb94c097de0",
+      "3f8789ca-30bd-4c1d-bb52-19a88e300f4e",
+      "97cf12cb-ad19-4669-83e3-bde768f80d5f",
+      "de05f797-2613-457b-810b-7feaa868133f",
+      "a642fdcf-0b13-477b-9925-39a3bbb03d12"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "pinn_T10",
+    "goal": "Reproduce the per-iteration wall-clock timing comparison between L-BFGS and NNCG (Table 3). Implement per-iteration timing measurement. Measure and report per-iteration wall-clock times for L-BFGS and NNCG training on each of the three PDE domains (convection, reaction, wave). Confirm that NNCG is at least 5x slower per iteration than L-BFGS across all problem domains, establishing the computational cost tradeoff between NNCG's superior convergence and its higher per-step expense.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C06: NNCG's per-iteration cost is substantially higher than L-BFGS (practical efficiency tradeoff)"
+    ],
+    "rubric_requirement_ids": [
+      "81d1f400-190c-4307-8419-74a0ef3eca25",
+      "2192ccec-f1aa-46f4-b643-f4f3206b61c2",
+      "33402091-e004-40fd-a60c-535b6605599b",
+      "8b03d367-d4d1-46cc-a944-b98dad98e1c3",
+      "942ace27-46c4-4c18-b4c3-2e41ead75c0a",
+      "27024621-a110-4387-af2b-7cf86c6bb3c6",
+      "2b311ead-e216-4ea4-b550-cddfe8325fa3",
+      "e7d45c85-3ec6-4f44-9d34-a22b27ed1561"
+    ],
+    "n_requirements": 8
+  }
+]

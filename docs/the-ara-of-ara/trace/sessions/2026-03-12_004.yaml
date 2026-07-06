@@ -1,0 +1,96 @@
+session:
+  id: "2026-03-12_004"
+  timestamp: "2026-03-12T01:00"
+  summary: "Full 23-paper PaperBench info gap analysis — quantified Storytelling Tax across 8,921 requirements"
+
+events_logged:
+  - type: experiment
+    id: N12
+    provenance: ai-executed
+    summary: "3-paper pilot: 530 reqs, median 62% sufficient"
+  - type: decision
+    id: N13
+    provenance: user
+    summary: "Scale to full 23-paper benchmark with parallel execution"
+  - type: experiment
+    id: N14
+    provenance: ai-executed
+    summary: "Full 23-paper benchmark: 8,921 reqs, median 45.3% sufficient"
+  - type: claim
+    id: C09
+    provenance: user
+    summary: "Advanced from hypothesis to supported — 45% median sufficient"
+  - type: claim
+    id: C11
+    provenance: ai-suggested
+    summary: "New claim: operational hierarchy of omission (results > methods > code > execution)"
+  - type: claim
+    id: C12
+    provenance: ai-suggested
+    summary: "New claim: 3 gap types account for 61% of all gaps"
+  - type: heuristic
+    id: H09
+    provenance: ai-executed
+    summary: "Prompt caching for batched PDF eval — 97% input cost savings"
+  - type: heuristic
+    id: H10
+    provenance: ai-executed
+    summary: "Ghostscript compression for oversized arXiv PDFs"
+  - type: observation
+    id: O07
+    provenance: ai-suggested
+    summary: "pinn outlier analysis — empirical grid paper, 94.2% sufficient"
+  - type: observation
+    id: O08
+    provenance: ai-suggested
+    summary: "Negative correlation (-0.76) between rubric size and sufficiency"
+  - type: observation
+    id: O09
+    provenance: ai-suggested
+    summary: "Dataset/Model Acquisition universally worst at 5.4% sufficient"
+  - type: observation
+    id: O10
+    provenance: ai-suggested
+    summary: "Old RIC eval (98.2%) was wildly lenient vs strict eval (45%)"
+
+ai_actions:
+  - action: "Built pdf_information_gap.py — strict 3-tier eval with gap taxonomy"
+    provenance: ai-executed
+    files_changed: ["code/eval/pdf_information_gap.py"]
+  - action: "Built aggregate_info_gap.py — cross-paper aggregation"
+    provenance: ai-executed
+    files_changed: ["code/eval/aggregate_info_gap.py"]
+  - action: "Downloaded 20 PaperBench rubrics and arXiv PDFs"
+    provenance: ai-executed
+    files_changed: ["code/eval/rubrics/*.json", "code/pdfs/*.pdf"]
+  - action: "Ran 23 parallel evaluations (8,921 total requirements)"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/info_gap_*.json"]
+  - action: "Wrote pilot and full memos"
+    provenance: ai-executed
+    files_changed: ["memo/pdf_information_gap_pilot.md", "memo/pdf_information_gap_full.md"]
+  - action: "Compressed oversized PDFs with ghostscript"
+    provenance: ai-executed
+    files_changed: ["code/pdfs/bridging-data-gaps.pdf", "code/pdfs/stochastic-interpolants.pdf"]
+
+claims_touched:
+  - id: C09
+    action: advanced
+    provenance: ai-executed
+  - id: C11
+    action: created
+    provenance: ai-suggested
+  - id: C12
+    action: created
+    provenance: ai-suggested
+
+open_threads:
+  - "Update introduction.tex \\todo{} placeholders with final numbers"
+  - "Run ARA-side info gap analysis (how much does ARA recover?) to complete the ARA vs PDF comparison"
+  - "Address pinn outlier in paper — report with and without it"
+  - "Verify O08 (rubric size vs sufficiency correlation) with formal statistical test"
+
+ai_suggestions_pending:
+  - "C11 (operational hierarchy) and C12 (3 dominant gap types) need user confirmation"
+  - "O09 (Dataset/Model Acquisition universally worst) could be promoted to a claim"
+  - "O10 (lenient vs strict eval difference) suggests the existing Exp B results should be deprecated or re-run"

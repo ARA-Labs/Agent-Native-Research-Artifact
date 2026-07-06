@@ -1,0 +1,96 @@
+session:
+  id: "2026-03-15_002"
+  timestamp: "2026-03-15T10:00"
+  summary: "Redesigned Cat B as rubric-alignment questions (ARA-exclusive); added GitHub repo tools + rubric ingestion module to ingestor; created rubric/requirements.md for 3 eval papers"
+
+events_logged:
+  - type: decision
+    id: N53
+    provenance: user
+    summary: "Dual decision: redesign Cat B as rubric-alignment requiring ARA-exclusive rubric/requirements.md AND strengthen ingestor with repo + rubric ingestion"
+
+  - type: experiment
+    id: N54
+    provenance: ai-executed
+    summary: "Implemented ingestor changes: agent.py (list_repo/read_repo_file tools + skip filters), ingestor.py (repo_path param bug fix), prompt.py (rubric/ schema + repo exploration guide)"
+
+  - type: experiment
+    id: N55
+    provenance: ai-executed
+    summary: "Created rubric/requirements.md for adaptive-pruning (123 reqs), bam (789 reqs), lbcs (~800+ reqs) via background sub-agent"
+
+  - type: experiment
+    id: N56
+    provenance: ai-executed
+    summary: "Redesigned all 3 Cat B question sets to rubric-alignment format: 5 questions each requiring (1) rubric/requirements.md + (2) a specific ARA file"
+
+  - type: heuristic
+    id: H14
+    provenance: ai-suggested
+    summary: "2-hop rubric-alignment pattern as ARA-exclusive evaluation: rubric/requirements.md + specific ARA file cross-reference"
+
+  - type: heuristic
+    id: H15
+    provenance: ai-suggested
+    summary: "Repo ingestion skip filter: binary/image/archive extensions + cache dirs + 64KB size limit"
+
+  - type: observation
+    id: O34
+    provenance: ai-suggested
+    summary: "bam/lbcs rubric files are very large (5546/6441 lines) — may need truncation for practical eval agent use"
+
+  - type: observation
+    id: O35
+    provenance: ai-executed
+    summary: "Latent ingestor bug: CLI passed repo_path to ingest() but function signature didn't accept it — silently dropped since implementation"
+
+ai_actions:
+  - action: "Modified code/ingestor/agent.py: added _REPO_SKIP_EXTENSIONS, _REPO_SKIP_DIRS, _REPO_MAX_FILE_SIZE constants; added list_repo and read_repo_file tools to TOOLS list; added repo_dir parameter to ToolExecutor; added _list_repo() and _read_repo_file() methods"
+    provenance: ai-executed
+    files_changed: ["code/ingestor/agent.py"]
+
+  - action: "Modified code/ingestor/ingestor.py: added repo_path and fast_extract parameters to ingest(); added repo_dir resolution; wired repo_dir to build_prompt(has_repo=) and ToolExecutor(repo_dir=)"
+    provenance: ai-executed
+    files_changed: ["code/ingestor/ingestor.py"]
+
+  - action: "Modified code/ingestor/prompt.py: added rubric/ directory to schema; added rubric/requirements.md format spec; updated Stage 3 with repo exploration + rubric extraction; added has_repo parameter to build_prompt()"
+    provenance: ai-executed
+    files_changed: ["code/ingestor/prompt.py"]
+
+  - action: "Created code/artifacts/adaptive-pruning/rubric/requirements.md (123 leaf requirements R01-R123, ~885 lines)"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/adaptive-pruning/rubric/requirements.md"]
+
+  - action: "Created code/artifacts/bam/rubric/requirements.md (789 leaf requirements, ~5546 lines)"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/bam/rubric/requirements.md"]
+
+  - action: "Created code/artifacts/lbcs/rubric/requirements.md (916 leaf requirements, 6441 lines, 559KB)"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/lbcs/rubric/requirements.md"]
+
+  - action: "Redesigned code/eval/questions/adaptive-pruning_catB.json: 5 rubric-alignment questions (R84, R43+R44, R47+R48, R80, R05)"
+    provenance: ai-executed
+    files_changed: ["code/eval/questions/adaptive-pruning_catB.json"]
+
+  - action: "Redesigned code/eval/questions/bam_catB.json: 5 rubric-alignment questions (R01, R14+R15, R05+R06, VAE score function, iteration counts)"
+    provenance: ai-executed
+    files_changed: ["code/eval/questions/bam_catB.json"]
+
+  - action: "Redesigned code/eval/questions/lbcs_catB.json: 5 rubric-alignment questions (R17, k=100, CNN arch, k=2000 T=500, GraNd bar chart gap)"
+    provenance: ai-executed
+    files_changed: ["code/eval/questions/lbcs_catB.json"]
+
+claims_touched:
+  - id: C04
+    action: confirmed
+    provenance: ai-suggested
+
+open_threads:
+  - "Run new rubric-alignment Cat B eval to verify ARA outperforms PDF+repo on redesigned questions"
+  - "Re-ingest eval papers with new ingestor (--rubric + --repo flags) for fully automated rubric/requirements.md generation"
+  - "Validate bam/lbcs rubric/requirements.md file sizes — 5546/6441 lines may need truncation for eval agent context"
+
+ai_suggestions_pending:
+  - "Rubric-alignment Cat B questions expected to produce ARA > PDF+repo; not yet empirically verified"
+  - "list_repo/read_repo_file tools not yet tested end-to-end in a live ingestor run with a real repo"

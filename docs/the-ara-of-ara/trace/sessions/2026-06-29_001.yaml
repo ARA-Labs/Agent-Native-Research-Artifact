@@ -1,0 +1,59 @@
+session:
+  id: "2026-06-29_001"
+  date: "2026-06-29"
+  started: "2026-06-29T20:00"
+  last_turn: "2026-06-29T20:00"
+  turn_count: 1
+  summary: "New venue build: adapted the ARA paper into a PLOS Digital Health Methods Article for the Reproducibility 2.0 collection (invited by Leo Anthony Celi). Created paper/plos/ from the official PLOS 2025 template (IMRaD, single column, line numbers); restructured protocol+mechanisms -> Materials and methods, 3-layer eval -> Results; new 250w abstract, 191w author summary, cover letter. Three user-confirmed adaptation decisions (light health reframing / focused scope / Xianglin Ji MIT corresponding, no Celi). Added 6 verified health-reproducibility citations. Compiles clean, 11pp."
+
+events_logged:
+  - turn: 1
+    type: decision
+    id: "N123"
+    routing: direct
+    provenance: user
+    summary: "Submit ARA to PLOS Digital Health Reproducibility 2.0 as a Methods Article; light health reframing + focused scope + Ji(MIT) corresponding/no Celi."
+
+ai_actions:
+  - turn: 1
+    action: "Downloaded official PLOS 2025 LaTeX template; scaffolded paper/plos/ (symlinked figures + references.bib to shared, copied plos2025.bst, Makefile)."
+    provenance: ai-executed
+    files_changed: ["paper/plos/plos2025.bst", "paper/plos/Makefile", "paper/plos/figures", "paper/plos/references.bib", "paper/plos/_REFERENCE_plos_template.tex"]
+  - turn: 1
+    action: "Wrote the full PLOS IMRaD manuscript (single self-contained file): title page with Xianglin Ji (MIT, corresponding), 26 affiliations; abstract 250w; author summary 191w; intro reframed on digital-health reproducibility crisis; Materials and methods (4-layer protocol + 3 mechanisms + illustrative clinical-ML mapping + eval design); Results (3 tables); Discussion/Conclusion/SI."
+    provenance: ai-executed
+    files_changed: ["paper/plos/main.tex"]
+  - turn: 1
+    action: "Added 6 verified health-reproducibility BibTeX entries to the shared bibliography."
+    provenance: ai-executed
+    files_changed: ["paper/shared/references.bib"]
+  - turn: 1
+    action: "Wrote cover letter (names the Reproducibility 2.0 collection + MIT corresponding-author/APC condition) and a pre-submission README/checklist."
+    provenance: ai-executed
+    files_changed: ["paper/plos/cover_letter.md", "paper/plos/README.md"]
+  - turn: 1
+    action: "Compiled paper/plos/main.tex with latexmk (exit 0, 11pp, 19 refs resolved, no undefined cites/refs); fixed a microtype option incompatible with local TeX Live 2021 (nopatch=eqnum -> removed)."
+    provenance: ai-executed
+    files_changed: ["paper/plos/main.pdf"]
+
+claims_touched: []
+
+logic_revisions: []
+
+key_context:
+  - turn: 1
+    excerpt: "Celi (PLOS Digital Health) invited the ARA paper to the Reproducibility 2.0 collection; instructions: Methods Article, full paper, standard Editorial Manager, cover letter must name the collection, APC waived if corresponding author is at MIT. User: 'I will add Xianglin Ji as the corresponding author.'"
+  - turn: 1
+    excerpt: "User chose (via clarifying question) light health reframing, focused Methods-Article scope, and Ji=MIT corresponding with no Leo Celi co-author."
+
+open_threads:
+  - "BLOCKER (research integrity): resolve dual-submission status vs NeurIPS before submitting to PLOS. PLOS and NeurIPS are both archival; the ARA work is substantially similar across both, so concurrent peer review = dual-submission violation. If the ARA paper is currently under NeurIPS review, do NOT submit to PLOS concurrently (wait for the decision, or withdraw). arXiv preprint and the non-archival ICML workshops do NOT conflict. NeurIPS status unknown as of this turn — must confirm with the user."
+  - "Obtain explicit written consent from all listed authors for THIS PLOS version before submission (ICMJE final-approval + PLOS all-author-agreement requirement); silence is not consent. Especially required if the work is concurrently at another venue."
+  - "Confirm Xianglin Ji's MIT affiliation + institutional email (main.tex has placeholder * xji@mit.edu); APC waiver depends on the corresponding author being at MIT."
+  - "Provide corresponding-author ORCID in Editorial Manager."
+  - "Export Fig 1-7 as individual image files for separate upload (PLOS strips graphics from the manuscript PDF)."
+  - "Populate Supporting Information (S1 Appendix schema, S1/S2 Table, S1 File) from the full paper appendix / GitHub repo."
+  - "Deadline ~end of 2026; rolling publication (accepted papers published without waiting for the full collection)."
+
+ai_suggestions_pending:
+  - "Offered to generate a figures-embedded preview PDF for review and to adjust Xianglin Ji's position in the author order (currently after the MIT author Ao Qu) — awaiting user response."

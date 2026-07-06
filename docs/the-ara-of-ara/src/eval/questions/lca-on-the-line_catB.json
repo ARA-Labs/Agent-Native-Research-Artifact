@@ -1,0 +1,118 @@
+{
+  "paper_id": "lca-on-the-line",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "lca-on-the-line_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "(a) According to R10 in rubric/requirements.md, what are the two alternative loss functions that the conditional soft loss implementation must select between, and what variable controls this selection? (b) Which ARA file in src/execution/ is designed to implement this conditional soft loss logic? (c) What does R10's requirement imply about how the alignment_mode parameter must be handled in that implementation file — specifically, what must happen for each of the two modes?",
+      "gold_answer": "(a) R10 states: 'Code has been written to compute the conditional soft loss as described in Algorithm 1. This should select between computing binary cross-entropy (BCE) loss or a version of cross-entropy loss on the reverse LCA matrix, based on the value of alignment_mode, as described in Steps 6 - 10 of Algorithm 1.' The two loss functions are (1) binary cross-entropy (BCE) loss and (2) a cross-entropy loss computed on the reverse LCA matrix. The variable controlling selection is 'alignment_mode'. (b) The ARA file src/execution/lca_alignment_loss.py is designed to implement this conditional soft loss logic, as it directly corresponds to the LCA alignment loss described in Algorithm 1. (c) The implementation must include a conditional branch (e.g., if/else) that checks the value of alignment_mode: when alignment_mode indicates BCE mode, the code computes binary cross-entropy loss; when alignment_mode is set to 'CE' (cross-entropy mode), the code computes a cross-entropy loss applied to the reverse LCA matrix (which itself is computed per R07 by subtracting the LCA matrix from 1). Both branches must operate over Steps 6-10 of Algorithm 1.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies both loss types: BCE and cross-entropy on reverse LCA matrix",
+        "Correctly identifies 'alignment_mode' as the controlling variable from R10",
+        "Correctly identifies src/execution/lca_alignment_loss.py as the relevant ARA file",
+        "Correctly explains that implementation requires a conditional branch handling both modes per Steps 6-10 of Algorithm 1"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/lca_alignment_loss.py"
+      ],
+      "rubric_requirement_id": "R10",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lca-on-the-line_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) Requirements R27, R30, R33, R36, R39, and R42 in rubric/requirements.md all specify training linear probes with the alignment loss. What exact hyperparameter values for lambda, temperature T, and alignment_mode are shared across all these requirements, and what is the source of the soft labels used? (b) Which ARA file in src/configs/ would be expected to encode these shared training hyperparameters? (c) Given that R27 specifies soft labels derived from 'M_LCA = MinMax(M^T) computed using the WordNet hierarchy', and cross-referencing evidence/tables/table9_ablation_soft_loss.md, what does this imply about the sensitivity of results to the choice of temperature and lambda values used during training?",
+      "gold_answer": "(a) All six requirements (R27, R30, R33, R36, R39, R42) share: lambda = 0.03, temperature T = 25, and alignment_mode = 'CE'. The soft labels are derived from the matrix M_LCA = MinMax(M^T), computed using the WordNet hierarchy. For example, R27 states: 'Code has been written to train a linear probe on the ImageNet train set with a ResNet-18 backbone by optimizing the probe using the alignment loss, as described in Algorithm 1, with lambda = 0.03, temperature T set to 25, and alignment mode set to CE... The soft labels used in the loss function are derived from the matrix M_LCA = MinMax(M^T), which is computed using the WordNet hierarchy.' (b) The ARA file src/configs/training.md is the appropriate file to encode these shared training hyperparameters (lambda, T, alignment_mode, backbone type, loss type). (c) Cross-referencing evidence/tables/table9_ablation_soft_loss.md (the ablation on soft loss) implies that the specific values lambda=0.03 and T=25 were selected through ablation — the table documents sensitivity of performance metrics to variation in these parameters, implying that using other values would degrade results. The fixed hyperparameters in R27-R42 represent the best-found configuration from this ablation.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies all three shared hyperparameters: lambda=0.03, T=25, alignment_mode='CE' from the rubric requirements",
+        "Correctly identifies soft labels source as M_LCA = MinMax(M^T) from the WordNet hierarchy",
+        "Correctly identifies src/configs/training.md as the relevant ARA config file",
+        "Provides a reasoned explanation linking evidence/tables/table9_ablation_soft_loss.md to the sensitivity/selection of the fixed hyperparameter values"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md",
+        "evidence/tables/table9_ablation_soft_loss.md"
+      ],
+      "rubric_requirement_id": "R27",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lca-on-the-line_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) R16 in rubric/requirements.md specifies a precise method for constructing hierarchical clusterings. What exact algorithm is used, how many layers does the hierarchy have, and what is the formula for setting the number of cluster centers at each layer? (b) Which ARA file in src/execution/ implements this hierarchical clustering procedure, and what does the filename suggest about the relationship between k-means and the hierarchy construction? (c) R18 further specifies how the latent class hierarchy is derived from the clustering outcomes — what is the precise definition of the pairwise LCA height according to R18, and how does this definition connect the k-means clustering output to the structure examined in evidence/tables/table4_kmeans_latent.md?",
+      "gold_answer": "(a) R16 states: 'For each set of the 75 model-specific averaged class labels, code has been written to compute a 9-layer hierarchical clustering using the k-means algorithm on the computed per-class average features setting the number of cluster centers as 2^i, where i ranges from 1, 2, 3, 4, ..., 9, as described in Appendix E.1.' The algorithm is k-means, the hierarchy has 9 layers, and the number of cluster centers at layer i is 2^i (for i = 1 through 9). (b) The ARA file src/execution/kmeans_hierarchy.py implements this procedure. The filename 'kmeans_hierarchy' directly signals that k-means is used to build a hierarchy, linking the flat k-means clustering at each of 9 levels into a tree structure. (c) R18 states: 'For each model, code has been written to compute the latent class hierarchy by finding the lowest common ancestor nodes for every pair of classes based on the clustering outcomes. The cluster level at which a pair of classes first share a cluster is the pairwise LCA height.' This means: for every pair of ImageNet classes, one scans through the 9 clustering levels (from fewest to most clusters) and identifies the first level at which both classes fall in the same cluster — that level index is their LCA height. This produces an n×n matrix of pairwise LCA heights, which is exactly the latent hierarchy distance matrix whose structure and statistics are reported in evidence/tables/table4_kmeans_latent.md.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states: k-means algorithm, 9 layers, cluster centers = 2^i for i in 1..9",
+        "Correctly identifies src/execution/kmeans_hierarchy.py and explains the filename's implication",
+        "Correctly quotes or paraphrases R18's definition of pairwise LCA height as the first cluster level where two classes share a cluster",
+        "Correctly connects the n×n pairwise LCA height matrix construction to the content of evidence/tables/table4_kmeans_latent.md"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/kmeans_hierarchy.py",
+        "evidence/tables/table4_kmeans_latent.md"
+      ],
+      "rubric_requirement_id": "R16",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lca-on-the-line_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "(a) Requirements R05 and R06 in rubric/requirements.md each define a distinct LCA distance formula. Write out both formulas exactly as stated in the rubric, identifying what function each uses and how they differ structurally. (b) Which single ARA file in src/execution/ is responsible for implementing both of these distance computations, and what does its filename indicate about its scope? (c) Given that R06 involves a symmetric sum of depth differences while R05 uses information content, what does this imply about the different data dependencies each formula requires at runtime, as would be reflected in src/execution/lca_distance.py?",
+      "gold_answer": "(a) R05 states: 'Code has been written to compute the LCA distance between two nodes using information content, D_LCA(y', y) := f(y) - f(N_LCA(y, y')), where f is the information content.' R06 states: 'Code has been written to compute the LCA distance between two nodes using tree depth, D_LCA^P(y', y) := (P(y) - P(N_LCA(y', y))) + (P(y') - P(N_LCA(y', y))), where P is a function which retrieves the depth of node x from a tree T.' R05 uses information content f (a scalar derived from node probability per R03) and is asymmetric in form (only subtracts from the true label y's IC). R06 uses tree depth P and is symmetric — it sums the depth differences for both y and y' relative to their LCA. (b) The ARA file src/execution/lca_distance.py is responsible for implementing both distance computations. The filename 'lca_distance' indicates it is a general-purpose module for LCA-based distance calculations, covering both IC-based and depth-based variants. (c) R05 (IC-based) requires at runtime: the information content values f(y) and f(N_LCA), which depend on pre-computed node probabilities p(y) (per R02) and the -log2 transform (per R03). R06 (depth-based) requires at runtime: the depth P(x) of each node in the tree T (per R04) and the identity of N_LCA (per R01). Thus lca_distance.py must accept either a pre-computed IC lookup or a depth-lookup function, reflecting two distinct data dependency paths.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states both formulas: R05 as D_LCA = f(y) - f(N_LCA(y,y')) and R06 as D_LCA^P = (P(y)-P(LCA)) + (P(y')-P(LCA))",
+        "Correctly identifies the structural difference: R05 uses information content f (asymmetric), R06 uses tree depth P (symmetric sum)",
+        "Correctly identifies src/execution/lca_distance.py as the implementing file",
+        "Correctly explains different data dependencies: R05 needs IC/probability values; R06 needs tree depth values per R04"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/lca_distance.py"
+      ],
+      "rubric_requirement_id": "R05",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "lca-on-the-line_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) R11 in rubric/requirements.md specifies how the standard loss and soft loss are combined. Write out the exact combination formula given in R11, identifying the role of each component and what the final output must be. (b) Cross-referencing src/execution/lca_alignment_loss.py, what does R11's requirement that the function 'return the mean loss over the batch' imply about the reduction strategy that must be applied, and how does this differ from a sum reduction? (c) R11 refers to Steps 12 and 13 of Algorithm 1 — given that R09 handles the standard cross-entropy loss (Step 5) and R10 handles the soft loss (Steps 6-10), what does R11's positioning as Steps 12-13 imply about the sequential dependency structure within lca_alignment_loss.py, and how does this structure relate to the claim reported in evidence/tables/table8_lca_elca.md regarding LCA vs. eLCA variants?",
+      "gold_answer": "(a) R11 states: 'Code has been written to combine the standard loss and the computed soft loss with the lambda weight (e.g., total_loss = lambda * standard_loss + soft_loss) and return the mean loss over the batch, as described in Steps 12 and 13 of Algorithm 1.' The exact formula is: total_loss = lambda * standard_loss + soft_loss. Lambda scales the standard cross-entropy loss (R09), soft_loss is the conditional loss from R10, and the final output is the mean of total_loss over the batch. (b) Returning the 'mean loss over the batch' implies that after computing total_loss for each sample in the batch, a mean reduction (torch.mean or equivalent) must be applied before returning. This differs from sum reduction in that the gradient magnitude is normalized by batch size — sum reduction would make the effective learning rate batch-size-dependent, while mean reduction keeps it stable. In lca_alignment_loss.py, the final return statement must therefore apply .mean() rather than .sum() to the per-sample losses. (c) R11 being Steps 12-13 means it is strictly downstream of R09 (standard CE, Step 5) and R10 (soft loss, Steps 6-10) in the sequential execution of Algorithm 1. In lca_alignment_loss.py, the function must first compute standard_loss, then soft_loss, then combine them — this three-stage pipeline is a hard sequential dependency. Regarding evidence/tables/table8_lca_elca.md, which compares LCA and eLCA (extended LCA) alignment variants, R11's lambda-weighted combination formula is the mechanism by which the alignment strength is controlled; the table's comparison of LCA vs. eLCA variants implicitly tests whether this weighting formula (with the specific lambda from R27-R42) produces meaningfully different hierarchical alignment behavior across the two methods.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states the exact formula from R11: total_loss = lambda * standard_loss + soft_loss, and identifies mean-over-batch as the required output",
+        "Correctly explains mean vs. sum reduction: mean normalizes by batch size, stabilizing gradient magnitude, and implies .mean() in lca_alignment_loss.py",
+        "Correctly identifies the sequential dependency: R09 → R10 → R11 mapping to Steps 5 → 6-10 → 12-13 of Algorithm 1",
+        "Provides a substantive connection between R11's lambda-weighting mechanism and the LCA vs. eLCA comparison in evidence/tables/table8_lca_elca.md"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/lca_alignment_loss.py",
+        "evidence/tables/table8_lca_elca.md"
+      ],
+      "rubric_requirement_id": "R11",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

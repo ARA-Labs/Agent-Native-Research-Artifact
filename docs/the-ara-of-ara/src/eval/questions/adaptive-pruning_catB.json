@@ -1,0 +1,97 @@
+{
+  "paper_id": "adaptive-pruning",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md; they must parse raw rubric JSON and have no pre-built R->file mapping.",
+  "questions": [
+    {
+      "id": "adaptive-pruning_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Open the ARA artifact's rubric/requirements.md. Find the requirement listed under 'Evaluation & Metrics Implementation' about which blocks are eligible for salience density computation. (a) State the exact requirement text. (b) Which ARA artifact file is listed as the coverage for this requirement? (c) What constraint does this place on the block selection implementation?",
+      "gold_answer": "The requirement is R84: 'The salience density is only calculated for blocks that have an APT adapter applied to them.' Coverage: src/execution/pruning.py (or logic/solution/algorithm.md). The constraint: blocks without APT adapters are excluded from salience density computation — only APT-adapter blocks are eligible for the block selection ranking.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Identifies the APT-adapter-only constraint (only adapter blocks included)",
+        "Cites the correct ARA artifact file",
+        "Correctly states that non-adapter blocks are excluded"
+      ],
+      "requires": ["rubric/requirements.md", "src/execution/pruning.py"],
+      "rubric_requirement_id": "R84",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "adaptive-pruning_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "In rubric/requirements.md, find the two adjacent requirements (both under 'Method Implementation') that together specify the full teacher-student layer-mapping function m(.) in Efficient Self-Knowledge Distillation. (a) What does the first say about HOW the mapping is computed? (b) What does the second say about HOW OFTEN it is recomputed? (c) Which ARA file is listed as the coverage for the recomputation-frequency requirement?",
+      "gold_answer": "The two requirements are R43 and R44. R43: 'the teacher-student layer-mapping function m(.) is implemented to match 4 teacher layers with the closest, non-pruned student layers, using the same method introduced in CoFi (Xia et al., 2022), dynamically determining the closest student layer via argmin_{j: z_FFN^(j)>0} MSE(W_layer H_s^j, H_t^i).' R44: 'the teacher-student layer-mapping function m(.) is re-computed every training step.' Coverage for R44: src/execution/distillation.py.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States mapping is CoFi-style MSE argmin over non-pruned student layers",
+        "States recomputation frequency is every training step",
+        "Cites src/execution/distillation.py as the relevant ARA file"
+      ],
+      "requires": ["rubric/requirements.md", "src/execution/distillation.py"],
+      "rubric_requirement_id": "R43, R44",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "adaptive-pruning_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "rubric/requirements.md contains two adjacent requirements specifying the exact distillation loss formulas for different datasets. Find them and answer: (a) What is the exact formula L_distill for GLUE tasks? (b) What is the exact formula for SQuAD or CNN/DM tasks? (c) What is the only coefficient that differs between the two formulas, and what are its two values?",
+      "gold_answer": "The two requirements are R47 and R48. R47 (GLUE): L_distill = L_pred + 0.9 * L_layer, where L_pred = D_KL(p_s || p_t). R48 (SQuAD/CNN-DM): L_distill = 0.1 * L_pred + 0.9 * L_layer. The only coefficient that differs is the weight on L_pred: 1.0 for GLUE vs 0.1 for SQuAD/CNN-DM. The L_layer coefficient (0.9) is identical in both formulas.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States GLUE formula correctly: L_pred + 0.9*L_layer (L_pred coefficient = 1.0)",
+        "States SQuAD/CNN-DM formula correctly: 0.1*L_pred + 0.9*L_layer",
+        "Identifies the differing coefficient as the L_pred weight (1.0 vs 0.1)",
+        "Notes L_layer coefficient is 0.9 in both cases"
+      ],
+      "requires": ["rubric/requirements.md", "logic/solution/algorithm.md"],
+      "rubric_requirement_id": "R47, R48",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "adaptive-pruning_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Find the requirement in rubric/requirements.md (under 'Evaluation & Metrics Implementation') that defines how training efficiency (train time / TTA) is measured. (a) What is the exact metric definition this requirement specifies? (b) What specific performance threshold percentage is used? (c) In which ARA evidence file would you verify this metric, and what TTA value does it show for APT on RoBERTa at 60% sparsity?",
+      "gold_answer": "The requirement is R80: 'For each method trained on some dataset, the train time is measured as the time-to-accuracy of reaching 97% of the dev (/test) set performance of the finetuning baseline.' The threshold is 97%. The ARA evidence file is evidence/tables/table2_roberta_t5_main.md (or table12_raw_efficiency_roberta_t5.md). For APT on RoBERTa at 60% sparsity, the TTA value is approximately 752 seconds (corrected from an earlier ingestion error of 1890s).",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly defines TTA as time-to-accuracy at 97% of finetuning baseline performance",
+        "States the 97% threshold",
+        "Identifies the correct ARA evidence file",
+        "Reports the APT RoBERTa TTA value (~752s)"
+      ],
+      "requires": ["rubric/requirements.md", "evidence/tables/table2_roberta_t5_main.md"],
+      "rubric_requirement_id": "R80",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "adaptive-pruning_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "In rubric/requirements.md, find requirement R05 which specifies how the Mask Tuning baseline must be implemented. (a) What exact external repository URL does R05 require? (b) What is R05's weight compared to most other requirements? (c) Does ARA's logic/related_work.md include an entry for this repository? If yes, what dependency type is assigned? If not, what does this reveal about ARA's artifact completeness?",
+      "gold_answer": "R05 requires: 'The Mask Tuning baseline is implemented, using the implementation at https://github.com/WoosukKwon/retraining-free-pruning.' R05 has weight 2, which is higher than most other requirements (weight 1). If logic/related_work.md includes Kwon et al., 2022, it should be classified as type 'baseline'. If it is missing, rubric/requirements.md reveals an artifact gap: the URL is captured in R05 even though related_work.md is incomplete — demonstrating that rubric/requirements.md serves as a safety net for completeness.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States the correct GitHub URL: https://github.com/WoosukKwon/retraining-free-pruning",
+        "States weight=2 for R05",
+        "Checks logic/related_work.md for this entry and reports what it finds"
+      ],
+      "requires": ["rubric/requirements.md", "logic/related_work.md"],
+      "rubric_requirement_id": "R05",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

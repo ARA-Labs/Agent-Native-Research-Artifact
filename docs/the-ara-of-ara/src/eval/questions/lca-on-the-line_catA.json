@@ -1,0 +1,101 @@
+{
+  "paper_id": "lca-on-the-line",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "lca-on-the-line_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the Pearson correlation coefficient (PEA) between ID LCA and OOD Top1 accuracy on ObjectNet across all 75 models?",
+      "gold_answer": "0.956",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "lca-on-the-line_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "In the simulation experiment (Table 7), what is the OOD Top-1 error for model g (confounding feature) versus model f (causal feature)?",
+      "gold_answer": "Model g has OOD Top-1 error of 0.7503; model f has OOD Top-1 error of 0.3197",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "lca-on-the-line_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe how the LCA alignment loss is computed in CE mode, including how the soft label matrix is constructed before training.",
+      "gold_answer": "Before training, the soft label matrix is constructed as M_LCA = MinMax(M^T) where M[i,k] = D^P_LCA(i,k) and T=25 is the temperature. The reverse matrix is 1 - M_LCA. During training in CE mode, the soft loss is: soft_loss = -mean(reverse_LCA_matrix[targets] * log(probs), dim=1). The total loss is lambda * standard_CE_loss + soft_loss, with lambda=0.03.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "lca-on-the-line_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How is the LCA distance computed when using information content as the node scoring function, and how does this differ from the tree-depth-based formulation?",
+      "gold_answer": "Using information content: D_LCA(y', y) = I(y) - I(N_LCA(y', y)), where I(node) = -log2(p) and p is computed by applying a uniform distribution to leaf nodes and recursively summing descendants. The tree-depth version uses D_LCA(y', y) = (P(y) - P(N_LCA(y', y))) + (P(y') - P(N_LCA(y', y))), where the second term is added to counter tree imbalance. The information-content version is used for LCA measurements while the depth version is used for linear probing experiments.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "lca-on-the-line_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the key hyperparameters used for linear probing training, including optimizer, learning rate, batch size, number of epochs, and warm-up learning rate?",
+      "gold_answer": "Optimizer: AdamW with weight decay; learning rate: 0.001; batch size: 1024; epochs: 50; warm-up learning rate: 1e-5; cosine LR scheduler with linear warm-up; run on a single NVIDIA GeForce GTX 1080 Ti GPU.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "lca-on-the-line_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does the MAE error prediction performance of ID LCA compare to Accuracy-on-the-Line (ID Top1) on ImageNet-Sketch and ObjectNet across all 75 models, and what does this reveal about the relative strengths of each method?",
+      "gold_answer": "On ImageNet-Sketch, ID LCA achieves MAE of 0.093 vs ID Top1's 0.230 (LCA is better). On ObjectNet, ID LCA achieves 0.048 vs ID Top1's 0.178 (LCA is better). However, on ImageNet-v2, ID Top1 (0.040) outperforms ID LCA (0.162). This reveals that LCA is a more robust predictor for severely shifted OOD datasets, while ID Top1 remains better for datasets visually similar to ImageNet.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "lca-on-the-line_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does the mean PEA of latent K-means hierarchies compare to the WordNet-based LCA PEA on ImageNet-S and ObjectNet, and what does this imply about the robustness of the latent hierarchy approach?",
+      "gold_answer": "On ImageNet-S, WordNet LCA PEA is 0.903 while the mean latent hierarchy PEA is 0.773. On ObjectNet, WordNet PEA is 0.956 while mean latent PEA is 0.930. The latent hierarchies are somewhat lower than WordNet but still substantially high, and the low standard deviation (0.022 and 0.010 respectively) across 75 source models demonstrates robustness to the choice of source model.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "lca-on-the-line_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the paper argue that LCA distance is a better indicator of OOD generalization than Top-1 accuracy specifically when comparing VMs and VLMs together, even though LCA and Top-1 tend to correlate within each model family separately?",
+      "gold_answer": "VMs trained on ImageNet tend to 'inflate' their ID Top-1 accuracy on IID test sets due to spurious correlations, causing their data points to shift and disrupt the linear relationship with VLMs. LCA distance, being based on the relative ranking of class predictions within a fixed hierarchy (WordNet), is less sensitive to this inflation and captures semantic understanding that is consistent across both model families. This allows LCA to unify VMs and VLMs under a single linear trend, whereas Top-1 accuracy produces two separate trends.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "lca-on-the-line_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does the LCA-on-the-Line framework fail to outperform standard Accuracy-on-the-Line, and what is the underlying reason for this failure?",
+      "gold_answer": "LCA-on-the-Line fails on ImageNet-v2, where ID Top-1 achieves R²=0.962/PEA=0.980 while ID LCA only achieves R²=0.339/PEA=0.582. The reason is that ImageNet-v2 is a recollection of ImageNet with minimal external intervention, so spurious correlations learned from ImageNet training transfer directly to ImageNet-v2. This means the dataset shift is not severe enough to expose the difference between causal and confounding features, making Top-1 accuracy a better predictor than LCA distance in this case.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "lca-on-the-line_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What specific weight decay value is used in the AdamW optimizer during linear probing, and how was it selected?",
+      "gold_answer": "The paper does not specify the exact weight decay value used in AdamW, only stating that weight decay is enabled. No search range or selection procedure for weight decay is described.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

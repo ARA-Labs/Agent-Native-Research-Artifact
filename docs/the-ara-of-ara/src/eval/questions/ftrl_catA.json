@@ -1,0 +1,101 @@
+{
+  "paper_id": "ftrl",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 5,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "ftrl_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the exact score (mean ± std) achieved by Fine-tuning + KS on the NetHack Human Monk scenario in the full evaluation over 1000 episodes?",
+      "gold_answer": "10588 ± 672",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "ftrl_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What is the initial scale and per-step exponential decay rate of the Kickstarting (KS) auxiliary loss coefficient used in NetHack fine-tuning?",
+      "gold_answer": "Initial scale of 0.5 with a decay rate of 0.99998 per training step.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "ftrl_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What are the key differences between the Behavioral Cloning (BC) and Kickstarting (KS) auxiliary losses in terms of the data distribution used to compute the KL divergence?",
+      "gold_answer": "BC computes the KL divergence over a static buffer B_BC of states from the pre-training environment (offline data), while KS computes the KL divergence over states gathered by the current online policy π_θ (online data). This means BC always enforces matching on pre-training states regardless of where the agent currently is, whereas KS only enforces matching on states the current policy visits.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "ftrl_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Why does Kickstarting (KS) fail for the state coverage gap (e.g., Montezuma's Revenge, RoboticSequence) but succeed for the imperfect cloning gap (e.g., NetHack)?",
+      "gold_answer": "KS applies the KL divergence loss on states visited by the current online policy. In state coverage gap settings, the pre-trained policy π* was never trained on CLOSE states, so forcing KL matching on those states interferes with learning CLOSE behaviors. In imperfect cloning gap settings (NetHack), the pre-trained policy has broad coverage and the agent eventually visits FAR states, so KS can enforce matching there beneficially. BC avoids this problem by using a static buffer of pre-training states, ensuring the KL is always computed on states where π* is competent.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "ftrl_A05",
+      "category": "design_rationale",
+      "difficulty": "T2_scattered",
+      "question": "Why is the entropy maximization term disabled when using EWC, BC, or KS in NetHack fine-tuning, and what value is used for entropy_cost in vanilla fine-tuning versus KR-augmented fine-tuning?",
+      "gold_answer": "Entropy maximization conflicts with the KL-divergence auxiliary losses used in BC and KS, which push the policy toward π* rather than toward a high-entropy distribution, creating competing objectives that destabilize training. In vanilla fine-tuning, entropy_cost = 0.001; when using EWC, BC, or KS, entropy_cost = 0.0.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "ftrl_A06",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "In the NetHack full evaluation, what are the scores for Fine-tuning + BC and Fine-tuning + EWC at the last checkpoint, and how do they compare to the vanilla Fine-tuning score?",
+      "gold_answer": "Fine-tuning + BC scores 7610, Fine-tuning + EWC scores 3976, and vanilla Fine-tuning scores 7756. Fine-tuning + BC is slightly below vanilla Fine-tuning, while Fine-tuning + EWC is substantially lower than both.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "ftrl_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Under what conditions does Episodic Memory (EM) fail to be applicable as a knowledge retention method, and what environments in this paper are affected?",
+      "gold_answer": "Episodic Memory can only be used with off-policy algorithms that employ a replay buffer. It cannot be trivially applied with on-policy algorithms like PPO (used in Montezuma's Revenge) or APPO (used in NetHack), as these methods do not use a replay buffer and may become unstable when trained with off-policy data.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "ftrl_A08",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the actor and critic regularization coefficients for EWC and BC in the RoboticSequence (Meta-World) experiments, and what is the rationale for setting the critic coefficient to zero?",
+      "gold_answer": "For EWC: actor reg. coef. = 100, critic reg. coef. = 0. For BC: actor reg. coef. = 1, critic reg. coef. = 0. The critic coefficient is set to zero because the critic is only used during training and forgetting in the critic does not directly affect policy performance; only actor regularization is needed to preserve pre-trained capabilities.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "ftrl_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does BC outperform KS at retaining Sokoban-level performance in NetHack, even though KS is the overall best-performing method?",
+      "gold_answer": "KS applies KL divergence on data gathered by the online policy, which does not contain Sokoban levels at the start of fine-tuning because Sokoban is only encountered in deeper dungeon levels. Therefore, KS cannot rehearse Sokoban behavior. BC, by contrast, uses data gathered by the expert (AutoAscend), which includes Sokoban trajectories, so it constantly rehearses the correct way to solve the puzzle regardless of what the online policy visits.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "ftrl_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the minimum EWC regularization coefficient at which Fine-tuning + EWC matches or exceeds Fine-tuning + KS performance on the NetHack Human Monk scenario?",
+      "gold_answer": "This cannot be answered from the paper. The paper reports a single EWC coefficient of 2×10⁶ for NetHack and does not present a sweep of EWC coefficients or identify a threshold at which EWC matches KS performance.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

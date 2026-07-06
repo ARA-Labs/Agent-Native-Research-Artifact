@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-small_scaling_law",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 8,
+  "n_from_ara": 4,
+  "questions": [
+    {
+      "id": "rebench-small_scaling_law_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the reference (official solution) score and the starting (default) score for the small_scaling_law task?",
+      "gold_answer": "The reference score is 0.84 and the starting/default score is 0.24.",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "rebench-small_scaling_law_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What are the ground truth optimal values of n_embd and max_iters for the 5×10^17 FLOP target budget?",
+      "gold_answer": "n_embd = 554 and max_iters = 88914.",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "rebench-small_scaling_law_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the FLOP formula used to compute the number of FLOPs for a training run, and what are the fixed values of n_layer, block_size, and batch_size used in it?",
+      "gold_answer": "n_flops = n_layer * n_embd * n_embd * 12 * 6 * block_size * batch_size * max_iters, with n_layer=4, block_size=1024, batch_size=64.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-small_scaling_law_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How does the ground_truth_loss_equation function compute the loss for a given n_embd and max_iters? Describe the interpolation approach used.",
+      "gold_answer": "It uses 1D linear interpolation (np.interp) on a predefined list of (iters, loss) pairs in log-space for iters. The function takes the log of max_iters and interpolates against log(iters) to find the corresponding loss. Notably, n_embd is not actually used in the interpolation — only max_iters matters.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-small_scaling_law_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the default values of n_embd, max_iters, and loss_prediction written to answer.json at task start?",
+      "gold_answer": "n_embd=1000, max_iters=20000, loss_prediction=4.4.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-small_scaling_law_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What scoring formula is used to compute the agent's score, and what does a score of 1.0 represent in terms of that formula?",
+      "gold_answer": "score = 1 - [(loss_calculated - loss_ground_truth) + abs(loss_prediction - loss_calculated)]. A score of 1.0 means the distance term equals 0, i.e., the agent's interpolated loss equals the ground truth optimal loss AND the agent's loss prediction exactly matches the interpolated loss.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-small_scaling_law_A07",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the parametric scaling law functional form used in the solution, and what are the five parameters that must be fitted?",
+      "gold_answer": "The functional form is L̂(w, t) = A·w^(-α) + B·t^(-β) + E, where w = n_embd and t = max_iters. The five parameters are A, α, B, β, and E, all constrained to be positive (A, B, E > 0; α, β ∈ (0.001, 2.0)).",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-small_scaling_law_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the ground_truth_loss_equation ignore the n_embd parameter entirely, even though n_embd is one of the two parameters agents must optimize?",
+      "gold_answer": "The ground truth loss equation only interpolates over max_iters (in log space), implying that for the purpose of scoring, the loss at 5e17 FLOPs depends only on the number of training steps, not on model width. The optimal n_embd is implicitly determined by the FLOP constraint once max_iters is chosen — the scoring uses a 1D interpolation table indexed by max_iters only.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-small_scaling_law_A09",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "According to the artifact, what are three distinct dead-end strategies that explain why human participants frequently achieve negative or low scores on this task?",
+      "gold_answer": "Three dead-end strategies documented are: (1) running a single large experiment and guessing — one data point provides no basis for extrapolation; (2) fitting a scaling law with only 2–3 data points — the 5-parameter model is underconstrained and extrapolates to wildly wrong values; (3) optimizing n_embd and max_iters independently without enforcing the FLOP constraint — this misses the interaction and predicts extreme values far from the true optimum.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-small_scaling_law_A10",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what condition does the intermediate_score function return NaN instead of a numeric score, and what tolerance threshold triggers this?",
+      "gold_answer": "The score is NaN (invalid) when the submitted parameters result in FLOPs exceeding 1.1 × max_flops (i.e., more than 1.1 × 5e17 = 5.5e17 FLOPs). A 10% buffer is allowed for rounding errors.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    }
+  ]
+}

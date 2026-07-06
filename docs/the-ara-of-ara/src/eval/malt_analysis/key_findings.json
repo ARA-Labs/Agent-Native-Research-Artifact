@@ -1,0 +1,17 @@
+{
+  "total_runs": 24008,
+  "total_models": 21,
+  "total_tasks": 228,
+  "overall_failure_rate": 0.315894701766078,
+  "rebench_failure_rate": 0.7339449541284404,
+  "hcast_failure_rate": 0.46955719557195574,
+  "tokens_wasted_on_failures_pct": 79.9,
+  "cost_wasted_on_failures_pct": 90.2,
+  "failed_run_avg_tokens": 2579000,
+  "successful_run_avg_tokens": 300000,
+  "failed_to_success_token_ratio": 8.596666666666666,
+  "easy_task_success": 85.4,
+  "medium_task_success": 30.7,
+  "hard_task_success": 15.1,
+  "insight": "Failed agent runs consume 8.6x more tokens than successful ones on average, and 90% of total compute cost goes to dead-end exploration. This 'exploration waste' is the direct cost of lacking structured knowledge transfer: each run rediscovers dead ends independently, with no mechanism to share insights across attempts."
+}

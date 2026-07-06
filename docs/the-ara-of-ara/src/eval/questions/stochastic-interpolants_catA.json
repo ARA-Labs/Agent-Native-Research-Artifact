@@ -1,0 +1,101 @@
+{
+  "paper_id": "stochastic-interpolants",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 9,
+  "n_from_ara": 10,
+  "questions": [
+    {
+      "id": "stochastic-interpolants_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What FID-50k score does the dependent coupling method achieve on ImageNet-256 inpainting, and what is the FID-50k of the uncoupled Gaussian baseline it is compared against?",
+      "gold_answer": "The dependent coupling method achieves FID-50k of 1.13, compared to the uncoupled interpolant baseline of 1.35.",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A02",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What are the two objective functions used to learn the velocity field bt and the score-related function gt, and what are their unique minimizers?",
+      "gold_answer": "The objectives are Lb(b̂) = ∫₀¹ E[|b̂t(It)|² − 2İt · b̂t(It)]dt and Lg(ĝ) = ∫₀¹ E[|ĝt(It)|² − 2z · ĝt(It)]dt. Their unique minimizers are bt(x) = E(İt|It=x) and gt(x) = E(z|It=x), respectively.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A03",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the optimizer, initial learning rate, learning rate schedule, and gradient clipping threshold used for training the velocity model in the experiments?",
+      "gold_answer": "Adam optimizer with initial learning rate 2e-4; StepLR schedule with decay factor γ=0.99 applied every 1000 steps; gradient norm clipping at 10,000 (global L2 norm over all parameters). No weight decay is used.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "In the in-painting experiment, how is the base density x0 defined, and what interpolant coefficients αt and βt are used? How does this differ from the super-resolution schedule?",
+      "gold_answer": "For inpainting, the base density is x0 = ξ ∘ x1 + (1 − ξ) ∘ ζ where ξ is the mask and ζ ~ N(0, Id), with αt = t and βt = 1 − t (reversed schedule). This ensures ξ ∘ It = ξ ∘ x1 for all t, so the velocity is structurally zero outside the masked region. For super-resolution, the standard linear schedule αt = 1−t, βt = t is used instead.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "On the ImageNet 64×64→256×256 super-resolution benchmark, what are the train and validation FID-50k scores of the proposed dependent coupling method, and which baseline achieves the second-best validation FID-50k?",
+      "gold_answer": "The dependent coupling method achieves Train FID-50k of 2.13 and Valid FID-50k of 2.05. The second-best validation FID-50k is 2.70, achieved by I2SB (Liu et al., 2023a).",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A06",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the paper require σ > 0 (strictly positive noise) in the corrupted base x0 = m(x1) + σζ, and what would go wrong if σ = 0?",
+      "gold_answer": "With σ = 0, x0 = m(x1) lies on a lower-dimensional manifold (it is a deterministic function of x1), making the base density ρ0 degenerate — it would not be a valid density over the full ambient space R^d. This would also make the score function unavailable (since the score relies on the Gaussian noise component). A strictly positive σ ensures ρ0 is non-degenerate and the score ∇log ρt is well-defined, which is required for the theoretical framework (transport equation, velocity regression) to hold.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What is the transport cost bound E[|İt|²] under the dependent coupling (x0 = m(x1) + σζ, m(x1)=x1) versus the independent coupling, and what does this imply about when dependent coupling is strictly better?",
+      "gold_answer": "Under the dependent coupling with m(x1)=x1, E[|İt|²] = E[|x1 − x0|²] = dσ² (since İt = x1 − x0 = −σζ). Under the independent coupling, the bound is 2E[|x1|²] + dσ². The dependent coupling is strictly better (lower transport cost) whenever E[|x1|²] > 0, i.e., whenever the target distribution is not concentrated at the origin.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "stochastic-interpolants_A08",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How is the conditioning variable ξ incorporated into the U-Net velocity model for both the inpainting and super-resolution tasks, and what are the U-Net's base channel dimension and channel multiplier sequence?",
+      "gold_answer": "The conditioning variable ξ (the binary mask for inpainting, or the upsampled low-resolution image U(D(x1)) for super-resolution) is appended as extra channels to the interpolant value It along the channel dimension. The U-Net has base channel dimension 256 and channel multipliers (1, 1, 2, 3, 4). Additional hyperparameters include 4 attention heads with head dimension 64, Resnet block groups of 8, and learned sinusoidal conditioning with dim 32.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what condition on γt does the score identity ∇ log ρt(x) = −γt⁻¹ gt(x) break down, and what does this imply for using the SDE-based generative model? What other conditions cause the framework to break down?",
+      "gold_answer": "The score identity holds only when γt ≠ 0; when γt = 0 the identity is undefined (division by zero), so the SDE-based generative model cannot be used at time points where γt = 0 (e.g., at boundaries t=0 and t=1). More broadly, the framework also breaks down if σ = 0 (degenerate base density), if the joint density ρ(x0, x1) lacks finite second moments, if interpolant coefficients violate differentiability or boundary conditions, or if the corrupted observation x0 = m(x1) + σζ is inaccessible at inference time.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "stochastic-interpolants_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the specific number of training steps (or epochs) used to train the velocity model for the ImageNet super-resolution experiment, and how was this number determined?",
+      "gold_answer": "The paper does not specify the total number of training steps or epochs for the super-resolution experiment. This information is not provided in the paper.",
+      "grading_type": "abstention",
+      "source": "both"
+    }
+  ]
+}

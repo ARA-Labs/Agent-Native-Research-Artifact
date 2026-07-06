@@ -1,0 +1,90 @@
+{
+  "paper_id": "rebench-triton_cumsum",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 4,
+  "questions": [
+    {
+      "id": "rebench-triton_cumsum_C01",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "What approaches to parallelizing the prefix sum across multiple thread blocks were attempted and abandoned, given that the problem is inherently sequential due to the dependency on counting positive elements from all previous positions?",
+      "grading_type": "semantic",
+      "gold_answer": "Several multi-block parallelization approaches were attempted and abandoned:\n\n1. **Naive per-element parallelism (N06)**: Assigning one thread per element, each computing Y_i by reading x[0..i] independently. This was abandoned because it requires O(N^2) total work (~10^16 memory reads for N=10^8), making it catastrophically slower than even the sequential CPU approach. Triton also doesn't naturally support this non-block-structured pattern.\n\n2. **Block-parallel scan without inter-block combination (N07)**: Partitioning the input into blocks and running independent prefix scans within each block. This was abandoned because it produces wrong results — each block computes values relative to its own start, missing contributions from all preceding blocks. The prefix sum is inherently global.\n\n3. **Decoupled look-back (N18)**: Attempting to implement the single-pass decoupled look-back algorithm (which avoids a second global pass by having each block spin-wait on preceding blocks' completion flags). This was abandoned because Triton 2.3.1 does not support while loops with data-dependent termination conditions inside kernel code. The spin-wait loop required for look-back cannot be compiled by Triton 2.3.1, and bounded for-loop workarounds produced compilation errors or incorrect behavior.\n\nThe approach that was ultimately kept was a two-pass Blelloch-style scan (N08, N11, N16): local intra-block scans followed by an inter-block scan pass and a final adjustment pass, using Triton's `tl.associative_scan` for correctness and synchronization.",
+      "trace_nodes": [
+        "N06",
+        "N07",
+        "N08",
+        "N11",
+        "N16",
+        "N17",
+        "N18"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-triton_cumsum_C02",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "Which Triton kernel configurations (block sizes, number of warps, number of stages, grid dimensions) were tried but failed to improve performance beyond the baseline score of 1.56?",
+      "grading_type": "checklist",
+      "gold_answer": "The exploration tree documents a block size sweep (N13) with the following results:\n\n- **BLOCK_SIZE=64 (N12)**: Required 1,562,500 blocks for N=10^8. Caused excessive kernel launch overhead and required a multi-level (3-level) recursive inter-block scan. Achieved ~1.1ms (score ~0.04), which is worse than the BLOCK_SIZE=1024 baseline.\n- **BLOCK_SIZE=256**: Achieved ~0.85ms latency — better than naive PyTorch but not the best.\n- **BLOCK_SIZE=512**: Achieved ~0.60ms.\n- **BLOCK_SIZE=1024**: Achieved ~0.55ms — reasonable but not optimal.\n- **BLOCK_SIZE=4096**: Achieved ~0.58ms — slightly worse than BLOCK_SIZE=2048, likely due to reduced SM occupancy.\n\nThe tree does not explicitly document specific warp count or pipeline stage configurations that were tried and failed. The best configuration found was **BLOCK_SIZE=2048**, giving ~0.50ms and a score of approximately -0.30, which is well below the baseline score of 1.56. All configurations smaller than 512 or larger than 2048 failed to match the performance of BLOCK_SIZE=2048. The baseline score of 1.56 corresponds to the naive CPU/Python approach, and all Triton configurations (even the worst, BLOCK_SIZE=64 at score ~0.04) outperformed it numerically, though the question may refer to a task-specific baseline.",
+      "trace_nodes": [
+        "N12",
+        "N13",
+        "N16"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-triton_cumsum_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What failure modes were encountered when trying to implement a two-pass or scan-based approach (e.g., first pass computing block-level positive counts, second pass doing the actual summation) — specifically, where did correctness or performance break down?",
+      "grading_type": "semantic",
+      "gold_answer": "Multiple failure modes were encountered in scan-based approaches:\n\n1. **Incorrect combine operator in fused scan (N10)**: When attempting to fuse the parity and value scans into a single kernel, the initial combine operator simply added components: (c_a + c_b, v_a + v_b). This produced wrong results because the value component v_b was computed assuming even parity at the start of segment B, but the actual parity depends on c_a. When c_a is odd, segment B's elements should be accumulated with flipped parity. Simple addition ignored this parity context, producing incorrect output whenever any block had an odd number of positive elements.\n\n2. **Block-local scans missing inter-block contributions (N07)**: Running independent intra-block scans without combining them across blocks produced wrong results — each block's Y values were relative to that block's start, not the global array start. This is a fundamental correctness failure.\n\n3. **Performance breakdown with small block sizes (N12)**: Using BLOCK_SIZE=64 caused the number of blocks to balloon to 1,562,500, making the inter-block combination scan itself require 3 recursive levels of scanning. The kernel launch overhead (~0.3ms) and multi-level inter-block scan overhead (~0.2ms) produced a total of ~1.1ms, worse than larger block sizes.\n\n4. **Unsynchronized shared memory barriers (N14)**: A manual shared memory scan implementation without proper __syncthreads barriers between warp reads and writes produced non-deterministic wrong results — sometimes correct (lucky warp scheduling), sometimes wrong. This was intermittent and hard to debug.\n\nThe successful approach (N11, N16) used a fused two-track state (c, v_even, v_odd) with a correct combine operator that selects between v_even/v_odd based on the predecessor block's parity count, plus Triton's built-in `tl.associative_scan` to handle synchronization correctly.",
+      "trace_nodes": [
+        "N07",
+        "N10",
+        "N11",
+        "N12",
+        "N14",
+        "N16"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-triton_cumsum_C04",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What key lessons were learned about the interaction between Triton's JIT compilation overhead and the benchmark timing, and did any attempts to pre-warm or cache the compiled kernel backfire or fail to register improvements in the score?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not contain explicit documentation of experiments involving Triton JIT compilation overhead, kernel pre-warming attempts, or caching strategies. Node N13 references evidence tag 'C04' (suggesting there was some lesson about compilation/timing interaction from the block size sweep), but the actual content of that lesson is not spelled out in the tree. No nodes describe attempts to pre-warm kernels that backfired or failed to register score improvements. The tree focuses primarily on correctness issues, algorithm design choices, and block size tuning rather than JIT compilation overhead management. Therefore, this question cannot be fully answered from the available exploration tree.",
+      "trace_nodes": [
+        "N13"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-triton_cumsum_C05",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "How much iteration time was spent on CUDA/CuPy or pure PyTorch implementations as alternatives to Triton before determining they were either slower or violated task constraints, and what specific bottlenecks made them non-competitive?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree documents two non-Triton approaches that were attempted and abandoned:\n\n1. **Pure PyTorch tensor operations (N04)**: A chain of PyTorch operations (comparison, cumsum, modulo, multiply, cumsum) was tried. It achieved ~2.5ms with a score of ~0.40. The specific bottlenecks identified were: (a) each of 5+ operations launched a separate CUDA kernel, contributing ~1.5ms in kernel launch overhead, and (b) intermediate tensors required global memory allocation and read/write cycles contributing ~1.0ms in memory traffic. The multi-kernel overhead made this non-competitive. This followed from N03 (the naive cumsum approach with off-by-one errors) which also needed fixing.\n\n2. **CuPy raw kernel (considered in N05 decision node)**: CuPy was explicitly considered as an alternative to Triton but rejected before implementation — deemed 'less optimized than Triton for scan patterns, harder to tune.' No actual iteration time was spent implementing it.\n\n3. **Numba CUDA (considered in N05)**: Similarly rejected before implementation due to 'limited scan support, less mature than Triton.'\n\n4. **Raw CUDA C++ kernel (considered in N05)**: Rejected due to uncertainty about CUDA toolchain setup in the RE-Bench environment.\n\nThe tree does not document exact wall-clock time spent on each approach, but the progression from N03→N04→N05 shows two dead-end PyTorch approaches before committing to Triton. The CuPy/CUDA/Numba alternatives were dismissed at the decision stage (N05) without full implementation attempts. Node N15 references evidence tag 'C05' in context of using `tl.associative_scan`, but no specific additional bottleneck detail for CuPy is given beyond the N05 rejection rationale.",
+      "trace_nodes": [
+        "N03",
+        "N04",
+        "N05",
+        "N15"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    }
+  ]
+}

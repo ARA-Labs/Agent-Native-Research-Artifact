@@ -1,0 +1,119 @@
+{
+  "paper_id": "bridging-data-gaps",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "bridging-data-gaps_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the adapter layer initialization requirement (R12/R13): (a) What does R13 in rubric/requirements.md state about how adapter layer parameters must be initialized, and what is the parent context of this requirement? (b) Which file in the ARA artifact contains the implementation code for the adaptor module, and what does that file reveal about how initialization is actually handled? (c) What would be the consequence for the ANT training algorithm if this initialization requirement were violated — specifically, how would non-zero initialization affect the adaptor's behavior at the start of fine-tuning?",
+      "gold_answer": "(a) R13 states: 'The parameters of the adapter layer are initialized to zero.' The parent context is: 'The experimental setup to evaluate the DDPM and LDM models has been replicated.' This is a Code Execution requirement (category: Code Execution / Method Implementation) with weight 1. (b) The file src/execution/adaptor.py contains the adaptor module implementation. This file should show the zero-initialization of shift/scale parameters (e.g., torch.nn.init.zeros_ or setting weight/bias to zero tensors), reflecting the Noguchi & Harada 2019 adaptor design. (c) If parameters were initialized to non-zero values, the adaptor would immediately impose a non-trivial transformation on the pre-trained U-Net features at iteration 0, disrupting the pretrained model's learned representations before any target-domain signal has been incorporated. Zero initialization ensures the adaptor acts as an identity-like pass-through at the start, allowing gradual, stable adaptation via the similarity-guided loss (Equation 5) and adversarial noise objective (Equation 8).",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R13 requirement text: 'The parameters of the adapter layer are initialized to zero.'",
+        "Identifies src/execution/adaptor.py as the relevant ARA implementation file",
+        "Correctly states the parent context relates to experimental setup for DDPM and LDM evaluation",
+        "Explains that non-zero initialization would disrupt pretrained features and undermine stable fine-tuning from the start"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/adaptor.py"
+      ],
+      "rubric_requirement_id": "R13",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bridging-data-gaps_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the hyperparameter configuration requirements R65 and R66 in rubric/requirements.md: (a) What exact values do R65 and R66 specify for the hyperparameters J and omega, and in what context are these hyperparameters used? (b) Cross-referencing src/execution/tan_core.py, where and how are J and omega expected to appear in the adversarial noise selection procedure? (c) R66 is a Code Execution requirement while R65 is a Code Development requirement — what does this distinction imply about what an evaluator must verify differently for each, and how does logic/solution/algorithm.md corroborate these specific values?",
+      "gold_answer": "(a) R65 states: 'Code has been written to set the hyperparameters J and omega to 10 and 0.02, respectively, for adversarial noise selection.' R66 states: 'The hyperparameters J and omega are set to 10 and 0.02, respectively, for adversarial noise selection.' These govern the inner maximization loop (Equation 7): J is the number of adversarial noise update iterations, and omega is the step size for the PGD-style update. (b) In src/execution/tan_core.py, J controls the number of iterations in the inner loop that searches for adversarial noise epsilon, and omega is the gradient step size applied when updating epsilon to maximize classifier loss. The code should show a loop running exactly J=10 times with step size omega=0.02. (c) R65 (Code Development) requires verifying that the code contains these values as constants or configurable parameters — i.e., they appear in the source. R66 (Code Execution) requires verifying that at runtime these values are actually used during training, not overridden. logic/solution/algorithm.md describes Algorithm 1 and the adaptive inner maximum, corroborating that J iterations and step size omega define the adversarial noise selection procedure as formalized in Equation 7.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states J=10 and omega=0.02 from both R65 and R66 requirement texts",
+        "Identifies src/execution/tan_core.py as the implementation file where J and omega appear in the adversarial noise inner loop",
+        "Explains the Code Development vs Code Execution distinction: R65 requires code presence, R66 requires runtime correctness",
+        "References logic/solution/algorithm.md as corroborating the role of J and omega in the adaptive inner maximum (Equation 7)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/tan_core.py",
+        "logic/solution/algorithm.md"
+      ],
+      "rubric_requirement_id": "R66",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bridging-data-gaps_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R67/R68 in rubric/requirements.md specify exact training configuration values. (a) What does R67 state about learning rates, number of iterations, and batch size for DDPM and LDM models? (b) Cross-referencing src/configs/training.md, which of these values can be confirmed in the training configuration, and are there any discrepancies or gaps between the rubric requirement and the config file? (c) Given that R67 and R68 share the same Rubric ID (d96e73af-6bc0-405d-bebf-0730dca61911), what does this duplication imply about rubric structure, and how does the value gamma=5 from R62 interact with the learning rate configuration to define the full experimental setup?",
+      "gold_answer": "(a) R67 states: 'The learning rate is set to 0.00005 for DDPM and 0.00001 for LDM. Both models are trained for 300 iterations and a batch size of 40.' This falls under Code Execution / Experimental Setup with weight 1, parent context being replication of the experimental setup to evaluate DDPM and LDM models. (b) src/configs/training.md should contain fields for learning_rate, num_iterations (or steps), and batch_size. The DDPM learning rate (5e-5) and LDM learning rate (1e-5) should be listed separately, with 300 iterations and batch size 40. Any absent or differing values indicate a gap between the rubric requirement and the implemented config. (c) The shared Rubric ID between R67 and R68 indicates this requirement appears twice in the rubric (likely a duplication artifact), meaning both Code Development and Code Execution aspects are captured under the same identifier — an evaluator must check both code presence and runtime execution. R62 specifies gamma=5 for similarity-guided training; combined with LR=5e-5 (DDPM) or 1e-5 (LDM), 300 iterations, batch size 40, and J=10/omega=0.02, these collectively define the complete hyperparameter configuration for the ANT training procedure.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R67: learning rate 0.00005 for DDPM, 0.00001 for LDM, 300 iterations, batch size 40",
+        "Identifies src/configs/training.md as the cross-reference file and discusses whether values match",
+        "Notes the duplicate Rubric ID shared by R67 and R68 and explains its implication for evaluation",
+        "Connects R62 (gamma=5) to R67 values to describe the complete experimental hyperparameter configuration"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R67",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bridging-data-gaps_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirements R55/R56 and R57/R58 in rubric/requirements.md describe two related but distinct classifier training experiments. (a) What is the precise difference between what R56 and R58 require, and what are their exact requirement texts? (b) Cross-referencing src/execution/classifier.py, how does the classifier training code accommodate both the 10-adapted-image and 100-adapted-image variants — specifically, what parameter or argument controls the number of adapted images used? (c) How do evidence/tables/table1_intra_lpips.md or evidence/tables/table2_fid.md record results from these experiments, and what do R55-R58 collectively imply about the role of data augmentation via DPM-ANT in downstream classifier performance?",
+      "gold_answer": "(a) R56 states: 'The DPM-ANT model was used to transfer FFHQ to Sunglasses, and a classifier was trained on 10 adapted images.' R58 states: 'The DPM-ANT model was used to transfer FFHQ to Sunglasses, and a classifier was trained on 100 adapted images.' The difference is the number of adapted images used to train the downstream classifier: 10 vs 100. R55 and R57 are the corresponding Code Development requirements (code written), while R56 and R58 are Code Execution requirements (actually executed). (b) src/execution/classifier.py should expose a parameter (e.g., n_samples, num_images, or train_size) that can be set to 10 or 100 to control the adapted image count for the training split. The DPM-ANT model generates the adapted images, which are then fed to the classifier training loop with the specified count. (c) evidence/tables/table2_fid.md or evidence/tables/table1_intra_lpips.md may record classifier accuracy results showing improvement from 10 to 100 adapted images. Collectively, R55-R58 imply that DPM-ANT serves as a data augmentation mechanism: by generating high-quality domain-adapted images, it enables training classifiers with more diverse data even in few-shot settings, with the 10 vs 100 comparison demonstrating scalability of the augmentation benefit.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes both R56 (10 adapted images) and R58 (100 adapted images) exact requirement texts",
+        "Identifies src/execution/classifier.py as the implementation file and describes the parameter controlling image count",
+        "Distinguishes Code Development (R55, R57) from Code Execution (R56, R58) requirement pairs",
+        "Explains the collective implication: DPM-ANT as data augmentation for downstream classifiers in few-shot settings"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/classifier.py",
+        "evidence/tables/table2_fid.md"
+      ],
+      "rubric_requirement_id": "R56",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bridging-data-gaps_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R10 and R11 in rubric/requirements.md specify a constraint unique to the LDM variant of the ANT method. (a) What do R10 and R11 state precisely about which parts of the LDM are fine-tuned versus kept fixed, and how does this differ from the DDPM fine-tuning approach implied by other requirements? (b) Cross-referencing logic/solution/architecture.md, how does the architectural description of LDM (latent diffusion model) justify why the autoencoder and pre-trained DPM components must be frozen — what role does the shift module of the U-Net play specifically? (c) Requirements R12/R13 (zero initialization of adapter) and R10/R11 (fixed autoencoder/DPM) together define a constrained fine-tuning regime — consulting src/execution/tan_core.py, what implementation pattern (e.g., requires_grad flags, parameter groups) would satisfy both constraints simultaneously, and what does evidence/figures/figure4_ablation.md reveal about why this constrained approach outperforms full fine-tuning?",
+      "gold_answer": "(a) R10 states: 'Code has been written to fine-tune a pre-trained LDM in the shift module of the U-net. The pre-trained DPM and autoencoders in LDM are kept fixed.' R11 states: 'A pre-trained LDM has been fine-tuned in the shift module of the U-net. The pre-trained DPM and autoencoders in LDM are kept fixed.' This contrasts with DDPM fine-tuning (e.g., R46-R52) where all parameters are updated; for LDM-ANT, only the shift module parameters are trainable. (b) logic/solution/architecture.md describes the LDM as consisting of a pre-trained autoencoder (encoder+decoder) operating in latent space, plus a U-Net diffusion model. The shift module (from the Noguchi & Harada adaptor, R03) inserts lightweight affine-transform layers into the U-Net. Freezing the autoencoder preserves the latent space structure; freezing the DPM backbone preserves source-domain priors; only the shift parameters adapt to the target domain, preventing overfitting with 10 shots. (c) In src/execution/tan_core.py, the implementation should set requires_grad=False on all autoencoder and backbone DPM parameters, while only the shift/adaptor module parameters (initialized to zero per R13) have requires_grad=True. The optimizer parameter group should include only shift module parameters. evidence/figures/figure4_ablation.md shows that constrained fine-tuning (shift-only) produces better Intra-LPIPS scores than full fine-tuning, confirming that restricting the trainable parameter space prevents mode collapse and overfitting in the 10-shot regime.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes both R10 and R11 requirement texts specifying shift-module-only training with frozen DPM and autoencoders",
+        "Explains from logic/solution/architecture.md why freezing autoencoder and DPM backbone is architecturally justified for LDM",
+        "Identifies the requires_grad=False pattern in src/execution/tan_core.py as the implementation mechanism satisfying R10/R11 and R12/R13 simultaneously",
+        "References evidence/figures/figure4_ablation.md to explain why constrained fine-tuning outperforms full fine-tuning in the 10-shot setting"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "logic/solution/architecture.md",
+        "src/execution/tan_core.py",
+        "evidence/figures/figure4_ablation.md"
+      ],
+      "rubric_requirement_id": "R11",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "paper_id": "sample-specific-masks",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 3,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "sample-specific-masks_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the average accuracy of SMM on ResNet-50 across all 11 datasets reported in Table 1?",
+      "gold_answer": "56.35%",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "sample-specific-masks_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the average test accuracy of SMM on ViT-B32 across 11 benchmark datasets, and what is the best-performing shared-mask baseline average on the same setting?",
+      "gold_answer": "SMM achieves 72.4% average accuracy on ViT-B32; the best shared-mask baseline is MEDIUM watermarking at 65.2%.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A03",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the initial learning rates used for δ and φ when training SMM on ResNet backbones, and at which epochs does the learning rate decay occur?",
+      "gold_answer": "Both δ and φ use an initial learning rate of 0.01 for ResNet. Learning rate decay (γ=0.1) is applied at epochs 100 and 145 within a 200-epoch training schedule.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A04",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "How does the patch-wise interpolation module handle non-divisible edge cases when upscaling the CNN-generated mask back to full image resolution?",
+      "gold_answer": "Non-divisible edge cases are handled by mirroring the nearest patch (nearest-patch mirroring).",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The theoretical proof that Fshr ⊆ Fsmm relies on a specific construction involving the last CNN layer. What is that construction, and how many parameters does the mask generator add relative to the pre-trained ResNet-18 model?",
+      "gold_answer": "The construction sets all weights in the last CNN layer to zero and sets the bias to M (the flattened binary shared mask), so fmask(r(x)) = M for all x, showing any shared-mask hypothesis is in Fsmm. The mask generator adds 26,499 parameters, which is 0.23% of ResNet-18's parameters.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A06",
+      "category": "design_rationale",
+      "difficulty": "T2_scattered",
+      "question": "Why does SMM use three output channels in the mask generator rather than a single channel, and what empirical evidence supports this design choice?",
+      "gold_answer": "Three-channel masks allow the model to weight the noise pattern differently per color channel, benefiting both rich-color images (e.g., CIFAR) and monotonous-color images (e.g., SVHN). The ablation study (Table 3) shows that the single-channel variant achieves an average accuracy of 49.70% on ResNet-18 vs. 52.53% for the full three-channel SMM, a degradation of 2.83 percentage points, with particularly large gaps on datasets like GTSRB (70.7% vs 80.4%) and Flowers102 (30.2% vs 38.7%).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "sample-specific-masks_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "On the StanfordCars dataset, does SMM improve over shared-mask baselines, and what does this reveal about the boundary conditions of visual reprogramming?",
+      "gold_answer": "No. On StanfordCars, SMM (ResNet-18: 2.9%, ResNet-50: 3.0%, ViT-B32: 4.8%) actually performs slightly worse than or comparable to shared-mask baselines (e.g., PAD: 4.5%/4.7%/4.7%). This reveals that VR fundamentally fails on fine-grained recognition tasks with subtle inter-class differences (196 car classes), and SMM does not overcome this limitation — adding fmask may even marginally hurt when VR itself is ineffective.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A08",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "Across the three label mapping methods (Ilm, Flm, Rlm), which one benefits the most from SMM on average, and what is the average improvement for that method on ResNet-18?",
+      "gold_answer": "Random label mapping (Rlm) benefits the most from SMM, with an average improvement of +8.94% (from 33.39% to 42.32%) across 11 datasets on ResNet-18.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A09",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the complete spatial dimension transformations that occur in the 5-layer CNN mask generator for ResNet (input 224×224×3), including the effect of each layer type on spatial resolution.",
+      "gold_answer": "The 5-layer CNN for ResNet processes as follows: Conv3×3 (pad=1, stride=1) preserves 224×224; MaxPool 2×2 halves to 112×112; Conv3×3 preserves 112×112; MaxPool 2×2 halves to 56×56; Conv3×3 preserves 56×56; MaxPool 2×2 halves to 28×28; Conv3×3 preserves 28×28; final Conv3×3 outputs 28×28×3. The patch-wise interpolation then upscales back to 224×224×3 using 8×8 block replication (patch size = 2^3 = 8).",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sample-specific-masks_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the optimal learning rate for the mask generator when training SMM on the SVHN dataset with ViT-B32, as determined by the hyperparameter search reported in the paper?",
+      "gold_answer": "The paper does not report dataset-specific optimal learning rates for SVHN with ViT-B32. The hyperparameter search (Table 7) was conducted only on CIFAR10 with ViT-B32, and the resulting unified parameters (alpha=0.001, gamma=1) were applied to all datasets including SVHN without reporting per-dataset optimal values.",
+      "grading_type": "abstention",
+      "source": "pdf"
+    }
+  ]
+}

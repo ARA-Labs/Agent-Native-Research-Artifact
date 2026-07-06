@@ -1,0 +1,101 @@
+{
+  "paper_id": "self-composing-policies",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "self-composing-policies_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is CompoNet's average performance (mean ± std) and forward transfer on the Freeway task sequence as reported in Table 1?",
+      "gold_answer": "Performance: 0.94±0.06, Forward Transfer: 0.80±0.07",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "self-composing-policies_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What is the PPO clipping coefficient used for the SpaceInvaders and Freeway task sequences?",
+      "gold_answer": "0.2",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "self-composing-policies_A03",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "What are the three main blocks that constitute the self-composing policy module in CompoNet?",
+      "gold_answer": "The output attention head, the input attention head, and the internal policy.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "self-composing-policies_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the key architectural difference between the Output Attention Head and the Input Attention Head in CompoNet regarding how they compute their values matrix V?",
+      "gold_answer": "The Output Attention Head uses no learned transformation on the values — V equals the raw previous policy outputs Φ^{k;s} directly. The Input Attention Head applies a learned linear transformation W^V_in to the concatenated matrix P=[v; Φ^{k;s}], so V = P·W^V_in. This means the input head has an additional learnable parameter W^V_in that the output head lacks.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "self-composing-policies_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What hidden dimension (dmodel) and batch size are used for the Meta-World sequence versus the SpaceInvaders/Freeway sequences?",
+      "gold_answer": "Meta-World uses dmodel=256 and batch size=128 (SAC). SpaceInvaders/Freeway use dmodel=512 and batch size=1024 (PPO).",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "self-composing-policies_A06",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "What are the Reference Forward Transfer (RT) values for all three task sequences, and in which sequence is RT negative?",
+      "gold_answer": "Meta-World RT = −0.06 (negative), SpaceInvaders RT = 0.70, Freeway RT = 0.67. The Meta-World sequence has a negative RT, indicating high inter-task interference even for the best single-source fine-tuning transfer.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "self-composing-policies_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The paper claims CompoNet's parameter count grows linearly with the number of tasks. What architectural property of the self-composing policy module enables this, and what is the big-O memory complexity stated?",
+      "gold_answer": "Each self-composing policy module has a constant number of parameters (six linear transformations and a feed-forward block) whose sizes depend only on fixed hyperparameters (denc, dmodel, |A|), not on the number of tasks. The attention mechanism operates over a variable-length sequence without adding new parameters — only the input sequence length changes at inference time, not the weight dimensions. Therefore the total memory complexity is O(m·n) = O(n), i.e., linear in the number of tasks n.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "self-composing-policies_A08",
+      "category": "design_rationale",
+      "difficulty": "T2_scattered",
+      "question": "Why does CompoNet reset the critic network at every task boundary while keeping the actor modules frozen, and why is this applied uniformly to all baseline methods?",
+      "gold_answer": "The critic (value function or Q-network) is reset because it encodes task-specific reward structure. Carrying over a critic trained on a previous task's rewards would provide misleading value estimates under the new task's reward function, destabilizing actor training. The actor modules are frozen (not reset) to preserve learned policies. Applying this reset uniformly to all methods ensures fair comparison — no method gains an unfair advantage or disadvantage from stale critic estimates.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "self-composing-policies_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "FT-1 achieves higher forward transfer than the Baseline in SpaceInvaders (0.73±0.25 vs 0.00±0.00) yet lower average performance (0.44±0.50 vs 0.56±0.37). What does this apparent contradiction reveal about the relationship between forward transfer and average performance as metrics?",
+      "gold_answer": "This reveals that forward transfer measures learning speed relative to the from-scratch baseline during each task's training window (high AUC), while average performance measures final task success rates at the end of the entire sequence. FT-1 achieves high forward transfer because fine-tuning accelerates early learning, but suffers severe catastrophic forgetting — previously learned tasks are overwritten, collapsing their final performance. Average performance aggregates final performance across all tasks including forgotten ones, so the forgetting penalty dominates and FT-1's score falls below the Baseline, which retains each task's performance since it trains from scratch each time without overwriting prior tasks.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "self-composing-policies_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What was the specific hyperparameter search procedure (e.g., grid search ranges, number of trials, search algorithm) used to select dmodel=256 for CompoNet's attention heads in the Meta-World experiments?",
+      "gold_answer": "The paper does not specify any hyperparameter search procedure for selecting dmodel=256. The value is stated as a fixed design choice in the appendix model configurations, but no search range, number of trials, or search algorithm is described for this parameter.",
+      "grading_type": "abstention",
+      "source": "both"
+    }
+  ]
+}

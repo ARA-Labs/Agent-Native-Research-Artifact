@@ -1,0 +1,28 @@
+session:
+  id: "2026-04-15_002"
+  timestamp: "2026-04-15"
+  summary: "Clarified that the Compiler uses only Seal Level 1 in-loop, with Levels 2-3 deferred to downstream review, then rebuilt the paper successfully"
+
+events_logged:
+  - type: decision
+    id: "N110"
+    provenance: user
+    summary: "User clarified that the ingestor or Compiler should use only Seal Level 1 as the in-loop verifier"
+
+ai_actions:
+  - action: "Updated paper/sections/ingestor.tex so the intro, figure caption, validation paragraph, and post-compilation verification text all state that only Seal Level 1 runs in-loop"
+    provenance: ai-executed
+    files_changed:
+      - "paper/sections/ingestor.tex"
+
+  - action: "Cleaned stale LaTeX aux state after an interrupted compile and rebuilt the paper successfully"
+    provenance: ai-executed
+    files_changed:
+      - "paper/main.pdf"
+
+claims_touched: []
+
+open_threads:
+  - "If needed, align any code-side documentation for the compiler or seal prompts with the paper's Level 1 only in-loop verification design"
+
+ai_suggestions_pending: []

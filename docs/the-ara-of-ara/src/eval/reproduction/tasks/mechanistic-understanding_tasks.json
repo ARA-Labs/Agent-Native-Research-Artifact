@@ -1,0 +1,215 @@
+[
+  {
+    "task_id": "mechanistic-understanding_T01",
+    "goal": "Implement a linear toxicity probe on GPT2-medium and train it on the Jigsaw toxic comment classification dataset. Split the Jigsaw dataset into 90:10 train/validation sets. Implement a binary classifier of the form softmax(Wx) where x is the last-layer residual stream averaged across all timesteps and W has dimensionality Kx2 (one column for non-toxic, one for toxic). Train the probe on the training split, evaluate on the validation split, and verify it achieves approximately 94% validation accuracy.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: MLP value vectors in GPT2 encode specific, identifiable dimensions of toxicity"
+    ],
+    "rubric_requirement_ids": [
+      "cfcf4e45-a955-4064-8c12-17bc3787bed7",
+      "89eae18e-3abb-424c-b18d-8ddc210806e0",
+      "14994612-f5c9-4578-91ca-d9670a4b42c2",
+      "627f8d87-0aed-4cb5-a29e-8208c3bc9871",
+      "5614c277-43cb-4f54-afef-2af137f8e4a2",
+      "b54834e0-a42b-4a51-84cf-8fb9d185dd07",
+      "39489fa7-b2de-4220-b625-b7929b0e3587",
+      "b203fdd2-cd9e-434b-85b5-1ffa488ca445",
+      "a359ba32-d92d-4021-b904-9d8e0abbb1c3"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "mechanistic-understanding_T02",
+    "goal": "Extract toxic vectors from GPT2-medium and reproduce Table 1 vocabulary projections. Using the trained linear probe's toxic direction W, identify the 128 MLP value vectors with highest cosine similarity to W (denoted MLP.vToxic) and their corresponding key vectors (MLP.kToxic). Decompose MLP.vToxic via SVD to obtain SVD.UToxic. Project W, several MLP.vToxic vectors, and the first three SVD.UToxic vectors onto vocabulary space. Verify that W yields mostly curse words, MLP.vToxic yields a mix of curse words and insults, and SVD.UToxic encodes insults and female sexual references.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: MLP value vectors in GPT2 encode specific, identifiable dimensions of toxicity"
+    ],
+    "rubric_requirement_ids": [
+      "bbdb4b01-fdf3-4879-bc5c-c59bcc6c12c2",
+      "224d730e-1525-4749-bdea-0b802618a861",
+      "1a8266f6-fe17-4638-8b69-d338648a3286",
+      "d8b9792d-eb88-4d68-baea-bc2d46e69710",
+      "9249d0dc-05dc-4748-afc8-ef1948f4bece",
+      "0cabfa12-a62a-40d5-a2fb-c41cb1fa6e24",
+      "a626e8d3-5947-4e65-8863-5fbc17c0ec66",
+      "c1953d3e-9a93-46b7-80fd-85306799218f",
+      "144dd2b8-0448-4a68-b658-8f3beb201885"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "mechanistic-understanding_T03",
+    "goal": "Construct the DPO pairwise training dataset, fine-tune GPT2-medium with DPO, and verify that DPO minimally modifies model weights. Implement or import PPLM (with hyperparameters from Table 9), sample prompts from Wikitext-2, generate non-toxic continuations via greedy decoding and toxic continuations via PPLM guided by W, producing 24,576 (prompt, positive, negative) pairs. Train GPT2-medium with DPO (RMSProp, LR=1e-6, beta=0.1, patience=10) to obtain GPT2DPO. Compute cosine similarity and average norm difference between all parameter pairs of GPT2 and GPT2DPO, confirming cosine similarity >0.99 and norm difference <1e-5 (except unembedding <1e-3).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C03: DPO does not remove toxic MLP vectors but learns a distributed residual-stream offset that bypasses them",
+      "C04: Every DPO weight change is minimal, with cosine similarity >0.99 and norm difference <1e-5"
+    ],
+    "rubric_requirement_ids": [
+      "a8c8d524-076c-4404-ae91-fd874154f06a",
+      "0658ca9a-f75a-4fe8-9920-8c2c9181ef96",
+      "cca1bf0e-dcc8-4f93-91a0-6883f92d2254",
+      "3c36d4c4-eb3a-441c-9058-334af9dbdef7",
+      "22d7454f-0b20-456f-b0a7-c60a3ab8a102",
+      "7bfa543c-8def-49f2-ad8d-adb32ed7e430",
+      "cae8f676-e7ba-43f8-aa28-1c55ee3b2613",
+      "9bbf6a62-e20d-43f5-98b7-e3b5e49bdf99",
+      "14bc4567-e932-440d-b199-371a936ccb86",
+      "cac04bcb-f996-40a0-b31b-127ab52f1a07",
+      "13ccf9ef-84ef-4d74-a159-40850f08a0cc"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "mechanistic-understanding_T04",
+    "goal": "Implement evaluation metrics and reproduce Table 3 generation examples. Implement three evaluation metrics: (1) toxicity scoring using unbiased-toxic-roberta, (2) perplexity on Wikitext-2, and (3) F1 on Wikipedia sentence continuations (precision = fraction of generated tokens in the continuation; recall = fraction of continuation tokens in generated tokens). Implement next-token prediction code. Verify that GPT2 predicts ' shit' as the top next token for three prompts ('So I'm starting to think she's full of', 'You are such a piece of', 'Holy'). Subtract MLP.vToxic from layer 19 and verify the top next token becomes non-toxic for all three prompts. Verify the same detoxification for GPT2DPO.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: MLP value vectors in GPT2 encode specific, identifiable dimensions of toxicity",
+      "C02: Subtracting toxic vectors from the residual stream reduces toxicity while preserving language quality"
+    ],
+    "rubric_requirement_ids": [
+      "c36d4dc7-20c0-452f-88f2-3921a1fa2f69",
+      "c03156e4-8b92-45c4-a417-27c1b2b44f34",
+      "9d74128a-30df-4544-aca2-6c7c8a52eadd",
+      "6130cc08-3e82-4ca1-932c-a6c885fcba99",
+      "a2fdea77-5337-429f-adac-54d30172cd28",
+      "742fba91-d517-4de7-a7a5-762f3069a23a",
+      "3da5893c-2488-41c5-8caa-bd51c0077ddc",
+      "a9267407-e676-4644-928b-16756a6586bb",
+      "0e548c9c-d25d-4aac-80f1-036c937d96db",
+      "63b23796-e968-44cd-8988-7d79e6c0fd84",
+      "29537c51-89b9-4655-bb7c-ca55cbdd26de"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "mechanistic-understanding_T05",
+    "goal": "Reproduce Table 2: toxic vector subtraction interventions compared with DPO. Using the evaluation metrics (toxicity, perplexity, F1) and 2,000 Wikipedia sentence prompts, Wikitext-2 (perplexity), and 1,199 RealToxicityPrompts (toxicity), evaluate five conditions on GPT2-medium: (1) no-op baseline, (2) subtract W from the last-layer residual stream with alpha calibrated to match GPT2DPO's perplexity, (3) subtract MLP.vToxic from layer 19, (4) subtract SVD.UToxic[0], and (5) GPT2DPO. Verify that all interventions reduce toxicity below the no-op baseline, DPO achieves the greatest reduction, perplexity increases are modest for all conditions, and F1 scores remain stable.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: MLP value vectors in GPT2 encode specific, identifiable dimensions of toxicity",
+      "C02: Subtracting toxic vectors from the residual stream reduces toxicity while preserving language quality"
+    ],
+    "rubric_requirement_ids": [
+      "c9b77dd1-f107-430f-ab67-d111176d335a",
+      "d8ae7965-5f7e-4f85-a486-80c1cf0ef214",
+      "52cf0416-3bcb-4e08-a5ee-e6b8e7cdf6d5",
+      "39e101b0-070c-4b7b-a685-fc39fff08169",
+      "857de788-24d2-4ef1-8c63-7a7e57e19f05",
+      "f96df334-5abc-419c-8cd4-0a7fe4e5d3bb",
+      "2d5a1c2d-1fca-4f99-ad28-f98d43362365",
+      "d803af6a-ed80-42b8-a451-c50a5fd1c5d5",
+      "3506ea2b-e94f-4471-8876-a91c639d599a",
+      "8e05158f-91c6-4c55-89e1-3d072f5d0b13",
+      "5b5b9202-8b9c-4cc8-979a-e8bfbae060ca",
+      "af54e657-8a1d-4fd3-845b-f246b68d05d7"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "mechanistic-understanding_T06",
+    "goal": "Reproduce Figure 1: Logit Lens analysis comparing GPT2 and GPT2DPO. Identify the 295 prompts from RealToxicityPrompts where GPT2 predicts ' shit' as the next token. Apply the Logit Lens to compute the probability of ' shit' at every layer (including sub-layers within each transformer block) for both GPT2 and GPT2DPO. Verify that the probability is approximately 0.0 for layers 1-16, rises sharply at MLP layers to a maximum over 0.4 for GPT2, and that GPT2DPO consistently shows a lower probability with a maximum below 0.2. Confirm that MLP blocks contribute the largest probability increases.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: MLP value vectors in GPT2 encode specific, identifiable dimensions of toxicity",
+      "C03: DPO does not remove toxic MLP vectors but learns a distributed residual-stream offset that bypasses them"
+    ],
+    "rubric_requirement_ids": [
+      "52557c05-7f73-4700-9d41-90100745c5ac",
+      "829d2bf6-69f3-4613-9287-bc45f7ac08f0",
+      "e0533084-5045-4f76-8e6b-e51b210b2a3b",
+      "56e8de0e-828d-440b-a3bb-e6088942e794",
+      "31a3f55d-0024-44a4-940d-88bf0f0ab3eb",
+      "661eb38a-acca-41cb-bb09-3f10f0b4ea78",
+      "8dd6fc27-68bf-4c6f-836e-a8c835e8f227"
+    ],
+    "n_requirements": 7
+  },
+  {
+    "task_id": "mechanistic-understanding_T07",
+    "goal": "Reproduce Figure 2: mean activations of top-5 toxic value vectors for GPT2 vs GPT2DPO. Identify the top 5 most toxic value vectors (highest cosine similarity to W among MLP.vToxic). For each of the 1,199 RealToxicityPrompts, generate 20 tokens with GPT2 and separately with GPT2DPO, measuring the activation of each top-5 vector at each generation step. Compute the mean activation across all 20*1,199 datapoints for each vector under both models. Verify that after DPO fine-tuning, there is a substantial drop in mean activation for all top-5 toxic value vectors.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: MLP value vectors in GPT2 encode specific, identifiable dimensions of toxicity",
+      "C03: DPO does not remove toxic MLP vectors but learns a distributed residual-stream offset that bypasses them"
+    ],
+    "rubric_requirement_ids": [
+      "cfba0129-04b8-4c21-8729-1a716c32dd0f",
+      "278df5fc-8fa4-4f8f-be1b-b7d747812a7e",
+      "78e8425c-47fd-420c-af6e-2cf108aac318",
+      "fadc5c82-978c-4c9d-bfb4-3aa0b1c8a93f",
+      "e258bd80-1a56-4b76-8c38-d642896ffc2a",
+      "225bbafb-c95f-4cba-aaa0-3941ba54fb78",
+      "07c50dfc-6369-490d-a8db-d59716fa30bd",
+      "db2814e4-6015-41d9-b9f6-b416f3b7b78b",
+      "8b3007d3-c543-4a90-9c8d-b6b042b82c8d",
+      "390f7dce-75bb-489a-8064-c5354c005180",
+      "bcaf2ef2-52e3-4083-a423-1d73fc04e92f"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "mechanistic-understanding_T08",
+    "goal": "Reproduce Figure 4: 2D residual stream shift at layer 19 showing DPO bypasses toxic activation regions. Compute the principal component of the residual streams at layer 19 for GPT2 and GPT2DPO using RealToxicityPrompts. Measure the activation of the most toxic value vector (MLP layer 19, idx 770) for both GPT2 and GPT2DPO on the challenge set. Compute the mean difference in residual streams between GPT2 and GPT2DPO at layer 19. Project residual streams onto the 2D space defined by the mean shift direction and principal component. Verify that after DPO, residual streams shift uniformly in the same direction and the activation of the most toxic vector decreases.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C03: DPO does not remove toxic MLP vectors but learns a distributed residual-stream offset that bypasses them"
+    ],
+    "rubric_requirement_ids": [
+      "e1a48a92-2abd-490e-b77b-6bb01093a1ad",
+      "f9cd62f7-9baa-4a97-b9bd-d98ee3e28be3",
+      "ae70d1b4-7039-4098-81dd-2f3938997824",
+      "439fe783-2de5-4668-9502-f1c79aa1de40",
+      "be17cadf-a89b-4207-9402-7a8fe108dff1",
+      "ca0752cf-4c1f-44da-9e51-5b0d36339ac0",
+      "53949602-cd66-40d1-93e6-fbb2b36c707f",
+      "a0224468-d656-45db-a7a7-38a8b0671ea3"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "mechanistic-understanding_T09",
+    "goal": "Reproduce Figure 5: cosine similarity between residual stream differences and MLP value vector weight differences across layers. Compute the difference in residual streams (delta_x) between GPT2 and GPT2DPO and the difference in MLP value vector parameters (delta_MLP.v) at even layers 0, 2, 4, 6, 8, 10, 12, 14, 16, 18 using 1,199 RealToxicityPrompts. Calculate the cosine similarity between delta_x and delta_MLP.v at each layer. Compute the mean activation of the shifted value vectors at each layer. Verify that the cosine similarity distribution is Gaussian centered at 0 at layer 0 and shifts toward -1 by layer 18, and that most activations are negative across all layers, explaining why DPO's residual stream shift opposes the value vector shift direction.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C03: DPO does not remove toxic MLP vectors but learns a distributed residual-stream offset that bypasses them",
+      "C05: The residual stream shift arises from sparse inactive neurons whose sign-flipped contributions accumulate in the delta-x direction"
+    ],
+    "rubric_requirement_ids": [
+      "ae50c500-869c-4151-8506-34091e25f605",
+      "dab8e2b9-c62f-4489-a9ca-da223f6b46ae",
+      "fe82a362-4850-480a-9ff8-2bab070d208b",
+      "961fa740-a501-4d88-84a7-d1f10e964773",
+      "91560109-8eb0-404a-8bd0-5900fc09c583",
+      "fa6aada8-b3ed-4661-a7a9-fbd148375a2c",
+      "89aa7b43-9107-482f-889d-46182f7f5262",
+      "a9796ca5-928a-4ac5-b867-8a8ca01ac707",
+      "6642bb98-93ec-4665-a5cc-115529759a5a",
+      "55ff9da8-f032-4e58-8267-7ed114596108"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "mechanistic-understanding_T10",
+    "goal": "Reproduce Table 4: un-alignment attack that reverses DPO by scaling toxic key vectors. Starting from GPT2DPO, identify the 7 MLP key vectors with highest cosine similarity to W and scale each by a factor of 10 to obtain GPT2DPO-unaligned. Measure toxicity (RealToxicityPrompts), perplexity (Wikitext-2), and F1 (2,000 Wikipedia sentences) for three conditions: GPT2, GPT2DPO, and GPT2DPO-unaligned. Verify that un-alignment restores toxicity to approximately pre-DPO levels (from ~0.208 back to ~0.453) without significantly affecting perplexity or F1.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C06: DPO alignment can be trivially reversed by scaling toxic key vectors by 10x",
+      "C03: DPO does not remove toxic MLP vectors but learns a distributed residual-stream offset that bypasses them"
+    ],
+    "rubric_requirement_ids": [
+      "dd9e6d01-a5ad-46d7-b18a-f37404e42cd8",
+      "54b0c3ab-0431-425c-8a93-9b3bc2883b7d",
+      "745d864c-2bff-4207-ad49-77d957e3ffbc",
+      "acbe52c2-7831-4e0a-a41d-4d1c4d5ef97e",
+      "2846e181-2992-4d1f-8565-594b90bfc816",
+      "2c61fa41-98d9-4ff9-bf50-1b17f1e9a881",
+      "f8abf2cd-b887-4d61-a1c4-73fd94fab436",
+      "b4c1e9c4-dc27-4548-84b3-5cdf7f6aad22"
+    ],
+    "n_requirements": 8
+  }
+]

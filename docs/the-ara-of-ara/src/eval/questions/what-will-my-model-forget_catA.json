@@ -1,0 +1,101 @@
+{
+  "paper_id": "what-will-my-model-forget",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 3,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "what-will-my-model-forget_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the F1 score achieved by representation-based forecasting on BART0Large with LM head-only tuning on P3-Test?",
+      "gold_answer": "79.32",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "what-will-my-model-forget_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the FLOP count for the representation-based forecasting method when forecasting forgotten examples among 3,600 upstream pretraining examples given one online learning example on FLAN-T5Large (Full FT)?",
+      "gold_answer": "1.35×10^10 FLOPs (1.35e10)",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "what-will-my-model-forget_A03",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What positive-pair weight (α) is used in the representation-based forecasting model's BCE loss to handle class imbalance, and what is the corresponding batch composition?",
+      "gold_answer": "α = 0.1 for positive (forgotten) pairs; batch size = 16 total, composed of 8 positive pairs and 8 negative pairs per mini-batch.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "what-will-my-model-forget_A04",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "How many parameter update steps are performed on a single online learning example when applying LoRA or full fine-tuning to fix an error?",
+      "gold_answer": "30 steps",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "what-will-my-model-forget_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "In the representation-based forecasting model, what is the bias term added to capture frequency priors, and what loss function is used to train the encoding function h?",
+      "gold_answer": "The bias term is the log odds that the upstream example is forgotten: bj = log(|{xi in D_R^train | zij=1}| / |D_R^train|) - log(|{xi in D_R^train | zij=0}| / |D_R^train|). The model is trained with binary cross-entropy loss.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "what-will-my-model-forget_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "For FLAN-T5Large with LoRA fine-tuning in sequential model refinement, what is the EM Drop Ratio for (a) Vanilla FT, (b) Random replay, and (c) Representation-based replay? What encoder backbone is used for the representation-based forecasting model in FLAN-T5 experiments?",
+      "gold_answer": "(a) Vanilla FT: 4.384%; (b) Random replay: 1.910%; (c) Representation-based replay: 0.138%. The encoder backbone used for FLAN-T5 experiments is FLAN-T5Small (plus a freshly initialized 2-layer MLP).",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "what-will-my-model-forget_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Under what specific experimental conditions does the fixed logit-based forecasting method perform worst, and what F1 score does it achieve in that worst case? What is the proposed explanation for this failure?",
+      "gold_answer": "The fixed logit-based method performs worst on FLAN-T5Large with Full FT, achieving an F1 of 12.74 (lower than even the threshold baseline of 48.43). Under LoRA on FLAN-T5Large it also degrades severely to 19.54. The failure is attributed to the logit-change transfer phenomenon not holding for FLAN-T5 under LoRA or Full FT — the first-order NTK approximation and the assumption that logit changes transfer proportionally between examples breaks down for this model architecture and tuning regime.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "what-will-my-model-forget_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the representation-based forecasting model use averaged token representations rather than per-token representations as used in the logit-based model, and what computational advantage does this provide?",
+      "gold_answer": "The representation-based model uses averaged representations to produce a scalar inner product h(xj,yj)·h(xi,yi)^T directly, enabling a simple binary classifier without the T×T kernel matrix required by the logit-based model. This reduces complexity from O(NPT·T²·(H+V)) to O(NPT·H), making it the most computationally efficient forecasting method. The averaged representation also avoids the need to predict per-token logit changes, which is the mechanism that fails on FLAN-T5.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "what-will-my-model-forget_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "In Table 10, replaying 3 mini-batches (default) causes higher EM Drop (0.122%) than replaying just 1 mini-batch (0.064%) in the single-error setting, yet replaying 3 mini-batches causes lower EM Drop (0.038%) than 1 mini-batch (0.089%) in the multiple-error setting. What does this asymmetry reveal about the interaction between replay frequency and the number of online corrections being applied?",
+      "gold_answer": "In the single-error setting, replaying more batches causes overfitting to the replayed examples themselves, which paradoxically increases forgetting of non-replayed upstream examples. Since only one error is being fixed, the model has limited capacity to absorb both the correction and the replay signal, and excess replay disrupts the fine-tuning. In the multiple-error (sequential) setting, the cumulative forgetting from many corrections is large enough that more replay is beneficial — the replay signal counteracts compounding forgetting across the stream. This reveals that optimal replay frequency depends on the scale of the forgetting problem: sparse replay suffices for single corrections but more aggressive replay is needed to combat accumulating forgetting in continual streams.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "what-will-my-model-forget_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the specific LoRA rank (r) used when applying LoRA fine-tuning to BART0Large and FLAN-T5Large in the model refinement experiments?",
+      "gold_answer": "The LoRA rank is not specified anywhere in the paper. The paper mentions LoRA as one of three tuning setups and cites Hu et al. (2021), but provides no specific rank value.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "paper_id": "rice",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "rice_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "(a) According to requirement R52 in rubric/requirements.md, what specific technique must be implemented for the MuJoCo environments as part of the 'Ours' refining method, and what section of the paper describes it? (b) Which ARA file in src/execution/ directly implements this technique? (c) What does that implementation imply about the architectural relationship between the predictor and target networks in this technique?",
+      "gold_answer": "(a) R52 states: 'For the MuJoCo environments, Random Network Distillation (RND) for exploration has been implemented as outlined in Section 3.3.' This is categorized under Code Development / Method Implementation with weight 2, and is a sub-requirement of the 'Ours' Refining Method for MuJoCo environments. (b) The file src/execution/rnd.py directly implements RND for exploration in the MuJoCo setting. The companion file src/execution/rnd_model.py defines the model architecture used by RND. (c) RND requires two networks with identical architecture — a randomly initialized fixed target network and a trained predictor network — where the predictor is trained to minimize prediction error on the target network's outputs; states with high prediction error are considered novel/unexplored, driving curiosity-based exploration bonuses during the refining phase.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R52 as requiring Random Network Distillation (RND) for exploration as outlined in Section 3.3",
+        "Correctly identifies src/execution/rnd.py (and optionally src/execution/rnd_model.py) as the ARA file implementing this technique",
+        "Explains the predictor-target network relationship: fixed random target network and trained predictor network where prediction error signals novelty",
+        "Notes that high prediction error drives exploration bonuses during the refining stage"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/rnd.py",
+        "src/execution/rnd_model.py"
+      ],
+      "rubric_requirement_id": "R52",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "rice_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) Requirements R26 and R30 in rubric/requirements.md both address the mask network for MuJoCo environments but differ in a critical way — what exact distinction does R30 make versus R26 regarding the optimization method? (b) Which ARA file in src/execution/ reflects the optimized version described in R30, and what structural evidence in that file supports the optimization method switch? (c) What does this imply about why the 'Ours' method is presented as an improvement over the original StateMask method?",
+      "gold_answer": "(a) R26 states the mask network 'outputs 0 for critical steps and 1 otherwise' as part of the original StateMask method, while R30 states: 'For the MuJoCo environments, the optimization of the mask network objective now uses PPO rather than the prime-dual method.' R28 covers the original prime-dual optimization, whereas R30 explicitly replaces it with PPO, marking the 'Ours' variant. (b) The file src/execution/mask_network.py implements the mask network; the presence of PPO-compatible training loops, policy gradient updates, or references to a PPO optimizer in that file (rather than Lagrangian/dual variable updates) signals the R30-compliant optimization. (c) Switching from prime-dual (which requires solving a constrained optimization with dual variables and can be unstable) to PPO (a well-established, stable policy gradient method) implies that the 'Ours' method improves training stability and scalability, which is why it is presented as a contribution over the original StateMask — the same mask network architecture is retained but trained via a more reliable RL optimizer.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly contrasts R28 (prime-dual optimization for original StateMask) with R30 ('optimization of the mask network objective now uses PPO rather than the prime-dual method')",
+        "Identifies src/execution/mask_network.py as the relevant ARA file for the mask network implementation",
+        "Provides a structural reason from the file (PPO-style updates vs. dual variable updates) that supports the optimization method distinction",
+        "Explains the implication: PPO replaces prime-dual for improved stability/scalability, forming the core contribution of the 'Ours' variant"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/mask_network.py"
+      ],
+      "rubric_requirement_id": "R30",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "rice_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) Requirements R18, R19, and R20 in rubric/requirements.md specify observation normalization for certain MuJoCo environments but notably omit others — which environments require observation normalization and which do not, according to these requirements? (b) Which ARA file under src/configs/ contains configuration details that reflect this selective normalization policy? (c) What does this selective normalization imply about the experimental design — specifically why would some environments need normalization while others (e.g., Hopper) do not?",
+      "gold_answer": "(a) R18 states: 'In the (MuJoCo) Walker2d environment, the observations are normalized when training DRL agents.' R19 states: 'In the (MuJoCo) HalfCheetah environment, the observations are normalized when training DRL agents.' R20 states: 'In the (MuJoCo) Sparse HalfCheetah environment, the observations are normalized when training DRL agents.' Notably absent from normalization requirements are Hopper (R01/R02), Reacher (R05/R06), Sparse Hopper (R14/R15), meaning those environments do not require observation normalization per the rubric. (b) The file src/configs/training.md contains training configuration details that would reflect per-environment normalization flags or settings, indicating which environments enable observation normalization. (c) The selective normalization implies that Walker2d and HalfCheetah have observation spaces with larger or more heterogeneous feature scales that can destabilize learning without normalization, while Hopper and Reacher have naturally scaled observations. This design choice prevents gradient issues and improves sample efficiency specifically for environments where raw observations vary widely in magnitude.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies Walker2d (R18), HalfCheetah (R19), and Sparse HalfCheetah (R20) as requiring normalization, and notes Hopper/Reacher/Sparse Hopper are not listed",
+        "Identifies src/configs/training.md as the ARA configuration file reflecting per-environment normalization settings",
+        "Explains the implication of selective normalization in terms of observation scale differences across environments",
+        "Notes that the rubric's omission of Hopper from normalization requirements is a deliberate experimental design choice, not an oversight"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R18",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "rice_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "(a) Requirement R51 in rubric/requirements.md describes a specific data construction step for the MuJoCo 'Ours' refining method — what exactly must be constructed and how, according to the requirement text? (b) Which ARA file in src/execution/ implements the refining pipeline that would use this construction, and what does requirement R53 add about how this construction integrates with another component? (c) What does the combination of R51 and R53 imply about the initialization strategy used during the refining phase?",
+      "gold_answer": "(a) R51 states: 'For the MuJoCo environments, code for constructing a mixed initial state distribution by combining default initial states and critical states identified by the \"Ours\" explanation method has been implemented as described in Section 3.3.' This means the implementation must blend the environment's standard initial state distribution with critical states found by the mask network explanation method to form a combined initial state pool. (b) The file src/execution/rice_refine.py implements the refining pipeline; R53 states: 'For the MuJoCo environments, the refining method has been implemented as outlined in Algorithm 2, integrating the mixed initial state distribution and RND.' This means rice_refine.py must jointly use the mixed initial state distribution (R51) and Random Network Distillation (R52) as specified in Algorithm 2. (c) The combination implies a two-pronged initialization strategy: episodes are started from either default states or identified critical states (providing targeted coverage of hard regions), while RND bonuses drive further exploration from those starting points — together ensuring the refined policy improves precisely in the sub-optimal regions flagged by the explanation method.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R51: mixed initial state distribution combining default initial states and critical states from the 'Ours' explanation method, per Section 3.3",
+        "Identifies src/execution/rice_refine.py as the ARA file implementing the refining pipeline",
+        "Correctly cites R53 as requiring Algorithm 2 integration of the mixed distribution with RND in the same file",
+        "Explains the two-pronged implication: targeted initialization at critical states plus RND exploration bonuses for improved coverage of sub-optimal regions"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/rice_refine.py"
+      ],
+      "rubric_requirement_id": "R51",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "rice_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) Requirement R22 in rubric/requirements.md specifies the network architecture for the PPO agent in the selfish mining environment with unusual specificity — what is the exact architecture stated, and how does this differ from what the rubric says about MuJoCo policy network agents in R21? (b) Which ARA file under src/configs/ would reflect this architecture specification, and what hyperparameter entries would you expect to find there consistent with R22? (c) What does the rubric's decision to specify architecture details only for the selfish mining environment (but not MuJoCo in R21) imply about the reproducibility sensitivity of these two experimental domains?",
+      "gold_answer": "(a) R22 states: 'For the selfish mining environment, the policy network agents has been implemented. The network architecture of the PPO agent is a 4-layer Multi-Layer Perceptron (MLP) with a hidden size of 128, 128, 128, and 128 in each layer.' In contrast, R21 states only: 'For the MuJoCo environments, the policy network agents has been implemented' — with no architecture details specified, making R21 a vague/partial requirement and R22 architecturally explicit. (b) The file src/configs/model.md contains model architecture configuration; consistent with R22, one would expect entries specifying num_layers=4 and hidden_sizes=[128, 128, 128, 128] for the selfish mining PPO agent. (c) The rubric's specificity for selfish mining but vagueness for MuJoCo implies that the selfish mining environment's results are more sensitive to the exact network architecture — likely because the tabular-style discrete state space of selfish mining requires a carefully sized network to avoid underfitting or overfitting, whereas MuJoCo's continuous control tasks are robust to moderate architectural variation, so the rubric flags architecture as a key reproducibility factor only where it materially affects outcomes.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R22's exact architecture: '4-layer MLP with hidden size of 128, 128, 128, and 128 in each layer' and contrasts with R21's lack of architecture detail",
+        "Identifies src/configs/model.md as the ARA file where this architecture specification would be reflected",
+        "Notes expected entries in model.md: 4 layers, hidden sizes [128,128,128,128] for selfish mining PPO agent",
+        "Explains the reproducibility implication: selfish mining architecture is specified because it is sensitivity-critical, while MuJoCo is architecturally flexible per the rubric's design"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/model.md"
+      ],
+      "rubric_requirement_id": "R22",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

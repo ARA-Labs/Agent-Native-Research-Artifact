@@ -1,0 +1,74 @@
+session:
+  id: "2026-03-14_001"
+  timestamp: "2026-03-14T21:00"
+  summary: "Trimmed enriched RE-Bench/Speedrun ARAs to minimal kernel; re-ran eval → Cat A 90.0%, Cat C 57.5%; updated paper"
+
+events_logged:
+  - type: decision
+    id: N48
+    provenance: user
+    summary: "Trim enriched ARAs to minimal kernel — delete execution/ and kernel/*.py, keep notes.md + configs"
+  - type: experiment
+    id: N49
+    provenance: ai-executed
+    summary: "Re-ran Understanding eval on trimmed ARAs: Cat A 90.0% (+3.9pp), Cat C 57.5% (+37.5pp), Overall 82.2% (+12.0pp)"
+  - type: dead_end
+    id: N50
+    provenance: ai-suggested
+    summary: "Trimming src/ alone does not recover Cat C from enrichment regression (stayed at 57.5%)"
+  - type: heuristic
+    id: H12
+    provenance: user-revised
+    summary: "Minimal kernel = algorithm notes with inline snippets, not raw code files"
+  - type: heuristic
+    id: H13
+    provenance: ai-suggested
+    summary: "Context dilution creates Cat A vs Cat C trade-off in ARA evaluation"
+  - type: observation
+    id: O30
+    provenance: ai-suggested
+    summary: "Speedrun Cat C (n=5) too small for stable LLM judge evaluation"
+  - type: observation
+    id: O31
+    provenance: ai-suggested
+    summary: "Enrichment-trimming cycle reveals fundamental tension between Physical Layer richness and Trace Layer retrieval"
+
+ai_actions:
+  - action: "Deleted src/execution/ from all 8 enriched artifacts (scoring scripts, starter code)"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/rebench-*/src/execution/", "code/artifacts/nanogpt-speedrun/src/execution/"]
+  - action: "Deleted raw .py/.sh files from src/kernel/ in 7 RE-Bench artifacts"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/rebench-*/src/kernel/*.py"]
+  - action: "Re-ran eval pipeline (answer + judge + analyze) for 8 papers"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/"]
+  - action: "Updated evaluation.tex table and prose with final numbers"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+  - action: "Updated abstract.tex with final Understanding numbers"
+    provenance: ai-executed
+    files_changed: ["paper/sections/abstract.tex"]
+  - action: "Updated conclusion.tex with final Understanding numbers"
+    provenance: ai-executed
+    files_changed: ["paper/sections/conclusion.tex"]
+
+claims_touched:
+  - id: C04
+    action: advanced
+    provenance: ai-executed
+  - id: C06
+    action: weakened
+    provenance: ai-executed
+  - id: C16
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "Cat C at 57.5% — consider whether further trimming (remove task_config.md, constraints.md) could recover without losing Cat A"
+  - "Speedrun Cat C (n=5) judge instability — consider increasing sample size or noting limitation"
+  - "Layer 2 (Reproduction) and Layer 3 (Extension) experiments still TODO"
+
+ai_suggestions_pending:
+  - "The Cat A vs Cat C trade-off may be the Pareto optimum at current enrichment level (H13)"
+  - "Consider mentioning the enrichment trade-off in the paper's discussion section"

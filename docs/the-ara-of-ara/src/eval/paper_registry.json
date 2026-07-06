@@ -1,0 +1,361 @@
+{
+  "papers": [
+    {
+      "paper_id": "adaptive-pruning",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/adaptive-pruning",
+      "pdf_path": "code/pdfs/adaptive-pruning.pdf",
+      "rubric_path": "code/eval/rubrics/adaptive-pruning.json",
+      "info_gap_path": "code/eval/results/info_gap_adaptive-pruning.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "all-in-one",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/all-in-one",
+      "pdf_path": "code/pdfs/all-in-one.pdf",
+      "rubric_path": "code/eval/rubrics/all-in-one.json",
+      "info_gap_path": "code/eval/results/info_gap_all-in-one.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "bam",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/bam",
+      "pdf_path": "code/pdfs/bam.pdf",
+      "rubric_path": "code/eval/rubrics/bam.json",
+      "info_gap_path": "code/eval/results/info_gap_bam.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "bbox",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/bbox",
+      "pdf_path": "code/pdfs/bbox.pdf",
+      "rubric_path": "code/eval/rubrics/bbox.json",
+      "info_gap_path": "code/eval/results/info_gap_bbox.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "bridging-data-gaps",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/bridging-data-gaps",
+      "pdf_path": "code/pdfs/bridging-data-gaps.pdf",
+      "rubric_path": "code/eval/rubrics/bridging-data-gaps.json",
+      "info_gap_path": "code/eval/results/info_gap_bridging-data-gaps.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "fre",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/fre",
+      "pdf_path": "code/pdfs/fre.pdf",
+      "rubric_path": "code/eval/rubrics/fre.json",
+      "info_gap_path": "code/eval/results/info_gap_fre.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "ftrl",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/ftrl",
+      "pdf_path": "code/pdfs/ftrl.pdf",
+      "rubric_path": "code/eval/rubrics/ftrl.json",
+      "info_gap_path": "code/eval/results/info_gap_ftrl.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "lbcs",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/lbcs",
+      "pdf_path": "code/pdfs/lbcs.pdf",
+      "rubric_path": "code/eval/rubrics/lbcs.json",
+      "info_gap_path": "code/eval/results/info_gap_lbcs.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "lca-on-the-line",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/lca-on-the-line",
+      "pdf_path": "code/pdfs/lca-on-the-line.pdf",
+      "rubric_path": "code/eval/rubrics/lca-on-the-line.json",
+      "info_gap_path": "code/eval/results/info_gap_lca-on-the-line.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "mechanistic-understanding",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/mechanistic-understanding",
+      "pdf_path": "code/pdfs/mechanistic-understanding.pdf",
+      "rubric_path": "code/eval/rubrics/mechanistic-understanding.json",
+      "info_gap_path": "code/eval/results/info_gap_mechanistic-understanding.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "pinn",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/pinn",
+      "pdf_path": "code/pdfs/pinn.pdf",
+      "rubric_path": "code/eval/rubrics/pinn.json",
+      "info_gap_path": "code/eval/results/info_gap_pinn.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "rice",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/rice",
+      "pdf_path": "code/pdfs/rice.pdf",
+      "rubric_path": "code/eval/rubrics/rice.json",
+      "info_gap_path": "code/eval/results/info_gap_rice.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "robust-clip",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/robust-clip",
+      "pdf_path": "code/pdfs/robust-clip.pdf",
+      "rubric_path": "code/eval/rubrics/robust-clip.json",
+      "info_gap_path": "code/eval/results/info_gap_robust-clip.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "sample-specific-masks",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/sample-specific-masks",
+      "pdf_path": "code/pdfs/sample-specific-masks.pdf",
+      "rubric_path": "code/eval/rubrics/sample-specific-masks.json",
+      "info_gap_path": "code/eval/results/info_gap_sample-specific-masks.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "sapg",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/sapg",
+      "pdf_path": "code/pdfs/sapg.pdf",
+      "rubric_path": "code/eval/rubrics/sapg.json",
+      "info_gap_path": "code/eval/results/info_gap_sapg.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "self-composing-policies",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/self-composing-policies",
+      "pdf_path": "code/pdfs/self-composing-policies.pdf",
+      "rubric_path": "code/eval/rubrics/self-composing-policies.json",
+      "info_gap_path": "code/eval/results/info_gap_self-composing-policies.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "self-expansion",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/self-expansion",
+      "pdf_path": "code/pdfs/self-expansion.pdf",
+      "rubric_path": "code/eval/rubrics/self-expansion.json",
+      "info_gap_path": "code/eval/results/info_gap_self-expansion.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "semantic-self-consistency",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/semantic-self-consistency",
+      "pdf_path": "code/pdfs/semantic-self-consistency.pdf",
+      "rubric_path": "code/eval/rubrics/semantic-self-consistency.json",
+      "info_gap_path": "code/eval/results/info_gap_semantic-self-consistency.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "sequential-neural-score-estimation",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/sequential-neural-score-estimation",
+      "pdf_path": "code/pdfs/sequential-neural-score-estimation.pdf",
+      "rubric_path": "code/eval/rubrics/sequential-neural-score-estimation.json",
+      "info_gap_path": "code/eval/results/info_gap_sequential-neural-score-estimation.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "stay-on-topic-with-classifier-free-guidance",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/stay-on-topic-with-classifier-free-guidance",
+      "pdf_path": "code/pdfs/stay-on-topic-with-classifier-free-guidance.pdf",
+      "rubric_path": "code/eval/rubrics/stay-on-topic-with-classifier-free-guidance.json",
+      "info_gap_path": "code/eval/results/info_gap_stay-on-topic-with-classifier-free-guidance.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "stochastic-interpolants",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/stochastic-interpolants",
+      "pdf_path": "code/pdfs/stochastic-interpolants.pdf",
+      "rubric_path": "code/eval/rubrics/stochastic-interpolants.json",
+      "info_gap_path": "code/eval/results/info_gap_stochastic-interpolants.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "test-time-model-adaptation",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/test-time-model-adaptation",
+      "pdf_path": "code/pdfs/test-time-model-adaptation.pdf",
+      "rubric_path": "code/eval/rubrics/test-time-model-adaptation.json",
+      "info_gap_path": "code/eval/results/info_gap_test-time-model-adaptation.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "what-will-my-model-forget",
+      "benchmark": "paperbench",
+      "artifact_dir": "code/artifacts/what-will-my-model-forget",
+      "pdf_path": "code/pdfs/what-will-my-model-forget.pdf",
+      "rubric_path": "code/eval/rubrics/what-will-my-model-forget.json",
+      "info_gap_path": "code/eval/results/info_gap_what-will-my-model-forget.json",
+      "categories": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "paper_id": "rebench-fix_embedding",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-fix_embedding",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_fix_embedding",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "rebench-nanogpt_chat_rl",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-nanogpt_chat_rl",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_nanogpt_chat_rl",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "rebench-optimize_llm_foundry",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-optimize_llm_foundry",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_optimize_llm_foundry",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "rebench-restricted_mlm",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-restricted_mlm",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_restricted_mlm",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "rebench-rust_codecontests",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-rust_codecontests",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_rust_codecontests_inference",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "rebench-small_scaling_law",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-small_scaling_law",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_small_scaling_law",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "rebench-triton_cumsum",
+      "benchmark": "rebench",
+      "artifact_dir": "code/artifacts/rebench-triton_cumsum",
+      "baseline_dir": "code/artifacts/rebench-repo/ai_rd_triton_cumsum",
+      "categories": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "paper_id": "nanogpt-speedrun",
+      "benchmark": "speedrun",
+      "artifact_dir": "code/artifacts/nanogpt-speedrun",
+      "baseline_dir": "code/artifacts/nanogpt-speedrun",
+      "categories": [
+        "A",
+        "C"
+      ]
+    }
+  ],
+  "total": 31
+}

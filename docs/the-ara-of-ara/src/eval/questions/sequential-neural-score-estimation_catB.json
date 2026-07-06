@@ -1,0 +1,115 @@
+{
+  "paper_id": "sequential-neural-score-estimation",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "sequential-neural-score-estimation_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirement R45 in rubric/requirements.md specifies how the sinusoidal time embedding must be computed. (a) What is the exact formula stated in R45 for computing the i-th value of the sinusoidal embedding, including both the sine and cosine branches and their index conditions? (b) Which ARA source file implements this sinusoidal embedding — identify the file from the available listing and describe what evidence it provides about the embedding dimension and formula? (c) Given R44 specifies the embedding dimension and R45 specifies the formula, what is the total number of sine components and cosine components, and how does the index boundary (i ≤ 32) partition the 64-dimensional output?",
+      "gold_answer": "R45 states: 'The sinusoidal embedding t is computed as follows: the i-th value is computed as sin(t / 10000^((i-1)/31)) if i ≤ 32, otherwise it is computed as cos(t / 10000^((i-32-1)/31)).' R44 states: 'The sinusoidal embedding t is embedded into 64 dimensions.' The relevant ARA source file is src/execution/score_network.py, which implements the score network including the sinusoidal time embedding. The 64-dimensional embedding is split evenly: indices i=1 to 32 use the sine formula sin(t / 10000^((i-1)/31)), yielding 32 sine components; indices i=33 to 64 use the cosine formula cos(t / 10000^((i-32-1)/31)), yielding 32 cosine components. The boundary i ≤ 32 thus partitions the output into exactly two equal halves of 32 dimensions each.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states the sine branch formula: sin(t / 10000^((i-1)/31)) for i ≤ 32",
+        "Correctly states the cosine branch formula: cos(t / 10000^((i-32-1)/31)) for i > 32",
+        "Identifies src/execution/score_network.py as the implementing ARA file",
+        "Correctly derives 32 sine components and 32 cosine components from the 64-dimensional total (R44) and the i ≤ 32 boundary (R45)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/score_network.py"
+      ],
+      "rubric_requirement_id": "R45",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sequential-neural-score-estimation_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R32 in rubric/requirements.md describes how the truncation boundary is computed in TSNPSE, and R36 describes how it is used during rejection sampling. (a) What exact percentile value ε is used to define the truncation boundary in R32, and what does the boundary represent? (b) Which ARA file implements TSNPSE — identify it from the available listing and describe what it reveals about the truncation boundary computation and its use in the acceptance/rejection step? (c) Taken together, R32, R34, R35, and R36 describe a multi-stage rejection sampling procedure. What is the logical order of these stages, and what would happen if the hyperrectangle check (R34) were omitted while keeping the log-probability threshold check (R36)?",
+      "gold_answer": "R32 states: 'In TSNPSE, in the r-th round, the truncation boundary is computed as the ε = 5 × 10^{-4}-th percentile of the samples from the approximate posterior. This defines the log-probability rejection threshold for rejection sampling.' The truncation boundary is the 5×10^{-4} percentile of approximate posterior log-likelihoods, serving as the minimum log-probability threshold a candidate sample must exceed to be accepted. The relevant ARA file is src/execution/tsnpse.py, which implements TSNPSE including the proposal prior construction, hyperrectangle check, and log-probability threshold. The logical order per R33–R37 is: (1) draw θ ~ p(θ) from the prior (R33); (2) reject if θ falls outside the empirical hyperrectangle defined by min/max of approximate posterior samples per dimension (R34); (3) compute the likelihood under the approximate posterior via instantaneous change-of-variables (R35); (4) accept if log-likelihood exceeds the truncation boundary, else reject (R36); (5) repeat until required number of samples obtained (R37). Omitting the hyperrectangle check (R34) would mean the ODE-based likelihood evaluation (R35) would be called on samples potentially far from the posterior support, increasing computational cost and potentially causing numerical instability, since the hyperrectangle serves as a cheap pre-filter before the expensive likelihood computation.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies ε = 5 × 10^{-4} as the percentile value and explains it defines a log-probability rejection threshold (R32)",
+        "Identifies src/execution/tsnpse.py as the implementing ARA file for TSNPSE",
+        "Correctly orders all four stages: prior sampling (R33), hyperrectangle rejection (R34), likelihood computation (R35), threshold acceptance (R36)",
+        "Correctly explains that omitting R34 forces the expensive change-of-variables likelihood (R35) on all prior samples, increasing computational cost or causing numerical issues"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/tsnpse.py"
+      ],
+      "rubric_requirement_id": "R32",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sequential-neural-score-estimation_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R12 in rubric/requirements.md specifies a standardization procedure applied before data enters the score network, and is flagged as 'partial' in the info gap analysis with gap type 'ambiguous_specification'. (a) What exactly does R12 require to be standardized, what statistics are used, and at what point in the pipeline does this standardization occur? (b) Which ARA file implements the score network and its input preprocessing — identify it and describe what it reveals about how standardization is applied to the parameter and observation embeddings? (c) Why is the info gap flagged as 'ambiguous_specification', and what ambiguity could arise in implementation if the requirement were interpreted differently regarding when the empirical mean and standard deviation are estimated (e.g., per-round vs. across all rounds in sequential settings)?",
+      "gold_answer": "R12 states: 'Both the output of the parameter embedding network θ_t and output of the observation embedding network x are standardized before being inputted to the score network, by subtracting an estimate of the mean and dividing by the standard deviation in each dimension. The empirical mean and empirical standard deviation of the training data is used.' Standardization applies to two quantities — the output of the parameter embedding network and the output of the observation embedding network — using the empirical (training-data) mean and standard deviation per dimension, and this occurs after the embedding networks but before the score network receives its concatenated input. The implementing ARA file is src/execution/score_network.py (and/or src/execution/npse_core.py), which contains the score network definition and would show how running statistics or fixed statistics are applied to the embeddings. The 'ambiguous_specification' gap arises because R12 says 'empirical mean and empirical standard deviation of the training data' without clarifying whether, in sequential TSNPSE settings with growing datasets across rounds, the statistics are re-estimated from the combined dataset each round or fixed from the first round. This ambiguity matters: re-estimating each round changes the normalization distribution shift across rounds, potentially destabilizing training if the score network's input distribution shifts, while fixing from round 1 may misrepresent later rounds' data distributions.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies both outputs being standardized: parameter embedding network output AND observation embedding network output, using empirical per-dimension mean and std (R12)",
+        "Identifies src/execution/score_network.py or src/execution/npse_core.py as the relevant ARA implementing file",
+        "Explains the ambiguity: whether statistics are re-computed each round (sequential) or fixed from training data globally/round-1",
+        "Correctly places the standardization step after embedding networks but before the score network's concatenated input (per R47 context)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/score_network.py"
+      ],
+      "rubric_requirement_id": "R12",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sequential-neural-score-estimation_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirements R63 and R64 in rubric/requirements.md specify batch sizes for different experiment types, and R62 specifies the maximum training iterations. (a) What are the exact batch sizes specified in R63 and R64 for simulation budgets of 1000 or 10000, distinguishing between non-sequential methods (NPSE-VE, NPSE-VP, NPE) and sequential methods (TSNPSE-VE, TSNPSE-VP, SNPE, TSNPE)? (b) Which ARA configuration or training file captures these training hyperparameters — identify the file from the available listing and describe what training settings it documents? (c) What is the maximum number of training iterations per R62, and given the early stopping rule in R61 (patience of 1000 steps), what is the relationship between the patience and maximum iterations, and under what condition would the maximum iteration limit actually be the binding constraint?",
+      "gold_answer": "R63 states: 'For experiments with a simulation budget of either 1000 or 10000, the batch size is 50 for non-sequential experiments (NPSE-VE, NPSE-VP, NPE).' R64 states: 'For experiments with a simulation budget of either 1000 or 10000, the batch size is 200 for sequential experiments (TSNPSE-VE, TSNPSE-VP, SNPE, TSNPE).' Thus non-sequential methods use batch size 50 and sequential methods use batch size 200 for these budgets. The relevant ARA file is src/configs/training.md, which documents training configuration hyperparameters including batch sizes, learning rate, and stopping criteria. R62 states: 'The maximum number of training iterations is 3000.' R61 states early stopping triggers if validation loss does not decrease for 1000 steps, returning the best network. The relationship is: early stopping patience (1000) is one-third of the maximum (3000). The maximum iteration limit is the binding constraint only when validation loss continues to decrease (or oscillates without a 1000-step plateau) throughout all 3000 steps — i.e., when the model has not converged to a stable minimum within the budget, which might happen with very large datasets or a highly expressive model that continues to slowly improve.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states batch size 50 for non-sequential methods (NPSE-VE, NPSE-VP, NPE) and batch size 200 for sequential methods (TSNPSE-VE, TSNPSE-VP, SNPE, TSNPE) per R63 and R64",
+        "Identifies src/configs/training.md as the relevant ARA configuration file",
+        "Correctly states maximum training iterations is 3000 (R62) and early stopping patience is 1000 steps (R61)",
+        "Correctly explains the maximum iteration limit binds only when validation loss never plateaus for 1000 consecutive steps within 3000 total steps"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R63",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "sequential-neural-score-estimation_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R52 in rubric/requirements.md specifies how σ_max for VESDE is chosen, and is flagged as 'partial' with gap 'vague_description'. Requirements R50 and R51 further specify σ_min values per task. (a) What is the exact rule stated in R52 for selecting σ_max, and what special consideration applies to sequential methods? (b) Which ARA file implements the VESDE SDE and its parameter configuration — identify it from the available listing and describe what it reveals about how σ_max is set relative to training data? (c) R52 states σ_max is chosen as 'as large as the maximum Euclidean distance between all pairs of training data points.' Given that R51 sets σ_min = 0.05 for tasks like Lotka Volterra and R50 sets σ_min = 0.01 for SIR and Two Moons, what does the relationship between σ_min and σ_max imply about the required dynamic range of the diffusion process, and why is using first-round data specifically for sequential methods (rather than all rounds combined) the appropriate choice for σ_max?",
+      "gold_answer": "R52 states: 'The constant σ_max for VESDE is chosen to be as large as the maximum Euclidean distance between all pairs of training data points for the current task. For sequential methods, the training data points that are used are the training data points available in the first round.' This means σ_max is data-dependent and task-specific, computed as the maximum pairwise Euclidean distance in the training parameter space, and fixed using only round-1 data for sequential experiments. The relevant ARA file is src/execution/sde.py, which implements the SDE classes including VESDE, and would show how σ_max is accepted as a parameter and used in the diffusion coefficient formula g(t) = σ_min · (σ_min/σ_max)^t · sqrt(2 log(σ_max/σ_min)) from R16. The dynamic range σ_max/σ_min must be large enough to ensure the forward process can fully diffuse the posterior into the stationary distribution: for Lotka Volterra with σ_min=0.05, if σ_max is very large (e.g., hundreds), the ratio exceeds 1000×, meaning the diffusion must traverse a wide scale range. Using first-round data for sequential methods ensures σ_max remains consistent across all rounds — if later rounds' (potentially more concentrated) proposal posterior samples were used, σ_max could shrink across rounds, making the forward process incompatible with score networks trained under different noise schedules in earlier rounds, and breaking the assumption that all rounds share the same SDE.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states R52's rule: σ_max equals maximum pairwise Euclidean distance among training data points, with sequential methods using only round-1 data",
+        "Identifies src/execution/sde.py as the ARA file implementing VESDE with σ_max as a configurable parameter",
+        "Correctly connects σ_min task-specific values (R50, R51) with σ_max to explain the diffusion dynamic range requirement",
+        "Correctly explains why fixing σ_max from round-1 data in sequential settings ensures a consistent noise schedule across all rounds, avoiding incompatibility from shrinking posterior support in later rounds"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/sde.py"
+      ],
+      "rubric_requirement_id": "R52",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

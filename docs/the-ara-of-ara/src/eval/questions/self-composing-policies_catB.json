@@ -1,0 +1,117 @@
+{
+  "paper_id": "self-composing-policies",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "self-composing-policies_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Consider requirement R45 from rubric/requirements.md regarding the value function critic for Meta-World environments. (a) What does R45 state exactly about how the critic maps inputs to outputs for Meta-World? (b) Which ARA file in src/execution/ contains the implementation evidence for this critic layer, and what does that file reveal about the actual input dimensionality used? (c) Given that R45 is rated 'absent' in the info gap analysis, what does this imply about whether a reproduction can verify this requirement from the PDF or GitHub repo alone?",
+      "gold_answer": "(a) R45 states exactly: 'In the case of the Meta-World environments, the layer maps a 39-dimensional state vector down to a single scalar.' This is under the parent context 'The value function (critic) has been implemented as a single fully connected layer.' (b) The relevant ARA file is src/execution/componet_module.py, which contains the CompoNet module implementation including the critic/value function layer. That file should reveal whether the fully connected layer is defined with input dimension 39 and output dimension 1 (scalar). (c) Because the info gap analysis rates R45 as 'ABSENT' with gap types 'vague_description' and 'missing_code_detail', the exact input dimensionality of 39 for Meta-World is not recoverable from the original PDF or GitHub repo alone — only rubric/requirements.md makes this concrete specification explicit. A reproduction agent relying solely on the PDF would not know the precise dimension is 39 rather than, e.g., the full observation space size used internally.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R45 requirement text including '39-dimensional state vector' and 'single scalar'",
+        "Identifies src/execution/componet_module.py (or src/execution/componet.py) as the cross-referenced ARA file containing the critic implementation",
+        "Notes that R45 is rated ABSENT in the info gap analysis, meaning the 39-dimension detail is rubric-exclusive",
+        "Explains that PDF+repo agents cannot verify this requirement without rubric/requirements.md"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/componet_module.py"
+      ],
+      "rubric_requirement_id": "R45",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-composing-policies_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R37 and R38 from rubric/requirements.md specify structural details of the SAC critic and target networks. (a) What do R37 and R38 say precisely about the number of layers in the target network and the critic network respectively? (b) Cross-reference src/execution/componet.py and evidence/tables/tableE1_sac_hyperparams.md — do these ARA files corroborate, contradict, or remain silent on the 3-layer specification for both networks? (c) R34 describes the critic as 'a two-layer MLP followed by two separate output heads' — how do you reconcile R34's description with R37/R38's claim of '3 layers' in target and critic networks, and what does this imply for a correct implementation?",
+      "gold_answer": "(a) R37 states exactly: 'In the SAC implementation, there are 3 layers in the target network.' R38 states exactly: 'In the SAC implementation, there are 3 layers in the critic network.' Both are under the parent context 'The hyperparameters for SAC have been set to those stated in Table E.1.' (b) evidence/tables/tableE1_sac_hyperparams.md should list SAC hyperparameters from Table E.1 of the paper; it may record the number of layers. src/execution/componet.py may show the critic/target network construction. If tableE1_sac_hyperparams.md lists 'num_layers: 3' or similar, it corroborates R37/R38; if silent, the rubric is the only explicit source. (c) R34 describes 'a two-layer MLP followed by two separate output heads of a single layer' — counting the two MLP layers plus one output head layer equals 3 layers total, which reconciles with R37/R38's '3 layers'. This implies the implementation must build a network with exactly 3 total layers: 2 hidden MLP layers plus 1 output head layer, and the target network mirrors this structure.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes both R37 ('3 layers in the target network') and R38 ('3 layers in the critic network')",
+        "References evidence/tables/tableE1_sac_hyperparams.md as the corroborating ARA evidence file for SAC hyperparameters",
+        "Correctly reconciles R34's 'two-layer MLP + two output heads' with R37/R38's '3 layers' by explaining that 2 hidden + 1 output = 3 total layers",
+        "Notes that this layer-count detail is only fully specified via rubric/requirements.md cross-referenced with the SAC hyperparams table"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/tableE1_sac_hyperparams.md",
+        "src/execution/componet.py"
+      ],
+      "rubric_requirement_id": "R37",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-composing-policies_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R03 from rubric/requirements.md addresses CNN encoder initialization across tasks and is rated 'partial' in the info gap analysis. (a) What does R03 specify about how the CNN encoder for a new policy should be initialized, and what appendix section does it reference? (b) Which file in src/execution/ implements the CNN encoder, and what does src/execution/cnn_encoder.py reveal about whether weight-transfer initialization logic is present? (c) Given that R03's gap types are 'vague_description' and 'missing_code_detail', what specific implementation detail is at risk of being missed by an agent that only reads the PDF, and why is rubric/requirements.md necessary to resolve this ambiguity?",
+      "gold_answer": "(a) R03 states exactly: 'Logic to use a single CNN encoder per policy has been implemented, where the encoder for a new policy is initialized with the weights of the previous one, as described in Appendix E.2.' This means rather than random initialization, each new task's CNN encoder copies weights from the encoder trained on the preceding task. (b) src/execution/cnn_encoder.py implements the CNN encoder. Examining this file should reveal whether there is logic to accept or copy pre-trained weights from a previous encoder instance (e.g., a load_weights or copy_from method), as opposed to always using random initialization. (c) The PDF may describe the CNN architecture in general terms but not explicitly state that weight transfer (warm-starting) is used between tasks for the encoder — only Appendix E.2 (referenced by R03) and rubric/requirements.md make this explicit. An agent reading only the PDF might implement a randomly initialized encoder per task, missing the warm-start requirement. The gap types 'vague_description' and 'missing_code_detail' confirm rubric/requirements.md is the authoritative source for this initialization protocol.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R03 requirement text including 'initialized with the weights of the previous one' and 'Appendix E.2'",
+        "Identifies src/execution/cnn_encoder.py as the cross-referenced ARA implementation file",
+        "Explains the specific missing detail: warm-start weight initialization from previous task's encoder (not random init)",
+        "Explains why rubric/requirements.md is necessary: PDF is vague about this initialization protocol per the 'partial' gap rating"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/cnn_encoder.py"
+      ],
+      "rubric_requirement_id": "R03",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-composing-policies_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirements R41, R42, and R43 from rubric/requirements.md specify three distinct implementation details for the PPO algorithm. (a) State exactly what each of R41, R42, and R43 requires. (b) Cross-reference evidence/tables/tableE2_ppo_hyperparams.md — which of these three requirements are directly verifiable from that table, and which are not? (c) For the requirement(s) that are NOT verifiable from the PPO hyperparams table alone, which src/execution/ file would need to be inspected to confirm compliance, and what specific code pattern would indicate the requirement is met?",
+      "gold_answer": "(a) R41 states: 'In the PPO implementation, the activation function has been set to ReLU.' R42 states: 'In the PPO implementation, the value loss is clipped.' R43 states: 'In the PPO implementation, advantage estimates are normalized.' All three are under parent context 'The hyperparameters for PPO have been set to those stated in Table E.2.' (b) evidence/tables/tableE2_ppo_hyperparams.md lists PPO hyperparameters from Table E.2. The activation function (ReLU) may appear as a hyperparameter entry, making R41 verifiable. Value loss clipping and advantage normalization are algorithmic implementation choices that may or may not appear as explicit hyperparameter entries — they are more likely implementation flags. R42 and R43 may not be directly verifiable from the hyperparams table alone if they are not listed as explicit parameters. (c) src/execution/componet_module.py or a PPO-specific training file would need to be inspected. For R42 (value loss clipping), the code should show a clipped value loss computation (e.g., torch.clamp on value predictions or a clip_vloss flag set to True). For R43 (advantage normalization), the code should show advantages being normalized (subtracted mean, divided by std) before use in the policy gradient update.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes all three requirements: R41 (ReLU activation), R42 (value loss clipped), R43 (advantage estimates normalized)",
+        "Identifies evidence/tables/tableE2_ppo_hyperparams.md as the cross-reference table and correctly assesses which requirements it can/cannot verify",
+        "Identifies src/execution/componet_module.py (or equivalent PPO execution file) as needed for verifying R42 and R43",
+        "Describes specific code patterns: clamp/clip operation for R42 and mean-std normalization for R43"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/tableE2_ppo_hyperparams.md",
+        "src/execution/componet_module.py"
+      ],
+      "rubric_requirement_id": "R42",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-composing-policies_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R31 from rubric/requirements.md specifies the ALE task sequence and is rated 'partial' with gap type 'ambiguous_specification'. (a) What does R31 state precisely about the sequence of 17 tasks, including the specific environment names and the number of playing modes for each? (b) Cross-reference src/execution/task_manager.py — what does that file reveal about how the 17-task ALE sequence is constructed, and does it match R31's specification of 10 SpaceInvaders modes followed by 7 Freeway modes? (c) Why would an agent relying only on the paper PDF and GitHub repo fail to correctly determine the exact ordering (SpaceInvaders first, then Freeway) and the precise mode counts (10 and 7), and how does rubric/requirements.md resolve this ambiguity?",
+      "gold_answer": "(a) R31 states exactly: 'The logic to generate a sequence of 17 tasks (i.e., a sequence of all 10 playing modes of `ALE/SpaceInvaders-v5` followed by all 7 playing modes of `ALE/Freeway-v5`) has been implemented, as described in Section 5.2.' This specifies: exactly 17 tasks total, the environment identifier ALE/SpaceInvaders-v5 with all 10 playing modes coming first, followed by ALE/Freeway-v5 with all 7 playing modes. (b) src/execution/task_manager.py should contain the logic for constructing task sequences. Inspecting this file would reveal whether the task list is hardcoded or dynamically generated, and whether SpaceInvaders modes (expected: 10) are listed before Freeway modes (expected: 7), using the exact gym environment identifiers ALE/SpaceInvaders-v5 and ALE/Freeway-v5. (c) The paper PDF (Section 5.2) may mention SpaceInvaders and Freeway but may not unambiguously specify the exact ordering or confirm that SpaceInvaders has exactly 10 modes and Freeway has exactly 7 — the 'ambiguous_specification' gap type confirms this. The GitHub repo code structure might show both environments but not clarify which comes first in the continual learning sequence. Only rubric/requirements.md makes the ordering (SpaceInvaders then Freeway) and exact mode counts (10 + 7 = 17) unambiguous.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R31 including '10 playing modes of ALE/SpaceInvaders-v5 followed by all 7 playing modes of ALE/Freeway-v5' and total of 17 tasks",
+        "Identifies src/execution/task_manager.py as the cross-referenced ARA file for task sequence construction",
+        "Explains that the ordering (SpaceInvaders first) and exact mode counts (10 and 7) are the ambiguous details not resolvable from PDF alone",
+        "Explains that rubric/requirements.md resolves the ambiguity by explicitly stating the ordered sequence and exact counts"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/task_manager.py"
+      ],
+      "rubric_requirement_id": "R31",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

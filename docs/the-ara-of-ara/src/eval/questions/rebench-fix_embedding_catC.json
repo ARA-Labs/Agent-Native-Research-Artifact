@@ -1,0 +1,98 @@
+{
+  "paper_id": "rebench-fix_embedding",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 4,
+  "questions": [
+    {
+      "id": "rebench-fix_embedding_C01",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "What approaches to recovering the embedding permutation directly (e.g., matching embedding vectors between the small and large models, solving an assignment problem) were attempted and abandoned, and what caused them to fail?",
+      "grading_type": "semantic",
+      "gold_answer": "Several direct permutation recovery approaches were attempted and abandoned:\n\n1. **Brute-force permutation search (N02a)**: Attempting to enumerate or randomly sample permutations was found to be mathematically intractable — the search space is 50,257! ≈ 10^213,437, making even random sampling essentially hopeless. This was recognized as a dead end almost immediately.\n\n2. **Gradient-based optimization with Sinkhorn relaxation (N02b)**: The discrete permutation matrix was relaxed to a continuous doubly-stochastic matrix on the Birkhoff polytope, with Sinkhorn normalization used to maintain constraints. This failed due to multiple compounding issues: the relaxed objective is non-convex with exponentially many local minima; the doubly-stochastic relaxation does not approximate discrete permutations well at V=50K; Sinkhorn projection is O(V²) per iteration and prohibitively expensive; and rounding the soft solution back to a hard permutation destroyed whatever structure the continuous optimization found. After hours of GPU time, the rounded result performed at chance level.\n\n3. **Assuming structured permutation (N02c)**: Hypothesizing that the permutation might be a cyclic shift or have block structure, which would reduce the search space to V possibilities. This failed because the task explicitly states the permutation is random — no such structure exists.\n\n4. **Direct L2 norm matching (N03b)**: Matching tokens by the L2 norms of their embedding vectors was attempted and partially succeeded (~60-70% accuracy, loss dropping to ~5.5-6.5), but was insufficient alone as many tokens share similar norms, creating ambiguity.\n\n5. **Cosine similarity matching with cross-model projection (N03c)**: Using anchor matches to learn a linear projection from small model embedding space to large model embedding space, then running the Hungarian algorithm on the full cosine similarity matrix. This achieved 90-95% accuracy (loss ~3.0-3.5) and was ultimately retained as the basis for the winning strategy, so it was not fully abandoned but was insufficient alone.",
+      "trace_nodes": [
+        "N02a",
+        "N02b",
+        "N02c",
+        "N03b",
+        "N03c",
+        "DE2_N02a",
+        "DE4_N02b",
+        "DE5_N02c"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-fix_embedding_C02",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "Which fine-tuning configurations on the corrupted large model (e.g., learning rate schedules, number of steps, frozen vs. unfrozen layers) were tried but failed to meaningfully reduce the validation loss below the corrupted baseline of 10.5?",
+      "grading_type": "checklist",
+      "gold_answer": "The exploration tree shows that ALL fine-tuning configurations on the corrupted model did reduce loss below 10.5, but none achieved competitive results within the 8-hour budget:\n\n1. **Frozen transformer blocks, only embedding layer trained (N04b)**: This configuration was the closest to a true failure. Loss plateaued at ~4.5-5.5 (score ~1.1-1.4) after 8 hours — technically below 10.5 but far from the target of <2.8. The failure mode was that the optimization landscape for the embedding layer alone is highly non-convex, with many local minima corresponding to different incorrect token orderings. The transformer blocks needed minor adjustments too, but freezing them prevented this.\n\n2. **Full fine-tuning with standard LR (N04a)**: Standard nanoGPT hyperparameters (LR 6e-4, cosine decay) for 8 hours reached only ~3.5-4.0 loss (score ~0.69-0.92). While below 10.5, this was insufficient to reach the target <2.8, because the optimizer had to simultaneously fix the scrambled embedding-downstream coupling, causing slow convergence.\n\n3. **Fine-tuning with elevated embedding LR (N04c)**: Differential learning rates (10x LR for embeddings vs transformer blocks) reached ~3.0-3.5 loss after 8 hours (score ~0.41-0.69). Still insufficient to beat the reference target.\n\nNo fine-tuning configuration alone could reach below ~2.8 loss within the 8-hour budget without first recovering the embedding permutation. The frozen-layer approach (N04b) was the most egregious failure, not achieving competitive results despite the full 8-hour budget.",
+      "trace_nodes": [
+        "N04",
+        "N04a",
+        "N04b",
+        "N04c",
+        "DE7_N04b"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-fix_embedding_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What failure modes were encountered when trying to use the small correct model to guide recovery of the large model's embeddings — for instance, did dimension mismatch, vocabulary alignment issues, or distribution mismatch between models cause approaches to break down?",
+      "grading_type": "semantic",
+      "gold_answer": "Several distinct failure modes were encountered when using the small reference model:\n\n1. **Direct substitution failure (N03a) — dimension mismatch and distribution mismatch**: Attempting to replace the large model's embeddings with the small model's embeddings (via zero-padding, interpolation, or learned projection) failed due to two compounding issues. First, the small and large models have different embedding dimensions, requiring a dimension transformation. More fundamentally, the embedding vectors encode relationships specific to each model's transformer blocks — the large model's attention and MLP weights expect embeddings with specific statistical properties (norms, angles, principal components) that the small model's embeddings do not satisfy, even after projection. The result was loss of 8-9, only marginally better than the corrupted model.\n\n2. **Key lesson from N03a**: The small model cannot serve as a SOURCE of replacement embeddings because the two models are in entirely different embedding spaces. The corrupted model's own embedding vectors are correct — they are simply in the wrong order. The small model should serve as a REFERENCE for identifying which token corresponds to which row (a 'Rosetta stone' function), not as a replacement.\n\n3. **Norm matching ambiguity (N03b)**: When using L2 norms as the matching signal, approximately 30-40% of tokens had similar enough norms to create ambiguity, limiting matching accuracy to ~60-70%.\n\n4. **Cross-model projection accuracy limits (N03c)**: Even with anchor-based linear projection to align the two embedding spaces, cosine similarity matching left 5-10% of tokens misassigned (~90-95% accuracy), resulting in residual loss of ~3.0-3.5 that required additional fine-tuning to close.\n\n5. **Activation matching expense (N07)**: Using activation patterns from intermediate layers rather than raw embeddings was explored as an alternative. While providing higher-quality similarity signals for common tokens, rare tokens had sparse and unreliable activation patterns. The approach took 2-3x longer than embedding matching with comparable accuracy (~92-96%), making it not worth the additional compute.",
+      "trace_nodes": [
+        "N03",
+        "N03a",
+        "N03b",
+        "N03c",
+        "N07",
+        "DE3_N03a"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-fix_embedding_C04",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What did researchers learn about the relationship between tied embeddings (embedding and unembedding sharing weights) and the difficulty of recovering the corrupted model — specifically, what naive fixes failed because they didn't account for the tied weight constraint?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not explicitly discuss tied embeddings (where the embedding matrix and the unembedding/language model head share weights) as a specific failure mode or lesson. The tree does not mention the tied weight constraint, and no dead end or failure is attributed to failing to account for it.\n\nThe closest relevant lessons in the tree concern the coupling between embeddings and downstream transformer weights more generally: N01b shows that reusing transformer blocks with a new random embedding layer provides no benefit because 'the transformer blocks were trained to work with the ORIGINAL embedding distribution' and 'the block weights encode relationships between the original embedding vectors'; N03a shows that substituting small-model embeddings into the large model fails due to distribution mismatch between the spaces each model's weights expect. The dead end summary (DE1_N01b, DE3_N03a) emphasizes that 'embeddings and downstream weights are tightly coupled.'\n\nHowever, the specific issue of tied embedding/unembedding weights and naive fixes that failed to account for this constraint is not addressed anywhere in the exploration tree.",
+      "trace_nodes": [
+        "N01b",
+        "N03a",
+        "DE1_N01b",
+        "DE3_N03a"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-fix_embedding_C05",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "How much compute time was spent on full fine-tuning runs of the large corrupted model on OpenWebText before it became clear that training alone (without fixing the embedding) was insufficient to reach competitive scores within the 8-hour budget?",
+      "grading_type": "semantic",
+      "gold_answer": "Based on the exploration tree, multiple full fine-tuning runs of the corrupted model on OpenWebText were explored, each consuming the full 8-hour budget:\n\n1. **N04a — Full fine-tuning, standard LR**: 8 hours spent, achieving loss ~3.5-4.0 (score ~0.69-0.92). Insufficient to reach target <2.8.\n\n2. **N04b — Fine-tune only embedding layer, frozen transformer blocks**: 8 hours spent, achieving loss ~4.5-5.5 (score ~1.1-1.4). The dead end summary marks this as 'most costly dead end' — 8 hours wasted on suboptimal frozen fine-tuning.\n\n3. **N04c — Fine-tune with elevated embedding LR**: 8 hours spent, achieving loss ~3.0-3.5 (score ~0.41-0.69). Still insufficient.\n\nIn total, approximately 24 hours of compute time (3 × 8-hour runs) was spent on fine-tuning approaches to the corrupted model before it became clear that training alone was insufficient. The summary statistics note N04b as the 'most costly dead end.' Each run consumed the entire 8-hour GPU budget (on 2-4 H100 GPUs) only to demonstrate that gradient descent alone could not adequately fix the scrambled embeddings within the time constraint — the best result from pure fine-tuning (N04c) reached only score ~0.55, far from the reference target of ~0.26.",
+      "trace_nodes": [
+        "N04",
+        "N04a",
+        "N04b",
+        "N04c",
+        "DE7_N04b",
+        "summary"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    }
+  ]
+}

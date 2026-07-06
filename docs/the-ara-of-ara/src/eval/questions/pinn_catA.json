@@ -1,0 +1,101 @@
+{
+  "paper_id": "pinn",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 9,
+  "n_from_ara": 1,
+  "questions": [
+    {
+      "id": "pinn_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the best (lowest) L2RE achieved by Adam+L-BFGS on the convection problem (β=40) according to Table 1?",
+      "gold_answer": "4.19e-3",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What memory size and line search method are used for L-BFGS in the experiments?",
+      "gold_answer": "Memory size 100 and strong Wolfe line search.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What preconditioner does NysNewton-CG (NNCG) use to solve the Newton step, and why is it chosen over standard CG?",
+      "gold_answer": "NNCG uses NystromPCG (a preconditioned conjugate gradient method based on the randomized Nyström approximation). It is chosen because the Hessian is ill-conditioned with fast spectral decay, which causes standard CG without preconditioning to converge slowly. NystromPCG is specifically designed to solve linear systems with fast spectral decay.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The paper argues that the reaction problem is less ill-conditioned than convection and wave. What empirical evidence from the Hessian spectral analysis supports this, and how does it explain Adam's competitive performance on the reaction problem?",
+      "gold_answer": "The largest outlier eigenvalue of the Hessian for the reaction problem is around 10^3, while for convection it is around 10^4 and for wave it is around 10^5. A smaller largest eigenvalue implies a smaller condition number, so the reaction loss is less ill-conditioned. Because first-order methods like Adam converge slowly mainly when the condition number is large, Adam suffers less on the reaction problem and can sometimes match or outperform Adam+L-BFGS there.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the specific hyperparameter values used for NNCG in the experiments (sketch size s, update frequency F, CG tolerance ε, CG max iterations M, backtracking parameters α and β, and the tuned range for damping parameter µ)?",
+      "gold_answer": "η=1, K=2000, s=60, F=20, ε=10^{-16}, M=1000, α=0.1, β=0.5. µ is tuned over {10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}}, with µ=10^{-2} or 10^{-1} working best in practice.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A06",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "By what factor is NNCG slower per iteration than L-BFGS on the wave problem, and what is the reason given for this large gap compared to the other PDEs?",
+      "gold_answer": "NNCG is 322 times slower per iteration than L-BFGS on the wave problem. The reason is that NNCG must compute Hessian-vector products involving second derivatives for the wave PDE, whereas this is not required for the convection and reaction PDEs.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the paper recommend running Adam before L-BFGS rather than starting directly with L-BFGS, even though L-BFGS improves conditioning?",
+      "gold_answer": "L-BFGS (as a quasi-Newton method) is attracted to saddle points because it ignores negative curvature, and saddle points are far more numerous than local minima in neural network loss landscapes. First-order methods like Adam avoid saddle points. By running Adam first, the optimizer escapes saddle points and reaches a region closer to a true minimum, from which L-BFGS can then exploit its superior conditioning properties for fast local convergence. Starting with L-BFGS alone risks converging to a saddle point rather than a minimum.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A08",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions can a PINN achieve near-zero training loss yet still have an L2 relative error close to 1, and what is the underlying cause?",
+      "gold_answer": "This occurs when the PINN converges to a trivial solution that satisfies the residual portion of the loss but not the boundary conditions. For example, on the convection PDE any constant function makes the residual loss zero, and on the reaction ODE constant functions u=0 or u=1 do so. The PINN learns the initial condition but fails to satisfy the boundary conditions, resulting in a solution that is nearly constant over the domain—far from the true solution despite a near-zero total loss.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the paper analyze the Gradient-Damped Newton Descent (GDND) algorithm theoretically instead of directly analyzing Adam+L-BFGS+NNCG, which is the method recommended in practice?",
+      "gold_answer": "The paper analyzes GDND (gradient descent followed by damped Newton) because existing theoretical analyses of Adam do not mirror its empirical performance, making it difficult to provide rigorous convergence guarantees for Adam. Gradient descent has well-understood convergence theory under PŁ*-conditions. Additionally, the reason both L-BFGS and damped Newton (NNCG) are used in practice (rather than just NNCG) is computational efficiency—L-BFGS updates are much cheaper per iteration than NNCG, so L-BFGS is used first to make as much progress as possible before switching to the more expensive NNCG.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "pinn_A10",
+      "category": "cross_section",
+      "difficulty": "T3_implicit",
+      "question": "How does the PINN framework unify forward and inverse problem solving, and what architectural or training change distinguishes these two use cases?",
+      "gold_answer": "In the forward problem, the PDE parameters (e.g., diffusivity, wave speed) are known and the network learns the solution field. In the inverse problem, some PDE parameters are unknown and treated as additional trainable variables alongside the network weights, with observed data providing the constraint to identify them. The architecture is essentially the same; the key difference is that unknown physical parameters become part of the optimization variables, allowing simultaneous solution and parameter identification from data.",
+      "grading_type": "semantic",
+      "source": "ara"
+    }
+  ]
+}

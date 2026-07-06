@@ -1,0 +1,16 @@
+# Large dataset files (download via setup.sh)
+env/*/data/
+**/data/*.jsonl
+
+# Run results (generated, not committed)
+results/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Run logs (generated)
+logs/
+
+# Token usage log (session-specific)
+token_usage_log.json

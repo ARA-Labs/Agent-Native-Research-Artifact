@@ -1,0 +1,68 @@
+session:
+  id: "2026-03-19_001"
+  timestamp: "2026-03-19T02:00"
+  summary: "BAM reproduction pilot: ARA 88.2% vs baseline 93.2% (weighted) — first paper where baseline leads"
+
+events_logged:
+  - type: experiment
+    id: N65
+    provenance: ai-executed
+    summary: "BAM ARA mega-task: 112/123 (91.1% raw), 220.5/250 (88.2% weighted), 10/10 subtasks, 6.9h, 12.6M tokens"
+
+  - type: experiment
+    id: N66
+    provenance: ai-executed
+    summary: "BAM baseline mega-task: 117.5/124 (94.8% raw), 234/251 (93.2% weighted), 10/10 subtasks, 4.3h, 8.6M tokens"
+
+  - type: observation
+    id: O48
+    provenance: ai-suggested
+    summary: "Baseline edges ARA +5% weighted on BAM — first paper where baseline leads; BAM is well-documented paper"
+
+  - type: observation
+    id: O49
+    provenance: ai-suggested
+    summary: "ARA used 47% more tokens and 60% more time than baseline on BAM — artifact reading overhead"
+
+  - type: observation
+    id: O50
+    provenance: ai-suggested
+    summary: "ARA won T6 (non-Gaussian) 10/10 vs 8.5/10 — clearer hyperparameter specs in structured artifact"
+
+  - type: observation
+    id: O51
+    provenance: ai-suggested
+    summary: "Baseline misinterpreted sinh-arcsinh parameterization from PDF — ran extra s=0.0 experiments with varying t values"
+
+  - type: observation
+    id: O52
+    provenance: ai-suggested
+    summary: "ARA evidence/ directory blocked by design — may have cost ARA points on T8/T9 where evidence tables had useful hyperparameters"
+
+ai_actions:
+  - action: "Ran BAM ARA paper-level mega-task via run_agent.py"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/bam_ara_seed0/"]
+
+  - action: "Ran BAM baseline paper-level mega-task via run_agent.py"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/bam_baseline_seed0/"]
+
+  - action: "Judged both conditions via run_agent.py judge-paper"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/bam_ara_seed0/_judge_result.json",
+                     "code/eval/reproduction/results/bam_baseline_seed0/_judge_result.json"]
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "C05 now has 3 papers — BAM result (baseline +5%) may reduce aggregate ARA advantage; need to recompute"
+  - "ARA evidence/ blocking is an experimental design choice — consider ablation with evidence unblocked"
+  - "Investigate why ARA uses ~50% more tokens than baseline on BAM but the reverse on mechanistic-understanding"
+
+ai_suggestions_pending:
+  - "BAM's well-documented nature (high PDF sufficiency) may explain why baseline leads — ARA advantage strongest on poorly-documented papers"
+  - "The ARA token overhead (artifact reading) is a fixed cost; for papers with more subtasks or harder tasks, the overhead is amortized better"

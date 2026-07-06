@@ -1,0 +1,101 @@
+{
+  "paper_id": "rice",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 10,
+  "n_from_ara": 0,
+  "questions": [
+    {
+      "id": "rice_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the average percentage reduction in training time that RICE's explanation method achieves compared to StateMask when training the mask network?",
+      "gold_answer": "16.8% reduction in training time on average",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What is the default value of the hyperparameter α used for the mask network across all eight applications in RICE's experiments?",
+      "gold_answer": "α = 0.0001",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How does RICE's mask network avoid the trivial solution of never blinding the target agent, and what is the modified reward function used during mask network training?",
+      "gold_answer": "To avoid the trivial solution of always outputting '0' (never blinding), RICE adds an extra bonus reward when the mask network outputs '1'. The new reward is R'(s_t, a_t) = R(s_t, a_t) + α·a^m_t, where α is a hyperparameter controlling the bonus magnitude.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "In the Malware Mutation case study, what was the evasion probability of the original agent before any refinement, and what evasion probability was achieved after fixing the reward design bugs identified through RICE?",
+      "gold_answer": "The original agent had an evasion probability of 33.8% (or 42.2% as reported in Table 1 for the pre-trained agent). After fixing the reward design (making it Markovian and scaling intermediate rewards by 3), the evasion probability jumped to 72.0%.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A05",
+      "category": "design_rationale",
+      "difficulty": "T2_scattered",
+      "question": "Why does RICE use a mixed initial state distribution (combining default initial states and critical states) rather than initializing exclusively from critical states, and what theoretical benefit does this provide?",
+      "gold_answer": "Initializing solely from critical states hurts diversity and causes overfitting—the agent learns to perform well from critical states but fails from default initial states. The mixed distribution prevents overfitting and provides a tighter sub-optimality bound by reducing the distribution mismatch coefficient ||d^π*_ρ / d^π̂_ρ||_∞ compared to random explanation, as shown in Theorem 3.6 and Claim 1.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A06",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What values of the reset probability p and exploration bonus weight λ are used for the Autonomous Driving (Auto) task in RICE's experiments, and what general recommendation does the paper make about the best range for p?",
+      "gold_answer": "For Autonomous Driving: p = 0.25 and λ = 0.01. The paper recommends that p = 0.25 or p = 0.5 is most beneficial across all applications, as a mixed initial distribution (0 < p < 1) helps eliminate overfitting.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A07",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "In Table 1, what is the final reward achieved by RICE (Ours) versus JSRL in the Autonomous Driving task, and what was the pre-refinement (No Refine) performance?",
+      "gold_answer": "No Refine: 10.30 (±2.25), JSRL: 11.26 (±3.66), RICE (Ours): 17.03 (±1.65).",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does RICE use Random Network Distillation (RND) for exploration rather than goal-conditioned RL approaches, and under what condition does RICE's behavior degenerate to being equivalent to plain RND?",
+      "gold_answer": "RND is chosen because it is effective in large and continuous state spaces where count-based bonuses are hard to extend, and it rewards visiting novel states to increase state coverage. RICE degenerates to plain RND when the pre-trained policy has extremely poor state coverage (cold start setting, violating Assumption 3.2), such as in the Mountain Car environment, because the explanation method cannot identify meaningful critical states.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what two conditions does RICE fail to provide meaningful improvement over a baseline exploration method, and what assumption is violated in each case?",
+      "gold_answer": "1) Cold start: when the pre-trained policy has extremely poor state coverage (Assumption 3.2 is violated), making explanations meaningless—RICE reduces to RND. 2) When critical states identified are ones where the agent has already converged to the optimal action, resetting to those states provides no learning benefit (related to the Critical State Filtering limitation discussed in Section 5).",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rice_A10",
+      "category": "cross_section",
+      "difficulty": "unanswerable",
+      "question": "What is the exact wall-clock time required to run the full RICE refining procedure (including mask network training and policy refinement) for the Cage Challenge 2 environment on the authors' hardware setup?",
+      "gold_answer": "The paper does not report the total wall-clock time for the full RICE refining procedure in Cage Challenge 2. It only reports the mask network training time (79,382 seconds for StateMask and 65,400 seconds for RICE's method) for a fixed number of samples, not the complete end-to-end refining time.",
+      "grading_type": "abstention",
+      "source": "pdf"
+    }
+  ]
+}

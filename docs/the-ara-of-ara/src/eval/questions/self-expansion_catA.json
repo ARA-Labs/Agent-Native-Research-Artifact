@@ -1,0 +1,101 @@
+{
+  "paper_id": "self-expansion",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 9,
+  "n_from_ara": 6,
+  "questions": [
+    {
+      "id": "self-expansion_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is SEMA's average accuracy (A_N) on the ImageNet-A benchmark using ViT-B/16-IN1K as reported in Table 1?",
+      "gold_answer": "64.53%",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "self-expansion_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What are the initial learning rates used for adapters and representation descriptors in SEMA's training setup, and how do they differ?",
+      "gold_answer": "0.005 for adapters and 0.01 for representation descriptors (RDs use twice the learning rate of adapters), both decaying with cosine annealing.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "self-expansion_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the complete expansion trigger condition in SEMA: what is computed, how is it normalized, and what logical condition must be satisfied across all existing representation descriptors at a layer before a new adapter is added?",
+      "gold_answer": "For each existing representation descriptor k at layer l, the reconstruction error r_k^l = ||x^l - g(x^l)||_2 is computed. This is normalized to a z-score: z_k^l = (r_k^l - mu_k^l) / sigma_k^l, where mu and sigma are running mean and std maintained over a buffer of samples. Expansion is triggered at layer l if and only if ALL existing RDs at that layer report z-scores exceeding threshold tau (i.e., for all k: z_k^l > tau), meaning the input is out of scope of every existing RD.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "self-expansion_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Comparing SEMA's added parameters (in Millions) to CODA-P on ImageNet-A, and given both methods' A_N scores on that dataset from Table 1, what does this reveal about SEMA's parameter efficiency?",
+      "gold_answer": "SEMA uses only 0.560M added parameters on ImageNet-A versus CODA-P's 3.994M (roughly 7x fewer), yet SEMA achieves A_N of 53.32% compared to CODA-P's 35.02%, demonstrating that SEMA achieves substantially better accuracy with far fewer parameters.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "self-expansion_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How is the expandable weighting router implemented mathematically, and what happens to existing router columns and the newly added column when a new adapter is added?",
+      "gold_answer": "The router h_{psi^l}(x^l) is a linear mapping followed by softmax: w^l = softmax(x^l * W^l_mix), where W^l_mix is in R^{d x K^l}. When a new adapter is added, W^l_mix is expanded by one new column. The existing columns are frozen (not updated during training of the new task); only the newly added column is trained. This controls forgetting in the router, though it cannot fully eliminate it.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "self-expansion_A06",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does SEMA use a learned soft weighting router rather than hard selection based directly on representation descriptor reconstruction errors for composing adapters at inference?",
+      "gold_answer": "RD-based hard selection is unreliable for individual inputs because it heavily relies on batch-level statistics and can be noisy for single samples. The learned soft weighting router is trained jointly with the adapters and produces more effective weighted mixtures, as confirmed by ablation results showing the soft router outperforms RD-based routing and other hard selection strategies.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "self-expansion_A07",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does SEMA's expansion mechanism fail to provide sufficient adaptation, and what design limitation is explicitly acknowledged regarding intra-task diversity?",
+      "gold_answer": "SEMA fails to adapt sufficiently when the expansion threshold is set too large (e.g., above 1.5 for ImageNet-A), minimizing expansion chances. Additionally, SEMA performs task-oriented expansion at most once per layer per task, which limits its ability to handle intra-task diversity (samples within a single task with highly varied distributions). The authors acknowledge this as a limitation and suggest fully online dynamic expansion as future work.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "self-expansion_A08",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "In the VTAB analysis (Fig. 4 and 5), which tasks triggered expansion and which did not, and what does the adapter usage pattern for Tasks 4 and 5 reveal about knowledge reuse?",
+      "gold_answer": "Expansion was triggered for Tasks 1, 2, and 3 (adding Adapters 1, 2, 3 respectively). Tasks 4 and 5 did not trigger expansion. Task 4 primarily reuses Adapter 1 (similar to Task 1, remote sensing/land cover), and Task 5 primarily reuses Adapter 3 (similar to Task 3, pets/flowers). This shows that SEMA effectively reuses previously learned adapters for tasks with similar feature distributions.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "self-expansion_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does SEMA scan transformer layers sequentially from shallow to deep during the expansion detection phase, rather than scanning all layers simultaneously or from deep to shallow?",
+      "gold_answer": "Expansion is scanned shallow-to-deep because when a shallow layer adds a new adapter and is trained, the representations it produces change, and these modified representations flow into deeper layers. If expansion decisions at deeper layers were made before shallow layers were expanded and trained, the RDs at deeper layers would be evaluating representations that will subsequently change, leading to inconsistent or incorrect expansion decisions. Shallow-to-deep ordering ensures each layer's expansion decision is based on the final adapted representations from all shallower layers.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "self-expansion_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the specific weight decay value used in SEMA's SGD optimizer during functional adapter training?",
+      "gold_answer": "The paper does not specify a weight decay value for the SGD optimizer. The training configuration only mentions the optimizer type (SGD), learning rates (0.005 for adapters, 0.01 for RDs), LR schedule (cosine annealing), and batch size (32). Weight decay is not reported.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "paper_id": "adaptive-pruning",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 5,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "adaptive-pruning_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "According to Table 5, what is the average performance of LLaMA2-7B with APT at 30% sparsity versus the same model without the kurtosis component (w/o kurtosis) at 30% sparsity?",
+      "gold_answer": "APT achieves an average of 50.0, while w/o kurtosis achieves an average of 38.1 — a drop of 11.9 points.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "adaptive-pruning_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What is the total number of training epochs used for APT on GLUE-big tasks (e.g., MNLI, SST2), and how are those epochs split between the distillation phase and the fine-tuning recovery phase?",
+      "gold_answer": "40 total epochs: 20 distillation (pruning) epochs followed by 20 fine-tuning recovery epochs.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "adaptive-pruning_A03",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "In the APT adapter formulation, how is the output H_apt(X) mathematically defined, and what role do the binary pruning masks m_i and m_o play?",
+      "gold_answer": "H_apt(X) = m_o ∘ (W + s · W_B W_A) X ∘ m_i, where s is a constant scaling factor and ∘ denotes the Hadamard product. m_i masks the input dimension and m_o masks the output dimension; a mask value of 0 prunes the corresponding parameter block and 1 retains it.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "adaptive-pruning_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe how the APT adapter's binary pruning masks are updated during training — specifically, what happens to the mask values of retained versus pruned blocks at each adjustment step, and what rate is used?",
+      "gold_answer": "Masks for retained blocks are increased by α = 0.01 per step (capped at 1), and masks for pruned blocks are decreased by α = 0.01 per step (floored at 0). This gradual decay prevents training instability from abrupt parameter removal.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "adaptive-pruning_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the outlier-aware salience score formula used in APT, and why is the kurtosis term added rather than using the activation-gradient product alone?",
+      "gold_answer": "The score is Ŝ(W_{:,j}) = S̃(W_{:,j}) + Kurt(O_{j,:})^{1/2}, where S̃ is the activation-gradient product summed over the dataset. The kurtosis term is added because block outlier parameters are disproportionately important for task-specific capabilities; averaging salience at the block level loses this signal — without kurtosis, LLaMA2-7B average performance drops from 50.0 to 38.1 at 30% sparsity.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "adaptive-pruning_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "APT's self-distillation is claimed to be more memory-efficient than using a separately trained FT teacher. Using the data in Table 10, what are the training memory footprints (relative to dense FT) for APT with self-distillation versus the FT teacher approach, and what architectural choice enables APT's memory advantage?",
+      "gold_answer": "APT with self-distillation uses 70.1% of FT training memory, while the FT teacher approach uses 111.8%. The key architectural choice is that APT shares frozen pretrained parameters between teacher and student, avoiding duplication of the bulk of the model's weights.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "adaptive-pruning_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "For T5-base at 60% sparsity, what is the raw 97% TTA (time-to-accuracy) in seconds for APT versus LoRA+Prune, and what is the resulting speedup ratio? How does this compare to the speedup ratio for RoBERTa-base at 60% sparsity?",
+      "gold_answer": "For T5-base: APT TTA = 1,774s, LoRA+Prune TTA = 14,417s, giving a speedup of approximately 8.1×. For RoBERTa-base: APT TTA = 752s, LoRA+Prune TTA = 6,513s, giving approximately 8.4×. Both show roughly 8× speedup, consistent with the paper's headline claim.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "adaptive-pruning_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does APT use different distillation loss weightings for GLUE tasks versus SQuAD/CNN-DM tasks (L_pred weight of 1.0 vs 0.1 respectively), and what does this imply about the nature of knowledge transfer needed for classification versus generation/QA tasks?",
+      "gold_answer": "For GLUE (classification), L_distill = L_pred + 0.9·L_layer, giving equal weight to prediction-level KL divergence. For SQuAD/CNN-DM (generation/QA), L_distill = 0.1·L_pred + 0.9·L_layer, heavily down-weighting prediction distillation. This implies that for generation and span-extraction tasks, matching intermediate hidden representations is more informative than matching output distributions, likely because the output space is much larger and sparser, making prediction-level KL less stable or informative.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "adaptive-pruning_A09",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Under what conditions does APT's inference efficiency for T5 models fall short of the LoRA+Prune baseline, and what is the underlying reason given by the authors?",
+      "gold_answer": "When pruning T5 models at 60% sparsity, APT achieves only 1.3× inference speedup and 81.5% memory cost, which is worse than LoRA+Prune's 2.1× speedup and 73.4% memory cost. The reason is that APT adaptively prunes more decoder parameters, which are computationally cheaper than encoder parameters (due to shorter output sequence length) but relatively less useful for classification tasks, resulting in less actual inference speedup.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "adaptive-pruning_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "ara_difficulty": "T3_implicit",
+      "question": "What is the specific value of the exponential moving average decay parameter β used when updating global salience scores in APT's adaptive pruning algorithm?",
+      "gold_answer": "The paper mentions using exponential moving-averaged salience (referencing Zhang et al., 2023b) and includes β in Algorithm 1, but does not specify the exact numerical value of β used in experiments.",
+      "ara_gold_answer": "β = 0.85. The artifact's src/configs/training.md records: 'EMA Decay for Salience (β): Value = 0.85, adopted from AdaLoRA (Zhang et al., 2023b), Source: §A (Appendix A).' This value is not stated in the paper text but is captured in the artifact's hyperparameter documentation.",
+      "grading_type": "abstention",
+      "ara_grading_type": "exact_numeric",
+      "source": "pdf",
+      "design_note": "PDF-centric gold marks this unanswerable because the paper does not state β. ARA gold reflects that the artifact captures this value from the appendix/code, making it T3_implicit for artifact-based evaluation."
+    }
+  ]
+}

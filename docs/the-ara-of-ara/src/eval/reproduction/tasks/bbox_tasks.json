@@ -1,0 +1,251 @@
+[
+  {
+    "task_id": "bbox_T01",
+    "goal": "Implement the EBM adapter architecture for BBOX-ADAPTER. Set up both DeBERTa-v3-base (0.1B) and DeBERTa-v3-large (0.3B) backbones with scalar classification heads, and implement the NCE loss from Equation 3 with spectral normalization. Configure the adapter to accept (x,y) text pairs and output scalar energy scores. Do NOT train or evaluate — implementation only.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: BBOX-ADAPTER's energy-based adapter architecture can be correctly instantiated with DeBERTa backbones"
+    ],
+    "rubric_requirement_ids": [
+      "deberta-base-strategyqa",
+      "deberta-base-gsm8k",
+      "deberta-large-strategyqa",
+      "deberta-large-gsm8k",
+      "adapter-inputs",
+      "adapter-outputs",
+      "positive-terms",
+      "negative-terms",
+      "loss-computation",
+      "gradient-updates",
+      "spectral-normalization",
+      "model-loading",
+      "classification-head",
+      "model-loading-large",
+      "classification-head-large"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "bbox_T02",
+    "goal": "Implement the sentence-level beam search inference mechanism for BBOX-ADAPTER. Implement both the single-step variant (LLM generates complete answers, adapter selects the best) and the full-step variant (iterative beam search with sentence-level factorization). Set up the LLM as a black-box proposal generator: handle prompt formatting, completion parsing, and configure generation parameters (temperature=1.0, max_length=512). Verify the beam search correctly scores candidates, prunes beams, and selects final outputs.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: BBOX-ADAPTER's beam search inference can combine black-box LLM proposals with adapter scoring"
+    ],
+    "rubric_requirement_ids": [
+      "sequence-decomposition",
+      "autoregressive-scoring",
+      "candidate-generation",
+      "beam-scoring",
+      "beam-pruning",
+      "termination-check",
+      "final-selection",
+      "single-step-generation",
+      "single-step-selection",
+      "full-step-generation",
+      "full-step-selection",
+      "prompt-handling",
+      "completion-handling",
+      "proposal-generation",
+      "black-box-usage"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "bbox_T03",
+    "goal": "Download and prepare all four evaluation datasets (StrategyQA, GSM8K, TruthfulQA, ScienceQA) with the exact train/test splits specified in Appendix F.1. Set up the BERT-base-cased adapter backbone for TruthfulQA. Configure GPT-5-mini API access and Mixtral-8x7B model loading. Implement the few-shot CoT prompts (2-shot for StrategyQA, 4-shot for GSM8K, 1-shot for ScienceQA) as specified in Appendix J.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Evaluation infrastructure can be correctly configured for all four datasets",
+      "C05: AI feedback pipeline requires correct dataset and model setup"
+    ],
+    "rubric_requirement_ids": [
+      "gsm8k-download-code",
+      "gsm8k-download-exec",
+      "gsm8k-split-code",
+      "gsm8k-split-exec",
+      "strategyqa-download-code",
+      "strategyqa-download-exec",
+      "strategyqa-split-code",
+      "strategyqa-split-exec",
+      "truthfulqa-download-code",
+      "truthfulqa-download-exec",
+      "truthfulqa-split-code",
+      "truthfulqa-split-exec",
+      "bert-base-tasks",
+      "model-loading-bert",
+      "classification-head-bert"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "bbox_T04",
+    "goal": "Implement and execute Algorithm 1 (Online Adaptation) for BBOX-ADAPTER. Implement initialization (random adapter parameters, initial K-response sampling, ground-truth and AI-feedback positive/negative selection), the main adaptation loop (Equations 3-7: adapted sampling, positive/negative sample updates, NCE loss gradient, parameter update), and the training configuration (AdamW optimizer with lr=5e-6 and weight decay 0.01, batch size 64, 6000 steps). Train one 0.1B adapter on StrategyQA using ground-truth feedback.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: The online adaptation algorithm converges and produces a functional adapter",
+      "C06: Iterative online adaptation improves adapter quality over random initialization"
+    ],
+    "rubric_requirement_ids": [
+      "random-init",
+      "initial-sampling",
+      "ground-truth-selection",
+      "ai-feedback-selection",
+      "eq4-implementation",
+      "eq5-implementation",
+      "eq6-implementation",
+      "eq3-implementation",
+      "eq7-implementation",
+      "optimizer-setup",
+      "batch-config",
+      "adapter-training-execution",
+      "strategyqa-small-adapter"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "bbox_T05",
+    "goal": "Evaluate BBOX-ADAPTER with Ground-Truth feedback against the CoT baseline on GPT-5-mini for StrategyQA and GSM8K (partial Table 2). Run the CoT baseline on both datasets. Train task-specific 0.1B and 0.3B adapters for each dataset, select the best performer, and evaluate with ground-truth feedback. Verify that BBOX-ADAPTER (GT) improves over CoT by approximately 5.03% on StrategyQA and 6.35% on GSM8K.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: BBOX-ADAPTER improves black-box LLM task performance without parameter or probability access",
+      "C02: Ground-truth feedback enables effective adapter training"
+    ],
+    "rubric_requirement_ids": [
+      "azure-api-setup",
+      "gpt-generation-params",
+      "cot-execution",
+      "cot-strategyqa-accuracy",
+      "cot-gsm8k-accuracy",
+      "gt-adapter-training",
+      "gt-evaluation",
+      "gt-acc-sqa",
+      "gsm8k-small-adapter",
+      "gsm8k-large-adapter",
+      "performance-comparison-code",
+      "performance-comparison-exec",
+      "baseline-strategyqa",
+      "baseline-gsm8k",
+      "gt-strategyqa-gain"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "bbox_T06",
+    "goal": "Evaluate BBOX-ADAPTER with AI Feedback and Combined feedback on GPT-5-mini for StrategyQA and GSM8K (partial Table 2). Train adapters using AI feedback (GPT-4 as judge, no ground-truth labels) and combined feedback (both GT + AI). Evaluate all three feedback modes and compare. Verify that AI Feedback achieves competitive performance with GT (~3.26% on StrategyQA, ~5.99% on GSM8K) and that Combined achieves the best results (~5.68% on StrategyQA, ~6.77% on GSM8K).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C05: Online adaptation with AI feedback achieves competitive performance to ground-truth-based adaptation",
+      "C01: Combined feedback achieves the highest improvement"
+    ],
+    "rubric_requirement_ids": [
+      "ai-adapter-training",
+      "ai-evaluation",
+      "combined-adapter-training",
+      "combined-evaluation",
+      "ai-feedback-strategyqa-trend",
+      "ai-feedback-gsm8k-trend",
+      "combined-strategyqa-trend",
+      "combined-gsm8k-trend",
+      "combined-strategyqa",
+      "combined-gsm8k",
+      "gt-gsm8k-gain"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "bbox_T07",
+    "goal": "Reproduce the NCE-vs-MLM loss ablation study (Table 5). Implement the MLM baseline (masked word supervision for training, masked word probability scoring for inference). Train both NCE and MLM adapters at both sizes (0.1B and 0.3B) on StrategyQA and GSM8K. Verify that NCE consistently outperforms MLM by approximately 10 percentage points on StrategyQA regardless of adapter size (MLM: ~61.52%/60.41% vs NCE: ~71.62%/71.18%).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: Ranking-based NCE loss significantly outperforms MLM loss for black-box adaptation",
+      "C01: NCE advantage is consistent across adapter sizes"
+    ],
+    "rubric_requirement_ids": [
+      "mlm-training",
+      "mlm-inference",
+      "deberta-base-scienceqa",
+      "deberta-large-scienceqa",
+      "size-performance-calculation",
+      "mlm-size-trend",
+      "nce-size-trend",
+      "temperature-setting",
+      "max-length-setting"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "bbox_T08",
+    "goal": "Reproduce the plug-and-play transfer evaluation on davinci-002 (partial Table 3). Set up davinci-002 API access with the specified generation parameters. Take the adapter trained on GPT-5-mini and apply it without retraining to davinci-002. Evaluate base and adapted davinci-002 on StrategyQA and TruthfulQA. Verify that adapted davinci-002 improves by ~15.42% on StrategyQA and ~5.00% on TruthfulQA.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: BBOX-ADAPTER transfers plug-and-play to unseen black-box LLMs without retraining",
+      "C01: The adapter generalizes across different LLM backends"
+    ],
+    "rubric_requirement_ids": [
+      "davinci-api-setup",
+      "davinci-generation-params",
+      "base-davinci-strategyqa",
+      "base-davinci-gsm8k",
+      "base-davinci-truthfulqa",
+      "adapted-davinci-strategyqa",
+      "adapted-davinci-gsm8k",
+      "adapted-davinci-truthfulqa",
+      "davinci-strategyqa-trend",
+      "davinci-gsm8k-trend",
+      "davinci-truthfulqa-trend",
+      "davinci-average-trend"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "bbox_T09",
+    "goal": "Reproduce the scaling analysis for beam size and online adaptation iterations (Figure 3). Configure BBOX-ADAPTER with beam sizes k=1, 3, 5 on StrategyQA and verify that increasing beam size yields ~2.41% average improvement. Configure online adaptation with T=0, 1, 2, 3, 4 iterations on StrategyQA and verify that (a) the un-finetuned adapter (T=0) performs worse than the base model, (b) performance surpasses the base model after T=1, and (c) improvements are consistent up to T=3.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C06: Increasing beam size monotonically improves performance",
+      "C06: Additional online adaptation iterations improve performance up to a saturation point"
+    ],
+    "rubric_requirement_ids": [
+      "beam-configurations",
+      "beam-inference",
+      "performance-tracking-beam",
+      "beam-size-trends",
+      "iteration-configurations",
+      "iteration-training",
+      "performance-tracking-129838129",
+      "performance-tracking",
+      "initial-performance-trend",
+      "adaptation-improvement-trend",
+      "subsequent-iterations-trend"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "bbox_T10",
+    "goal": "Reproduce the cost efficiency analysis (Table 4) comparing BBOX-ADAPTER vs Azure-SFT on StrategyQA and GSM8K. Set up and execute Azure-SFT baseline fine-tuning (epochs=3). Track and compute training costs ($), inference costs ($/1k questions), and evaluation costs ($) for both Azure-SFT and BBOX-ADAPTER (full-step variant). Verify that BBOX-ADAPTER reduces training costs by ~31.30x and inference costs by ~1.84x compared to Azure-SFT, while maintaining competitive performance.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C03: BBOX-ADAPTER reduces training and inference costs substantially compared to SFT",
+      "C01: Cost reduction does not sacrifice performance disproportionately"
+    ],
+    "rubric_requirement_ids": [
+      "data-formatting",
+      "hyperparameter-config",
+      "azure-sft-implementation",
+      "azure-sft-execution",
+      "gpt-finetune-params",
+      "azure-sft-strategyqa-cost",
+      "azure-sft-gsm8k-cost",
+      "adapter-strategyqa-cost",
+      "adapter-gsm8k-cost",
+      "azure-sft-strategyqa-inf-cost",
+      "azure-sft-gsm8k-inf-cost",
+      "adapter-strategyqa-inf-cost",
+      "adapter-gsm8k-inf-cost",
+      "training-reduction-trend",
+      "inference-reduction-trend"
+    ],
+    "n_requirements": 15
+  }
+]

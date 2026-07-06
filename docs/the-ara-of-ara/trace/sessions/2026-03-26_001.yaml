@@ -1,0 +1,65 @@
+session:
+  id: "2026-03-26_001"
+  timestamp: "2026-03-26T00:00"
+  summary: "small_scaling_law extension experiment v2: ARA 0.644 vs baseline 0.806 — baseline wins on loss calibration despite ARA finding near-optimal hyperparams"
+
+key_context:
+  - "Previous small_scaling_law runs (v1) were invalidated by scorer isolation failure — agents decoded base64+zlib ground truth from local_score.py. Fixed with 7-layer defense: score_wrapper.py relay, hidden scorer in .scorers/, blocked env paths, blind scoring, ARA subdir blocks."
+  - "Three ARA budget attempts: 2M (59 turns, no training), 5M (103 turns, no training completed), 8M (121 turns, ran 27 experiments). Agent spent 70+ turns reading files and batch-size debugging before first training run."
+  - "ARA agent submitted n_embd=552 (vs optimal 554, error 0.0002!) but predicted loss=3.28 (vs actual 3.64, error 0.356). Near-perfect hyperparameter selection, terrible loss calibration."
+  - "Baseline agent used polished paper's reference (n_embd=992, max_iters=26919) — suboptimal hyperparams (error 0.074) but better loss prediction (3.59, error 0.12)."
+  - "Bug: baseline used 'python' instead of 'python3' for scorer calls, causing all scoring to fail silently behind blind scoring. Score 0.806 computed manually."
+  - "Bug: score extraction regex matched 'Score = 1 - [...]' in README as score 1.0. Fixed by restricting extraction to scoring commands only."
+
+events_logged:
+  - type: experiment
+    id: N83
+    provenance: ai-executed
+    summary: "small_scaling_law extension v2 ARA: 0.644 (n_embd=552, near-optimal but bad loss prediction)"
+  - type: experiment
+    id: N84
+    provenance: ai-executed
+    summary: "small_scaling_law extension v2 baseline: 0.806 (n_embd=992 from polished paper, better loss calibration)"
+  - type: dead_end
+    id: N85
+    provenance: ai-executed
+    summary: "2M and 5M token budgets insufficient — agent exhausted reading files before training"
+  - type: observation
+    id: O76
+    provenance: ai-suggested
+    summary: "ARA can guide to correct hyperparameter region but agent failed at loss calibration"
+  - type: observation
+    id: O77
+    provenance: ai-suggested
+    summary: "Score extraction regex false positives from README content"
+
+ai_actions:
+  - action: "Ran ARA condition 3 times (2M, 5M, 8M budget), baseline once (8M budget)"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/results/small_scaling_law_ara_seed0/", "code/eval/extension/results/small_scaling_law_baseline_seed0/"]
+  - action: "Updated SCORING_INSTRUCTIONS.md with batch size guidance and python3"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/env/small_scaling_law/SCORING_INSTRUCTIONS.md"]
+  - action: "Fixed score extraction false positive bug in run_extension.py"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/run_extension.py"]
+  - action: "Fixed python→python3 in all SCORING_INSTRUCTIONS.md files"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/env/*/SCORING_INSTRUCTIONS.md"]
+  - action: "Updated extension_experiment_design.md with v2 results"
+    provenance: ai-executed
+    files_changed: ["memo/extension_experiment_design.md"]
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "Multi-seed runs for small_scaling_law (currently 1/5 seeds)"
+  - "ARA's loss prediction could be much better with improved prompting — if pred=3.64, score would be 0.996"
+  - "restricted_mlm and optimize_llm_foundry still pending"
+
+ai_suggestions_pending:
+  - "The ARA condition's failure is specifically about loss calibration, not hyperparameter search. This distinction matters for the paper narrative."
+  - "Consider whether the polished paper's explicit reference parameters (n_embd≈992) constitute unfair advantage — it gives baseline a directly usable answer."

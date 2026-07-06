@@ -1,0 +1,86 @@
+session:
+  id: "2026-04-14_002"
+  timestamp: "2026-04-14"
+  summary: "RE-Bench pipeline v2 built; triton_cumsum ARA rebuilt end-to-end from official solution + 22 MALT transcripts; hardened sub-agent extraction prompt against truncation and chunk-skipping"
+
+events_logged:
+  - type: decision
+    id: "N104"
+    provenance: user
+    summary: "New code/rebench-pipeline/ scaffold: ORCHESTRATOR.md (Phase 0-4) + PIPELINE.md (RE-Bench rules, priority over ingestor skill) + malt_extraction_agent_prompt.md (sub-agent template). CLAUDE.md amended with RE-Bench ARA Generation section pointing at the orchestrator."
+
+  - type: heuristic
+    id: "H21"
+    provenance: user-revised
+    summary: "Sub-agents handling chunked transcript inputs must dump chunks to files + Read with pagination; never preview via content[:N]. Complements existing feedback_subagent_no_truncation memory."
+
+  - type: heuristic
+    id: "H22"
+    provenance: user-revised
+    summary: "NEVER SKIP CHUNKS: every chunk of every transcript must be read end-to-end. Earlier v1/v2 sub-agents silently dropped chunks and produced incomplete traces; hardened v3 prompt makes the rule explicit."
+
+  - type: heuristic
+    id: "H23"
+    provenance: ai-suggested
+    summary: "Merge-time scrubs are a necessary belt-and-suspenders even when the upstream sub-agent prompt enforces a filter (e.g. beat-reference PIPELINE.md §3.7): one of 22 runs leaked a sub-reference attempt despite the rule being in the prompt."
+
+  - type: experiment
+    id: "N105"
+    provenance: ai-executed
+    summary: "22 MALT runs extracted with v3 sub-agent prompt, Phase 3 merge consolidated into rebench-triton_cumsum: 9 official + 320 MALT exploration nodes, 339 evidence rows, 12 claims, 15 heuristics, 11 experiments. Cross-run distillation aggregated 144 raw insights into 6 new C-entries and 9 new H-entries."
+
+  - type: dead_end
+    id: "N106"
+    provenance: ai-executed
+    summary: "Python 3.6 pyyaml <5.1 rejects yaml.safe_dump(sort_keys=...); cluster py3.11/3.12 lacks pyyaml with no pip. Workaround: raw text concatenation from per-run trace_nodes.yaml files preserves formatting and avoids re-serialization."
+
+  - type: observation
+    id: "O01"
+    provenance: ai-executed
+    summary: "First Phase 3 merge attempt truncated the file (head written before yaml.dump failed); recovery required rebuilding malt_stream from source run files. Lesson: when writing large YAML via a multi-step script, write atomically or always verify final line count."
+
+  - type: decision
+    id: "N107"
+    provenance: user
+    summary: "Archive the 7 v1 hallucinated rebench ARAs to code/artifacts/old-rebench/ and gitignore them (matches existing code/artifacts/old pattern). Only rebench-triton_cumsum kept live in git; others will be rebuilt in subsequent sessions."
+
+  - type: decision
+    id: "N108"
+    provenance: user
+    summary: "Commit ecc15287 captures the full state of the pipeline v2 rollout: CLAUDE.md update, .gitignore additions (slurm_logs, model weights), rebench-pipeline scaffold + 22 MALT outputs (16M), rebuilt triton_cumsum ARA, archival of v1 ARAs. Not yet pushed; waiting on user go-ahead."
+
+ai_actions:
+  - action: "Created code/rebench-pipeline/{ORCHESTRATOR.md, PIPELINE.md, malt_extraction_agent_prompt.md} and ran 22 MALT extractions into malt_outputs/triton_cumsum/run_{id}/"
+    provenance: ai-executed
+    files_changed: ["code/rebench-pipeline/ORCHESTRATOR.md", "code/rebench-pipeline/PIPELINE.md", "code/rebench-pipeline/malt_extraction_agent_prompt.md", "code/rebench-pipeline/malt_outputs/triton_cumsum/run_*/"]
+
+  - action: "Rebuilt rebench-triton_cumsum ARA from official solution + 22 MALT runs; two-stream exploration tree (official + malt_stream), evidence tables, claims, heuristics, experiments"
+    provenance: ai-executed
+    files_changed:
+      - "code/artifacts/rebench-triton_cumsum/PAPER.md"
+      - "code/artifacts/rebench-triton_cumsum/logic/*"
+      - "code/artifacts/rebench-triton_cumsum/evidence/*"
+      - "code/artifacts/rebench-triton_cumsum/trace/exploration_tree.yaml"
+      - "code/artifacts/rebench-triton_cumsum/src/*"
+
+  - action: "Added RE-Bench ARA Generation section to CLAUDE.md pointing future sessions at code/rebench-pipeline/ORCHESTRATOR.md"
+    provenance: ai-executed
+    files_changed: ["CLAUDE.md"]
+
+  - action: "Gitignore updates: slurm_logs/, code/slurm_logs/, model weight extensions (*.safetensors, *.bin), code/artifacts/old-rebench/"
+    provenance: ai-executed
+    files_changed: [".gitignore"]
+
+  - action: "Committed pipeline v2 rollout as ecc15287 (567 files, +83991/-24567)"
+    provenance: ai-executed
+    files_changed: []
+
+claims_touched: []
+
+open_threads:
+  - "Commit ecc15287 not yet pushed to origin/main — awaiting user confirmation"
+  - "6 remaining rebench ARAs (fix_embedding, nanogpt_chat_rl, optimize_llm_foundry, restricted_mlm, rust_codecontests, small_scaling_law) still need to be rebuilt on the v2 pipeline"
+  - "Consider stamping the extraction prompt with an explicit version header (currently labeled v3 informally but no version field in the file)"
+
+ai_suggestions_pending:
+  - "Promote the O01 atomic-write lesson to a heuristic if the same failure mode recurs in future merge runs"

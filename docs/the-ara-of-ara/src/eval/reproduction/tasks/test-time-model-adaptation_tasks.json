@@ -1,0 +1,259 @@
+[
+    {
+        "task_id": "test-time-model-adaptation_T01",
+        "goal": "Implement the FOA core infrastructure: load a pretrained ViT-Base from timm, obtain the ImageNet-1K and ImageNet-C datasets, implement the fitness function (Equation 5) combining prediction entropy and activation distribution discrepancy, compute and store source domain statistics, implement the CMA-ES prompt optimizer with population sampling and parameter updates, implement the back-to-source activation shifting mechanism with EMA direction updates (Equations 7-9), and implement accuracy and ECE metrics. This is a pure implementation task with no evaluation runs required.",
+        "difficulty": "easy",
+        "hypotheses_tested": [
+            "C01: FOA without backpropagation can produce competitive accuracy on ImageNet-C using the CMA-ES prompt + activation shifting pipeline"
+        ],
+        "rubric_requirement_ids": [
+            "vit-base",
+            "07ab27df-589c-4896-b667-93ca6e0c7a05",
+            "e66011b0-67aa-4e40-8b89-028c61e5cd61",
+            "new-uuid-source-stats",
+            "prompt-insertion",
+            "dd2b0167-77fd-443c-9b1f-2421bf88de11",
+            "94f30003-f275-41a4-b76c-6fdd51721246",
+            "cdd126eb-86a2-4c3a-91f1-b217bff9456c",
+            "4c1b3e06-ded8-4fb0-866a-0f09af607afe",
+            "new-uuid-fitness-sum",
+            "8cc7f4ee-e809-4b43-81cd-f6e34bef05de",
+            "6fce355f-d43f-467d-b7ba-c324ff4cb17d",
+            "source-statistics",
+            "45191ae5-2021-4571-bb5c-bc45bbd054db",
+            "3487990e-09b6-40b7-9b48-c3321e67898c"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T02",
+        "goal": "Implement the activation shifting mechanism details and set all FOA hyperparameters correctly. This includes: batch-mean computation, EMA update rule, shifting direction calculation, gamma-scaled CLS feature shift, correct initialization of the moving average from the first batch, and all default parameter values (Np=3, uniform init, BS=64, K=28, lambda=0.4/0.2, alpha=0.1, gamma=1.0, 32-bit precision, full ImageNet-1K val for source stats). Verify source statistics are computed and stored.",
+        "difficulty": "easy",
+        "hypotheses_tested": [
+            "C05: Back-to-source activation shifting independently improves OOD accuracy over NoAdapt"
+        ],
+        "rubric_requirement_ids": [
+            "dfa8753b-5321-4f0f-b455-40f12edf0e41",
+            "6ae1951a-9046-4c4f-8b80-2dced089f876",
+            "37a2aa82-25db-467c-ac20-52110ea68af0",
+            "88178132-a2d9-4804-9516-b5e9d31d1a49",
+            "activation-shifting-initialization",
+            "96fe6dab-b94c-4b65-b226-685b2b030530",
+            "0c2acf08-070a-4f66-8c39-cd6ba26c141b",
+            "c33f98df-8d41-434b-9c27-ce71f7e6d6d1",
+            "bc867c99-9d7f-4d50-9af6-b46ede203b16",
+            "69c93e10-4535-477d-84d3-63ce712405e3",
+            "03d22003-456f-4288-8d22-25a829efdd54",
+            "7bf85e71-77f0-4f81-836e-03d5d56a9a29",
+            "38ece210-c07a-4f8d-baf7-7e99a3a203f3",
+            "new-uuid-1",
+            "new-uuid-2"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T03",
+        "goal": "Implement all baseline TTA methods with their prescribed hyperparameters. Implement gradient-free baselines: LAME (BS=64, k=5) and T3A (BS=64, M=20). Implement gradient-based baselines: TENT (BS=64, SGD, momentum=0.9, lr=0.001), CoTTA (SGD, momentum=0.9, lr=0.05, BS=64, p_th=0.1, 32 augmentations, restoration prob=0.01, EMA alpha=0.999), and SAR (SGD, momentum=0.9, lr=0.001, BS=64, entropy threshold=0.4*ln(C), trainable params=blocks1-8 LN affine). This is a pure implementation task.",
+        "difficulty": "easy",
+        "hypotheses_tested": [
+            "C01: FOA without backpropagation can produce competitive accuracy on ImageNet-C using the CMA-ES prompt + activation shifting pipeline"
+        ],
+        "rubric_requirement_ids": [
+            "lame-implementation",
+            "t3a-implementation",
+            "tent-implementation",
+            "cotta-implementation",
+            "sar-implementation",
+            "656e67f1-0777-4e04-a5e7-1bc55e1eae7c",
+            "537a4b4a-345d-47b5-9146-ecce04342a68",
+            "955216ec-c8dd-4734-8409-c8d8c1082670",
+            "12e08875-9130-45b4-9a69-94178bcd8294",
+            "caabc6a0-056f-4bd6-9994-b48c645ee976",
+            "4402b969-ad0c-401b-b475-2574749898bb",
+            "ccc0dd8a-31c6-490d-aa37-4f7c642edf7a",
+            "df17b005-f142-47e8-9286-1efa94d7905d",
+            "2500492e-6bf8-415b-9e8c-e492bcea9f2d",
+            "891b9f8e-9a71-41d8-8498-db75c554f37b"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T04",
+        "goal": "Evaluate all methods on ImageNet-C (severity 5, all 15 corruptions) with full-precision 32-bit ViT-Base (Tables 2 and 16). Run NoAdapt, LAME, T3A, TENT, CoTTA, SAR, and FOA. Verify: FOA achieves highest average accuracy and lowest average ECE; LAME and T3A perform at or below NoAdapt; gradient-based methods outperform gradient-free ones; FOA exceeds SAR by 2-6% in both accuracy and ECE; FOA ECE is >10pp lower than TENT.",
+        "difficulty": "medium",
+        "hypotheses_tested": [
+            "C01: FOA on full-precision 32-bit ViT-Base achieves the best average accuracy on ImageNet-C severity 5",
+            "C01: FOA achieves substantially lower ECE than all gradient-based TTA methods on ImageNet-C"
+        ],
+        "rubric_requirement_ids": [
+            "a3892035-d300-4c89-a761-ace7829f33b6",
+            "09a51455-c656-404b-be52-09999f529fb7",
+            "dd10692c-8196-4073-9555-db4b3034d405",
+            "413cecbd-59a4-451c-a60c-fad885bf33b5",
+            "806d13f1-ace2-4a29-b746-97659030f487",
+            "f49179f6-5d63-4117-abbd-2ef7c0325499",
+            "14e863e3-c953-424b-b059-aa126b261f88",
+            "e358b89e-c75f-448b-812f-734fca9e69d4",
+            "e008e8e1-0d6e-4411-8f46-69b07656d430",
+            "564653b0-70a0-4143-9d2d-5eb90ed2a833",
+            "fa981c83-ca1a-4122-bce2-2a5045cf3b13",
+            "new-uuid-3",
+            "fb2c9926-ef49-465d-8794-5201caa9c15c",
+            "95ba7d30-f4d7-4a15-befd-9fc6b3db57ce",
+            "87cca796-5257-46d8-bcca-2234287aa96b"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T05",
+        "goal": "Evaluate all methods on ImageNet-R (lambda=0.2), ImageNet-V2, and ImageNet-Sketch (Table 3). Obtain these three datasets. Evaluate gradient-free baselines (NoAdapt, LAME, T3A) and gradient-based methods (TENT, CoTTA, SAR) alongside FOA on all 3 benchmarks for both accuracy and ECE. Verify FOA achieves comparable or highest accuracy and comparable or lowest ECE across these distribution shift benchmarks.",
+        "difficulty": "medium",
+        "hypotheses_tested": [
+            "C01: FOA generalizes across distribution shift benchmarks (ImageNet-R, V2, Sketch)",
+            "C01: FOA achieves comparable or best ECE on alternative OOD benchmarks"
+        ],
+        "rubric_requirement_ids": [
+            "imagenet-r",
+            "imagenet-v2",
+            "imagenet-sketch",
+            "91f4fde3-cb9a-4899-9689-1ec0456c4d40",
+            "76d49374-1496-4dc3-970d-0c2890bca42f",
+            "b384d1f5-f600-4714-ae40-1e0e6d6ee276",
+            "e337c8f0-f757-41a8-95bd-d4d4972ea034",
+            "0ee5fada-d3a1-4e18-a711-af8189c0c0c2",
+            "6613dcf6-8941-42bb-a969-c03179a75d93"
+        ],
+        "n_requirements": 9
+    },
+    {
+        "task_id": "test-time-model-adaptation_T06",
+        "goal": "Reproduce the FOA component ablation study (Table 5). Run FOA with all 7 component subsets of {entropy fitness, activation discrepancy fitness, activation shifting} on all 15 ImageNet-C corruptions (severity 5). Compute average accuracy and ECE for each configuration. Verify: entropy-only CMA collapses below NoAdapt; activation discrepancy alone gives >5% accuracy gain over NoAdapt; activation shifting alone gives >2% accuracy gain over NoAdapt; full combination achieves best accuracy; full combination achieves best ECE.",
+        "difficulty": "medium",
+        "hypotheses_tested": [
+            "C04: Entropy-only fitness causes CMA optimization to collapse below NoAdapt",
+            "C05: Back-to-source activation shifting independently improves OOD accuracy",
+            "C06: Activation discrepancy fitness enables stable CMA optimization"
+        ],
+        "rubric_requirement_ids": [
+            "44021325-7929-45e0-9900-ca2bce85a5ea",
+            "c6a02904-c8bf-4d68-901e-b68c2b7c39d2",
+            "8c734773-1093-4409-b402-dc31bd03d82b",
+            "4c40bfda-0437-4354-bef3-6a903d6ee43d",
+            "60c1e713-4492-4558-a5f1-c38655056b52",
+            "ec71c4f7-a73b-4dd5-a35e-0f7b336b9a79",
+            "f0373fea-4f62-4d85-831d-e968cdf0e13b"
+        ],
+        "n_requirements": 7
+    },
+    {
+        "task_id": "test-time-model-adaptation_T07",
+        "goal": "Reproduce the design choice study (Table 9) and the population size sensitivity analysis (Figure 2a). Implement norm-layer-only and prompt-only training modes, SGD and CMA optimizers, entropy and fitness (Eq.5) loss functions. Run the design choice grid on ImageNet-C Gaussian noise (severity 5). Verify: CMA+entropy on norm layers collapses near 0.1% accuracy; prompts+CMA+fitness is effective; SGD+fitness on norm layers exceeds TENT by >8%. Sweep population size K from 2-28 on ImageNet-C Gaussian noise. Verify: K=2 beats T3A and NoAdapt, K=6 matches TENT, accuracy converges past K=15.",
+        "difficulty": "hard",
+        "hypotheses_tested": [
+            "C04: Entropy-only fitness causes CMA to collapse when applied to norm layers",
+            "C06: The proposed fitness function achieves excellent performance even with SGD",
+            "C10: Population size K=6 suffices to match gradient-based TENT"
+        ],
+        "rubric_requirement_ids": [
+            "norm-layer-training",
+            "prompt-training",
+            "sgd-implementation",
+            "cma-implementation",
+            "entropy-loss",
+            "fitness-loss",
+            "component-experiments",
+            "optimizer-experiments",
+            "loss-experiments",
+            "cma-entropy-failure",
+            "prompt-effectiveness",
+            "sgd-fitness-effectiveness",
+            "7cf9ca07-63b7-4610-a7ff-358919edba7e",
+            "ee156450-cd1a-4863-996d-00b569b899da",
+            "7a05f97c-bf1a-4a37-9aa6-6129b28befad"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T08",
+        "goal": "Reproduce the remaining hyperparameter sensitivity analyses (K convergence, Np stability, Q stability) and the quantized model evaluation (Table 4). Verify K convergence past 15 and K=6 matching TENT. Sweep Np from 1-10 and verify accuracy/ECE stability. Sweep Q from 16-1600 and verify stability past Q=32. Create 8-bit and 6-bit ViT-Base models via PTQ4ViT with 32 calibration samples. Evaluate NoAdapt, T3A, and FOA on both quantized models across all 15 ImageNet-C corruptions (severity 5). Verify FOA outperforms T3A on both precision levels and 8-bit FOA exceeds full-precision TENT by >2%.",
+        "difficulty": "hard",
+        "hypotheses_tested": [
+            "C02: FOA on 8-bit quantized ViT outperforms TENT on full-precision 32-bit ViT",
+            "C07: Source statistics stabilize at Q=32",
+            "C10: FOA accuracy converges past K=15"
+        ],
+        "rubric_requirement_ids": [
+            "46befbf5-4bc6-41dc-9cba-ec49c08a6936",
+            "b4b1643c-c2f7-4027-95bf-06dffd840008",
+            "6f98319e-5966-4e93-835f-d5a9db8cb021",
+            "be075650-2f5c-4237-92fa-7b6832ce34b7",
+            "25d31a1a-498a-44a8-8c48-25dd2e06be05",
+            "51f85c1f-45c8-4f63-b636-cbcb687c43ff",
+            "126f14d6-a8c6-4877-9cd0-06a6a87c2d05",
+            "1e18930c-fd61-4c7c-9e71-2e0d46018726",
+            "684701d0-8160-4bb6-b7da-aedb1a3f4576",
+            "4a0dce24-a6c0-4d68-915e-3959c7e0792e",
+            "quantized-models",
+            "8bit-accuracy",
+            "8bit-ece",
+            "6bit-accuracy",
+            "6bit-ece"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T09",
+        "goal": "Reproduce the memory/compute efficiency analysis (Tables 6-8) and single-sample FOA-I adaptation experiments. Implement FOA-I interval-based update strategy (V1 stores CLS features, V2 stores images). Evaluate FOA-I with intervals I={4,8,16,32,64} on ImageNet-C Gaussian noise (severity 5) alongside NoAdapt and TENT baselines. Verify I=4 outperforms TENT (BS=64) and smaller intervals yield better performance. Measure peak GPU memory for NoAdapt, TENT, CoTTA, FOA, FOA-8bit across batch sizes, and for FOA-I V1/V2. Verify: FOA uses less memory than gradient-based methods; FOA memory comparable to NoAdapt; FOA-I V1/V2 use less memory than FOA; quantization reduces memory; FOA on quantized model outperforms T3A and exceeds full-precision TENT by >2%.",
+        "difficulty": "hard",
+        "hypotheses_tested": [
+            "C03: FOA achieves up to 24-fold run-time memory reduction compared to TENT",
+            "C03: FOA-I variants further reduce memory while maintaining competitive accuracy"
+        ],
+        "rubric_requirement_ids": [
+            "foa-t3a-comparison",
+            "foa-8bit-tent-32bit",
+            "memory-measurements",
+            "memory-8bit",
+            "3100d5c8-761f-4529-8046-f1cd0d6e45fb",
+            "foa-memory",
+            "gradient-memory",
+            "2ce903d7-0dc1-424a-8b2a-d07ebaec0e01",
+            "57793664-3d52-444d-b5aa-023b4a4ad271",
+            "715c6377-fa52-4f44-8ed9-313bb0a8b630",
+            "interval-update",
+            "forward-pass",
+            "intervals-tested",
+            "noadapt-baseline",
+            "tent-baseline"
+        ],
+        "n_requirements": 15
+    },
+    {
+        "task_id": "test-time-model-adaptation_T10",
+        "goal": "Reproduce the robustness and generality experiments: in-distribution evaluation (Table 12), non-i.i.d. scenarios (Table 11), and alternative architectures (Table 10). For in-distribution: evaluate NoAdapt, TENT, CoTTA, SAR, FOA on clean ImageNet val; verify FOA retains near-NoAdapt accuracy (<2% degradation), outperforms other methods, achieves lower ECE than NoAdapt. For non-i.i.d.: create label-shift (class-ordered) and mixed-domain (interleaved corruptions) streams; evaluate TENT, SAR, FOA; verify FOA outperforms both under both settings with bounded degradation. For architectures: load ResNet-50 and VisionMamba; implement ResNet-50 prompts (7x7 Conv, uniform init, element-wise addition) and VisionMamba prompts (Np=3, concatenated); evaluate on ImageNet-C Gaussian noise (severity 5); verify FOA outperforms BN Adapt on ResNet-50 and FOA matches/exceeds TENT and SAR on VisionMamba.",
+        "difficulty": "hard",
+        "hypotheses_tested": [
+            "C08: FOA maintains near-source-domain in-distribution accuracy with minimal catastrophic forgetting",
+            "C09: FOA outperforms TENT and SAR under non-i.i.d. test stream scenarios",
+            "C01: FOA generalizes across model architectures (ResNet-50, VisionMamba)"
+        ],
+        "rubric_requirement_ids": [
+            "resnet50",
+            "visionmamba",
+            "f6b90573-15df-4859-85f3-2e816bcdf969",
+            "3e77debc-d638-49c8-9597-56ee903b95b2",
+            "noadapt-comparison",
+            "other-methods-comparison",
+            "ece-comparison",
+            "label-shift-data",
+            "label-shift-eval",
+            "mixed-domain-data",
+            "mixed-domain-eval",
+            "method-comparison",
+            "performance-degradation",
+            "relative-performance",
+            "relative-decline"
+        ],
+        "n_requirements": 15
+    }
+]

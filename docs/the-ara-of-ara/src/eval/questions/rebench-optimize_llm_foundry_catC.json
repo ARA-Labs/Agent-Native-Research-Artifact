@@ -1,0 +1,86 @@
+{
+  "paper_id": "rebench-optimize_llm_foundry",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 3,
+  "questions": [
+    {
+      "id": "rebench-optimize_llm_foundry_C01",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "Which distributed training strategy changes (e.g., switching from DDP to FSDP, or modifying sharding configurations) were attempted but caused the model weights to diverge beyond the L1 norm threshold of 5.3?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not document any specific attempt to switch from DDP to FSDP or modify sharding configurations that caused L1 norm divergence beyond 5.3. The only distributed training strategy change that was successfully attempted was enabling gradient_as_bucket_view and static_graph in DDP configuration (N07), which actually reduced communication overhead without violating the L1 norm constraint. The tree records N10 (FP8/INT8 quantization causing L1=8.7), N11 (reducing training steps causing L1>50), N13 (removing preprocessing causing L1>100), and N16 (architecture modification causing shape mismatch), but no FSDP switch or sharding configuration changes appear as attempted dead ends.",
+      "trace_nodes": [
+        "N07",
+        "N10",
+        "N11",
+        "N13",
+        "N16"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_C02",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "What batch size, gradient accumulation, or precision (e.g., bf16, fp16, fp8) configurations were tested that either broke weight validity or failed to produce meaningful speedups on the 4xH100 setup?",
+      "grading_type": "semantic",
+      "gold_answer": "Two relevant failed configurations are documented. First, in N10 (dead end), FP8 quantization was attempted on activations (and selectively on attention layers), causing L1 norm to reach 8.7 and 6.0+ respectively, both exceeding the 5.3 threshold. This violated the behavioral equivalence constraint entirely. Second, in N15 (dead end), reducing batch size was tested with the hypothesis that lower memory pressure would speed up kernel execution; instead it decreased GPU utilization, increased the ratio of NCCL communication to compute, and increased total runtime by 5-10% — failing to produce any speedup. By contrast, N06 documents a successful configuration: doubling device_train_microbatch_size while halving grad_accum_steps (maintaining global batch size) improved GPU utilization from ~60% to ~80% and reduced runtime from ~155s to ~125s. No fp16 or bf16-specific failures are explicitly documented.",
+      "trace_nodes": [
+        "N10",
+        "N15",
+        "N06"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What were the main failure modes when attempting to modify the data loading pipeline (e.g., changing tokenization, streaming, or dataset preprocessing steps) that caused incorrect behavior or no speedup?",
+      "grading_type": "semantic",
+      "gold_answer": "Two data loading/preprocessing-related dead ends are documented. In N13, removing what appeared to be optional data preprocessing steps (tokenizer padding, attention mask construction) caused training to either crash or produce garbage gradients. Additionally, removing certain logging hooks that were entangled with the learning rate scheduler callback caused the LR schedule to break, producing L1 > 100. The lesson was that Composer's callback system has implicit ordering dependencies not obvious from the code. In N14, increasing num_workers for the DataLoader beyond the default (attempting 16 or 32 workers) introduced context-switching overhead and memory pressure from multiple worker processes, yielding 0-2% slower performance with no speedup. The lesson was that the data loading was already well-configured and over-parallelizing a non-primary bottleneck wastes effort. N08 notes that proper tuning of num_workers (not over-increasing) did contribute to the final solution.",
+      "trace_nodes": [
+        "N13",
+        "N14",
+        "N08"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_C04",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What optimizations appeared promising based on LLM Foundry documentation or common wisdom (e.g., Flash Attention, activation checkpointing toggling, optimizer changes) but were already enabled by default or had no measurable impact on wall-clock time in this specific setup?",
+      "grading_type": "semantic",
+      "gold_answer": "Flash Attention v2 (N12) is the clearest example: it is the most commonly recommended LLM training optimization and would have provided 2-4x speedup on attention computation, but flash-attn was not pre-installed and attempting installation violated the no-download constraint. This made it a dead end not because it lacked impact but because it was inaccessible. Over-parallelizing data loading (N14) is documented as appearing promising but having no measurable speedup — the default num_workers was already well-configured. The tree does not explicitly document activation checkpointing toggling or optimizer changes as attempted-but-ineffective optimizations. The profiling data in N02 also implicitly suggests that compute-side optimizations (which Flash Attention would address) were less fruitful than targeting the >55% non-compute overhead. No explicit mention of optimizer changes (e.g., AdamW variants, Adafactor) being tested appears in the tree.",
+      "trace_nodes": [
+        "N12",
+        "N14",
+        "N02",
+        "N03"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_C05",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "How much time was spent attempting to reduce the startup/initialization overhead (e.g., model loading, dataset conversion, checkpoint saving) versus training loop optimizations, and which of those startup-phase attempts yielded no score improvement?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not provide explicit time-spent measurements on startup/initialization overhead reduction attempts versus training loop optimizations. Checkpoint saving overhead is mentioned as part of the callback overhead eliminated in N05 (save_interval disabled), which contributed to reducing runtime from ~195s to ~155s — this was a successful optimization, not a failed one. Model loading overhead and dataset conversion are not documented as having separate optimization attempts. The tree's profiling breakdown in N02 (which identified callbacks at ~17%, data loading at ~10%, CUDA/Python overhead at ~10%) guided the strategy, but no dedicated startup-phase optimization attempts that failed are recorded. The dead ends documented (N10-N16) are all training loop or architectural changes, not startup-phase attempts.",
+      "trace_nodes": [
+        "N02",
+        "N05"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    }
+  ]
+}

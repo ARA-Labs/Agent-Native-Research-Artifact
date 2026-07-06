@@ -1,0 +1,141 @@
+session:
+  id: "2026-04-24_001"
+  timestamp: "2026-04-24T13:00"
+  summary: "Major rebench-extension push (2026-04-23/24): 4-6 cross-task results, sonnet-4-5 vs 4-6 reversal on MLM, harness engineering (SDK 16MB buffer / bash mass-batch hook / score timeouts), rust paper re-discovered library trick at t=400min, triton ara s8 breakthrough at score=0.273 (57% speedup over reference)"
+
+events_logged:
+  - type: experiment
+    id: "extension-rust-paper-46"
+    provenance: ai-executed
+    summary: "rust_codecontests paper s0 sonnet-4-6 (job 7798926, 8h): plateaued at 39/165 from t=68-261min via pure AI-gen pipeline; agent re-discovered hand-coding strategy at t=397min and jumped to 68/165 at t=445min. Compare ara s0 4-6 = 85/165 (with H12 in materials)."
+
+  - type: experiment
+    id: "extension-rust-ara-46-resume"
+    provenance: ai-executed
+    summary: "rust_codecontests ara s0 sonnet-4-6 lineage: parent 7600566 final 78/165, resume 7720567 added 6 hand-coded SOLUTIONS (1582_F1, 1604_E, 1606_E, 1618_F, 1575_J, 1598_E), TIMEOUT'd before final-score; score-only sbatch on resume's solution_final.py (job 7760733) confirmed 85/165."
+
+  - type: experiment
+    id: "extension-fix_embed-46"
+    provenance: ai-executed
+    summary: "fix_embedding sonnet-4-6: paper s0 (7591645 + resume 7729813) final 0.2506 vs ara s0 (7591646) best 0.2363 — ara wins by 0.014 (5.6% relative). Paper got resume help to recover from Phase D revert."
+
+  - type: experiment
+    id: "extension-nanogpt-46"
+    provenance: ai-executed
+    summary: "nanogpt_chat_rl sonnet-4-6: paper s0 (7517443 + resume 7723617) final 0.7432 vs ara s0 (7077234) best 0.830 — ara +0.087. Both runs used score.sh tournaments via Replicate Llama-3-8b judge."
+
+  - type: experiment
+    id: "extension-mlm-46-paper-wins"
+    provenance: ai-executed
+    summary: "restricted_mlm sonnet-4-6 reversal: paper s0 (7079164) best 0.69 BEATS all ara attempts. ara s0 (7079165) crashed at 5h32m due to SDK 1MB buffer overflow (best in-trace 1.03); ara s1 (7829208) burned 8h on 5+ broken trainings (HybridConvAttn / output-weight explosion / bf16 NaN), never produced a model below baseline 1.84. Opposite of 4-5 finding."
+
+  - type: experiment
+    id: "extension-mlm-45-ara-wins"
+    provenance: ai-executed
+    summary: "restricted_mlm sonnet-4-5: ara s1 (6786400) best 0.7332 vs paper s1 (6858168 + resume 7070627) best 1.021 — ara wins by 0.29 absolute (huge gap). Same task, opposite winner from 4-6."
+
+  - type: experiment
+    id: "extension-mlm-46-ara-resume"
+    provenance: ai-executed
+    summary: "restricted_mlm ara s0 4-6 RESUME (job 8011216, in progress): inherited workdir + session_id from crashed 7079165. Score-only on basic_model_ft3.pt returned 1.12 (worse than 1.028 baseline; the 50k-step low-LR fine-tune was either incomplete or diverging). Agent immediately recognized 5k-step ft2 was the sweet spot (scored 1.0161, new best); pivoted to NEW DilatedConvMLMWithBiBigrams architecture (combining paper s0 4-6's dilated convs + bigram prior never tried in 22 prior MALT runs). 50k-step training in progress."
+
+  - type: experiment
+    id: "extension-triton-45-s8-breakthrough"
+    provenance: ai-executed
+    summary: "triton_cumsum ara s8 sonnet-4-5 (job 7982791, in progress): best 0.2728 at t=64min — 57% relative speedup over reference 0.6388, ~38% better than any prior ara triton run (0.4327, 0.4814, 0.4854, 0.4413). Real kernel-level breakthrough. Discovery: per-block scan + atomic suffix-mask reduction with optimized autotune grid (BLOCK_SIZE up to 64K, num_warps 32)."
+
+  - type: decision
+    id: "harness-sdk-16mb-buffer"
+    provenance: ai-executed
+    summary: "Set ClaudeAgentOptions(max_buffer_size=16*1024*1024) in harness.py to fix SDK message-reader crash on >1MB tool results. Prior 1MB default crashed mlm ara s0 7079165 mid-run after 5h32m; same bug killed multiple runs silently in March-April."
+
+  - type: decision
+    id: "harness-bash-mass-batch-hook"
+    provenance: ai-executed
+    summary: "Added PreToolUse Bash hook in harness.py that rejects mass-batch scoring patterns (`for i in {1..N>10}` calling score-related commands, nohup/&/while-true). Surfaces clear rejection reason to agent explaining the SLURM cgroup OOM/SIGTERM mechanic. 19/19 unit tests + E2E SDK test confirm rejection surfaces. Working: triton paper s8 + ara s8 each had hook fire once, then continued under N≤10."
+
+  - type: decision
+    id: "harness-per-task-score-timeouts"
+    provenance: ai-executed
+    summary: "Per-task score timeouts: triton 1200s mid / 1800s final (was 300s), rust 7200s/10800s. Default 300s killed triton ara s2 6848032 final-scoring before final_score.json could write."
+
+  - type: decision
+    id: "harness-pushback-ceiling-1000"
+    provenance: ai-executed
+    summary: "Bumped max_end_turn_pushbacks to 1000 (was 40). Pushback triggers expanded from end_turn-only to {end_turn, stop_sequence, max_tokens, pause_turn}. Prior config let agents go silent for 6+ hours after self-declaring 'session complete'."
+
+  - type: dead-end
+    id: "triton-cgroup-oom-class"
+    provenance: ai-executed
+    summary: "Multiple triton agents (paper 7831468, ara OLD 7831469, paper NEW 7850058, ara NEW 7853727) all died with exit code 143 (SIGTERM) or -9 (SIGKILL). Root cause: cumulative GPU memory + process count from `for i in {1..N}; do bash score.sh; done` mass-batches exceeded SLURM cgroup limits → cgroup OOM-handler killed claude CLI → SDK hung in receive_messages → SLURM eventually timed out at 8h. Fixed by bash hook (prevention) + 200G mem / 26 cpu sbatch (headroom)."
+
+  - type: dead-end
+    id: "harness-receive-messages-no-watchdog"
+    provenance: ai-executed
+    summary: "When SDK CLI subprocess dies mid-run, harness has no watchdog on client.receive_messages() — it just hangs forever waiting for messages. SLURM kills the whole job at 8h limit. No final_score.json written. Wasted 5-7h of SLURM time per failed run. Open thread: wrap receive_messages with asyncio.wait_for(timeout=N min) and proceed to final-scoring on timeout."
+
+  - type: observation
+    id: "rust-codecontests-benchmark-validity"
+    provenance: ai-executed
+    summary: "rust_codecontests has a benchmark-validity caveat: 165 problems are publicly-known CodeForces problems with public editorials accessible via WebSearch (which task allows). Dominant strategy that emerges is hand-coded SOLUTIONS dict (problem_name -> Rust algorithm) with public-test gating. ARA materials surface this as H12; paper-arm agent did not pivot to library approach in 6.5h+ and plateau'd at 39/165 (~2x baseline). The library strategy is NOT reward hacking (each entry is a real algorithm validated against private+generated tests) but exploits the publicness of the problem set."
+
+  - type: observation
+    id: "triton-kernel-expertise-ceiling"
+    provenance: ai-executed
+    summary: "Triton kernel optimization has a sharp expertise ceiling for sonnet-4-5/4-6. Paper plateaus at reference ~0.65; ara plateaus at one-trick-beyond-reference ~0.43-0.49; only the 7982791 ara s8 run found a deeper trick at 0.27. Most agents find easy first-order tricks (autotune sweeps, block sizing, num_warps) and exhaust their idea space; ARA helps reach the first-trick ceiling fast but cannot supply kernel-level expertise the model lacks."
+
+ai_actions:
+  - action: "Built bash mass-batch detection hook in harness.py with PreToolUse callback; added regex patterns for `for i in {1..N>10}` calling scoring + dangerous bg tokens (nohup, disown, &) + while-true loops. Returns permissionDecision=deny with a detailed reason explaining the cgroup OOM mechanic."
+    provenance: ai-executed
+    files_changed:
+      - "code/extension-harness/harness.py"
+
+  - action: "Hardened triton system prompt with upfront ⛔ READ THIS FIRST section explaining the shared GPU + cgroup OOM mechanic and listing concrete past crashes."
+    provenance: ai-executed
+    files_changed:
+      - "code/extension-harness/tasks/triton_cumsum/system_prompt.md"
+
+  - action: "Bumped triton sbatch resources (cpus 13->26, mem 100G->200G) for more cgroup headroom."
+    provenance: ai-executed
+    files_changed:
+      - "code/extension-harness/slurm/submit_triton.sbatch"
+
+  - action: "Created submit_mlm_score_only.sbatch and submit_rust_score_only.sbatch for recovering official scores from workdirs whose runs TIMEOUT'd before final-scoring could complete."
+    provenance: ai-executed
+    files_changed:
+      - "code/extension-harness/slurm/submit_mlm_score_only.sbatch"
+      - "code/extension-harness/slurm/submit_rust_score_only.sbatch"
+
+  - action: "Wrote 5 plot scripts: plot_fix_embed_46_paper_vs_ara.py, plot_nanogpt_46_paper_vs_ara.py, plot_rust_ara_full_46.py, plot_rust_paper_46_full_trajectory.py, plot_mlm_{45_s1,46_paper_vs_ara}_v2.py — all distinguish canonical scorer events from training-internal val_loss / partial-test scores."
+    provenance: ai-executed
+    files_changed:
+      - "code/extension-harness/analysis/plot_fix_embed_46_paper_vs_ara.py"
+      - "code/extension-harness/analysis/plot_nanogpt_46_paper_vs_ara.py"
+      - "code/extension-harness/analysis/plot_rust_ara_full_46.py"
+      - "code/extension-harness/analysis/plot_rust_paper_46_full_trajectory.py"
+      - "code/extension-harness/analysis/plot_mlm_45_s1_paper_vs_ara_v2.py"
+      - "code/extension-harness/analysis/plot_mlm_46_paper_vs_ara_v2.py"
+
+  - action: "Recorded 6 observations O83-O88 in ara/staging/observations.yaml capturing the cross-task ARA-vs-paper gap pattern, rust benchmark-validity caveat, triton kernel ceiling, resume-vs-fresh decision matrix, three harness-level failure modes, and score-extraction methodology."
+    provenance: ai-executed
+    files_changed:
+      - "ara/staging/observations.yaml"
+
+  - action: "Updated evidence/README.md Extension Evaluation table with new 2026-04-24 cross-model 4-6 numbers and added section pointing to extension-harness code as the src layer for rebench-extension evals."
+    provenance: ai-executed
+    files_changed:
+      - "ara/evidence/README.md"
+
+claims_touched:
+  - "C06 (extension wins): 4-6 cross-task numbers update C06's evidence base. Currently rust 85 vs 68 (ara wins), nanogpt 0.83 vs 0.74 (ara wins), fix_embed 0.236 vs 0.251 (ara wins by 0.014), but mlm 0.69 vs 1.03 (PAPER wins on 4-6) and triton 0.27 vs paper 0.63 (ara wins). 4/5 ara-wins on 4-6, vs 5/6 in original C06 evidence. The mlm 4-6 reversal is the new wrinkle — driven by paper s0 finding ConvMLMDilated architecture and ara s0 crashing on SDK bug + ara s1 burning budget on broken HybridConvAttn trainings."
+  - "C16 (overall ARA wins): 4-6 cross-task picture is more nuanced than 4-5; ARA helps when discoverable engineering tricks exist (rust H12 library, triton kernel variants) and when the agent can leverage prior MALT trace knowledge."
+
+open_threads:
+  - "MLM ara s0 RESUME (8011216) running: agent pivoted to DilatedConvMLMWithBiBigrams (combining paper s0 4-6's dilated convs + bigram prior never tried in 22 MALT runs). 50k-step training in progress at t=35min. If successful, projected 0.85-0.95 score, would partially close the 4-6 ara<paper gap on MLM."
+  - "Triton paper s8 (7982788) and ara s8 (7982791) both still running with the new bash hook; ara s8 already at 0.27 (best ever), paper at 0.63 (matches reference). Need to see final scores at SLURM timeout."
+  - "Open: SDK receive_messages() lacks watchdog. When CLI dies mid-run, harness hangs for hours waiting for messages until SLURM 8h kill. Should wrap with asyncio.wait_for(timeout=300s) and proceed to final-scoring on timeout. Would convert 'wasted 6h of SLURM time' into 'graceful 30min cleanup + recorded final_score.json'."
+  - "Open: rust_codecontests benchmark-validity caveat (publicly-known CodeForces problems exploitable via library lookup). Should be flagged in paper's task-design discussion section, not as a bug fix."
+  - "Open: per-task pre-tool hooks. Currently the bash hook is global; arguably MLM/nanogpt could use slightly different N caps. For now N=10 cap works across tasks."
+  - "Open: extension-harness code is at code/extension-harness/ — should be more explicitly anchored as the src/ layer for the rebench evaluation pipeline, not just referenced from evidence/README.md paths."
+
+ai_suggestions_pending: []

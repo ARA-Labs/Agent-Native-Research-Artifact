@@ -1,0 +1,115 @@
+{
+  "paper_id": "semantic-self-consistency",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "semantic-self-consistency_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the KNN outlier removal method: (a) According to R40 in rubric/requirements.md, exactly how are input points filtered — what percentage is removed and by what criterion? (b) Which ARA file (src/execution/*.py) implements this filtering logic, and what function or code block handles the sorting and filtering step? (c) What does R19 additionally require about the algorithm argument, and how does that interact with the filtering described in R40 to constrain the implementation?",
+      "gold_answer": "(a) R40 states: 'All input points are sorted by average distance to their neighbours, and the 10% of inputs to the KNN method with the largest average distances are filtered out.' So the top 10% of points — those with the largest average neighbor distances — are removed. (b) The file src/execution/outlier_detection.py implements this logic; it contains code that computes average distances to neighbors, sorts them, and removes the top 10% of points with the largest distances. (c) R19 states: 'The method uses the ball tree algorithm (the \"algorithm\" argument is set to \"ball_tree\" if using the sklearn implementation of KNeighborsClassifier).' This means the KNeighborsClassifier must be instantiated with algorithm='ball_tree', and the distance computations used for sorting in R40 must be consistent with the ball tree spatial indexing — so the average distances computed for filtering are derived from the same KNN structure that uses ball_tree.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer identifies the 10% threshold and the criterion of largest average distances to neighbours as specified in R40",
+        "Answer correctly names src/execution/outlier_detection.py as the implementing file",
+        "Answer quotes or accurately paraphrases R19's requirement to set algorithm='ball_tree' for KNeighborsClassifier",
+        "Answer explains the interaction: the ball_tree algorithm (R19) governs the distance computations that feed the sorting/filtering step (R40)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/outlier_detection.py"
+      ],
+      "rubric_requirement_id": "R40",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "semantic-self-consistency_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric specifies distinct featurizer requirements for different benchmarks. (a) What does R50 in rubric/requirements.md say about which featurizer must be used for StrategyQA evaluations, and what does R48 say about SVAMP? (b) Looking at src/execution/featurizer.py, what featurizer classes or model identifiers are defined there, and which ones correspond to the models required by R50 and R48? (c) Given that R21 specifies RoBERTa base as 125 million parameters and R22 specifies SciBERT as 110 million parameters, what implementation constraint does this create for the featurizer code, and why would using the wrong model size violate both R50/R48 and R21/R22 simultaneously?",
+      "gold_answer": "(a) R50 states: 'All evaluations on the StrategyQA benchmark use RoBERTa as the featurizer to produce embeddings.' R48 states: 'All evaluations on the SVAMP benchmark use SciBERT as the featurizer to produce embeddings.' (b) src/execution/featurizer.py defines featurizer classes/functions for RoBERTa and SciBERT models; the RoBERTa entry corresponds to 'roberta-base' (R50/StrategyQA) and the SciBERT entry corresponds to 'allenai/scibert_scivocab_uncased' or equivalent (R48/SVAMP and R17/AQuA-RAT). (c) R21 specifies RoBERTa base must be the 125M parameter version, and R22 specifies SciBERT must be the 110M parameter version. Using a larger variant (e.g., roberta-large) would violate R21 even if the model name partially matches R50's requirement, and similarly for SciBERT. This creates a dual constraint: the featurizer code must load the exact model checkpoint corresponding to the correct parameter count, meaning model identifiers in featurizer.py must resolve to the base/small versions — not large variants — to simultaneously satisfy R21/R22 (size requirements) and R48/R50 (benchmark-featurizer assignments).",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly quotes R50 (RoBERTa for StrategyQA) and R48 (SciBERT for SVAMP) with accurate requirement text",
+        "Answer references src/execution/featurizer.py and identifies the model identifiers for both RoBERTa and SciBERT defined there",
+        "Answer cites R21's 125M parameter constraint for RoBERTa and R22's 110M parameter constraint for SciBERT",
+        "Answer explains that using wrong-sized model variants would simultaneously violate both the size requirements (R21/R22) and the benchmark-featurizer assignment requirements (R48/R50)"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/featurizer.py"
+      ],
+      "rubric_requirement_id": "R50",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "semantic-self-consistency_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric places specific constraints on answer extraction and filtering for the top prob method and AQuA-RAT. (a) What does R42 say about filtering when using the top prob method, and what does R43 say specifically about AQuA-RAT — how do these two requirements differ in scope? (b) Which ARA file src/execution/evaluation.py or src/execution/semantic_consistency.py contains the evaluation logic, and what does that file reveal about how missing-answer samples are handled? (c) R24 states 'The parsing extraction approach is applied to extract the models answer from the response' for the top prob method — given the info gap analysis flags R42 as 'absent' and R43 as 'partial', what does this imply about the risk that an implementation might incorrectly include non-parseable responses in accuracy calculations, and across which benchmarks does this risk apply according to the rubric?",
+      "gold_answer": "(a) R42 states: 'When generating answers using the top prob method, only generations where an answer could be extracted should be considered when computing the various metrics in each of the experiments.' R43 states: 'When generating answers for AQuA-RAT, only generations where an answer could be extracted should be considered when computing the various metrics in each of the experiments.' R42 is method-scoped (top prob only, all benchmarks), while R43 is benchmark-scoped (AQuA-RAT only, all methods) — together they form overlapping constraints. (b) src/execution/evaluation.py contains grading/evaluation logic; it should show filtering steps that exclude samples where answer parsing returned None or empty, applied before computing accuracy metrics. (c) The info gap analysis marks R42 as 'absent' (missing_code_detail) and R43 as 'partial', meaning an implementation could easily omit these filters. For R42, the risk applies to all three benchmarks (AQuA-RAT, SVAMP, StrategyQA) when using the top prob method. For R43, the risk applies specifically to AQuA-RAT across all methods. An implementation that divides by total samples rather than parseable samples would inflate or deflate accuracy numbers, violating both requirements. The rubric implies the denominator in accuracy calculations must be the count of parseable responses, not the total number of questions.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer accurately quotes or paraphrases both R42 and R43 and correctly identifies their differing scopes (method-scoped vs. benchmark-scoped)",
+        "Answer references src/execution/evaluation.py as the relevant implementation file and describes the filtering mechanism for non-parseable answers",
+        "Answer notes that R42 is rated 'absent' in the info gap analysis, indicating highest risk of omission",
+        "Answer explains the denominator implication: accuracy must be computed over parseable-only responses, and identifies which benchmarks/methods each requirement covers"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/evaluation.py"
+      ],
+      "rubric_requirement_id": "R42",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "semantic-self-consistency_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "The Isolation Forest outlier removal method has several hyperparameter requirements in the rubric. (a) What exact values do R11, R12, and R13 specify for n_estimators, contamination, and max_samples respectively in the sklearn IsolationForest implementation? (b) Which ARA file src/execution/outlier_detection.py implements Isolation Forest, and do the parameter values instantiated there match the rubric's requirements? (c) R38 describes the overall pipeline for Isolation Forest — how does it chain with self-consistency, and what does the combination of R12 (contamination='auto') and R38's pipeline design imply about how many samples are passed to the self-consistency step in practice?",
+      "gold_answer": "(a) R11 states: 'The number of base estimators in the ensemble is set to 200 (the \"n_estimators\" arg is set to 200 if using the sklearn implementation of IsolationForest\").' R12 states: 'The threshold is determined as in the original paper (the \"contamination\" arg is set to \"auto\" if using the sklearn implementation of IsolationForest\").' R13 states: 'The number of samples to draw from the training data to train each base estimator is set to min(256, n_samples) (the \"max_samples\" arg is set to \"auto\" if using the sklearn implementation of IsolationForest\").' (b) src/execution/outlier_detection.py implements IsolationForest; it should instantiate IsolationForest(n_estimators=200, contamination='auto', max_samples='auto'). (c) R38 states: 'Model answer generation with the Isolation Forest outlier removal method has been implemented. Given k generated samples for a question, the Isolation Forest method is applied to filter out some samples, then standard self-consistency is applied to the remaining samples to compute the final answer.' With contamination='auto', sklearn sets the threshold based on the original paper's score at training, which for small sample sizes (k=10 as per R16) means the number of inliers passed to self-consistency is variable and data-dependent — the 'auto' setting does not guarantee a fixed percentage removal unlike KNN's 10%, so the self-consistency step operates on a variable-size subset of the original k=10 samples.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly states all three hyperparameter values: n_estimators=200 (R11), contamination='auto' (R12), max_samples='auto' (R13)",
+        "Answer identifies src/execution/outlier_detection.py as the implementation file and references IsolationForest instantiation",
+        "Answer quotes or accurately paraphrases R38's pipeline description: Isolation Forest filters samples, then standard self-consistency is applied to remaining samples",
+        "Answer explains that contamination='auto' produces variable-size output (unlike fixed 10% in KNN/R40), meaning the self-consistency step receives a data-dependent number of samples from the original k=10"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/outlier_detection.py"
+      ],
+      "rubric_requirement_id": "R11",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "semantic-self-consistency_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric specifies dataset-dependent max_new_tokens constraints alongside specific k-shot prompts. (a) What does R06 specify about max new tokens for each of the three benchmarks, and what does R07 say about which prompt is used for AQuA-RAT? (b) Looking at src/configs/training.md or src/configs/model.md, what generation configuration parameters are defined there, and do they reflect the per-benchmark token limits required by R06? (c) R06 sets different token limits (250 for SVAMP, 400 for AQuA-RAT, 450 for StrategyQA) while R07–R09 reference external prompt tables from a specific paper — what does this combination imply about how the generation config must be dynamically adjusted per benchmark, and what would happen to the AQuA-RAT 4-shot prompt (R07) if the SVAMP token limit of 250 were mistakenly applied instead of 400?",
+      "gold_answer": "(a) R06 states: 'All models generate up to 250 max new tokens on SVAMP, 400 on AQuA-RAT, and 450 on StrategyQA.' R07 states: 'All models use the 4-shot prompt provided in Table 21 of \"Chain-of-Thought Prompting Elicits Reasoning in Large Language Models\" when evaluated on AQuA-RAT.' (b) src/configs/training.md and/or src/configs/model.md define generation parameters; they should contain max_new_tokens or max_tokens settings, ideally showing dataset-conditional values of 250/400/450 corresponding to SVAMP/AQuA-RAT/StrategyQA respectively. (c) The combination of R06 and R07–R09 implies that the generation configuration cannot be a single static value — it must be parameterized or conditionally set based on the active benchmark. Since R07 specifies the AQuA-RAT prompt comes from a Chain-of-Thought paper (Table 21, 4-shot), those prompts involve multi-step reasoning chains that can be lengthy. Applying SVAMP's 250-token limit to AQuA-RAT (which requires 400 tokens) would cause the model to truncate its chain-of-thought reasoning mid-generation, potentially cutting off the 'The answer is' extraction token (required by R41), which would cause those responses to fail parsing and be filtered out under R43 — degrading accuracy metrics and violating both R06 and R43 simultaneously.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Answer correctly quotes R06's three per-benchmark token limits (250 SVAMP, 400 AQuA-RAT, 450 StrategyQA) and R07's 4-shot prompt source for AQuA-RAT",
+        "Answer references src/configs/training.md or src/configs/model.md and describes the generation parameter structure defined there",
+        "Answer explains that the config must be dynamically adjusted per benchmark (not a single static value) due to differing limits in R06",
+        "Answer identifies the failure cascade: wrong token limit → truncated chain-of-thought → missing 'The answer is' → failed parsing → filtered by R43 → degraded accuracy, violating R06 and R43 simultaneously"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R06",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

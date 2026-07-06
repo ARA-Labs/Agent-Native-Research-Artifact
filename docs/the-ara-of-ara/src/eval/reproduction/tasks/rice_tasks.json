@@ -1,0 +1,236 @@
+[
+  {
+    "task_id": "rice_T1",
+    "goal": "Set up the four dense MuJoCo environments (Hopper-v3, Walker2d-v3, Reacher-v2, HalfCheetah-v3) with observation normalization where required, implement the PPO policy network, and pretrain a PPO agent on each environment.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C02: Infrastructure prerequisite \u2014 dense MuJoCo environments and pretrained PPO agents are needed for all downstream experiments"
+    ],
+    "rubric_requirement_ids": [
+      "b60369ed-967c-4514-af16-b18de243f11c",
+      "54ad568e-c5bc-43c1-a646-f7da9d2b9e23",
+      "3dfc9232-28e2-4e3d-a50a-dd4df1bfbea2",
+      "5f77df97-70ed-48f1-91e5-73662eb89caa",
+      "d3dceca7-6c04-4242-ab5d-d3c1edc6a9d2",
+      "3945867c-ec5f-4e54-b561-df85f481ef09",
+      "22e87ccc-269c-47d3-b3bb-27859a744c3d",
+      "7d4737bb-db74-484f-b409-82233ac83d20",
+      "9396ab08-0f57-4ffd-8d25-123e9b33b40e",
+      "06a8c8ac-cabe-4df1-85d0-fcc70f0a9143",
+      "c8ce16bb-cbcb-4a1f-86c5-41c101d5267c",
+      "a87331ac-4973-473a-b323-791133ed37a9",
+      "ce49667e-7668-48ff-940f-f6c37970be22"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "rice_T2",
+    "goal": "Implement the original StateMask (primal-dual) and optimized StateMask (PPO-based with blinding bonus alpha) explanation methods for MuJoCo environments. Implement the mask network that outputs 0 for critical steps and 1 otherwise, the original J(theta) = min|eta(pi)-eta(pi_bar)| objective, and the transformed J(theta) = max eta(pi_bar) objective with configurable alpha.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C02: The optimized StateMask explanation module is a core component of RICE that must be correctly implemented before fidelity or refining experiments"
+    ],
+    "rubric_requirement_ids": [
+      "143f314c-a4da-4e35-b803-fa64e85694da",
+      "17729bfd-cd62-44c5-a92c-ea7a00005831",
+      "b8d07797-0c38-47af-829a-cfb9b132ac82",
+      "d3c987e9-dcd2-40b8-9248-aa610dfb28c8",
+      "dcfd2b61-35ac-452b-93d8-75f08ea89592",
+      "29f9e53c-e362-49bd-889b-ce1eb6d89826",
+      "22155807-0a6d-4107-9b5b-d06158631a78",
+      "632df4ba-5fad-4af2-9a94-5735a9dcb739",
+      "bf075d5c-8195-40a4-80a2-c007d73c47ee",
+      "358bcf48-8b43-4ff6-b853-9ed4248daf9e",
+      "e743cd24-f55c-4c5a-9ef5-493a3cf6b131",
+      "48d9a794-eb7a-42c6-83e6-608567381ab9",
+      "5a8c16f5-d6e4-4dea-9e15-5af6901b8e21"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "rice_T3",
+    "goal": "Train StateMask and Optimized StateMask (Ours) on the four dense MuJoCo environments and evaluate Experiment I: compare fidelity scores at K = 10%, 20%, 30%, 40% across 3 seeds, report training time (seconds), and verify that Ours achieves comparable fidelity while training approximately 16.8% faster on average.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: RICE's optimized StateMask achieves comparable fidelity to original StateMask",
+      "C02: RICE's optimized StateMask trains faster (approximately 16.8% reduction)"
+    ],
+    "rubric_requirement_ids": [
+      "5847ef05-813b-4bd6-872c-38686460b969",
+      "2b13f7a7-c58d-4c7b-9f83-c7f358b114d6",
+      "d2829f5e-a5fa-41e0-a519-5048187c0a90",
+      "a8326b10-e1d2-422b-95cb-750e09947e37",
+      "6b2f7d07-12e1-4708-9cbc-11c42cf5e22b",
+      "32bbbf26-8adb-40fc-b04b-8dba8056727e",
+      "5dc01394-b478-4b6e-97d2-a07834b055cb",
+      "6cc090bc-4fe4-4d74-b57c-d7cd91b5d92f",
+      "e7ea3cdf-fb61-4fb2-9913-6a618cb76d81",
+      "5045ef7f-f49c-46e4-a5e5-a5678c6bbe99",
+      "a2fcbf80-2a03-42e0-9007-783ab2771895",
+      "ab5b547a-e025-442f-952a-f77e773dc52a",
+      "ba97fafc-7979-4d0c-914e-502ec40d93c9",
+      "ca72c6a5-e905-4ee5-a1c4-2eb3419d069c",
+      "e834600f-ceb0-4f9e-b6bd-39ad95f2e352"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "rice_T4",
+    "goal": "Implement the RICE refining method (mixed initial state distribution + RND exploration bonus) and all three baselines (PPO fine-tuning, StateMask-R, JSRL) for MuJoCo environments. Ensure hyperparameters p (mixing probability) and lambda (RND weight) are configurable.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C03: Implementation prerequisite \u2014 all four refining methods must be correctly implemented before Experiment II comparisons"
+    ],
+    "rubric_requirement_ids": [
+      "fc13b48a-9b1d-4ff9-9841-a133851f7822",
+      "6ff262df-f3af-45d9-b0cb-81f37c61f007",
+      "c5acc159-3533-4235-830a-fd1ba6537607",
+      "9d9512eb-0952-4cfa-abdc-3802377d9f4b",
+      "ee6a8328-5573-469d-8650-efb5140dfce1",
+      "14841e38-1edc-4309-b1c9-cf437a016f1a",
+      "9f7d0d0f-437a-448d-a09d-19f4e9a92b27",
+      "1c311868-15ef-4b98-b6a9-af6fd0808f59"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "rice_T5",
+    "goal": "Run Experiment II on dense MuJoCo environments: refine pretrained PPO agents using RICE (Ours) and all baselines (PPO fine-tuning, StateMask-R, JSRL). Report cumulative reward (mean +/- std across 3 seeds) before and after refining. Verify that RICE achieves the largest improvement, PPO fine-tuning shows marginal improvement, and StateMask-R sometimes degrades performance.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C03: RICE outperforms all baselines on dense MuJoCo refining",
+      "C01: Explanation-guided mixed distribution yields tighter sub-optimality bound empirically"
+    ],
+    "rubric_requirement_ids": [
+      "3d0f30f8-429c-4812-9c2b-b09bcdeb62a0",
+      "caa6183f-caaa-4d3a-a5d8-631612896f65",
+      "bcc7b87a-4437-4405-ab6b-2fe40211abcc",
+      "646b586d-343d-4d6a-b0e3-8ab9de3981a4",
+      "2a2b381d-8c53-499a-93b2-f0ebec72757b",
+      "c844a419-385a-4b3d-af6f-0f0bf21874ed",
+      "862d4b09-1675-48c2-8330-c7e616aa44c6",
+      "79acd816-d044-4f3c-b997-70ea97080781",
+      "11f8f9a9-da6a-4636-a54a-972791661128",
+      "f789f789-049a-4756-960d-87537d7251d8",
+      "1753a88e-17bd-4cc9-b477-20beae9f4f49",
+      "9a4fc11e-5e80-4215-8d59-14eb7a8c27a6",
+      "a03cb5a1-8350-4f4f-ab5b-debfccf043f9",
+      "237ad521-7dc3-4250-86ac-0d636e61c9ec"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "rice_T6",
+    "goal": "Set up the two sparse MuJoCo environments (SparseHopper, SparseHalfCheetah) and run Experiment II on sparse environments: refine pretrained agents with RICE and all baselines, producing refining curves comparable to Figure 2a. Verify RICE achieves the highest reward (~900 in SparseHopper) at convergence and outperforms all baselines in both sparse environments.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: RICE's explanation-guided mixed distribution is especially beneficial in sparse-reward settings",
+      "C03: RICE outperforms all baselines in sparse environments"
+    ],
+    "rubric_requirement_ids": [
+      "e4bb76d7-1210-4ff3-8b98-ec2c1a80ac25",
+      "74e39b4f-7199-4cc6-93d0-c43907742f58",
+      "ac87da61-66b6-45e7-819a-1cb9c226b4e8",
+      "fb3b2f03-5749-4110-ab2a-7decea5f6c1c",
+      "a51b8a8e-01ea-4442-ba0b-d9483bd11485",
+      "3f8c1dd8-aaa9-49c6-a600-daa058a549a2",
+      "ed3b38dd-870f-447d-84cb-ce6100bf37b7",
+      "e9b855d2-23d0-48a6-b160-7b6a3f14b22a",
+      "2784c2ec-bb86-45ec-96d0-5523f8a0a962"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "rice_T7",
+    "goal": "Reproduce Experiment IV (cross-algorithm refining): pretrain a SAC agent on dense Hopper for 1M steps, convert it to a PPO-compatible policy via GAIL imitation learning, then refine using RICE and all baselines (SAC fine-tuning, PPO fine-tuning, StateMask-R, JSRL). Verify that RICE outperforms all baselines including SAC fine-tuning, and that PPO fine-tuning achieves higher reward than SAC fine-tuning.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C06: RICE generalizes to non-PPO pretrained agents (SAC via GAIL conversion)",
+      "C03: RICE outperforms all baselines in cross-algorithm setting"
+    ],
+    "rubric_requirement_ids": [
+      "3dd86059-494b-4d54-957e-7c44fea66150",
+      "42a4230a-dbfb-4e46-8d78-2b0307ad26da",
+      "b4908b09-9d4b-4f92-aa37-58939500811e",
+      "3cbadd76-0962-4231-9453-2f2a722cdca0",
+      "aea05231-2022-49c4-98f9-6c0bf923436c",
+      "49ff5227-112b-4d8d-9736-503c20c95651",
+      "81818e53-68dc-406a-8801-4a72abec011c",
+      "4b6457bc-83dd-40a6-a1a7-d1eb9ac7a4fb",
+      "4d1ff848-90f8-4137-ab6e-5084c2a6554d",
+      "85c81232-e5c8-4167-810e-5e49f0f40347",
+      "f40e9fd2-0cdd-4ab1-b6a2-b65e6bc4869a",
+      "56813d1a-8862-4b40-bada-d620f423f9eb",
+      "df6a98da-1063-42d9-802e-aac0dbb70e16",
+      "ddce5c57-f427-4dee-975e-1aa185c9c500"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "rice_T8",
+    "goal": "Run Experiment III (explanation quality ablation) on MuJoCo environments: fix the RICE refining method and vary the explanation source (Random, StateMask, Ours), comparing downstream refining performance (cumulative reward). Verify that refining with StateMask or Ours explanations outperforms refining with Random explanations, confirming that higher-fidelity explanations yield better refining outcomes.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C07: Explanation quality positively correlates with downstream refining performance",
+      "C01: Tighter sub-optimality bound from better explanations translates to empirical gains"
+    ],
+    "rubric_requirement_ids": [
+      "217cd73d-4ff6-4a93-8248-a1b5bc73f335",
+      "5ce51a77-e57e-47aa-a8d1-c62855eb02f6",
+      "35620546-c46d-4597-ac7b-6de846053504",
+      "122fccfd-4ad6-4eeb-9d5a-caf008942492",
+      "9b2cc875-5974-4102-8b9e-737b57606e0b",
+      "ad2b5ff0-e601-4928-8e41-84678c7e2c3f",
+      "a2cf487b-a0c1-4ac2-a3e9-e093c7375d60",
+      "e21bb1b9-f2ea-4d3b-a02f-135771b3440d",
+      "5b79083b-94cd-4c31-86b6-4d4de5ae3cea",
+      "c477bf52-98ba-477d-870c-6e16f59883d4",
+      "0e027908-7236-4e62-b7b3-85f8b30d1400",
+      "3829943a-7672-4e3f-9ffc-1123cb15ccc7"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "rice_T9",
+    "goal": "Reproduce Experiment V alpha sensitivity: sweep the mask network blinding bonus alpha in {0.01, 0.001, 0.0001} and re-run Experiment I fidelity measurement on all environments. Verify that fidelity scores are insensitive to alpha (scores remain similar across all alpha values).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: Fidelity scores are robust to alpha choice \u2014 the blinding bonus does not distort explanation quality",
+      "C02: Optimized StateMask maintains quality across hyperparameter variations"
+    ],
+    "rubric_requirement_ids": [
+      "211d1077-df56-4733-9e7a-862261914107",
+      "e6002227-4878-41ec-871b-fdf8ca0bbb80",
+      "c75ccbdd-bc06-456e-84f6-b043cfd408e5",
+      "390ef180-320b-44ed-856d-3e207b4ae8d9",
+      "6301e9da-0d2d-4c70-9cea-63eda0edacab",
+      "5c97f0be-6907-4677-b24a-4a268c045015",
+      "4e0b4788-fddd-42ab-a29b-5898228adc96",
+      "46204d98-9fb8-4c17-ad45-8535b5e9afbb",
+      "e31d3e10-80d9-4492-8db5-7aa03e49515e"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "rice_T10",
+    "goal": "Reproduce Experiment V p and lambda sensitivity: sweep mixing probability p in {0, 0.25, 0.5, 0.75, 1.0} and RND exploration coefficient lambda in {0, 0.1, 0.01, 0.001} across all environments. Verify that mixed p values (0 < p < 1) outperform pure initialization (p=0 or p=1), and that lambda > 0 improves performance over lambda = 0.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: Mixed initial distribution (0 < p < 1) prevents overfitting and outperforms pure initialization",
+      "C05: RND exploration bonus (lambda > 0) is necessary for breaking through local optima"
+    ],
+    "rubric_requirement_ids": [
+      "5dfcfd17-8812-4db0-a7a7-6e8405146731",
+      "329a8def-fd28-4980-b6b0-a1966e9c0049",
+      "1e850be3-5db8-401f-a0e6-28345b0a56d2",
+      "01c9dd08-ee2e-4541-9f03-4d2dc8a712b7",
+      "39f39967-06ae-409b-ade7-4906d4ffeea6",
+      "fec7f4e9-724e-48ea-89aa-0ae252f809e7",
+      "35e38a34-fc24-49f4-a6bb-e3fb25c32638",
+      "adc60774-6c8c-4541-8fe8-140dc0da480f",
+      "0a2fc041-28c3-428d-8703-61efa7c7bcb1",
+      "da43435e-3297-4e73-b135-e1e92cd8b795"
+    ],
+    "n_requirements": 10
+  }
+]

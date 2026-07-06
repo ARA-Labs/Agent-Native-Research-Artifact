@@ -1,0 +1,258 @@
+[
+  {
+    "task_id": "self-composing-policies_T01",
+    "goal": "Implement the CompoNet output attention head module as described in Section 4.2. This includes: (1) defining the prior-module output matrix Phi^{k;s} of size (k-1) x |A|; (2) computing h_s from the CNN encoder or raw state; (3) implementing the query via W_out^Q, the key via cosine positional embeddings E_out and W_out^K applied to (Phi + E_out), the value as Phi^{k;s}, and the scaled dot-product attention to produce output vector v; (4) verifying the only learnable parameters are W_out^Q and W_out^K. Unit-test that output shapes are correct and parameter count is independent of k.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C06: CompoNet modules autonomously learn their own composition strategy via the output attention head without requiring a separate routing network"
+    ],
+    "rubric_requirement_ids": [
+      "dbbb11b3-c045-4e46-b2cc-cc1f652d84bf",
+      "f0afda32-51d9-434d-be8e-5eb3ab5e72d3",
+      "dda77699-d443-4fbf-90f4-59841597db57",
+      "7ce56b99-e970-469c-8031-09d4697acf3e",
+      "060b1284-6e1b-4692-bd53-64e043c07fd3",
+      "cde1da9b-47ce-4d8d-80c4-ab2a0cb678b0",
+      "0b8be057-bf1b-44fe-9d9f-0f4ca535d12b",
+      "48b73614-82f1-4d32-b2af-427ab51924b9",
+      "76fa75da-2e3e-4260-9e2f-09ad3e0e9259",
+      "bd7db785-3a65-42bc-bbf8-f3818a19700a"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "self-composing-policies_T02",
+    "goal": "Implement the CompoNet input attention head and internal policy modules as described in Section 4.2. For the input attention head: (1) define matrix P as the row-wise concatenation of the output attention head result and Phi^{k;s}; (2) implement query via W_in^Q, key via cosine embeddings E_in and W_in^K, value via W_in^V, and scaled dot-product attention; (3) verify only W_in^Q, W_in^K, W_in^V are learnable. For the internal policy: (4) concatenate h_s with the input attention head output; (5) implement the MLP mapping d_enc + d_model to |A|; (6) verify only MLP parameters are learnable. For the final output: (7) sum the internal policy output with v from the output attention head; (8) implement normalization for continuous action spaces.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C06: CompoNet modules autonomously learn their own composition strategy via the input attention head without requiring a separate routing network",
+      "C01: Each self-composing policy module has a constant parameter count determined solely by fixed hyperparameters (d_enc, d_model, |A|), not by the number of previous modules"
+    ],
+    "rubric_requirement_ids": [
+      "d68e4314-52f6-4e6d-9aa3-a85f0bd9706d",
+      "cf3c7ec9-b96a-4a89-a688-b7ba1bb56148",
+      "ef07a797-146a-479d-9b9f-cfb2bef36599",
+      "83e80a16-d7bb-4e57-809b-be04bccacd9a",
+      "b40e5cba-8422-4aa1-a638-44e515d99f27",
+      "a75ab485-bbc2-4932-ab22-6be8c55498e3",
+      "eeb5aa73-4d41-49f5-ad43-05cfc3246084",
+      "467eb0c9-00c4-4aea-b508-4a7c2669f31b",
+      "2c041f24-2aed-4128-ba54-b27407f67db8",
+      "a6657076-1593-46c2-bac7-c83f69d44797",
+      "d861366a-340a-4fc8-9c02-ce0ad39c844e",
+      "0d54e498-4838-450f-a17b-59ac2155855b",
+      "b2387837-a2b3-41d0-8866-0516d7cb1067",
+      "5eb4989c-fa80-497f-935d-b27397ce63b8",
+      "74545ee1-9594-4d2f-89f0-374f8f48c745"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-composing-policies_T03",
+    "goal": "Implement the CNN encoder, SAC training loop, and evaluation metrics for the Meta-World continual learning setting. (1) Implement the 3-layer CNN encoder (32/64/64 channels, filters 8/4/3, dense 512) with weight inheritance across tasks, shared between actor and critic. (2) Adapt the SAC implementation from Huang et al. (2022) to use CompoNet as the actor, with the SAC-specific critic (2-layer MLP + mean/log-std heads), and configure all hyperparameters from Table E.1 (Adam, gamma=0.99, batch=128, buffer=1e6, tau=0.005, etc.). (3) Implement the average performance P(t), forward transfer FTr, and reference transfer RT metrics as described in Section 5.1.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: CompoNet achieves superior or equal average performance across all benchmark sequences",
+      "C03: CompoNet achieves superior forward transfer across all benchmark sequences"
+    ],
+    "rubric_requirement_ids": [
+      "d92c7aa0-6a11-4141-a8f3-bc9b12bf4d37",
+      "2eaeb892-c348-4acd-b603-30cbdd9f8ffc",
+      "2c2ef685-8326-4773-bb21-68f3e7a527b3",
+      "1f4b310c-b311-42e0-a8f6-4e4e931cb6a5",
+      "b57de4fc-b531-48b4-b4ab-c685126baf65",
+      "9fe63a30-dd3d-4889-a8c3-8dd04a57c8f1",
+      "37d0398b-02ff-45cb-a378-9229584fcfb3",
+      "0f95bb2e-1c2f-4394-a367-3d61dc8de2c4",
+      "09cd146f-2424-4bb1-b844-a3268856492d",
+      "3f61bfcd-04a9-4b08-a4c9-614b901315c0",
+      "07c21e51-90f4-43c4-986f-4d572829ffef",
+      "dbe45d3b-284d-40d2-9422-c3f4c75b1540",
+      "a16438be-02e0-49b4-b3d4-bbbe6f53b6af",
+      "05714e8d-caa5-4f88-b903-8595f1692b34",
+      "c76c362b-3f12-4420-a651-49cce1f7aac4"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-composing-policies_T04",
+    "goal": "Implement all five baseline methods (Baseline, FT-1, FT-N, ProgressiveNet, PackNet) for both Meta-World and ALE environments. (1) Implement the Baseline method (randomly initialized MLP per task) for Meta-World (39-dim state) and ALE (512-dim state). (2) Implement FT-1 (single continuously fine-tuned NN across all tasks) for both settings. (3) Implement FT-N (re-initialize output heads per task, save model params after each task) for both settings. (4) Implement ProgressiveNet (new column per task, lateral connections between columns, freeze prior column parameters, save parameters when task changes). (5) Implement PackNet (prune trained network per task, retrain 200K steps, freeze selected parameters, allocate parameter budget).",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C02: CompoNet achieves superior or equal average performance compared to all baselines",
+      "C03: CompoNet achieves the highest forward transfer among all evaluated methods"
+    ],
+    "rubric_requirement_ids": [
+      "97ddc4c5-192e-4faf-9fb0-628b63411a87",
+      "0345c389-bef7-4968-98bd-7c76912dffa5",
+      "96dbde05-2acb-4fde-a279-74e326a2254d",
+      "63030bd7-0708-45a6-b40d-c8ab3f46b88f",
+      "73ae5d74-de2e-4427-82af-1b1d7f5217e8",
+      "798a234f-1e95-4d27-8d74-4b1eaee220a1",
+      "de8d83b9-639e-4c95-b473-6a8dea90ee08",
+      "4fd52a4e-a799-428b-8910-cd799727240e",
+      "1b7ece23-8d81-446a-8af4-d468526c81e6",
+      "bce385fe-76ec-46e5-a00a-dc45d2eb984e",
+      "b7dccfee-06e4-4f55-959a-05ce7545efa7",
+      "b363705b-edc3-4a6c-8d74-1883abb02bb6",
+      "9ff4ad97-4f13-4af4-a1c0-e1dd19981e83",
+      "1cbbd1d1-e58f-4b33-907d-2d59fd9e1ca3",
+      "60c403cd-23cd-41d6-9a7b-a2713a5a33a5"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-composing-policies_T05",
+    "goal": "Measure and compare the scalability of CompoNet vs ProgressiveNet in terms of parameter count and inference time, reproducing Figure 3. (1) Instantiate CompoNet and ProgressiveNet models for k in {1, 10, 50, 100, 150, 200, 250, 300} using the hyperparameters from the Figure 3 caption (d_enc=64, |A|=6, d_model=256, batch=8). (2) For each k, count total and trainable parameters for both architectures. (3) For each k, run inference for at least 1 minute and record average inference time. (4) Verify CompoNet parameter counts grow linearly (O(n)) while ProgressiveNet's grow quadratically. (5) Verify CompoNet inference time grows substantially slower than ProgressiveNet up to 300 tasks.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: CompoNet total parameters grow linearly O(n) with respect to tasks",
+      "C06: CompoNet empirical inference time scales substantially better than ProgressiveNet up to 300 tasks"
+    ],
+    "rubric_requirement_ids": [
+      "82e6b6ac-73f7-4c6c-963f-7bf20db11ff2",
+      "b52da4ce-9be2-4046-afdf-061da3fcf5bb",
+      "043beaa5-0930-4535-866b-0cc8337649d4",
+      "56f8b909-59d1-4bec-93c2-f276d499694e",
+      "8d795b81-0cc9-41de-8d76-314ed523ff4e",
+      "8b74b662-4ec5-4b9c-a9ab-9f3276d75913",
+      "1f60a8c9-47d0-4b12-adf6-3cff221ba3df",
+      "3a78e866-1122-4dd4-a6e1-c2f65fbed097",
+      "f0dafbe8-c135-44e6-a758-95a62a85cf02",
+      "23a2aa0a-1970-4dc7-95ca-ebe70fb903c4",
+      "318d3eee-9f08-4b3b-ae34-e0bbc5d5b139",
+      "1df26f0a-7d45-4673-b0f4-caf4698bf86b"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "self-composing-policies_T06",
+    "goal": "Train and evaluate all six methods on the Meta-World 20-task sequence (Table 1, Meta-World columns). Using SAC with Table E.1 hyperparameters, train Baseline, FT-1, FT-N, ProgressiveNet, PackNet, and CompoNet for 10 seeds x 1M timesteps per task on the 20-task Meta-World sequence (10 environments repeated twice). Record success rates per task per seed. Compute average performance P(T) and forward transfer FTr for each method per seed, then report mean and std across seeds. Verify CompoNet achieves the highest or tied-highest average performance and forward transfer on Meta-World, and is the only method with non-negative forward transfer.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C02: CompoNet achieves superior average performance on Meta-World",
+      "C03: CompoNet is the only method with non-negative forward transfer on Meta-World"
+    ],
+    "rubric_requirement_ids": [
+      "dabaeb40-3ffd-48d6-a28d-b04ccbf351b5",
+      "066903cf-56bc-4aa1-8118-a12005ed0f9e",
+      "8036351f-b10a-4939-9b7d-1c7c65148801",
+      "40f3d0f3-69b7-4c5b-a800-e412b3f16c93",
+      "d5f9b44a-9d65-4974-bf55-91d86c690b38",
+      "90c21094-09bd-462e-92fa-0ef7907ff1ed",
+      "15067927-78c4-4c88-b141-e55c48d21df4",
+      "a8a243b1-007f-4f35-a6e9-31e41fb88c6b",
+      "ddd24b5c-d32b-4b21-b7f0-e6db01fbfc05",
+      "319edc0d-4cf8-4a71-933c-49f4155a2588",
+      "0d79cc8d-c8b2-4e97-a910-95090cd2338b",
+      "6ddede73-5b5b-43aa-b780-71d757075a38",
+      "915fdd73-cc58-4166-bea6-b729a159383d",
+      "d1f984f0-9a75-451d-9fe2-a20e1a445909",
+      "09240921-d50d-4490-b1df-84f206fe7eb5"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "self-composing-policies_T07",
+    "goal": "Train and evaluate all six methods on the SpaceInvaders 10-task sequence (Table 1, SpaceInvaders columns). Using PPO with Table E.2 hyperparameters, train Baseline, FT-1, FT-N, ProgressiveNet, PackNet, and CompoNet for 10 seeds x 1M timesteps per task on the 10 playing modes of ALE/SpaceInvaders-v5. Record success rates per task per seed using the thresholds from Table D.1a. Compute P(T) and FTr for each method per seed, then report mean and std. Set up the ALE SpaceInvaders environment with Gymnasium, configure the 17-task ALE sequence, and implement the PPO critic with single-layer output heads and critic reset at task boundaries. Verify CompoNet achieves the highest forward transfer and highest or tied-highest performance on SpaceInvaders.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C02: CompoNet achieves highest or tied-highest average performance on SpaceInvaders",
+      "C03: CompoNet achieves the highest forward transfer on SpaceInvaders"
+    ],
+    "rubric_requirement_ids": [
+      "4cae0a3a-f411-4486-8abb-d4ba75b08db3",
+      "1504ba8d-3cd7-4384-b633-5363ecf1e72d",
+      "a1e3bc32-dcd3-4b3f-994a-5674da57adc5",
+      "a7c5323e-0aac-4977-898c-34246b2bf3a9",
+      "17775db7-f3bb-42ac-8c3f-072bc3cfd295",
+      "8353a180-2494-4418-89f9-5a623f5717c0",
+      "65452b97-b69a-4045-ac89-90d44bfa2fc9",
+      "db4ec248-1f0a-4cea-8716-8bd96e347c05",
+      "f7c172f9-372e-4d43-8fa0-64d692abf65c",
+      "e4ba16c0-4d0e-4340-9624-cef226ae7d17",
+      "2bd5f28c-0d6b-46f1-a7f8-18aabf02d6bc",
+      "93d94ac7-8757-47cd-88da-cbedb56ca63b",
+      "f94431f2-3d7d-482c-bf47-119f41e084d1"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "self-composing-policies_T08",
+    "goal": "Reproduce the Scenario (i) architectural validation experiment (Figures 4a-4d): efficient policy reuse with one informative prior. (1) Pre-train one policy module on SpaceInvaders task 5 (mode 4). (2) Define 4 non-informative random modules (uniform Dirichlet). (3) Train a new CompoNet module on task 5 with these 5 prior modules for 1M timesteps across 10 seeds. (4) Train a from-scratch baseline on the same task. (5) Record episodic returns, matching rates (Out=OutHead, Out=IntPol, OutHead=IntPol), input attention weights per module, and output attention weights per module at least every 10k timesteps. (6) Verify CompoNet sharply surpasses baseline within 200k timesteps. (7) Verify output attention head concentrates on the informative module (approaching 1.0 within 10k timesteps). (8) Verify input attention head assigns ~0.8 to the output head row and ~0.16 to the informative module while non-informative modules drop to ~0.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C04: When a previously learned policy solves the current task, the output attention head rapidly assigns high attention to that module",
+      "C03: CompoNet achieves superior forward transfer via efficient reuse of informative prior policies"
+    ],
+    "rubric_requirement_ids": [
+      "b777444f-44ac-45fd-abf4-25162b3911fb",
+      "feec8fca-32d5-47d1-b5f5-6c9e0f5338b0",
+      "5f0ec7d2-cc32-4378-bea1-56b1ff9883c9",
+      "4dca3b7d-1188-4337-961e-dd6a0d5ac1f7",
+      "75042767-b7b9-4225-8297-f082f7390dc3",
+      "4f725a8e-0163-4a5c-b99a-52de8a26aefd",
+      "ca4ae1dd-5250-4b07-a40d-4995876fab3a",
+      "d1993d1e-d8c6-4ec0-bd8d-74d21fef01b5",
+      "c0916ef4-ee7a-43a0-9923-8004a18cd67c",
+      "d7e80724-6356-4172-b3e1-bfd2accdfc0c",
+      "4a93d5d7-0ac9-482b-a1ec-fbd7247c9c52",
+      "6c83fb26-cf32-496c-9966-42789b5411e8",
+      "1037dc3f-5e4b-41c0-9125-b227f96c5195",
+      "bf94fcd9-5ab6-43cd-8854-6bf9e921a665"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "self-composing-policies_T09",
+    "goal": "Reproduce the Scenario (iii) architectural validation experiment (Figures 4e-4h): interference-free learning from scratch with all non-informative priors. (1) Define 5 non-informative random modules (uniform Dirichlet). (2) Train a new CompoNet module on SpaceInvaders task 6 (mode 5) with these 5 prior modules for 1M timesteps across 10 seeds. (3) Train a from-scratch baseline on the same task. (4) Record episodic returns, matching rates, input attention weights, and output attention weights at least every 10k timesteps. (5) Verify CompoNet matches baseline performance (no degradation from uninformative priors). (6) Verify the internal policy fully determines the final output (matching rates show Out=IntPol dominates). (7) Verify both attention heads distribute attention uniformly (~0.18 per input for input head, ~0.2 per module for output head, no single module >0.125 above the mean).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C05: When no previously learned policy provides useful information, CompoNet matches from-scratch training with no interference",
+      "C04: The self-composing mechanism correctly distinguishes informative from non-informative modules (contrastive evidence from the all-uninformative case)"
+    ],
+    "rubric_requirement_ids": [
+      "a16cd6bb-5d47-45b0-995f-81f3485997bd",
+      "a377e3c6-61c8-405f-8459-699347bef89a",
+      "a52a28e5-be1f-40f3-9784-734978d353d8",
+      "57fe4f9d-e36d-4b55-80c3-23e3fa442292",
+      "315a31da-6a39-4be1-881b-4e5a29d46413",
+      "231696e0-c9bb-404e-b96f-985dcbd376cb",
+      "17f0e736-c600-4608-ad0c-0513fcc8bd14",
+      "19014129-a2a7-4e37-b03e-de87cd22da3b",
+      "b64840ed-52f0-42d3-8fa9-32760c524211",
+      "5adbab63-7b1a-4208-92f4-d30ffbcd4b89",
+      "2c237954-542f-4597-b388-042babda1840",
+      "652b7dd2-1c6c-40ef-ba1c-ae2b54204ad9",
+      "b91fef48-1fe0-481e-b37d-deea55144945",
+      "9e0900d2-45e9-47e1-9747-6a219abded90"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "self-composing-policies_T10",
+    "goal": "Implement the PPO training loop and configure all PPO hyperparameters from Table E.2 for the ALE continual learning experiments. (1) Adapt the PPO implementation from Huang et al. (2022) to use CompoNet as actor, compatible with both ALE environments. (2) Configure AdamW optimizer with betas (0.9, 0.999), max grad norm 0.5, gamma=0.99, d_model=512, lr=2.5e-4, vf_coef=0.5, GAE lambda=0.95, 8 parallel envs, batch=1024, 4 update epochs, clip=0.2, entropy_coef=0.01, lr annealing, clipped value loss, normalized advantages, 128 steps per rollout. (3) Implement two single-layer output heads for actor (logits of categorical distribution) and critic (value function).",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C02: CompoNet achieves superior average performance when trained with PPO on ALE tasks"
+    ],
+    "rubric_requirement_ids": [
+      "90f271f7-eba5-4a1e-a105-2212eb5f351f",
+      "4f2a00e0-423d-4bc2-b674-03e970b79568",
+      "04a582b9-5473-4d89-a2ff-c7e924acfd55",
+      "b5c20ebb-50da-4022-aed6-4cf969d67ad9",
+      "24277bc2-8e61-457e-af20-c13d18cab57a",
+      "b181f0b9-54d1-4030-8ed3-b52ef0f54b1a",
+      "61cf8fe3-10e8-414e-9b01-5f12b6e89bf1",
+      "9d838de5-2888-4431-8b57-5bb00dffe3a0",
+      "d8b7555f-3b55-4214-908b-e588e394c1cc",
+      "0193f558-fbfb-407d-acc5-5f122c306beb",
+      "940b2a8a-03be-4bfd-8cbe-abb88206f55c",
+      "27f990db-3c95-4443-a9e0-74cae3cc7798",
+      "eda94d3e-be8e-476b-a1b1-fc4034bd69f7",
+      "97903a43-5146-4ed5-8fdf-73aa04792903",
+      "b159646a-15bb-41a2-b041-455aadb3819e"
+    ],
+    "n_requirements": 15
+  }
+]

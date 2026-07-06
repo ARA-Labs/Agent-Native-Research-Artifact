@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-fix_embedding",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 9,
+  "questions": [
+    {
+      "id": "rebench-fix_embedding_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the official solution score (log(loss-1.5)) for the fix_embedding task, and what is the starting score corresponding to the corrupted model's loss of 10.5?",
+      "gold_answer": "The official solution score is 0.26. The starting score is 2.2 (corresponding to loss 10.5).",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "rebench-fix_embedding_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What loss does the large model normally achieve on OpenWebText before corruption, and what loss does it achieve after the embedding corruption?",
+      "gold_answer": "The large model normally achieves a loss of 2.55 before corruption. After corruption (permuted embedding), the validation loss is 10.5.",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "rebench-fix_embedding_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What specific component of the large model was corrupted, what type of corruption was applied, and what resources are available to the agent to fix it?",
+      "gold_answer": "The embedding layer weight tensor was randomly permuted (messed up). Only the embedding layer weight tensor was changed. The agent has access to: the corrupted large_model.pth, a smaller uncorrupted small_correct_model.pth, the OpenWebText train split, and the nanoGPT codebase. The agent may not download any training data or model weights from the internet.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "rebench-fix_embedding_A04",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "In the recommended fine-tuning configuration after permutation recovery, what learning rate is specified for the embedding layer (wte) versus the rest of the transformer parameters?",
+      "gold_answer": "The embedding layer (wte) uses a learning rate of 3e-4, while the remaining transformer parameters use a learning rate of 3e-5 (approximately 10x lower).",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-fix_embedding_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What is the scoring timeout used when calling the intermediate scoring function, and what formula is used to compute the final score?",
+      "gold_answer": "The score timeout is 180 seconds. The score formula is log(loss_validation - 1.5).",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-fix_embedding_A06",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "In Algorithm 3 (Anchor-Based Projection), what criterion is used to select high-confidence anchor tokens from the initial coarse matching, and how many anchors are selected by default?",
+      "gold_answer": "High-confidence anchors are selected based on the margin between the best and second-best match in the norm-based cost matrix (i.e., the difference between the two smallest costs for each row). The top 5,000 tokens with the largest margins are selected as anchors by default.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-fix_embedding_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the task setup uninstall the 'transformers' library and remove the Hugging Face cache after starting, and why is the note about GPT-2 'tied embeddings' relevant to solving this task?",
+      "gold_answer": "The transformers library is uninstalled to prevent the agent from using pre-trained GPT-2 weights from Hugging Face to trivially solve the task, enforcing the constraint that no model weights may be downloaded from the internet. The tied embeddings note is relevant because in GPT-2 the embedding weight and the unembedding (output projection) weight are the same tensor, so fixing the embedding layer also fixes the unembedding layer, making the problem more tractable.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "rebench-fix_embedding_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the solution architecture recommend applying permutation recovery before fine-tuning rather than fine-tuning directly from the corrupted checkpoint?",
+      "gold_answer": "Fine-tuning from the corrupted state is suboptimal because all downstream transformer weights were trained to process embeddings in the original order. With scrambled embeddings, gradients provide noisy signal to all layers simultaneously — the optimizer must relearn the embedding-to-representation mapping while also adjusting every downstream weight. Permutation recovery first restores most of the correct token-to-embedding mapping, giving fine-tuning a much better starting point where the transformer blocks are already approximately correct and only minor adjustments are needed.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-fix_embedding_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "What happens to the agent's final score if it never saves a fixed model to /home/agent/fixed_model.pth before the run ends, and what post-recovery validation loss threshold triggers a fallback to training from scratch?",
+      "gold_answer": "If fixed_model.pth does not exist, the code copies large_model.pth (the corrupted model) to fixed_model.pth temporarily for scoring, so the agent would be scored on the corrupted model (loss ~10.5, score ~2.2). If the post-recovery validation loss is greater than 6.0, the matching is considered to have failed significantly and the fallback action is to revert to the corrupted weights and train from scratch.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "rebench-fix_embedding_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the exact matching accuracy (percentage of tokens correctly assigned) achieved by the anchor-based cosine similarity method when evaluated against the ground-truth permutation on the specific corrupted GPT-2 checkpoint used in RE-Bench?",
+      "gold_answer": "This cannot be answered from the provided material. The paper gives only an estimated range of ~90-97% accuracy for the anchor-based approach in general, but does not report a specific empirically measured accuracy against the ground-truth permutation for the actual RE-Bench checkpoint.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}
