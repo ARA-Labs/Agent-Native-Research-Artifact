@@ -2,7 +2,7 @@
 name: research-foresight
 description: >
   ARA World Model — read-only reasoning engine over ONE Agent-Native Research Artifact (ARA), run
-  LOCALLY with Claude Code itself as the LLM (no SDK, no API key). Given an ARA directory and a
+  LOCALLY with the coding agent itself as the LLM (no SDK, no API key). Given an ARA directory and a
   free-text query, it answers any question about the ARA — a forward "what if I change X", but
   equally why-did-this-work, what-should-I-try, is-this-sound, how-do-these-compare, or anything
   else — by retrieving precedent from the ARA's native files (references/RETRIEVE.md) and answering
@@ -21,7 +21,7 @@ metadata:
 
 # research-foresight — the ARA World Model
 
-You (Claude Code) are the LLM that runs the engine — no SDK, no API key, no network call. The
+You (the coding agent) are the LLM that runs the engine — no SDK, no API key, no network call. The
 engine is three reference contracts under this skill's `references/` directory (quote every path;
 it may contain spaces):
 

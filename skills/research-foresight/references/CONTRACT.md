@@ -93,7 +93,7 @@ scope", so no field is renamed to add it.
 | contract | reads | writes |
 |---|---|---|
 | `RETRIEVE.md` | the ARA's native files directly (`logic/`, `trace/`, `evidence/`, `src/`, `PAPER.md`) | **nothing** |
-| `PREDICT.md` | answers any question over the ARA, grounded in native refs (via `RETRIEVE.md`) | **nothing** |
+| `PREDICT.md` | the `retrieval` object from `RETRIEVE.md` + the bodies of every ref it cites | **nothing** |
 
 `RETRIEVE.md` is **not** limited to `experiment`/`dead_end` nodes — `question`/`decision`/`pivot`
 nodes, `problem.md` framing, the `solution/` method, and evidence figures are all in scope and are
