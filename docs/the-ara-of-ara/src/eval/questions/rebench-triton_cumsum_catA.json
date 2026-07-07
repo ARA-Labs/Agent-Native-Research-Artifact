@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-triton_cumsum",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 4,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "rebench-triton_cumsum_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the starting score and corresponding execution time for the baseline solution in this task?",
+      "gold_answer": "Starting score: 1.56 (execution time: 4.76ms)",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-triton_cumsum_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the official solution score and its corresponding execution time?",
+      "gold_answer": "Official solution score: 0.47 (execution time: 1.6ms)",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-triton_cumsum_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the combine operation for the fused three-field monoid state (c, v_even, v_odd) used in the parallel scan, including how the parity of c_A determines which v fields are summed.",
+      "gold_answer": "combine(A, B) produces c = c_A + c_B. If c_A mod 2 == 0: v_even = v_even_A + v_even_B and v_odd = v_odd_A + v_odd_B. If c_A mod 2 == 1: v_even = v_even_A + v_odd_B and v_odd = v_odd_A + v_even_B. The identity element is (0, 0, 0).",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-triton_cumsum_A04",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the four key kernel parameters in the optimal H100 configuration, and what is the value of num_warps and its derivation?",
+      "gold_answer": "BLOCK_SIZE=2048, num_warps=16, num_stages=2, elements_per_thread=4. num_warps is derived as BLOCK_SIZE / elements_per_thread / 32 = 2048/4/32 = 16.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-triton_cumsum_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What input size is used for scoring, what GPU hardware and compute resources are allocated, and what is the scoring metric formula?",
+      "gold_answer": "The input size is 100,000,000 (10^8) elements. The hardware is 1 H100 GPU, 13 CPUs, and 100 GB of memory. The score equals log(execution time in milliseconds).",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "rebench-triton_cumsum_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The artifact claims a ~48% bandwidth utilization for the best implementation. Using the H100 HBM3 bandwidth and the achieved execution time, verify this figure and explain why it falls short of 100%.",
+      "gold_answer": "Theoretical floor: reading 400 MB input + writing 400 MB output at 3.35 TB/s = 800 MB / 3.35 TB/s ≈ 0.24 ms. Achieved time is 0.50 ms, so utilization ≈ 0.24/0.50 = 48%. The gap is due to three-kernel overhead, the inter-block scan pass, and additional memory traffic from storing/reading local v_even and v_odd buffers (~1.6 GB extra).",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-triton_cumsum_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the algorithm store both v_even and v_odd per element rather than just v_even, and what is the memory cost of this choice for N=10^8?",
+      "gold_answer": "Pass 2 must adjust each block's local results based on the true entering parity from the inter-block prefix. If the entering parity is odd, the correct output requires v_odd values, not v_even. Without storing v_odd, Pass 2 would need to recompute the local scan. Storing both tracks avoids recomputation at the cost of two int64 buffers: 2 × 800 MB = 1.6 GB of extra memory (local v_even and local v_odd), bringing total memory usage to ~2.8 GB.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-triton_cumsum_A08",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Why did the decoupled look-back implementation fail in this artifact, and what specific Triton 2.3.1 limitation caused the failure?",
+      "gold_answer": "The decoupled look-back requires spin-waiting on atomic status flags set by preceding blocks, which involves a while loop with a data-dependent condition. Triton 2.3.1 does not support while loops with data-dependent conditions, causing a compilation failure. The baseline table shows the decoupled look-back entry as 'Triton compilation failure' with N/A for time and correctness.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-triton_cumsum_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the task have both a 'main' task and a 'hidden_score' task, and what is the key difference between them?",
+      "gold_answer": "The 'main' task is visible to the agent and used for development/iteration, while 'hidden_score' is used for final evaluation without the agent seeing score details (strip_score_information=True). This prevents the agent from overfitting to the scoring mechanism or gaming the visible score.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-triton_cumsum_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the measured execution time of the warp-shuffle hybrid scan variant compared to the shared-memory-only scan variant at BLOCK_SIZE=1024, as reported in the E04 experiment results?",
+      "gold_answer": "The artifact describes E04 as a planned experiment with an expected result of 10-20% speedup for the warp-shuffle variant, but no actual measured timing results from running E04 are reported anywhere in the artifact.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

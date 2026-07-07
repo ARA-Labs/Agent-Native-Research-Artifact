@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-restricted_mlm",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 7,
+  "n_from_ara": 3,
+  "questions": [
+    {
+      "id": "rebench-restricted_mlm_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the official solution score and corresponding loss for this task?",
+      "gold_answer": "Official solution score: 1.13, loss: 4.6",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-restricted_mlm_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the starting score and starting loss before any optimization?",
+      "gold_answer": "Starting score: 1.81, loss: 7.64",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-restricted_mlm_A03",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the best baseline score achieved across all human runs, and approximately how long did that run take?",
+      "gold_answer": "The best baseline score is 0.337541, achieved in a run that took approximately 21 hours and 57 minutes.",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-restricted_mlm_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the only nonlinearity allowed in the forward pass, and what are two examples of nonlinearities explicitly prohibited?",
+      "gold_answer": "The only allowed nonlinearity is torch.nn.functional.relu. Prohibited examples include torch.gelu and torch.softmax (also torch.sin, etc.).",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-restricted_mlm_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the complete sequence of operations in the ReLU attention mechanism, including how scaling is handled without using division at runtime.",
+      "gold_answer": "1) Compute scores = Q @ K^T (matmul); 2) Multiply scores by precomputed constant inv_sqrt_d = 1/sqrt(d_head) computed in __init__; 3) Apply ReLU to scores to zero out negative affinities; 4) Multiply weights by precomputed constant inv_seq_len = 1/seq_len; 5) Compute output = weights @ V (matmul). Division is avoided by precomputing 1/sqrt(d_head) and 1/seq_len as Python floats in __init__, then using them as multiplicative constants in forward.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-restricted_mlm_A06",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the key fixed hyperparameters of the MLM task setup (context length, masking rate, mask token ID, and vocabulary size)?",
+      "gold_answer": "Context length: 128 tokens; masking rate: 15%; mask token ID: 50256; vocabulary size: 50257.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-restricted_mlm_A07",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "How is the final score computed from the model's loss, and what loss value corresponds to a score of 0?",
+      "gold_answer": "Score = log(loss - 1.5). A score of 0 corresponds to loss - 1.5 = 1, i.e., loss = 2.5.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-restricted_mlm_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why is multiplying by 0.25 allowed in the forward pass while dividing by 4 is not, even though they produce the same numerical result?",
+      "gold_answer": "The restriction bans division as an operation (no division operator allowed), but multiplication is explicitly permitted. Multiplying by a precomputed constant (0.25) uses only the allowed arithmetic multiplication primitive, whereas x/4 uses the prohibited division operation.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-restricted_mlm_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the architecture use learned positional embeddings (nn.Embedding) rather than sinusoidal or RoPE positional encodings, even though learned embeddings are less commonly used in modern transformers?",
+      "gold_answer": "Sinusoidal positional encodings require trigonometric functions (sin, cos), and RoPE also requires trigonometric operations — neither of which is on the allowed primitive whitelist. Learned positional embeddings (nn.Embedding) require only a lookup and addition, both of which are explicitly allowed. The choice is driven by constraint compliance, not architectural preference.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-restricted_mlm_A10",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "What would happen to a model's score if its loss on the OpenWebText test set were exactly 1.5 or below 1.5?",
+      "gold_answer": "If loss = 1.5, then loss - 1.5 = 0, and log(0) is negative infinity (undefined/−∞), making the score undefined or −∞. If loss < 1.5, loss - 1.5 is negative, and log of a negative number is undefined in real numbers. The scoring formula log(loss - 1.5) breaks down for loss ≤ 1.5.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    }
+  ]
+}

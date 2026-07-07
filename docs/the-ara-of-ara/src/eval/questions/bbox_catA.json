@@ -1,0 +1,101 @@
+{
+  "paper_id": "bbox",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 8,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "bbox_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the exact accuracy improvement (Δ%) achieved by BBOX-ADAPTER (Combined) on GSM8K compared to the gpt-3.5-turbo CoT baseline?",
+      "gold_answer": "+6.77% (from 67.51% to 74.28%)",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "bbox_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What learning rate, optimizer, batch size, and number of training steps are used to train the BBOX-ADAPTER?",
+      "gold_answer": "Learning rate η=5e-6, AdamW optimizer with weight decay 0.01, batch size 64, 6000 training steps.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bbox_A03",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "By how much does the ranking-based NCE loss outperform the MLM loss on StrategyQA with the 0.1B adapter, and what are the exact accuracy values for each?",
+      "gold_answer": "NCE achieves 71.62% vs MLM's 61.52%, a difference of +10.10 percentage points.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "bbox_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How does BBOX-ADAPTER handle the intractability of the partition function Z(θ) during adapter training, and what specific technique is added to address training instability?",
+      "gold_answer": "BBOX-ADAPTER uses Noise Contrastive Estimation (NCE) as an efficient estimator to avoid computing Z(θ) directly. Specifically, it uses a ranking-based NCE loss that reformulates training as a contrastive ranking problem over sampled positives and negatives. To address training instability caused by sharp gradients in energy models, spectral normalization is incorporated into the loss function.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bbox_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the three steps of the online adaptation framework in BBOX-ADAPTER for each iteration t.",
+      "gold_answer": "For each iteration t, the online adaptation involves: (1) Sampling a set of M candidates from the adapted inference p_θt(y|x) for each input; (2) Updating the positive samples y+(t) by selecting the better answer from previous positive samples and newly sampled candidates based on ground-truth or human/AI feedback, and updating negative samples y-(t) as the remaining candidates; (3) Computing the gradient of the NCE loss with updated positive and negative samples and updating the adapter parameters θ_{t+1} via gradient descent.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "bbox_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What are the training and inference cost ratios of Azure-SFT versus BBOX-ADAPTER (full-step) on GSM8K, and what specific dollar amounts support these ratios?",
+      "gold_answer": "Training: Azure-SFT costs $216.50 vs BBOX-ADAPTER full-step $11.58, a ratio of ~18.7x. Inference: Azure-SFT costs $28.30/1k Q vs BBOX-ADAPTER full-step $12.46/1k Q, a ratio of ~2.27x.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bbox_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What adapter backbone is used for TruthfulQA experiments, and how does this differ from the backbone used for StrategyQA, GSM8K, and ScienceQA? What parameter counts correspond to each?",
+      "gold_answer": "TruthfulQA uses bert-base-cased (110M parameters). StrategyQA, GSM8K, and ScienceQA use DeBERTa-v3-base (86M) and DeBERTa-v3-large (304M).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bbox_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does BBOX-ADAPTER use encoder-only models (DeBERTa, BERT) rather than decoder-only models as the adapter backbone, given that the black-box LLM is a decoder-only model?",
+      "gold_answer": "The adapter's role is discriminative scoring of (input, output) text pairs to produce a scalar energy value, not generative text production. Encoder-only models like DeBERTa and BERT are well-suited for discriminative tasks, using the [CLS] token representation mapped through a linear head to a scalar. They are also significantly smaller (0.1B–0.3B parameters) than decoder-only LLMs, enabling cost-efficient local training without accessing the black-box LLM's internals.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "bbox_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why is BBOX-ADAPTER described as enabling 'plug-and-play' adaptation, and what property of its design makes this possible compared to SFT-based methods?",
+      "gold_answer": "BBOX-ADAPTER enables plug-and-play adaptation because once trained on one black-box LLM (e.g., gpt-3.5-turbo), the adapter can be directly applied to other black-box LLMs (e.g., davinci-002, Mixtral-8×7B) without retraining. This is possible because the adapter operates solely on text outputs and data distributions rather than on internal model parameters, making it independent of the specific LLM's architecture. SFT-based methods cannot do this because they directly manipulate model parameters, tying them to a specific model.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "bbox_A10",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "What happens to BBOX-ADAPTER performance when T=0 (no online adaptation iterations), and why does this occur?",
+      "gold_answer": "At T=0, the randomly initialized (unfinetuned) adapter performs below the base model without any adapter. This occurs because the untrained adapter assigns arbitrary energy scores to beam candidates, actively misguiding the beam search to select worse outputs than the LLM would produce on its own. The adapter must be trained for at least T=1 iteration before it provides useful signal.",
+      "grading_type": "semantic",
+      "source": "both"
+    }
+  ]
+}

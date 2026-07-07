@@ -1,0 +1,101 @@
+{
+  "paper_id": "lbcs",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "lbcs_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What are the optimized coreset selection ratios achieved by LBCS on ImageNet-1k at predefined ratios of 70% and 80%?",
+      "gold_answer": "68.53% at the 70% predefined ratio and 77.82% at the 80% predefined ratio.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "lbcs_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What values are used for the voluntary performance compromise parameter ε and the number of training iterations T in the main comparison experiments on F-MNIST, SVHN, and CIFAR-10?",
+      "gold_answer": "ε is set to 0.2 and T is set to 500.",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "lbcs_A03",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What optimizer and learning rate are used for the inner loop training in the main F-MNIST, SVHN, and CIFAR-10 experiments?",
+      "gold_answer": "Adam optimizer with a learning rate of 0.001.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "lbcs_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How does LBCS handle the outer loop optimization, and what specific algorithm is used to implement it?",
+      "gold_answer": "The outer loop is treated as a black-box optimization problem using a randomized direct search algorithm called LexiFlow (from Zhang et al., 2023b), which iteratively maintains an incumbent mask and samples new masks near it, using lexicographic comparisons to update the incumbent. It includes restart and dynamic step size techniques to avoid local optima.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "lbcs_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How does LBCS handle the large-scale ImageNet-1k dataset to make the mask search tractable, and what group size is used?",
+      "gold_answer": "LBCS uses a grouping trick where G=100 consecutive examples share the same binary mask variable, reducing the search space from n dimensions to n/G dimensions. The same grouping trick is also applied to the Probabilistic baseline for fair comparison.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "lbcs_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What is the time complexity of LBCS compared to the Probabilistic coreset method, and what causes the difference?",
+      "gold_answer": "LBCS has time complexity O(TK) while Probabilistic coreset has O(TKC), where K is the number of training epochs per inner loop and C is the number of sampling times required by the policy gradient estimator. Since C > 1, LBCS has lower time complexity because it uses a gradient-free randomized direct search requiring only pairwise mask comparisons.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "lbcs_A07",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "On CIFAR-10 with predefined k=4000, what test accuracy does LBCS achieve and what is its optimized coreset size (mean ± std)?",
+      "gold_answer": "LBCS achieves 73.4±0.5% test accuracy with an optimized coreset size of 3736.0±14.2.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "lbcs_A08",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How is the optimum set M* defined in the lexicographic bilevel coreset selection framework, and what role does ε play in its definition?",
+      "gold_answer": "M* = {m ∈ M*_2 | ∀m≠m', F(m) ≤ F(m')}. It is defined recursively: M*_1 = {m ∈ M | f1(m) ≤ f*_1 * (1+ε)} where f*_1 is the infimum of f1, and M*_2 = {m ∈ M*_1 | f2(m) ≤ f*_2} where f*_2 is the infimum of f2 over M*_1. ε represents the voluntary performance compromise on f1, allowing a relaxed optimality region for f1 so that f2 can be better optimized.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "lbcs_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the paper argue that a weighted combination of f1 and f2 (e.g., (1−λ)f1 + λf2) cannot replace the lexicographic formulation, even in principle with careful tuning of λ?",
+      "gold_answer": "There are two reasons. First, there is a scale mismatch: the gradient norm of f2's term is √n (large and dataset-size-dependent), while f1's gradient depends on data, network, and task simultaneously, making calibration intractable. Second, and more fundamentally, lexicographic preferences cannot be represented by any weighted combination of objectives, because the strict priority structure—where f1 must reach its optimal region before f2 is minimized at all—cannot be captured by a fixed scalar weight.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "lbcs_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the minimum value of ε below which LBCS is theoretically guaranteed to find a coreset smaller than the predefined size k on any dataset?",
+      "gold_answer": "This question cannot be answered from the paper. The paper does not provide a theoretical lower bound on ε that guarantees coreset size reduction; it only shows empirically that larger ε leads to smaller coreset sizes on average, and the convergence theorem guarantees finding the optimal f2 given any non-negative ε, but no minimum ε threshold for size reduction is established.",
+      "grading_type": "abstention",
+      "source": "both"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "paper_id": "self-expansion",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "self-expansion_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the representation descriptor architecture in SEMA: (a) According to R11 and R12 in rubric/requirements.md, what are the exact specifications for the encoder of the representation descriptor, including both the projection target dimensionality and the non-linearity applied? (b) Which ARA file in src/execution/ implements this component — look at src/execution/sema_core.py and identify where the encoder is defined. (c) What does the combination of these two requirements imply about how the bottleneck representation is formed before the decoder reconstructs the original input?",
+      "gold_answer": "R11 states: 'The encoder of the representation descriptor is implemented as a linear layer that projects to 128 dimensions.' R12 states: 'LeakyReLU is applied to the output of the encoder of the representation descriptor.' Together, the encoder is a linear layer projecting to 128-dim followed by LeakyReLU. The implementing ARA file is src/execution/sema_core.py, which contains the autoencoder-style representation descriptor. The implication is that the bottleneck representation is a 128-dimensional non-linearly activated embedding; the LeakyReLU (rather than ReLU) allows small negative gradients to pass, preventing dead neurons in the bottleneck, and the fixed 128-dim projection creates a compact descriptor used to compute reconstruction error for z-score thresholding during expansion decisions.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R11: encoder is a linear layer projecting to 128 dimensions",
+        "Correctly cites R12: LeakyReLU (not ReLU) is applied after the encoder output",
+        "Identifies src/execution/sema_core.py as the implementing ARA file",
+        "Explains that the 128-dim LeakyReLU bottleneck feeds reconstruction error computation for z-score-based expansion triggering"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/sema_core.py"
+      ],
+      "rubric_requirement_id": "R11",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-expansion_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "SEMA uses running statistics to decide when to trigger expansion. (a) According to R45 in rubric/requirements.md, what is the exact window size and scope used for computing the running mean and standard deviation of the reconstruction error for each representation descriptor? (b) Cross-reference src/execution/expansion_controller.py — what does this file's role imply about where the window-based statistic accumulation would be managed? (c) Given that R18 defines the z-score as z_k^l = (r_k^l - u_k^l) / sigma_k^l, what does the 500-sample window specification from R45 imply about the sensitivity of the expansion trigger early in training versus later in training?",
+      "gold_answer": "R45 states: 'When training SEMA, the running statistics of the mean and standard deviation of the reconstruction error are stored for each representation descriptor, using the previous 500 samples (over all tasks) that were used for training prior to the current sample.' This means the window is exactly 500 samples, computed across all tasks (not just the current task). The ARA file src/execution/expansion_controller.py manages the expansion logic, implying it is the component responsible for tracking these per-descriptor running statistics and evaluating the z-score threshold. The implication for sensitivity: early in training (fewer than 500 samples seen), the running statistics are based on a smaller effective window, making the mean and std less stable and potentially causing more variable z-scores; once 500+ samples have been processed, the statistics become a proper sliding window estimate. This means the expansion trigger may be less reliable for very early tasks, and the 500-sample design balances responsiveness (not too long a history) with stability (not too short).",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R45: window is exactly 500 samples, accumulated over all tasks (not per-task)",
+        "Identifies src/execution/expansion_controller.py as the ARA file managing expansion logic and statistics",
+        "Connects R18's z-score formula to R45's window, noting u_k^l and sigma_k^l are derived from the 500-sample running window",
+        "Explains that early-training instability (fewer than 500 samples) affects z-score reliability and expansion trigger sensitivity"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/expansion_controller.py"
+      ],
+      "rubric_requirement_id": "R45",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-expansion_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The ablation study in Section 4.3 introduces several adapter composing variants. (a) According to R40 in rubric/requirements.md, what is the exact specification of the 'Random Weighting' variant, particularly regarding when the random weights are recomputed? (b) Compare this with R42's 'Random Selection' variant — what is the key architectural difference between the two? (c) Cross-reference evidence/tables/table2_ablation_composing.md or evidence/tables/table2_ablation_expansion_routing.md: what does the existence of both per-sample random weighting and per-sample random selection as separate ablations imply about what aspect of the router the authors are isolating in their study?",
+      "gold_answer": "R40 states: 'The architecture variant \"Random Weighting\" introduced in Section 4.3 on \"Ablation studies on module expansion and adapter composing\" is implemented as a variant of the SEMA architecture that uses a linear combination (from random weights) of the outputs of the functional adapters (e.g. the router has random weights for each adapter), where the random weights are re-computed per-sample.' R42 states: 'The architecture variant \"Random Selection\" introduced in Section 4.3 on \"Ablation studies on module expansion and adapter composing\" is implemented as a variant of the SEMA architecture that only uses the output of the single adapter chosen at random, where the adapter that is randomly chosen is re-computed (randomly) per-sample.' The key difference is that Random Weighting uses a soft linear combination of ALL adapter outputs with random weights (re-sampled per sample), while Random Selection uses only ONE randomly chosen adapter (hard selection, re-sampled per sample). Both are per-sample but differ in soft vs. hard aggregation. Cross-referencing evidence/tables/table2_ablation_expansion_routing.md, having both ablations isolates two separate questions: whether learned routing weights (vs. random weights) matter for the soft mixture, and whether the mixture (vs. single selection) matters at all. Together they disentangle the value of the learned router's weighting from the value of ensemble combination.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R40: Random Weighting uses soft linear combination of all adapters with random weights recomputed per-sample",
+        "Correctly cites R42: Random Selection uses a single randomly chosen adapter recomputed per-sample (hard selection)",
+        "Identifies evidence/tables/table2_ablation_expansion_routing.md (or table2_ablation_composing.md) as the cross-referenced ARA file",
+        "Explains that the two ablations jointly isolate: (1) value of learned vs. random weights and (2) value of soft mixture vs. hard single-adapter selection"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table2_ablation_expansion_routing.md"
+      ],
+      "rubric_requirement_id": "R40",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-expansion_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "SEMA's training involves two separate learning rate settings and epoch counts for different components. (a) According to R49, R50, R53, and R54 in rubric/requirements.md, what are the exact epoch counts and initial learning rates for adapters versus representation descriptors respectively? (b) Cross-reference src/configs/training.md — does this ARA file reflect these values, and what does the presence of two separate epoch/LR configurations imply about the training pipeline structure? (c) Given that R55 specifies cosine annealing for LR decay, what does the combination of different epoch counts (5 vs. 20) with cosine annealing imply about the relative convergence behavior expected for adapters versus representation descriptors?",
+      "gold_answer": "R49 states: 'All adapters are trained for 5 epochs.' R50 states: 'The representation descriptors are trained for 20 epochs.' R53 states: 'The initial learning rate is set to 0.005 for adapters.' R54 states: 'The initial learning rate is set to 0.01 for representational descriptors.' The ARA file src/configs/training.md captures these training configuration parameters. Two separate epoch/LR configurations imply the training pipeline must alternate or sequence adapter training and representation descriptor training as distinct phases with different hyperparameters. With cosine annealing: adapters decay over only 5 epochs (faster, steeper cosine decay) starting from lr=0.005, while representation descriptors decay over 20 epochs (slower, more gradual decay) starting from lr=0.01. This implies representation descriptors are expected to require more stable, longer optimization (autoencoder reconstruction is a more complex objective), while adapters converge quickly in a fine-tuning regime on top of already-learned representations.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R49 (5 epochs for adapters) and R50 (20 epochs for representation descriptors)",
+        "Correctly cites R53 (lr=0.005 for adapters) and R54 (lr=0.01 for representation descriptors)",
+        "Identifies src/configs/training.md as the cross-referenced ARA configuration file",
+        "Explains that cosine annealing over different epoch counts implies faster convergence expected for adapters vs. longer stable optimization for representation descriptors"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R49",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "self-expansion_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The SEMA expansion algorithm has specific rules about which layers are eligible and what happens when no expansion signal is triggered. (a) According to R34 and R21 in rubric/requirements.md, what are the two key constraints on the expansion process — specifically (i) which layers are eligible for expansion and (ii) what happens when no expansion signal is triggered for any layer during a task? (b) Cross-reference src/execution/sema_learner.py — what does this file's role imply about how these two constraints interact during the task loop? (c) What does the combination of restricting expansion to only the last three transformer layers (R34) and skipping tasks with no expansion signal (R21) imply about the expected parameter growth trajectory across a long sequence of tasks, as evidenced in evidence/figures/fig8_param_growth.md?",
+      "gold_answer": "R34 states: 'Self-expansion is only enabled in the last three transformer layers.' R21 states: 'When training SEMA on the t-th task, when scanning each layer, if no expansion signals are triggered, the task is skipped (no training is performed for such task and no adapters are added), and all existing functional adapters and representation descriptors are frozen.' The ARA file src/execution/sema_learner.py manages the per-task training loop, meaning it must enforce both: only scanning layers within the last three transformer layers for expansion candidates, and implementing the skip-task logic when no z-score threshold is exceeded across all scanned layers. The interaction is that the learner iterates over tasks, and for each task restricts the scan to at most three layers; if none of those three layers triggers expansion, the entire task is skipped with no parameter updates. The implication for parameter growth (evidenced in fig8_param_growth.md): because expansion is restricted to 3 layers AND many tasks may be skipped entirely, parameter growth is sublinear and sparse — adapters are only added when genuinely novel representations are encountered that exceed the z-score threshold in at least one of the three eligible layers. This explains the step-function-like, bounded growth curve expected in Figure 8.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R34: self-expansion restricted to last three transformer layers only",
+        "Correctly cites R21: if no expansion signal triggered across all scanned layers, the entire task is skipped with no training and all existing components frozen",
+        "Identifies src/execution/sema_learner.py as the ARA file managing the task loop and enforcing both constraints",
+        "Explains that the combination of 3-layer restriction and task-skipping produces sublinear/sparse parameter growth consistent with evidence/figures/fig8_param_growth.md"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/sema_learner.py"
+      ],
+      "rubric_requirement_id": "R34",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

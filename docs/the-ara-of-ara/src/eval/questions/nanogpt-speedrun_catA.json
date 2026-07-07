@@ -1,0 +1,101 @@
+{
+  "paper_id": "nanogpt-speedrun",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 5,
+  "n_from_ara": 5,
+  "questions": [
+    {
+      "id": "nanogpt-speedrun_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the baseline training time (in minutes) for GPT-2 124M on 8×H100 in Record 1 of the speedrun?",
+      "gold_answer": "49.5 minutes (2,968,348 ms)",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "nanogpt-speedrun_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the exact training time (in minutes) achieved by Record 3, which introduced the Muon optimizer?",
+      "gold_answer": "23.10 minutes (1,386,147 ms)",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "nanogpt-speedrun_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What are the three polynomial coefficients (a, b, c) used in the Newton-Schulz orthogonalization iterations within the Muon optimizer, and how many iterations are applied?",
+      "gold_answer": "a=3.4445, b=-4.7750, c=2.0315, applied for 5 iterations. The update rule is X_{k+1} = aX + bX^3 + cX^5.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "nanogpt-speedrun_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "In the Muon optimizer, how are model parameters partitioned between the OrthogonalNesterov update and the AdamW update, and what specific learning rates are used for each group in the final configuration?",
+      "gold_answer": "Parameters with ndim >= 2 (weight matrices) receive OrthogonalNesterov updates with lr_muon=0.6; parameters with ndim < 2 (biases, norms, embeddings) receive AdamW updates with lr_adam_1d=0.04; the LM head has a separate AdamW group with lr_adam_head=0.008.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "nanogpt-speedrun_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What three conditions must all be satisfied for the FlexAttention document-aware mask to allow attention between a query token and a key-value token?",
+      "gold_answer": "Causal (query position >= kv position), same_doc (document IDs match), and in_window (query position minus kv position <= window size). The block mask is compiled with 128-token block granularity.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "nanogpt-speedrun_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Claim C03 states the Muon optimizer achieves the single largest record-to-record speedup. What is the percentage reduction in training time from Record 2 to Record 3, and how does this compare to the percentage reduction achieved during the entire Architecture phase (Records 5–8)?",
+      "gold_answer": "Record 2 to Record 3: from 36.83 min to 23.10 min, a reduction of approximately 37.3%. The Architecture phase (Records 5–8) reduced time from 21.70 min to 11.04 min, a reduction of 49.1%. So the Architecture phase achieved a larger cumulative percentage reduction, but Muon (Record 3 alone) is the single largest single-record reduction.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "nanogpt-speedrun_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "FlexAttention is introduced in Record 11 with a sliding window of 1024 tokens. By which record is the sliding window reduced to 128 tokens, and what other architectural change is introduced in that same record?",
+      "gold_answer": "Record 15 reduces the sliding window to 128 tokens (block SW 128) and also introduces GQA (Grouped Query Attention) and gradient_as_bucket_view.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "nanogpt-speedrun_A08",
+      "category": "design_rationale",
+      "difficulty": "T2_scattered",
+      "question": "Why does the Muon optimizer restrict Newton-Schulz orthogonalization to parameters with 2 or more dimensions, and what happens to 1D parameters instead?",
+      "gold_answer": "Orthogonal updates are only geometrically meaningful for matrix-valued parameters where Stiefel manifold structure exists. 1D parameters (biases, layer norms) lack this structure, so they are handled by a standard AdamW optimizer instead.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "nanogpt-speedrun_A09",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "What are the two dead ends documented in the exploration tree, what failure mode did each exhibit, and what lesson was recorded for each?",
+      "gold_answer": "Dead end N07a: cuDNN attention was slower than expected at short sequences (~4K tokens), only beneficial at 64K+ context; lesson: avoid premature optimization. Dead end N17a: removing 2 or more transformer layers caused validation loss regression despite skip connections; lesson: a minimum model depth exists that skip connections cannot compensate for.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "nanogpt-speedrun_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the exact wall-clock time overhead (in milliseconds or percentage) added by the Newton-Schulz orthogonalization step per optimizer iteration in the distributed 8×H100 setup, as measured in the paper's experiments?",
+      "gold_answer": "The paper states Newton-Schulz adds approximately 5% compute per optimizer step in the algorithm complexity section, but no exact measured wall-clock overhead in milliseconds for the distributed 8×H100 setup is reported in the provided material.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

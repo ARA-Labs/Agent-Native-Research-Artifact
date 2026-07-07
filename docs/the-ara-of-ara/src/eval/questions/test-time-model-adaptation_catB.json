@@ -1,0 +1,121 @@
+{
+  "paper_id": "test-time-model-adaptation",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "test-time-model-adaptation_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirement R19 addresses initialization of the activation shifting moving average. (a) What does R19 specify about how muN(0) must be initialized? (b) Which ARA file in src/execution/ implements this initialization logic, and what does that file's code reveal about how the first-batch statistics are used? (c) Given that the info gap analysis marks R19 as ABSENT with gaps 'vague_description' and 'implicit_assumption', what critical implementation detail is missing from the rubric that an implementer would need to infer?",
+      "gold_answer": "(a) R19 (rubric ID: activation-shifting-initialization) states: 'The activation shifting moving average muN(0) is correctly initialized using the statistics of the first batch muN(X1).' This means the EMA state is not initialized to zero or source statistics but specifically to the first test batch's CLS token feature mean. (b) The file src/execution/activation_shift.py implements this logic. It should show that on the first batch (t=1), muN(0) is set equal to muN(X1) — i.e., the EMA update formula mu_N(t) = alpha * muN(Xt) + (1-alpha) * muN(t-1) collapses to muN(X1) for initialization, or is explicitly set as muN(0) = muN(X1) before any EMA update begins. (c) Because R19 is rated ABSENT with 'vague_description' and 'implicit_assumption', the rubric does not clarify whether initialization happens before the first EMA step (setting muN(0) = muN(X1) then applying the update formula starting at t=1) or whether muN(0) is defined as the result after the first forward pass. The exact mechanism — whether the first batch bypasses the EMA formula entirely or seeds it — is implicit and must be inferred from the paper or code context. R16 specifies the EMA update formula with alpha=0.1 (R71), but R19 leaves the boundary condition unstated.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R19 requirement text: 'muN(0) is correctly initialized using the statistics of the first batch muN(X1)'",
+        "Identifies src/execution/activation_shift.py as the implementing ARA file",
+        "Explains the implicit assumption gap: whether the first batch seeds muN(0) before or as part of the EMA update formula",
+        "References R16's EMA formula (mu_N(t) = alpha * muN(Xt) + (1-alpha) * muN(t-1)) as the context that makes R19's boundary condition ambiguous"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/activation_shift.py"
+      ],
+      "rubric_requirement_id": "R19",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "test-time-model-adaptation_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R29 and R69/R70 together define the fitness function and its lambda hyperparameter. (a) What does R29 specify about the fitness function, and what does R69 specify about the lambda value on ImageNet-C? (b) Cross-referencing src/execution/fitness.py, what does the implementation reveal about how entropy and activation discrepancy are combined, and does it match the dataset-conditional lambda values from R69 and R70? (c) Given that the info gap analysis flags the activation discrepancy term as PARTIAL with 'ambiguous_specification' and 'incomplete_equation', what specific aspect of the fitness function formula cannot be fully reconstructed from the rubric alone, and which evidence file would help verify the correct formulation?",
+      "gold_answer": "(a) R29 states: 'The fitness function from Equation 5 combining entropy and activation discrepancy is implemented.' R69 states: 'Lambda is set to 0.4 on ImageNet-C/V2/Sketch.' R70 states: 'Lambda is set to 0.2 on ImageNet-R.' Together these establish that the fitness function has a lambda-weighted combination of entropy and activation discrepancy, with dataset-conditional lambda values. (b) src/execution/fitness.py should implement Equation 5 as fitness = entropy_term + lambda * activation_discrepancy_term (or equivalent). The file should show configurable lambda supporting the two values (0.4 for most datasets, 0.2 for ImageNet-R). The implementation must combine both terms in a single scalar fitness value used by the CMA optimizer. (c) The info gap flags the activation discrepancy term as PARTIAL with 'ambiguous_specification' and 'incomplete_equation' — specifically, the rubric references 'the sum over x in X_t of lambda * ||mu_i(X_t) - mu_i^S||_2' for the mean term and '||sigma_i(X_t) - sigma_i^S||' for the std term, but does not fully specify which layer index i is used, whether the sum is normalized by batch size, or the exact L2 norm formulation. The evidence file evidence/tables/table5_ablation_components.md would help verify the correct formulation by showing performance with and without each component.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R29 ('fitness function from Equation 5 combining entropy and activation discrepancy') and R69 ('Lambda is set to 0.4 on ImageNet-C/V2/Sketch')",
+        "Identifies src/execution/fitness.py as the cross-reference file and describes lambda as a configurable parameter with two distinct values",
+        "Identifies the specific ambiguity: incomplete specification of the activation discrepancy term (layer index, normalization, exact norm formulation)",
+        "Names evidence/tables/table5_ablation_components.md as the verification file for component-level fitness function behavior"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/fitness.py",
+        "evidence/tables/table5_ablation_components.md"
+      ],
+      "rubric_requirement_id": "R29",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "test-time-model-adaptation_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R20 and R21 define the FOA-I interval-based update strategy. (a) What do R20 and R21 together specify about the two storage mechanisms (V1 and V2) and the CMA optimization trigger? (b) Cross-referencing src/execution/foa.py, what does the implementation reveal about how CLS token features versus raw images are stored, and when the stored samples are deleted after CMA optimization? (c) Requirement R78 specifies which interval values I are tested. Given evidence/tables/table6_interval.md, what does the table structure imply about whether FOA-I V1 and V2 produce different accuracy results across the tested intervals, and why does R20's distinction between storing features vs. images matter for memory consumption (cross-referencing evidence/tables/table7_memory.md)?",
+      "gold_answer": "(a) R20 states: 'Two storage mechanisms are implemented for interval-based updates: FOA-I V1 stores CLS token features between updates, while FOA-I V2 stores original input images between updates.' R21 states: 'After every I samples, CMA optimization is performed using all stored samples as a batch, followed by deleting all I stored samples.' Together these define a buffering strategy where I samples accumulate, CMA runs on the full buffer, then the buffer is cleared. (b) src/execution/foa.py should show two code paths: one that extracts and stores intermediate CLS token embeddings from the N-th layer (V1), and one that stores raw input tensors (V2). After every I samples, the buffered items are collated into a batch for CMA optimization, then the buffer list/queue is emptied. The deletion of stored samples after each interval update is explicit in R21 and should be visible as a buffer.clear() or equivalent operation. (c) evidence/tables/table6_interval.md shows accuracy across intervals I = {4, 8, 16, 32, 64} for both V1 and V2 variants. The distinction between V1 (storing features) and V2 (storing images) matters for memory because V1 stores compressed representations (CLS token vectors of dimension 768 for ViT-Base) while V2 stores full image tensors (3x224x224), making V2 significantly more memory-intensive per stored sample. evidence/tables/table7_memory.md corroborates this: FOA-I V2 with large intervals would incur higher memory overhead than V1, which aligns with R23's finding that quantization reduces memory.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes both R20 (V1 stores CLS features, V2 stores original images) and R21 (CMA after every I samples, then delete all stored samples)",
+        "Identifies src/execution/foa.py as the implementing file and describes the buffer-clear mechanism after CMA optimization",
+        "Explains the memory implication: V1 stores 768-dim vectors vs V2 stores 3x224x224 tensors, making V2 more memory-intensive",
+        "References both evidence/tables/table6_interval.md for interval performance and evidence/tables/table7_memory.md for memory consumption comparison"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/foa.py",
+        "evidence/tables/table6_interval.md",
+        "evidence/tables/table7_memory.md"
+      ],
+      "rubric_requirement_id": "R20",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "test-time-model-adaptation_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirements R11 and R65 together define the prompt insertion mechanism and its default configuration. (a) What does R11 specify about the arrangement of learnable prompts relative to CLS token and patch embeddings, and what does R65 specify about the default number of prompt embeddings? (b) Cross-referencing src/execution/prompt_vit.py, how does the implementation arrange the token sequence, and does it match the [CLS token, learnable prompts, patch embeddings] ordering from R11? (c) Given that R11 is flagged PARTIAL in the info gap analysis with 'ambiguous_specification', what specific aspect of prompt insertion is underspecified in the rubric, and how does logic/solution/algorithm.md clarify the role of prompts in the CMA optimization loop?",
+      "gold_answer": "(a) R11 states: 'The input prompt mechanism is implemented to add learnable prompts to the inputs following the required arrangement: [CLS token, learnable prompts, patch embeddings].' R65 states: 'The number of prompt embeddings N_p is set to 3.' Together these specify that by default 3 learnable prompt tokens are inserted between the CLS token and the patch embeddings in the input sequence to the transformer. (b) src/execution/prompt_vit.py should show that after the patch embedding layer extracts patch tokens, the sequence is constructed as torch.cat([cls_token, prompt_tokens, patch_embeddings], dim=1) or equivalent, with N_p=3 prompt tokens by default. The prompts are learnable parameters (nn.Parameter) initialized uniformly per R66. (c) R11 is PARTIAL with 'ambiguous_specification' — the rubric does not clarify whether prompts are inserted only at the input layer or also at intermediate transformer blocks (deep prompting vs. shallow prompting). The rubric only specifies the input arrangement without stating whether the same prompts or new prompts appear at each layer. logic/solution/algorithm.md clarifies that FOA uses shallow prompting (input layer only), and that the CMA optimizer updates the prompt parameters p_k between batches — prompts are the sole parameters being optimized, while the ViT backbone remains frozen.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R11 arrangement '[CLS token, learnable prompts, patch embeddings]' and R65 value 'N_p is set to 3'",
+        "Identifies src/execution/prompt_vit.py and describes the torch.cat or equivalent sequence construction",
+        "Identifies the ambiguity: rubric does not specify shallow vs. deep prompting (input-only vs. multi-layer insertion)",
+        "References logic/solution/algorithm.md to explain shallow prompting and that CMA optimizes only prompt parameters while backbone is frozen"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/prompt_vit.py",
+        "logic/solution/algorithm.md"
+      ],
+      "rubric_requirement_id": "R11",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "test-time-model-adaptation_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R12 and R27 define the CMA population sampling procedure and optimizer configuration. (a) What does R12 specify about how the t-th prompt p^(t)_k is sampled, including the roles of m^(t), tau^(t), and sigma^(t)? What does R27 specify about the CMA optimizer's configurable parameters? (b) Cross-referencing src/execution/foa.py, what does the implementation reveal about how the population of K prompts is generated per iteration, and does it use an off-the-shelf CMA library or a custom implementation of the sampling formula from R12? (c) R68 sets K=28 as the default population size. Cross-referencing evidence/figures/fig2a_population_size.md, what does the sensitivity analysis imply about why K=28 was chosen, and what does this reveal about the interaction between population size and the CMA convergence behavior described in logic/solution/algorithm.md?",
+      "gold_answer": "(a) R12 states: 'Given a population size K, the t-th prompt p^(t)_k is sampled K times i.i.d. (k=1,...,K) via p^(t)_k ~ m^(t) + tau^(t) * N(0, sigma^(t)), where m^(t) is the mean vector, tau^(t) is the step size, and sigma^(t) is the covariance matrix at iteration t.' R27 states: 'CMA optimizer is implemented with configurable population size and step size.' Together these specify that the CMA optimizer must expose at minimum K (population size) and tau (step size) as configurable parameters, while the covariance matrix sigma and mean vector m are updated internally by the CMA algorithm. (b) src/execution/foa.py should show that for each test batch, K prompt candidates are sampled using the formula from R12. This may use the pycma library (cma.CMAEvolutionStrategy) or a custom implementation. The K fitness values computed from these prompts (per R13) are fed back to update m, tau, and sigma. The file should show that K and the initial step size are passed as constructor arguments, matching R27's 'configurable' requirement. (c) evidence/figures/fig2a_population_size.md shows the sensitivity of accuracy to K values from 2 to 28. The figure shows accuracy generally improves and stabilizes around K=28, indicating diminishing returns beyond this point. This explains the choice of K=28 as the default — it is the point where the CMA search has sufficient diversity to explore the prompt space without excessive computational overhead. logic/solution/algorithm.md explains that CMA needs a minimum population size (typically 4+floor(3*ln(d)) for dimension d) to reliably estimate the covariance, so K=28 balances exploration quality against the per-iteration cost of K forward passes through the frozen ViT.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R12 sampling formula including all three parameters (m^(t) mean vector, tau^(t) step size, sigma^(t) covariance matrix) and R27 ('configurable population size and step size')",
+        "Identifies src/execution/foa.py and describes how K fitness evaluations feed back into CMA parameter updates (m, tau, sigma)",
+        "References evidence/figures/fig2a_population_size.md and explains that K=28 is where accuracy stabilizes, justifying the default choice",
+        "References logic/solution/algorithm.md to connect minimum population size requirements for reliable covariance estimation to the K=28 selection"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/foa.py",
+        "evidence/figures/fig2a_population_size.md",
+        "logic/solution/algorithm.md"
+      ],
+      "rubric_requirement_id": "R12",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

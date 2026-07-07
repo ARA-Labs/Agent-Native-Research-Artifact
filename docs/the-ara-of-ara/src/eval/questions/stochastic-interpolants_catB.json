@@ -1,0 +1,115 @@
+{
+  "paper_id": "stochastic-interpolants",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "stochastic-interpolants_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the U-Net velocity model architecture: (a) According to R32, R33, R34, and R35 in rubric/requirements.md, what are the exact non-default argument values that must be set for the U-Net velocity model, and what are the corresponding default values in lucidrain's denoising-diffusion-pytorch repository for each? (b) Which ARA file (src/configs/model.md) documents these architectural choices? (c) What does the combination of dim=256, dim_mults=(1,1,2,3,4), learned_sinusoidal_cond=True, and learned_sinusoidal_dim=32 imply about the model's capacity and temporal conditioning strategy compared to the lucidrain defaults?",
+      "gold_answer": "According to rubric/requirements.md: R32 states 'The U-net velocity model has the \"dim_mults\" argument set to (1, 1, 2, 3, 4) (note the default value for the Unet module from the lucidrain's denoisingdiffusion-pytorch repository is (1, 2, 4, 8))'; R33 states 'The U-net velocity model has the \"dim\" argument set to 256 (note there is no default value for the Unet module from the lucidrain's denoisingdiffusion-pytorch repository for the dim argument)'; R34 states 'The U-net velocity model has the \"learned_sinusoidal_cond\" argument set to True (note the default value for the Unet module from the lucidrain's denoisingdiffusion-pytorch repository is False)'; R35 states 'The U-net velocity model has the \"learned_sinusoidal_dim\" argument set to 32 (note the default value for the Unet module from the lucidrain's denoisingdiffusion-pytorch repository is 16)'. The file src/configs/model.md documents these architectural settings. The implications are: dim_mults=(1,1,2,3,4) creates a shallower early scaling (two levels at dim=256) compared to the aggressive (1,2,4,8) default, keeping more spatial resolution at higher feature counts; learned_sinusoidal_cond=True with learned_sinusoidal_dim=32 means the model learns its time-embedding sinusoidal features rather than using fixed sinusoids, giving the velocity field better expressivity for temporal conditioning.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites all four requirements (R32, R33, R34, R35) with exact argument names and values: dim_mults=(1,1,2,3,4), dim=256, learned_sinusoidal_cond=True, learned_sinusoidal_dim=32",
+        "Correctly identifies each default value: dim_mults default=(1,2,4,8), dim has no default, learned_sinusoidal_cond default=False, learned_sinusoidal_dim default=16",
+        "Identifies src/configs/model.md as the ARA cross-reference file documenting these architectural choices",
+        "Provides a substantive implication about model capacity (dim=256 base, shallower early scaling) and learned temporal conditioning vs. fixed sinusoidal embeddings"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/model.md"
+      ],
+      "rubric_requirement_id": "R32",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stochastic-interpolants_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the training procedure for the Dependent Coupling in-painting model: (a) According to R08 in rubric/requirements.md, how must the approximate velocity field b_t(x, ξ) be constrained during training, and what specific components does it act on versus ignore? (b) Cross-referencing src/execution/inpainting.py, how is this masking constraint implemented in the forward pass? (c) What does this constraint imply about the information flow during ODE integration at inference time — specifically, why is it necessary for the Dependent Coupling formulation to enforce that unmasked pixels remain fixed?",
+      "gold_answer": "R08 in rubric/requirements.md states: 'During training the Dependent Coupling model for in-painting, the approximate velocity field b_t(x, ξ) is defined such that b_t(x, ξ) = 0 except in the masked regions of the image; the output of the approximate velocity field is masked to enforce that the unmasked pixels remain fixed. Here, x denotes some image and ξ denotes the conditioning variable. The approximate velocity field only acts on the image, not the additional class channel that has been appended.' In src/execution/inpainting.py, this is implemented by multiplying the U-Net output by the mask (1 - ξ) so that outputs at unmasked locations are zeroed out, and the class conditioning channel is excluded from the velocity computation. The implication is that in the Dependent Coupling setting, x_0 is already a partially-correct image (masked regions contain noise, unmasked regions contain the true image), so the ODE only needs to transport the masked region pixels from noise to the correct distribution. Enforcing zero velocity outside the mask ensures the known pixels are not corrupted during integration, which is the key property that makes dependent coupling suitable for conditional generation tasks like inpainting.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes or accurately paraphrases R08: velocity field equals zero except in masked regions, output is masked, does not act on the appended class channel",
+        "Identifies src/execution/inpainting.py as the cross-reference file and describes how the mask is applied to the U-Net output (multiplication by (1-ξ) or equivalent masking operation)",
+        "Explains the implication: unmasked pixels contain correct ground truth in the dependent coupling setup, so zero velocity preserves them unchanged through ODE integration",
+        "Distinguishes the dependent coupling constraint (mask applied to velocity output) from what would happen without it, connecting to the conceptual motivation of the dependent coupling approach"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/inpainting.py"
+      ],
+      "rubric_requirement_id": "R08",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stochastic-interpolants_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding training hyperparameters that are absent from the original paper: (a) According to R48, R50, R51, and R52 in rubric/requirements.md, what are the exact values for the learning rate schedule, gradient clipping threshold, batch size, and total training steps? (b) Cross-referencing src/configs/training.md, are these hyperparameters documented there, and how do they align with what the rubric specifies? (c) Given that R51 and R52 are both rated 'absent' in the info gap analysis, what does this mean for an agent trying to reproduce results using only the original PDF — and what specific risk does training with a wrong batch size or step count pose for reproducing the FID scores reported in evidence/tables/table2_inpainting_fid.md?",
+      "gold_answer": "According to rubric/requirements.md: R48 states 'A learning rate scheduler is used, which starts at a learning rate of 2e-4 and scaling the learning rate by γ=0.99 every N=1000 steps'; R50 states 'Gradient norms are clipped at 10,000 (this is the norm of the entire set of parameters taken as a vector, the default type of norm clipping in PyTorch library)'; R51 states 'All models are trained with a batch size of 32'; R52 states 'All models are trained for 200,000 gradient steps'. The file src/configs/training.md cross-references these training configuration details. Both R51 and R52 are rated 'absent' in the info gap analysis, meaning these hyperparameter values do not appear in the original PDF and cannot be recovered from the paper alone. An agent relying solely on the PDF would have no way to determine the batch size (32) or the number of gradient steps (200,000). Using incorrect values — e.g., a smaller batch size would change gradient noise levels and effective learning rate scaling; training for fewer steps would produce an undertrained model — would directly affect the quality of generated images and thus FID scores. The target FID values in evidence/tables/table2_inpainting_fid.md (e.g., ~1.15 for Dependent Coupling) are sensitive to these choices, making rubric/requirements.md the only source for faithful reproduction.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states all four hyperparameter values: lr=2e-4 with γ=0.99 every 1000 steps (R48), gradient norm clip=10000 (R50), batch size=32 (R51), 200,000 gradient steps (R52)",
+        "Identifies src/configs/training.md as the cross-reference ARA file and notes whether it documents these values consistently with the rubric",
+        "Correctly explains that R51 and R52 are 'absent' from the original PDF (info gap rating), meaning a PDF-only agent cannot recover these values",
+        "Connects the absent hyperparameters to reproduction risk: wrong batch size or step count will produce different FID scores than those reported in evidence/tables/table2_inpainting_fid.md"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R51",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stochastic-interpolants_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the super-resolution training pipeline for the Dependent Coupling model: (a) According to R21, R22, and R25 in rubric/requirements.md, what is the exact procedure for constructing the corrupted input image x_0 (including the mathematical formula), how is the low-resolution image appended, and which components does the velocity field NOT act on? (b) Cross-referencing src/execution/superresolution.py, how are these three requirements implemented in the training loop? (c) What is the architectural implication of R25's constraint that the velocity field only acts on the interpolant image — specifically, how does this differ from how the class channel and low-resolution channel are used by the model?",
+      "gold_answer": "According to rubric/requirements.md: R21 states 'During training the Dependent Coupling model for super-resolution, for each i-th sample in each mini-batch, Gaussian noise is added to the downsampled and upsampled ImageNet image; x_0 = U(D(x_1)) + ζ, where ζ ~ N(0, Id), U is the upsampling operation, and D is the downsampling operation'; R22 states 'During training the Dependent Coupling model for super-resolution, for each i-th sample in each mini-batch, the image that has been downsampled, upsampled, and had gaussian noise added to it is appended to the original ImageNet image along the channel dimension to create the corrupted image'; R25 states 'During training the Dependent Coupling model for super-resolution, the velocity field only acts on the interpolant image, not the additional class channel that has been appended, or the low-resolution image that has been appended'. In src/execution/superresolution.py these are implemented by: (1) applying downsample then upsample (nearest-neighbour) then adding standard normal noise to get x_0; (2) concatenating x_0 along the channel dimension with the original image to form the model input; (3) masking the model output so only the first C channels (the image channels) receive gradient updates from the velocity field, while the appended low-resolution and class channels are treated as conditioning inputs only. The implication of R25 is that the low-resolution channel and class channel serve purely as conditioning signals fed into the U-Net's cross-attention or channel concatenation mechanism — the model sees them but its output velocity is only applied to update the image channels, preventing the conditioning channels from being corrupted during the ODE flow.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states the formula from R21: x_0 = U(D(x_1)) + ζ where ζ ~ N(0,Id), identifying U as upsampling and D as downsampling",
+        "Correctly describes R22's channel-dimension concatenation of the corrupted image with the original to form the model input",
+        "Correctly quotes or paraphrases R25: velocity field does not act on the class channel or the low-resolution appended channel, only on the interpolant image",
+        "Identifies src/execution/superresolution.py as the cross-reference and explains the architectural implication: low-res and class channels are conditioning inputs, and the velocity output is masked to only update the image channels"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/superresolution.py"
+      ],
+      "rubric_requirement_id": "R25",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stochastic-interpolants_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the stochastic interpolant computation for the Uncoupled Interpolant in-painting model: (a) According to R40 and R16 in rubric/requirements.md, what is the source of x_0 during training of the Uncoupled Interpolant model, and how does the interpolant I_{t_i} use this x_0 — including the exact mathematical formula? How does this differ from R04 and R06 which govern the Dependent Coupling model? (b) Cross-referencing src/execution/stochastic_interpolant.py, how is the distinction between the uncoupled (Gaussian noise) and dependent coupling (masked image) initialization of x_0 reflected in the code? (c) What does logic/solution/algorithm.md say about why this distinction between coupled and uncoupled interpolants matters for the theoretical guarantees of the method, and what does R40 being rated 'partial' (with gap type 'vague_description, implicit_assumption') imply about what the rubric adds over the PDF?",
+      "gold_answer": "According to rubric/requirements.md: R40 states 'During training the Uncoupled Interpolant model for in-painting, for each i-th sample in each mini-batch, the initial image is sampled as gaussian noise; x_0 ~ N(0, Id)'; R16 states 'During training the Uncoupled Interpolant model for in-painting, for each i-th sample in a mini-batch, the interpolant I_{t_i} is computed as I_{t_i} = t x_0^i + (1-t) x_1^i, where x_0 is the noisy image, x_1 is the original ImageNet image, and t is the sampled time'. In contrast, R04 states for Dependent Coupling that 'x_0 = ξ ∘ x_1 + (1-ξ) ∘ ζ' (masked image with structure-preserving noise) and R06 uses this masked image as x_0 in the same interpolant formula. In src/execution/stochastic_interpolant.py, the distinction is reflected by a branch or parameter controlling whether x_0 is sampled as pure Gaussian noise (uncoupled case) or constructed from the masked ImageNet image (dependent coupling case). In logic/solution/algorithm.md, the uncoupled interpolant transports between an independent Gaussian base distribution and the data distribution, which guarantees the velocity field learns a general transport map without relying on structural correlation between x_0 and x_1; the dependent coupling exploits the correlation (x_0 shares structure with x_1 via the mask) to potentially learn a shorter, more efficient transport path. R40 being rated 'partial' with gaps 'vague_description, implicit_assumption' means the PDF implies Gaussian initialization but does not explicitly state the per-sample i.i.d. sampling or that the same N(0,Id) noise is used independently for each sample — details the rubric makes precise and which are necessary for correct implementation.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R40 (x_0 ~ N(0,Id) for Uncoupled) and R16 (I_{t_i} = t*x_0 + (1-t)*x_1), and contrasts with R04/R06 where x_0 = ξ∘x_1 + (1-ξ)∘ζ for Dependent Coupling",
+        "Identifies src/execution/stochastic_interpolant.py as the cross-reference and describes how the code distinguishes the two x_0 constructions (pure Gaussian vs. mask-structured)",
+        "References logic/solution/algorithm.md and explains the theoretical distinction: uncoupled transports from independent Gaussian base, dependent coupling uses correlated x_0 for shorter transport path",
+        "Correctly interprets R40's 'partial' info gap rating: the PDF implies but does not fully specify the per-sample i.i.d. Gaussian sampling, making the rubric the authoritative source for this implementation detail"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/stochastic_interpolant.py"
+      ],
+      "rubric_requirement_id": "R40",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

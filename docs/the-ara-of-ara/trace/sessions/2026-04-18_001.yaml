@@ -1,0 +1,58 @@
+session:
+  id: "2026-04-18_001"
+  timestamp: "2026-04-18T23:00"
+  summary: "Built extension-from-reference harness (claude-agent-sdk + SLURM); first triton_cumsum smoke run, paper vs ara arms (seed=0): ARA finds 0.520 mid-run vs ref 0.65 baseline, but both agents revert to ref-tied at stop"
+
+events_logged:
+  - type: experiment
+    id: "extension-triton-001"
+    provenance: ai-executed
+    summary: "First end-to-end run of new extension-from-reference protocol on triton_cumsum (paper + ara arms, seed 0, 500K budget, sonnet-4-5)"
+
+  - type: decision
+    id: "extension-protocol-001"
+    provenance: ai-executed
+    summary: "Adopted extension-from-reference protocol: agent starts from official solution and tries to beat it, distinct from prior from-scratch RE-Bench eval format"
+
+  - type: dead-end
+    id: "harness-token-counter-001"
+    provenance: ai-executed
+    summary: "Naive per-AssistantMessage usage summation triple-counted (one event per content block, cloned usage); 500K hard cap was nominal-only on these runs"
+
+ai_actions:
+  - action: "Built extension-harness scaffolding (harness.py with claude-agent-sdk loop, scoring/triton_cumsum/score.py stripped scorer, tasks/triton_cumsum/system_prompt.md, slurm sbatch files, README)"
+    provenance: ai-executed
+    files_changed:
+      - "code/extension-harness/harness.py"
+      - "code/extension-harness/scoring/triton_cumsum/score.py"
+      - "code/extension-harness/tasks/triton_cumsum/system_prompt.md"
+      - "code/extension-harness/slurm/submit_triton.sbatch"
+      - "code/extension-harness/slurm/smoke_baseline.sbatch"
+      - "code/extension-harness/README.md"
+
+  - action: "Verified reference solution provenance (md5 b1f83fd34f80e265b84b5bfe59896c59 matches official tao_correct_solution.py) and ran baseline-only smoke (job 6564404, COMPLETED 1:09): ref scores 0.645 / 1.91 ms vs paper-claimed 0.47 / 1.6 ms — within single-shot timing variance, results_match True"
+    provenance: ai-executed
+
+  - action: "Submitted paper-arm and ara-arm jobs in parallel on kempner_h100 (jobs 6572827 and 6572835), 500K token budget each, both COMPLETED with end_turn"
+    provenance: ai-executed
+
+  - action: "Moved both venvs (extension-triton, extension-harness, ~5.4GB total) from home to scratch (/n/netscratch/.../venvs/), updated sbatch files; switched venvs to uv-managed Python 3.12.13 to fix Python.h missing for triton JIT"
+    provenance: ai-executed
+
+  - action: "Recorded findings as O78-O82 in ara/staging/observations.yaml"
+    provenance: ai-executed
+    files_changed:
+      - "ara/staging/observations.yaml"
+
+claims_touched:
+  - "C06 (extension wins): single-seed extension-from-reference data does not yet update C06; the 5/6 from-scratch evaluation evidence still stands. ARA-arm 0.520 mid-run win is suggestive but agents abandoned it before stop, so canonical comparison is paper-tied vs ara-tied."
+
+open_threads:
+  - "Fix harness token counter: dedup by message_id mid-run, use ResultMessage.usage as ground truth at completion. Until fixed, the 500K cap will never fire and the metric in metadata.json is wrong by ~157x"
+  - "Decide canonical headline metric: best-of-trace vs final-state. Current final_score.json buries the agent's actual exploration ceiling (ARA arm reached 0.520 but reports 0.641)"
+  - "Strengthen system prompt to force checkpointing of improving variants (current 'keep a copy' clause is ignored)"
+  - "Scale to >=3 seeds per arm on triton before reading any paper-vs-ara signal"
+  - "Replicate harness for the other 5 RE-Bench tasks (rust_codecontests, restricted_mlm, fix_embedding, small_scaling_law, nanogpt_chat_rl); 6-task matrix x 2 arms x 3 seeds = 36 runs"
+  - "Investigate whether early end_turn behavior is task-specific (kernel optimization gives slow feedback) or model-wide for sonnet-4-5 on extension tasks"
+
+ai_suggestions_pending: []

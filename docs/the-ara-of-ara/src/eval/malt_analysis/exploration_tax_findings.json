@@ -1,0 +1,34 @@
+{
+  "dataset": "METR eval-analysis-public v1.1",
+  "total_runs": 24008,
+  "total_models": 21,
+  "total_tasks": 228,
+  "total_tokens_B": 24.494117535,
+  "total_cost_usd": 63482.79339,
+  "dead_end_runs": 6639,
+  "dead_end_tokens_pct": 44.751995699934085,
+  "dead_end_cost_pct": 49.644873424811344,
+  "redundant_runs": 12982,
+  "redundant_tokens_pct": 14.421146505697127,
+  "redundant_cost_pct": 6.963502224677382,
+  "total_waste_tokens_pct": 59.173142205631216,
+  "total_waste_cost_pct": 56.60837564948872,
+  "useful_work_tokens_pct": 40.826857794368784,
+  "useful_work_cost_pct": 43.39162435051128,
+  "rebench": {
+    "total_runs": 545,
+    "failure_rate": 0.7339449541284404,
+    "best_model": "Claude Opus 4.6 (Inspect)",
+    "best_model_avg": 0.974
+  },
+  "difficulty_cliff": {
+    "easy_success": 0.854,
+    "medium_success": 0.307,
+    "hard_success": 0.151
+  },
+  "failed_vs_success_token_ratio": {
+    "p50": 112.9,
+    "p75": 28.2,
+    "mean": 8.6
+  }
+}

@@ -1,0 +1,244 @@
+[
+  {
+    "task_id": "sample-specific-masks_T01",
+    "goal": "Implement the iterative label mapping (ILM) module following Chen et al. (2023) and the Pad baseline for visual reprogramming. ILM must correctly compute frequency distributions and derive the output mapping each epoch. The Pad baseline must initialize a learnable noise pattern, center the input image, concatenate the pattern around it, feed through the frozen pre-trained model, apply ILM, compute cross-entropy loss, and update only the noise pattern via gradient descent. Verify correctness with ResNet-18 on CIFAR10 and OxfordPets using the correct hyperparameters (LR=0.01, decay=0.1 at epochs 100/145, 200 epochs, batch 256 for CIFAR10, batch 64 for OxfordPets).",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: ILM correctly computes per-epoch label mappings from frequency distributions"
+    ],
+    "rubric_requirement_ids": [
+      "3982c682-eeb3-4298-8ecc-894dee051bdc",
+      "f84d16cb-9fa4-4a48-a998-8341fbda33df",
+      "f45b8463-27f2-4014-8fdb-2c95c23c98be",
+      "2a23ed70-e265-48b3-add8-52b8fed355b3",
+      "04ab5a91-e779-4ae7-adc2-b2542e8a53dc",
+      "e72bdc32-4752-4664-bf89-cf19d5f1c06a",
+      "1aa39331-a96a-4a15-b149-8bdc40a8ab9f",
+      "2da66162-8014-4073-b299-a2ba8a6aeea5",
+      "1659bb57-01ba-4637-9645-ed781a6123c1",
+      "d41661a4-c34a-44c9-8493-f2bcd86e5649",
+      "09a272e5-cd45-468f-aa8a-ed481a93e7a1",
+      "a7cee3c7-4e8d-42a9-8638-24ba50532c76",
+      "2f60699e-e7ed-481b-b151-01ba070f0a9a",
+      "49822754-dac4-45aa-802f-101732638dce"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "sample-specific-masks_T02",
+    "goal": "Implement the three remaining shared-mask watermarking baselines: Narrow (28-pixel edge mask), Medium (quarter-size center mask), and Full (full watermark). Each method must initialize a learnable noise pattern, define its mask shape, resize input images via bilinear interpolation, apply the masked pattern, pass through the pre-trained model with ILM, compute cross-entropy loss, and update only the noise pattern. Configure correct hyperparameters for all baselines (LR=0.01, decay=0.1 at epochs 100/145, 200 epochs, batch sizes 256/64).",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: Shared-mask baselines are correctly implemented with their respective mask geometries"
+    ],
+    "rubric_requirement_ids": [
+      "82aec253-a90a-4515-95c5-a98a45f2b16b",
+      "7b29d3dc-4ebf-4b89-a00e-bc6bb6774d95",
+      "029e1a82-664e-40b0-8e98-56202d5f080c",
+      "c3885380-1f1d-4339-9e6d-0432536f505f",
+      "3010baa0-2eb1-427b-b0c3-c27f12c4a06d",
+      "727cea73-8c1c-4015-ab8f-884837a9574f",
+      "5760dac1-e5e8-4510-8dcb-93786fe80c5c",
+      "3d9bfc0b-52b0-4276-9fb8-c828d5d4a82a",
+      "c2bd1ec0-4155-49cb-aac2-04b567980314",
+      "a354fa2f-cb60-4102-9716-a642ce4e98ba",
+      "07faea63-1076-4e47-bd1a-ce590440dda9",
+      "011c0d8d-d496-43d2-bcdc-b11680a3a1d0",
+      "e1b7d56c-f670-444e-86ea-011fad9c1c97",
+      "c19f72e5-3023-4ab6-9435-9a87058406d2",
+      "23394dfb-c8f2-4f59-b760-3c4df5532ca2"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "sample-specific-masks_T03",
+    "goal": "Implement the SMM (Sample-specific Mask) method for ResNet-18/50. This includes: (1) the 5-layer CNN mask generator with correct channel progression (3->8->16->32->64->3), BatchNorm, ReLU, and MaxPool as specified; (2) the patch-wise interpolation module that upscales low-resolution masks to full resolution; (3) the end-to-end training loop following Algorithm 1: initialize delta to zeros and mask generator randomly, generate per-sample masks, apply patch-wise interpolation, compute f_in(x) = r(x) + delta * f_mask(r(x)), pass through frozen pre-trained model with ILM, and update both delta and mask generator via SGD.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: The 5-layer CNN mask generator produces correct output dimensions (H/2^l x W/2^l with l=3 pooling layers)",
+      "H2: Patch-wise interpolation correctly upscales masks to full resolution"
+    ],
+    "rubric_requirement_ids": [
+      "fe4f42fb-ee29-4c26-9385-f1a6472e6b23",
+      "28be07ce-4482-4813-ae60-9824fdb26970",
+      "c4ae713d-03bc-487d-82b0-61414ace95cc",
+      "02c368c6-9447-4d0b-bdb9-3e8b6719be02",
+      "b3bb8a27-abe3-4b9b-a22e-0a2a0df25ef8",
+      "adad65b3-7c4f-46a0-89b8-c4c0b1db4969",
+      "a3709fb5-e8d2-4e18-9fd0-5f819c20f278",
+      "43b56ae9-41a4-42f0-b947-f3ad5c90714a",
+      "0315e7cf-6348-4a44-ba10-56eb29ff07e7",
+      "1148dc53-dfe7-43b8-9565-1b4d057ac44d",
+      "613293bb-9868-458a-98bb-eb25b05ef5f7",
+      "d032889a-bbe7-4d7b-a912-195f277c3566",
+      "0fde2a77-a2d2-452e-bfce-ef78b96531ab",
+      "0cea4c76-6b6d-4b12-959f-cbbfe2a8afa5",
+      "27c360ce-967b-49ec-81e7-80c9af5e93f7"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "sample-specific-masks_T04",
+    "goal": "Train and evaluate both the Pad baseline and SMM (Ours) using ResNet-18 on CIFAR10 and SVHN (3 seeds each). Use correct hyperparameters (LR=0.01, decay=0.1 at epochs 100/145, batch=256, 200 epochs, patch size=8 for SMM). Record mean and std of test accuracy. Verify that SMM outperforms Pad on both datasets, and that SMM achieves roughly 6% absolute improvement over Pad on SVHN for ResNet-18.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: SMM outperforms Pad on CIFAR10 with ResNet-18",
+      "H2: SMM achieves ~6% absolute improvement over Pad on SVHN with ResNet-18"
+    ],
+    "rubric_requirement_ids": [
+      "08e02fff-9106-4d26-8fab-75b400762f68",
+      "87b4dcc3-ae76-4d29-b521-8374efd8e1ab",
+      "0e394886-4be0-4413-a051-9fb926330dd3",
+      "a27fe007-59e6-4ccd-a8c0-1eb856cfe9ed",
+      "913baecd-873f-4fe9-a701-99ed55502290",
+      "29ccdd70-e06c-4317-8fce-b698657e6859",
+      "cc6cc6c8-b198-4a7a-99db-5256e0e73240",
+      "4e8a2662-0cbf-4d73-8b57-49cc0727f30b",
+      "8d6e26aa-8470-4af6-b372-8b43d3d64dad",
+      "28aade60-b9c2-4d87-b732-3454e221f4a2"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "sample-specific-masks_T05",
+    "goal": "Train and evaluate all five methods (Pad, Narrow, Medium, Full, SMM) using ResNet-18 on Flowers102 and EuroSAT (3 seeds each, batch=256). Record mean and std of test accuracy. Verify that SMM achieves the highest accuracy on both datasets, with roughly 10% absolute improvement over the best baseline on Flowers102 and roughly 10% on EuroSAT for ResNet-18.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: SMM achieves ~10% absolute improvement over the best baseline on Flowers102 with ResNet-18",
+      "H2: SMM achieves ~10% absolute improvement over the best baseline on EuroSAT with ResNet-18"
+    ],
+    "rubric_requirement_ids": [
+      "bfed30a3-49a1-44a6-810c-c04822744046",
+      "4c9b219d-860f-4571-9ab7-1262786f28e1",
+      "55186fba-a6e3-4296-872e-3cf423508676",
+      "5eff8822-110b-454b-9453-1e77d0da3ed9",
+      "0b93529d-971a-47ec-a6b1-1eab09d5577d",
+      "5e68176b-47e9-46cc-bb67-a4c909ecd762",
+      "5f73fbf7-a070-4fee-beeb-74960688368c",
+      "5b3bc88a-1aa8-4bcb-aad7-7f9a0b9e2fd2",
+      "e59d6acb-ad45-4e95-bdb6-727bc2d5ed03",
+      "a73f93c3-6820-4954-b332-99e09bef9e5b",
+      "bc63b917-7f1a-4102-beff-30a5c62ca8ca",
+      "6b00f1df-6407-4f2b-afe0-7e9d46e3046b",
+      "e3db8d69-e576-4a86-99ca-ca09f7b233e9",
+      "36b3e62b-e1ae-41ab-9c61-4a51053e9b71"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "sample-specific-masks_T06",
+    "goal": "Train and evaluate both the Pad baseline and SMM using ResNet-50 on CIFAR10 and Flowers102 (3 seeds each, correct hyperparameters). Record mean and std of test accuracy. Verify that SMM achieves the highest average accuracy across all datasets when using ResNet-50, confirming that SMM's advantage generalizes from ResNet-18 to ResNet-50.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: SMM outperforms Pad on ResNet-50 across CIFAR10 and Flowers102",
+      "H2: SMM has highest average accuracy across all datasets on ResNet-50"
+    ],
+    "rubric_requirement_ids": [
+      "57d7b55b-a190-4f96-9468-4446a8343575",
+      "2ac32251-5599-4888-9ad1-4be5532e7447",
+      "83f678ea-5f73-42d5-8512-3093fe35b4c5",
+      "e9a1a7b1-39d1-4cb3-a977-7b9262a0f591",
+      "6c15c084-aac0-449f-8605-d1c5dc358014",
+      "6e482102-b67f-4e1c-a8a7-15445abf75bf",
+      "1415e5b0-7934-4e3e-b7d3-7ab84d1b7da8",
+      "7a6194fb-9f1b-4ede-8cab-9a3f53a3a9f9"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "sample-specific-masks_T07",
+    "goal": "Implement the 6-layer CNN mask generator for ViT-B32 (channels 3->8->16->32->64->128->3 with 4 pooling layers), configure ViT-specific hyperparameters (LR=0.001, decay=1, images resized to 384x384), and train all five methods (Pad, Narrow, Medium, Full, SMM) on Flowers102 and Food101 with ViT-B32 (3 seeds each). Verify that SMM achieves roughly 22% absolute improvement over the best baseline on Flowers102 and roughly 15% on Food101.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: SMM achieves ~22% absolute improvement over best baseline on Flowers102 with ViT-B32",
+      "H2: SMM achieves ~15% absolute improvement over best baseline on Food101 with ViT-B32"
+    ],
+    "rubric_requirement_ids": [
+      "6c6b1ad5-64e9-4985-be0b-97841918c297",
+      "50319077-9185-444a-abb3-124e17143454",
+      "59ff8add-298c-476e-96e2-8820acd6ef7f",
+      "33204cda-df15-4390-8472-934e7cbc217f",
+      "5fc09bcb-ded4-4641-9d18-050c13edb383",
+      "c43bdbe6-744c-4a35-8001-9e6411387b2a",
+      "7719f69d-f138-46d3-a528-fd338f5e37e0",
+      "a03cef9e-9922-4be5-8d4e-81169f7c307d",
+      "7799ad6e-56a5-43c5-958d-6bc0ad6c9f4b",
+      "1055ba97-54aa-4e2f-8877-999c11c7ce34",
+      "43767618-84d8-40e1-8a26-7d170b93d451",
+      "80b9098e-1af8-42a0-bd45-8eebd0fac155",
+      "688a2c83-0e01-4629-8e56-67c46a3c5371"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "sample-specific-masks_T08",
+    "goal": "Implement and train the three ablated SMM variants on ViT-B32: (1) Only-delta (shared-pattern VR, no mask generator), (2) Only-fmask (sample-specific pattern without shared delta), (3) Single-channel fmask^s (average penultimate-layer output). Train each variant on CIFAR10 and Flowers102 with ViT-B32 (3 seeds each). Verify that full three-channel SMM achieves the best average accuracy, that Only-fmask underperforms on data-abundant datasets, and that single-channel SMM underperforms on Flowers102.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: Full SMM achieves the best average accuracy across ablated variants",
+      "H2: Only-fmask variant underperforms on large-data datasets relative to full SMM",
+      "H3: Single-channel SMM underperforms three-channel SMM on Flowers102"
+    ],
+    "rubric_requirement_ids": [
+      "4ab4e8e2-9fe0-41bd-8f53-6950e8230b23",
+      "b525d390-b25f-4635-b848-dbd5845c0a67",
+      "647e8cc8-d90f-43f5-8ff1-6d24d5cce58c",
+      "bb1e2cb0-d8eb-4a85-b42a-f6b104ff1fda",
+      "76919e09-f9d4-4b2f-a5b5-3db205b416d0",
+      "ded7a725-4b1b-47b5-9c72-5145cd84c28b",
+      "58fa0ebb-150c-474f-b93f-85181300e01d",
+      "645fe9c1-d993-41b9-a227-2a89b0647041",
+      "c7adc31d-2cfb-4c68-adb0-fb9fcc1b2532",
+      "f516bb4c-c129-4857-8d80-2203a9e0260d",
+      "105c14cc-bf0d-486c-ada0-815d82a92613",
+      "251d1112-d76b-463a-add8-6f6b6e801f16"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "sample-specific-masks_T09",
+    "goal": "Train SMM with ResNet-18 using four patch sizes (1, 2, 4, 16 corresponding to 0, 1, 2, 4 pooling layers in the mask generator) on EuroSAT and Flowers102 (3 seeds each). Verify that patch size 4 outperforms patch size 1 on both datasets, and that patch size 16 performs similarly to the default patch size 8, confirming that SMM accuracy is robust to the patch size hyperparameter.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: Patch size 4 outperforms patch size 1 on EuroSAT and Flowers102",
+      "H2: Patch size 16 performs similarly to default patch size 8"
+    ],
+    "rubric_requirement_ids": [
+      "336893af-7dcb-4791-8cf6-40bbf4f57083",
+      "b016a53e-5a12-403a-840f-c879d8383220",
+      "75c8bfe3-6502-478e-8d27-eace694ba330",
+      "f426b856-22cf-4aed-ab75-dd8ac47cc614",
+      "d4753360-0c17-4baa-810d-e250383108b3",
+      "1090e6b8-5ccd-4af2-b27c-203a8504bb87",
+      "476f144c-c94b-4b67-8e03-da4d4733e29b",
+      "513d9f00-8b1b-4bc6-8541-c012b9c2e8cf",
+      "ee7c7b65-ad80-4c72-a013-5bb147982603",
+      "6b2a337f-7fc7-4637-b0d5-4953ff3dbef7",
+      "4087ac21-483d-4598-985c-fb90f5bd6f94",
+      "e18ae43e-86d7-437d-9eec-7adeb956cc6b"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "sample-specific-masks_T10",
+    "goal": "Compute ResNet-18 penultimate-layer embeddings for 5000 randomly selected training samples from SVHN and EuroSAT under three conditions: (1) no VR (raw ResNet-18), (2) Full watermarking, and (3) SMM. Apply t-SNE to project embeddings to 2D. Verify that raw ResNet-18 embeddings show poor class separation, that Full watermarking improves separation somewhat, and that SMM produces the best class separation among all methods.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: SMM produces the best class separation in feature space compared to no-VR and Full watermarking",
+      "H2: Raw ResNet-18 embeddings show poor class separation on SVHN and EuroSAT"
+    ],
+    "rubric_requirement_ids": [
+      "78ac48cc-7ba9-4469-a1dc-ea3c0b379b53",
+      "dcc68c79-615d-4951-8eed-56ecf9153dce",
+      "9e037051-8d0b-422f-99aa-185da29ffb2a",
+      "ca6af6fc-70fe-4dda-a146-9b4eb409591b",
+      "5691f99a-0131-4429-b37c-cdd7ca59a643",
+      "6f88164d-6b79-4a95-8894-d180f7a69789",
+      "a8339d1b-0b94-4cf7-99f8-1e76f33d25c4",
+      "9d2a4385-abc9-415e-901a-6993b2963de0",
+      "237676cb-e3d2-4934-bd0f-0eb47f928c28",
+      "5f41a380-ebed-4a1f-afee-0939eccc95f7"
+    ],
+    "n_requirements": 10
+  }
+]

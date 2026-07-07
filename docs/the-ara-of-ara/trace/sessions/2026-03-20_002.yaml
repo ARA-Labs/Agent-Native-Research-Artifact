@@ -1,0 +1,73 @@
+session:
+  id: "2026-03-20_002"
+  timestamp: "2026-03-20T06:30"
+  summary: "BBOX reproduction pilot: ARA 69.5% vs baseline 68.7% (+0.8pp rubric), ARA 100% vs 95.8% adapter selection with real gpt-5-mini API"
+
+events_logged:
+  - type: experiment
+    id: N68
+    provenance: ai-executed
+    summary: "BBOX reproduction pilot — both conditions complete 10/10 subtasks, 131 rubric requirements scored"
+
+  - type: experiment
+    id: N69
+    provenance: ai-executed
+    summary: "API evaluation with gpt-5-mini — ARA adapter 100% selection vs baseline 95.8% on StrategyQA"
+
+  - type: observation
+    id: O57
+    provenance: ai-suggested
+    summary: "ARA artifact alpha=1.0 over-regularized NCE loss; baseline independently chose alpha=0.01 with much better training convergence"
+
+  - type: observation
+    id: O58
+    provenance: ai-suggested
+    summary: "API-dependent papers compress ARA-baseline gap — ~31% of requirements identically blocked"
+
+  - type: observation
+    id: O59
+    provenance: ai-suggested
+    summary: "Baseline agent used better training engineering (grad accum, fp16, smaller max_len) despite having less structured information"
+
+  - type: observation
+    id: O60
+    provenance: ai-suggested
+    summary: "Despite worse simulated training (52% vs 99%), ARA adapter performed better on real LLM candidates (100% vs 95.8%)"
+
+ai_actions:
+  - action: "Spawned ARA + baseline reproduction agents for bbox paper (10 subtasks each)"
+    provenance: ai-executed
+    files_changed:
+      - "code/eval/reproduction/results/bbox_ara_seed0/"
+      - "code/eval/reproduction/results/bbox_baseline_seed0/"
+  - action: "Trained 8 ARA checkpoints + 7 baseline checkpoints (14.1 GB total)"
+    provenance: ai-executed
+    files_changed:
+      - "code/eval/reproduction/results/bbox_ara_seed0/checkpoints/"
+      - "code/eval/reproduction/results/bbox_baseline_seed0/checkpoints/"
+  - action: "Ran unified API evaluation with gpt-5-mini (CoT baseline + adapter-guided inference)"
+    provenance: ai-executed
+    files_changed:
+      - "code/eval/reproduction/run_bbox_api_eval.py"
+      - "code/eval/reproduction/bbox_api_results.json"
+  - action: "Wrote comprehensive experiment report"
+    provenance: ai-executed
+    files_changed:
+      - "memo/reproduction_layer_results_bbox.md"
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+  - id: C16
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "BBOX with full 6000 training steps and real LLM negatives (not simulated) would better differentiate conditions"
+  - "ARA artifact alpha=1.0 issue suggests need for hyperparameter validation in ingestor pipeline"
+  - "API-dependent papers need pre-generated LLM responses or upfront API keys to avoid compressed scoring"
+
+ai_suggestions_pending:
+  - "Consider adding 'validated hyperparameters' flag to ARA artifacts — currently code is mathematically correct but may be pragmatically suboptimal"
+  - "For API-dependent papers, consider two-phase scoring: implementation rubric (no API) + end-to-end rubric (with API)"

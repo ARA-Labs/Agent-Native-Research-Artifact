@@ -1,0 +1,101 @@
+{
+  "paper_id": "sapg",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 5,
+  "n_from_ara": 9,
+  "questions": [
+    {
+      "id": "sapg_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is SAPG's reported performance on the Allegro Kuka Two Arms Reorientation task after 2e10 samples (with λ_ENT = 0.005)?",
+      "gold_answer": "28.58 ± 1.55 episode successes",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "sapg_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What clipping factor ε is used for the AllegroHand task, and how does it differ from the value used for AllegroKuka and ShadowHand tasks?",
+      "gold_answer": "AllegroHand uses ε=0.2, while AllegroKuka and ShadowHand both use ε=0.1. AllegroHand's clipping factor is twice as large.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "sapg_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe how the off-policy clipped surrogate loss in SAPG differs from the standard PPO clipped surrogate loss, specifically what quantity re-centers the clipping range and what it equals when the data is on-policy.",
+      "gold_answer": "In SAPG's off-policy loss, the clipping range is re-centered around µ = π_{i,old}(s,a)/π_j(s,a) instead of 1, giving bounds [µ(1-ε), µ(1+ε)]. The ratio r_{π_i}(s,a) = π_i(s,a)/π_j(s,a) is used instead of π_i/π_{i,old}. When the data is on-policy (i=j), µ=1 and the expression reduces to the standard PPO clipped objective.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sapg_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "SAPG uses different value target formulas for on-policy and off-policy data. What are these two formulas, and what is the stated reason for using a shorter-horizon target for off-policy data?",
+      "gold_answer": "On-policy uses a 3-step bootstrapped return: V^target_on(s_t) = Σ_{k=t}^{t+2} γ^{k-t} r_k + γ³ V_{old}(s_{t+3}). Off-policy uses a 1-step return: V^target_off(s'_t) = r_t + γ V_{old}(s'_{t+1}). The 1-step return is used for off-policy data because follower trajectories lack sequential context (only individual transitions are available), making n-step returns infeasible.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sapg_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What dimension of latent conditioning vector φ_j is used for AllegroKuka tasks versus ShadowHand/AllegroHand tasks, and what justification is given for this difference?",
+      "gold_answer": "φ_j ∈ R^32 for AllegroKuka (complex environments) and φ_j ∈ R^16 for ShadowHand and AllegroHand (relatively simpler environments). The justification is that AllegroKuka tasks are more complex, requiring a higher-dimensional latent to differentiate policies.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "sapg_A06",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does SAPG subsample off-policy data from followers so that it matches the size of the leader's on-policy data, rather than using all available off-policy data?",
+      "gold_answer": "Off-policy gradients are typically noisier than on-policy gradients. Using all off-policy data without subsampling risks drowning out the on-policy gradient signal, leading to worse performance. Subsampling balances the contribution of noisier off-policy updates with the more reliable on-policy updates, as confirmed by the ablation showing the 'high off-policy ratio' variant performs significantly worse on AllegroHand and ShadowHand.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "sapg_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does SAPG use leader-follower aggregation (only the leader receives off-policy data) rather than symmetric aggregation (every policy updated with all others' data), even though symmetric aggregation seems to use data more thoroughly?",
+      "gold_answer": "Symmetric aggregation causes all policies to converge toward similar behaviors because each policy receives the same combined dataset from all others, eliminating the data diversity benefit of having multiple policies. In leader-follower, followers update only on their own data and thus maintain distinct behaviors (via their local φ_i and entropy coefficients), while only the leader benefits from the aggregated diverse data. Symmetric aggregation was empirically found to perform significantly worse.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "sapg_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does SAPG use a shared backbone Bθ with local latent parameters φ_i rather than either fully shared or fully disjoint policy parameters, and what specific problem does each extreme cause?",
+      "gold_answer": "Fully shared parameters would collapse diversity because all policies would converge to identical behaviors via shared gradients. Fully disjoint parameters risk followers getting stuck in bad local optima with no shared knowledge transfer. The shared backbone with local φ_i provides a middle ground: shared knowledge via Bθ while maintaining per-policy specialization via φ_i. Additionally, the shared backbone keeps follower policies close to the leader, bounding the importance sampling ratios and ensuring the off-policy correction remains stable.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sapg_A09",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "On the AllegroHand task, how does SAPG (λ_ENT=0) compare to PQL in asymptotic episode reward, and what does the paper say about their relative sample efficiency?",
+      "gold_answer": "SAPG (λ_ENT=0) achieves ~1.23e4 vs PQL's ~1.01e4 on AllegroHand, approximately a 21.8% improvement for SAPG. However, PQL is more sample-efficient early in training (reaches high reward faster due to off-policy data reuse), while SAPG achieves higher asymptotic performance.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "sapg_A10",
+      "category": "surface_results",
+      "difficulty": "unanswerable",
+      "question": "What is the specific wall-clock time speedup of SAPG over DexPBT when both are run on the same GPU hardware for the Allegro Kuka Reorientation task?",
+      "gold_answer": "This cannot be answered from the paper. The authors explicitly state that experiments were run on different machines making wall-clock time not directly comparable, and they compare methods by number of environment steps collected rather than wall-clock time.",
+      "grading_type": "abstention",
+      "source": "both"
+    }
+  ]
+}

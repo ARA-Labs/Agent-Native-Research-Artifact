@@ -1,0 +1,99 @@
+session:
+  id: "2026-03-17_002"
+  timestamp: "2026-03-17T06:30"
+  summary: "mechanistic-understanding reproduction: ARA 73% vs baseline 60%, scaffold GPU cleanup fix, 10/10 subtasks both conditions"
+
+events_logged:
+  - type: experiment
+    id: N60
+    provenance: ai-executed
+    summary: "ARA condition on mechanistic-understanding: 82/113 (73%), all 10 subtasks, 5.3h, 13.5M tokens"
+
+  - type: experiment
+    id: N61
+    provenance: ai-executed
+    summary: "Baseline condition on mechanistic-understanding: 66/110 (60%), 9/10 subtasks, 8.1h, 12.0M tokens"
+
+  - type: dead_end
+    id: N62
+    provenance: ai-executed
+    summary: "Orphaned GPU processes from subprocess.run(shell=True) — 5 processes consuming 30.5GB, persisting for hours"
+
+  - type: decision
+    id: N63
+    provenance: ai-executed
+    summary: "Fixed run_agent.py: Popen+start_new_session, os.killpg on timeout, _cleanup_gpu_processes on exit"
+
+  - type: decision
+    id: N64
+    provenance: ai-executed
+    summary: "Added GPU process management instructions to agent system prompt"
+
+  - type: observation
+    id: O43
+    provenance: ai-suggested
+    summary: "ARA agent completed all subtasks in 5.3h vs baseline 8.1h — ARA provides better task prioritization"
+
+  - type: observation
+    id: O44
+    provenance: ai-suggested
+    summary: "Baseline missed T06 (cosine similarity) entirely — spent too long on PPLM/DPO, ran out of budget"
+
+  - type: observation
+    id: O45
+    provenance: ai-suggested
+    summary: "ARA found 41 RTP 'shit' prompts with BOS trick; baseline found 22 without it; paper reports 295"
+
+  - type: observation
+    id: O46
+    provenance: ai-suggested
+    summary: "Both conditions used simplified PPLM (toxic-seed/logit-boosting) — full PPLM infeasible within time budget"
+
+  - type: observation
+    id: O47
+    provenance: ai-suggested
+    summary: "Baseline DPO training stuck for 3h (21600s timeout requested by agent) — manual kill needed"
+
+ai_actions:
+  - action: "Ran ARA condition mega-task (154 turns, 5.3h, 13.5M tokens)"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/mechanistic-understanding_ara_seed0/"]
+
+  - action: "Ran baseline condition mega-task (136 turns, 8.1h, 12.0M tokens)"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/mechanistic-understanding_baseline_seed0/"]
+
+  - action: "Ran judge on both conditions (ARA 73%, baseline 60%)"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/mechanistic-understanding_ara_seed0/_judge_result.json",
+                     "code/eval/reproduction/results/mechanistic-understanding_baseline_seed0/_judge_result.json"]
+
+  - action: "Fixed run_agent.py: Popen with process groups, GPU cleanup, crash resilience, system prompt"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/run_agent.py"]
+
+  - action: "Killed 4 orphaned GPU processes (freed ~20GB)"
+    provenance: ai-executed
+    files_changed: []
+
+  - action: "Sent 5 progress emails via send.py during experiment"
+    provenance: ai-executed
+    files_changed: []
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "Run reproduction on remaining 13 PaperBench papers"
+  - "Both conditions use simplified PPLM — consider providing pre-generated PPLM data as shared resource"
+  - "BASH_MAX_TIMEOUT (8h) too permissive — agent requested 6h timeout for DPO training"
+  - "Reduce BASH_MAX_TIMEOUT to 3600s (1h) to prevent single-script budget burn"
+  - "RTP prompt count mismatch (41/22 vs paper's 295) — investigate encoding/dataset version difference"
+
+ai_suggestions_pending:
+  - "O43: ARA's structured format enables better agent time management — could strengthen C05"
+  - "O44: Baseline agents get stuck on hard subtasks without structured priority guidance"
+  - "O46: Full PPLM is infeasible for agent reproduction — consider providing it as shared data"
+  - "O47: Need tighter bash timeout caps to prevent single-script monopolization"

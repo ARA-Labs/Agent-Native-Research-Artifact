@@ -1,0 +1,57 @@
+session:
+  id: "2026-03-12_013"
+  timestamp: "2026-03-12T23:45"
+  summary: "Removed Agent API; adopted skill-as-interface framing; complete paper rewrite (9 files)"
+
+events_logged:
+  - type: decision
+    id: N29
+    provenance: user
+    summary: "Remove Agent API (ara.query/run/log/verify); adopt NL skill as sole agent-facing interface"
+
+  - type: claim
+    id: C15
+    provenance: user
+    summary: "A skill (NL spec) is the right agent interface — open-ended interaction cannot be enumerated by a fixed API"
+
+  - type: heuristic
+    id: H11
+    provenance: user
+    summary: "Skill as interface: extensible without code changes, composable, improvable as LLMs advance"
+
+ai_actions:
+  - action: "Rewrote live_pm.tex as 'Skill as Interface: The ARA Research Manager' with 6 capability categories"
+    provenance: ai-executed
+    files_changed: ["paper/sections/live_pm.tex"]
+  - action: "Removed Agent API subsection from protocol.tex; added transition paragraph"
+    provenance: ai-executed
+    files_changed: ["paper/sections/protocol.tex"]
+  - action: "Updated abstract, intro, related_work, ingestor, discussion, conclusion for skill framing"
+    provenance: ai-executed
+    files_changed:
+      - "paper/sections/abstract.tex"
+      - "paper/sections/introduction.tex"
+      - "paper/sections/related_work.tex"
+      - "paper/sections/ingestor.tex"
+      - "paper/sections/discussion.tex"
+      - "paper/sections/conclusion.tex"
+  - action: "Compiled paper — 37 pages, no errors, no undefined references"
+    provenance: ai-executed
+    files_changed: ["paper/main.pdf"]
+
+claims_touched:
+  - id: C08
+    action: advanced
+    provenance: user
+    note: "Live PM claim now stronger — skill subsumes API, not just born-agent logging"
+  - id: C15
+    action: created
+    provenance: user
+
+open_threads:
+  - "O05 (open-source tooling TODO) was dropped from live_pm.tex — needs decision on whether to re-add or leave for camera-ready"
+  - "C15 (skill-as-interface) is hypothesis — needs empirical validation or at minimum a user study"
+  - "The skill capability table (Tab 3) references 6 categories but only Document is fully implemented in the PM skill code"
+
+ai_suggestions_pending:
+  - "Consider adding a worked example showing the same request handled by API vs skill to illustrate flexibility advantage"

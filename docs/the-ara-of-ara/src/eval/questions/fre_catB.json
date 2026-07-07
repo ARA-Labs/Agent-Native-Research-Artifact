@@ -1,0 +1,120 @@
+{
+  "paper_id": "fre",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "fre_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the FRE evaluation protocol specified in the rubric: (a) What does requirement R09 say about how the latent z is obtained when evaluating a FRE agent? (b) Which ARA file (from src/execution/) contains the implementation of this evaluation step? (c) What does R09's specification of '32 state-reward pairs' imply about how the encoder input is constructed during inference, and how does this differ from the training-time encoder usage described in logic/solution/algorithm.md?",
+      "gold_answer": "(a) R09 states exactly: 'Code has been implemented such that when evaluating a FRE agent, 32 state-reward pairs are sampled from the evaluation task environment and passed through the corresponding FRE encoder to obtain the latent z for policy conditioning.' This means at evaluation time, 32 (state, reward) samples must be drawn from the target environment and fed as a batch to the FRE encoder to produce a single z vector used for conditioning. (b) The relevant ARA implementation file is src/execution/fre.py, which contains the FRE agent class and its evaluation logic including the encoder call. (c) The specification of exactly 32 state-reward pairs implies a fixed-size context set is assembled at inference; the encoder must aggregate across these 32 pairs (consistent with a permutation-invariant architecture) to produce z. In logic/solution/algorithm.md, the training-time usage draws reward samples from the prior distribution to train the encoder, whereas at evaluation time the 32 pairs come from actual environment interactions with the target task reward — meaning the encoder must generalize from prior-trained reward distributions to the held-out target reward at test time.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes or closely paraphrases the exact R09 requirement text about 32 state-reward pairs being sampled from the evaluation task environment",
+        "Identifies src/execution/fre.py as the ARA file containing the FRE evaluation implementation",
+        "Explains that 32 is a fixed context set size and that the encoder must aggregate over these pairs to produce z",
+        "Contrasts evaluation-time sampling (from target task environment) with training-time sampling (from prior reward distribution) referencing logic/solution/algorithm.md"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/fre.py",
+        "logic/solution/algorithm.md"
+      ],
+      "rubric_requirement_id": "R09",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "fre_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric contains several requirements about the GC-BC baseline model architecture that are rated 'absent' in the info gap analysis. (a) What do requirements R## in the rubric say about GC-BC's activation functions, layer normalization, and output distribution (cite the exact requirement text for each)? (b) Which ARA file in src/execution/ would need to implement these architectural details, and what does that file currently describe? (c) Given that these requirements are marked 'absent', what specific architectural properties would be missing from a naive MLP implementation, and why does each matter for reproducing the paper's GC-BC baseline results shown in evidence/tables/table1_main_results.md?",
+      "gold_answer": "(a) The rubric contains the following absent GC-BC requirements: One requirement states 'The GC-BC model has been implemented such that it predicts a gaussian distribution over actions, with two outputs, a mean and a log standard deviation' (absent, gap: missing_baseline_detail, vague_description). Another states 'The GC-BC model has been implemented such that the log of the standard deviation is clamped with a lower bound of -5' (absent, gap: missing_baseline_detail). Another states 'The GC-BC model has been implemented such that ReLU is applied between each hidden layer' (absent, gap: missing_baseline_detail). Another states 'The GC-BC model has been implemented such that layer normalization is applied before each activation function' (absent, gap: missing_baseline_detail). The partial requirement states 'The GC-BC model has been implemented such that it is a MLP with three hidden layers of size 512'. (b) The implementation would reside in src/execution/fre_network.py, which describes network architectures for FRE and baselines. (c) A naive MLP implementation would be missing: (1) Gaussian output head (mean + log_std) rather than deterministic actions — this matters because GC-BC is trained with a probabilistic behavior cloning objective requiring a distribution; (2) log_std clamping at -5 — without this, numerical instability during training could cause NaN losses; (3) ReLU activations specifically — using a different activation like tanh would change the optimization landscape; (4) layer normalization before each activation — layer norm stabilizes training with offline data which has varying scales, and omitting it would likely degrade performance visible in table1_main_results.md scores for GC-BC.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Identifies and quotes all four absent GC-BC requirements: Gaussian output (mean+log_std), log_std clamped at -5, ReLU activations, and layer normalization before activations",
+        "Correctly identifies src/execution/fre_network.py as the ARA file for network architecture implementations",
+        "Explains why log_std clamping at -5 prevents numerical instability",
+        "Connects missing layer normalization and activation choices to potential performance discrepancies in evidence/tables/table1_main_results.md GC-BC results"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/fre_network.py",
+        "evidence/tables/table1_main_results.md"
+      ],
+      "rubric_requirement_id": "R## (GC-BC absent requirements)",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "fre_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric specifies distinct evaluation protocols for OPAL agents across requirements R14, R15, and R16. (a) What do these three requirements say verbatim about how OPAL skills are sampled and how episode performance is aggregated? (b) Which ARA file in src/execution/ would implement this OPAL evaluation logic, and what does the structure of that file reveal about how the skill sampling loop is organized? (c) R16 specifies taking the 'best performance across 10 sampled skills' — how does this oracle-best aggregation strategy interact with the 5-seed, 20-episode evaluation protocol specified in R08, and what does this imply about the total number of OPAL policy rollouts required to produce a single reported number in evidence/tables/table1_main_results.md?",
+      "gold_answer": "(a) R14 states exactly: 'Code has been implemented such that, for evaluating OPAL agents, for a given episode, 10 random OPAL skills can be sampled from a unit gaussian.' R15 states exactly: 'Code has been implemented such that, for evaluating OPAL agents, for a given episode, the agent is evaluated on the target task separately conditioning on each skill sampled from the unit gaussian.' R16 states exactly: 'Code has been implemented such that, for evaluating OPAL agents, for a given episode, the performance is taken to be the best performance across the 10 sampled skills for that episode.' (b) The implementation would be in src/execution/iql.py (or a dedicated OPAL evaluation script); examining this ARA file reveals how the policy conditioning on z-skills is structured and how the evaluation loop iterates over skills per episode. (c) The oracle-best strategy in R16 means for each episode, 10 full rollouts are performed and only the best cumulative reward is kept. Combined with R08's requirement of 5 seeds × 20 episodes per seed, this implies 5 × 20 × 10 = 1000 total OPAL policy rollouts to produce a single reported performance number in table1_main_results.md. This inflates OPAL's apparent performance compared to methods that condition on a single z — it is an oracle upper bound, not a single-sample evaluation — which is a critical detail for interpreting the baseline comparison.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes all three requirement texts (R14, R15, R16) correctly: unit gaussian sampling of 10 skills, separate evaluation per skill, best-of-10 aggregation",
+        "Identifies src/execution/iql.py as the relevant ARA implementation file for OPAL evaluation",
+        "Correctly computes 5 seeds × 20 episodes × 10 skills = 1000 total rollouts per reported OPAL number",
+        "Explains that the oracle-best aggregation makes OPAL an upper-bound baseline and notes the implication for interpreting table1_main_results.md comparisons"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/iql.py",
+        "evidence/tables/table1_main_results.md"
+      ],
+      "rubric_requirement_id": "R14",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "fre_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "The rubric specifies requirements R22–R25 for the `ant-goal-reaching` evaluation task. (a) What do R24 and R25 say verbatim about the goal-reaching criterion and the per-timestep reward structure? (b) Which ARA file in src/execution/ implements the reward functions for evaluation tasks, and what does that file's structure reveal about how the sparse goal-reaching reward is computed? (c) How does the distance threshold in R24 and the reward structure in R25 interact with the number of evaluation episodes specified in R07, and what does this imply about the range of possible cumulative reward scores that could be reported in evidence/tables/table1_main_results.md for the AntMaze goal-reaching task?",
+      "gold_answer": "(a) R24 states exactly: 'The `ant-goal-reaching` evaluation task has been implemented such that the goal is considered reached if an agent reaches within a distance of 2 from the target position.' R25 states exactly: 'The `ant-goal-reaching` evaluation task has been implemented such that the agent receives a reward of -1 at each timestep until it successfully reaches the goal.' (b) The relevant ARA file is src/execution/reward_functions.py, which implements the various evaluation reward functions. Its structure shows how the goal-reaching reward is computed as a step function: -1 per timestep until the Euclidean distance to goal falls below 2, then the episode terminates or reward stops accumulating. (c) R07 specifies evaluation over 20 episodes. With a reward of -1 per timestep and a maximum episode horizon (e.g., 700 steps for AntMaze-large), the minimum cumulative reward per episode would be -700 (never reaching goal) and the maximum would approach 0 (reaching immediately). When averaged over 20 episodes (R07) and 5 seeds (R08), the reported score in table1_main_results.md is the mean cumulative reward — so a score close to 0 indicates fast goal-reaching while a very negative score indicates failure. The distance threshold of 2 is relatively generous for AntMaze-large's scale, meaning the reward signal is still sparse but not maximally so.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes R24 exactly (distance threshold of 2) and R25 exactly (reward of -1 per timestep until goal is reached)",
+        "Identifies src/execution/reward_functions.py as the ARA file implementing evaluation reward functions",
+        "Correctly explains the cumulative reward range (bounded below by -max_timesteps, above by near 0) and connects to 20-episode averaging from R07",
+        "Notes that the distance-2 threshold and -1/step reward together define a sparse negative reward signal and explains what reported scores in table1_main_results.md imply about agent performance"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/reward_functions.py",
+        "evidence/tables/table1_main_results.md"
+      ],
+      "rubric_requirement_id": "R24",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "fre_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric contains requirements about the FRE Encoder network architecture that are marked as 'partial' with gaps including 'vague_description' and 'incomplete_equation'. (a) What do the partial requirements say about reward discretization, the mapping of discretized rewards to continuous vectors, and the state projection used in the FRE encoder (cite the requirement texts precisely)? (b) Which ARA file in src/execution/ implements the FRE encoder network, and what architectural details does that file specify about the discretization bins and embedding dimensionality? (c) Given the 'incomplete_equation' gap flag on the reward discretization requirement, what specific mathematical ambiguity exists in the rubric specification, and how does logic/solution/architecture.md resolve or fail to resolve this ambiguity for a practitioner trying to reproduce the encoder?",
+      "gold_answer": "(a) The partial requirements state: 'The FRE Encoder network has been implemented such that the input scalar reward is discretized into 32 bins by rescaling...' (partial, gaps: vague_description, incomplete_equation) — the exact rescaling formula is not fully specified. 'The FRE Encoder network has been implemented such that the discretized reward is mapped to a continuous vector representation...' (partial, gap: vague_description) — the embedding lookup or linear layer details are unspecified. 'The FRE Encoder network has been implemented such that the environment state projected into an embedding using a learnable...' (partial, gaps: vague_description, incomplete_equation) — the projection network architecture is incompletely described. 'The FRE Encoder network has been implemented such that for each state, the reward embedding is concatenated to end of the state embedding...' (partial, gaps: vague_description, missing_code_detail) — the concatenation order and subsequent processing are vague. (b) The implementation is in src/execution/fre_network.py, which specifies the FRE encoder class. This file details the number of bins (32), the embedding dimension for reward tokens, and how state and reward embeddings are combined before aggregation. (c) The 'incomplete_equation' gap means the rubric does not specify the exact formula for mapping a scalar reward r to a bin index — e.g., whether it uses uniform binning over a fixed range, percentile-based binning over the dataset, or a learned quantization. This ambiguity is significant because different discretization schemes would produce different bin assignments for the same reward value. logic/solution/architecture.md partially addresses this by describing the encoder's high-level design (permutation-invariant aggregation over state-reward pairs) but does not give the closed-form binning equation, leaving a practitioner uncertain about the reward normalization range and bin boundary computation.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Identifies and quotes all four partial FRE encoder requirements: reward discretization into 32 bins, mapping to continuous vector, state projection into embedding, and concatenation of reward and state embeddings",
+        "Correctly identifies src/execution/fre_network.py as the ARA file implementing the FRE encoder",
+        "Explains the specific mathematical ambiguity introduced by 'incomplete_equation': the binning formula (uniform vs. percentile vs. learned, and the reward range) is not specified",
+        "States that logic/solution/architecture.md describes high-level encoder design but does not resolve the exact bin boundary computation, leaving a reproducibility gap"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/fre_network.py",
+        "logic/solution/architecture.md"
+      ],
+      "rubric_requirement_id": "R## (FRE Encoder partial requirements)",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

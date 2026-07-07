@@ -1,0 +1,64 @@
+session:
+  id: "2026-03-20_001"
+  timestamp: "2026-03-20T00:50"
+  summary: "BAM ARA v2 rerun (fix+reflection): ARA 93.6% vs baseline 93.2% — ARA now leads after moving hyperparams from evidence/ to src/configs/"
+
+events_logged:
+  - type: experiment
+    id: N68
+    provenance: ai-executed
+    summary: "BAM ARA v2: 118/124 (95.2% raw), 235/251 (93.6% weighted), 129 turns, 5.2h"
+
+  - type: observation
+    id: O53
+    provenance: ai-executed
+    summary: "Fix flips BAM result: ARA 93.6% vs baseline 93.2% (+0.4pp)"
+
+  - type: observation
+    id: O54
+    provenance: ai-executed
+    summary: "T09 posteriorDB +4.0 pts — biggest gain from fix, posteriordb+bridgestan package"
+
+  - type: observation
+    id: O55
+    provenance: ai-suggested
+    summary: "T08 s=0 varying-tail still missed in v2 — agent doesn't parse two-panel experiment descriptions"
+
+  - type: observation
+    id: O56
+    provenance: ai-suggested
+    summary: "O51 confirmed (evidence blocking cost), O48 weakened (ARA value not just inversely correlated with PDF quality)"
+
+ai_actions:
+  - action: "Archived bam_ara_seed0 to bam_ara_seed0_v1_before_fix"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/bam_ara_seed0_v1_before_fix/"]
+
+  - action: "Fixed BAM PAPER.md evidence index (removed deleted table references)"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/bam/PAPER.md"]
+
+  - action: "Added src/reproduction_notes.md with v1 lessons (seeds, baselines, two non-Gaussian panels, posteriordb tips)"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/bam/src/reproduction_notes.md"]
+
+  - action: "Ran BAM ARA v2 reproduction (run-paper bam ara --seed 0)"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/bam_ara_seed0/"]
+
+  - action: "Ran judge on BAM ARA v2"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/bam_ara_seed0/_judge_result.json"]
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "T08 non-Gaussian s=0 varying-tail missed in both v1 and v2 — add explicit two-panel instruction to reproduction_notes.md?"
+  - "Other artifacts (adaptive-pruning, all-in-one, bbox) still have setup-in-evidence misclassification — batch migrate?"
+  - "BAM ARA v2 still uses only 5 posteriorDB seeds instead of required 10 — could gain 1 more point"
+
+ai_suggestions_pending:
+  - "O48 may need revision: ARA's baseline-leading result on BAM was partly artifact of evidence misclassification, not purely PDF quality"

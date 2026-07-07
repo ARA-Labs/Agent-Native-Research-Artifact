@@ -1,0 +1,115 @@
+{
+  "paper_id": "robust-clip",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "robust-clip_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the PGD algorithm implementation in the robust-clip ARA: (a) What does requirement R08 in rubric/requirements.md specify about gradient normalization? (b) Which ARA source file implements the PGD attack, and what does it reveal about how the sign-based gradient update is applied? (c) What does R09 additionally require about initialization, and how do R08 and R09 together constrain the PGD loop structure in that implementation file?",
+      "gold_answer": "(a) R08 states: 'There is gradient normalization with elementwise sign for l_infinity.' This means that when computing the adversarial perturbation step, the gradient must be reduced to its elementwise sign (i.e., sign(grad)) rather than using the raw gradient magnitude, which is the standard l-infinity PGD update rule. (b) The relevant ARA file is src/execution/pgd_attack.py. This file implements the PGD attack loop; the sign-based update means each perturbation step takes the form delta = delta + alpha * sign(gradient), ensuring the update is bounded in l-infinity norm per step. (c) R09 states: 'There is an initialization with uniform random perturbation.' Together, R08 and R09 require that: (1) before the PGD loop begins, the perturbation delta is initialized by sampling uniformly at random within the epsilon-ball (e.g., uniform in [-epsilon, epsilon]), and (2) each iteration of the loop applies the elementwise sign normalization to the gradient. This means the PGD loop in pgd_attack.py must have a random initialization block before the iterative sign-gradient update steps.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R08 requirement text: 'gradient normalization with elementwise sign for l_infinity'",
+        "Identifies src/execution/pgd_attack.py as the cross-referenced ARA file",
+        "Correctly cites R09 requirement text: 'initialization with uniform random perturbation'",
+        "Explains that R08 and R09 together require a random init block followed by sign(gradient) update steps in the PGD loop"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/pgd_attack.py"
+      ],
+      "rubric_requirement_id": "R08",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "robust-clip_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric/requirements.md defines specific optimizer and training schedule requirements for fine-tuning robust CLIP models. (a) What do requirements R29, R30, and R31 collectively specify about the optimizer configuration? (b) Which ARA file in src/configs/ documents the training configuration, and what parameters does it record for the optimizer and learning rate schedule? (c) Given R32's requirement about batch size, what does the combination of R29–R32 imply about how the AdamW optimizer must be configured in the training scripts src/execution/tecoa_training.py and src/execution/fare_training.py?",
+      "gold_answer": "(a) R29 states: 'AdamW optimizer is used with momentum coefficients beta_1 = 0.9 and beta_2 = 0.95.' R30 states: 'The learning rate is implemented with cosine decay schedule and linear warmup to a peak learning rate of 1e-5 at 7% of total training steps.' R31 states: 'The weight decay coefficient is set to 1e-4.' Together, these three requirements fully constrain the AdamW optimizer's momentum parameters, its learning rate schedule type (cosine decay with linear warmup), the peak LR value (1e-5), the warmup fraction (7% of total steps), and the weight decay value (1e-4). (b) The ARA file src/configs/training.md documents the training configuration. It records optimizer type (AdamW), beta values, learning rate schedule, peak LR, warmup proportion, and weight decay as used in training. (c) R32 states: 'An effective batch size of 128 is used.' The combination of R29–R32 implies that in src/execution/tecoa_training.py and src/execution/fare_training.py: the AdamW optimizer must be instantiated with betas=(0.9, 0.95) and weight_decay=1e-4; a cosine LR scheduler with linear warmup covering 7% of total steps and peak LR=1e-5 must be applied; and the data loader or gradient accumulation must be configured to achieve an effective batch size of 128.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites all three requirements R29 (betas 0.9/0.95), R30 (cosine decay + linear warmup to 1e-5 at 7%), and R31 (weight decay 1e-4)",
+        "Identifies src/configs/training.md as the cross-referenced ARA configuration file",
+        "Correctly includes R32 ('effective batch size of 128') in the combined implication",
+        "States that tecoa_training.py and fare_training.py must configure AdamW with the specified betas, weight_decay, cosine+warmup schedule, and batch size of 128"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R29",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "robust-clip_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric contains detailed requirements about the FARE training loss formulation. (a) What does requirement R17 in rubric/requirements.md specify as the exact FARE loss function, including which encoders are involved and what is frozen? (b) Which ARA file implements the FARE training loop, and how does the presence of two encoder references (fine-tuned vs. original) in R17 constrain the code structure in that file? (c) R18 adds a batching requirement — what does it say, and what does the combination of R17 and R18 imply about the forward pass structure and loss computation in src/execution/fare_training.py?",
+      "gold_answer": "(a) R17 states: 'Given an image encoder phi, image x and constant epsilon, the loss is the max of ||phi(z) - phi_{Org}(x)||_2^2 over perturbations z of image x satisfying ||z - x||_{infinity} <= epsilon, where phi(z) and phi_{Org}(x) are the (non-normalized) feature embeddings produced by the fine-tuned and original CLIP vision encoders respectively, as in equation 3. Here, phi_{Org}(x) is frozen.' This means the loss is the squared L2 distance between the fine-tuned encoder's output on the adversarial image and the frozen original encoder's output on the clean image. (b) The relevant ARA file is src/execution/fare_training.py. R17's requirement for two distinct encoders (one fine-tuned, one frozen original) implies the code must instantiate and maintain two separate encoder objects: one whose weights are updated by gradient descent and one that is frozen (no gradients, used only for inference to compute phi_{Org}(x)). The loss is the squared L2 norm of the difference of their (non-normalized) embeddings. (c) R18 states: 'The loss is summed over the samples in a batch, and their mean is taken.' Combined with R17, the forward pass in fare_training.py must: (1) compute phi_{Org}(x) with the frozen encoder for all samples in the batch, (2) find the worst-case adversarial z via inner maximization (PGD), (3) compute phi(z) with the fine-tuned encoder, (4) compute ||phi(z) - phi_{Org}(x)||_2^2 per sample, and (5) take the mean over the batch before calling backward.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R17 requirement text including the squared L2 loss formula, the two encoders (fine-tuned phi and frozen phi_Org), and non-normalized embeddings",
+        "Identifies src/execution/fare_training.py as the cross-referenced ARA file",
+        "Correctly cites R18: 'The loss is summed over the samples in a batch, and their mean is taken'",
+        "Explains that the combined implication requires two encoder instances (one frozen), per-sample squared L2 computation, and batch mean before backward pass"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/fare_training.py"
+      ],
+      "rubric_requirement_id": "R17",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "robust-clip_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "The rubric specifies detailed attack pipeline requirements for the visual question answering (VQA) setting. (a) What do requirements R35 and R36 in rubric/requirements.md jointly specify about the multi-stage attack procedure for VQA, including iteration counts, precision levels, and initialization strategy? (b) Which ARA evidence file reports the results of VQA adversarial evaluations, and what epsilon values and model encoders are shown there? (c) Given R37's constraint about TextVQA, what does the combination of R35, R36, and R37 imply about how the attack pipeline in src/execution/pgd_attack.py or src/execution/lvlm_integration.py must handle dataset-conditional branching?",
+      "gold_answer": "(a) R35 states: 'APGD at half precision was run for 100 iterations for each of the five most frequent ground-truth labels (among the 10 available ground-truths), maximizing the autoregressive cross-entropy loss with respect to the ground-truth answers.' R36 states: 'For all samples, an additional single precision attack is made, using the ground-truth that led to the lowest score for each sample. The single precision attack also initializes perturbations with the perturbation of the previous attacks that led to the lowest score for each sample.' Together, these specify a two-stage attack: stage 1 is half-precision APGD for 100 iterations over 5 ground-truth labels; stage 2 is single-precision APGD initialized from the best perturbation of stage 1, using the single worst-performing ground truth. (b) The ARA evidence file is evidence/tables/table1_lvlm_robustness.md, which reports CIDEr and VQA accuracy scores for clean images and adversarial images at epsilon=2/255 and epsilon=4/255 across the five vision encoders (original CLIP, TeCoA^2, TeCoA^4, FARE^2, FARE^4) for both OF and LLaVA on VQAv2 and TextVQA. (c) R37 states: 'The targeted attack with \"Word\" is not run on TextVQA.' The combination of R35, R36, and R37 implies the attack pipeline must include a dataset identity check: for VQAv2, all attacks including the targeted 'Word' attack are run; for TextVQA, the 'Word' targeted attack is skipped. This conditional branching must be present in the attack orchestration code (src/execution/lvlm_integration.py or equivalent), ensuring the pipeline selects attacks based on the dataset being evaluated.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R35 (half-precision APGD, 100 iterations, 5 most frequent ground-truth labels, maximize autoregressive cross-entropy)",
+        "Correctly cites R36 (additional single-precision attack, initialized from best perturbation of stage 1, using worst ground truth)",
+        "Identifies evidence/tables/table1_lvlm_robustness.md as the cross-referenced evidence file",
+        "Correctly cites R37 ('The targeted attack with \"Word\" is not run on TextVQA') and explains it implies dataset-conditional branching in the attack pipeline"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table1_lvlm_robustness.md"
+      ],
+      "rubric_requirement_id": "R35",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "robust-clip_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "The rubric specifies requirements about jailbreaking attack configuration and evaluation scope. (a) What does requirement R40 in rubric/requirements.md specify about the jailbreaking attack hyperparameters, and what does R41 specify about the exact experimental conditions (models, epsilon values) under which jailbreaking attacks must be run? (b) Which ARA evidence file contains the jailbreaking results, and what structure of results (rows/columns) does it report? (c) Given R51's data preparation requirement and the constraints from R40 and R41, what do these three requirements together imply about the setup in src/execution/lvlm_integration.py for the jailbreaking evaluation, particularly regarding image input, attack budget, and model variants tested?",
+      "gold_answer": "(a) R40 states: 'The jailbreaking attacks are set to have the following parameters: 5000 iterations and alpha = 1/255.' R41 states: 'Jailbreaking attacks are run on LLaVA with CLIP, FARE^4, and TeCoA^4 with epsilon = 0, 16/255, and 32/255, and 64/255 on harmful target strings.' Together these specify: APGD-style attack with 5000 iterations and step size alpha=1/255, evaluated across 4 epsilon budgets (0, 16/255, 32/255, 64/255) on 3 model variants (LLaVA+CLIP, LLaVA+FARE^4, LLaVA+TeCoA^4). (b) The ARA evidence file is evidence/tables/table7_jailbreak.md (or table7_jailbreaking.md). It reports jailbreak attack success rates organized by model encoder variant (CLIP, FARE^4, TeCoA^4) across the epsilon values (0, 16/255, 32/255, 64/255), showing whether harmful target strings are produced. (c) R51 states: 'A single image is prepared for the jailbreaking attacks to be run on.' The combination of R40, R41, and R51 implies that in src/execution/lvlm_integration.py: (1) only a single input image is used (not a dataset batch), (2) the attack loop must run for exactly 5000 iterations with alpha=1/255, (3) the outer loop must iterate over three LLaVA model instances (with CLIP, FARE^4, TeCoA^4 encoders) and four epsilon values (0, 16/255, 32/255, 64/255), and (4) the attack objective is to produce harmful target strings via adversarial perturbation of the single image within the specified epsilon-ball.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly cites R40 requirement text: '5000 iterations and alpha = 1/255'",
+        "Correctly cites R41 requirement text including all three model variants (CLIP, FARE^4, TeCoA^4) and all four epsilon values (0, 16/255, 32/255, 64/255)",
+        "Identifies evidence/tables/table7_jailbreak.md or evidence/tables/table7_jailbreaking.md as the cross-referenced evidence file",
+        "Correctly cites R51 ('A single image is prepared for the jailbreaking attacks') and explains the combined implication: single image input, 5000-iteration attack loop, outer loop over 3 models × 4 epsilon values targeting harmful strings"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table7_jailbreak.md"
+      ],
+      "rubric_requirement_id": "R40",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

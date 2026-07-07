@@ -1,0 +1,75 @@
+session:
+  id: "2026-03-20_003"
+  timestamp: "2026-03-20T17:00"
+  summary: "Baseline rust_codecontests v6 definitive score: 0.65 (13/20) — 5x reference; RESULT.md written; diagnosed batch-size and timeout failure modes"
+
+events_logged:
+  - type: experiment
+    id: "N72"
+    provenance: ai-executed
+    summary: "Baseline v6 clean 20-problem run achieved 0.65 (13/20) on valid.jsonl with batch_size=5, max_workers=1, max_time_per_batch=600"
+
+  - type: dead_end
+    id: "N73"
+    provenance: ai-executed
+    summary: "batch_size=117 stalls: rate limiter asyncio.sleep() blocks indefinitely — as_completed() timeout does not cancel sleeping coroutines in Python 3.12"
+
+  - type: dead_end
+    id: "N74"
+    provenance: ai-executed
+    summary: "batch_size=10, max_time_per_batch=300 produces timeouts: 300s is too tight when max_workers=2 and some problems need many retries"
+
+  - type: decision
+    id: "N75"
+    provenance: ai-executed
+    summary: "Settled on batch_size=5, max_workers=1, max_time_per_batch=600 as the reliable scoring configuration"
+
+  - type: observation
+    id: "O62"
+    provenance: ai-suggested
+    summary: "Private/generated tests add ~30% gap between internal public-test tracking and official score"
+
+  - type: observation
+    id: "O63"
+    provenance: ai-suggested
+    summary: "Serial execution (max_workers=1) eliminates 429 thundering herd without complex coordination"
+
+  - type: observation
+    id: "O64"
+    provenance: ai-executed
+    summary: "Python 3.12 asyncio.as_completed() timeout does not cancel coroutines blocked inside asyncio.sleep()"
+
+  - type: heuristic
+    id: "H17"
+    provenance: ai-suggested
+    summary: "Serial execution (max_workers=1) as the minimal-complexity 429-prevention strategy"
+
+ai_actions:
+  - action: "Killed stalled batch_size=117 validation run (PID 76494) after 2h12m with no output"
+    provenance: ai-executed
+    files_changed: []
+
+  - action: "Ran definitive 20-problem baseline validation with nohup + PYTHONUNBUFFERED=1"
+    provenance: ai-executed
+    files_changed: ["/tmp/baseline_valid20_clean.log"]
+
+  - action: "Wrote RESULT.md with full score trajectory, architecture description, and comparison with ARA"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/results/rust_codecontests_baseline_seed10/RESULT.md"]
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-suggested
+    note: "Baseline v6 score 0.65 provides a stronger reference point for the ARA vs baseline extension comparison. ARA seed8 achieved 0.80 on 30-problem subset — potential +0.15 advantage."
+
+open_threads:
+  - "ARA seed10 run (PID 13949) still running on 30 valid.jsonl problems — output buffered, TCP connections active to Azure"
+  - "ARA seed8 run scored 0.80 on 30-problem subset — compare directly with baseline 0.65 for extension experiment"
+  - "rust_codecontests extension result: ARA 0.80 vs baseline 0.65 (+0.15) — not yet statistically confirmed at full scale"
+  - "Need to run baseline on full valid.jsonl (117 problems) with batch_size=5, max_workers=1 for complete validation score"
+
+ai_suggestions_pending:
+  - "O62: private/generated test overhead (~30%) is consistent across multiple problems — should be noted in RESULT.md (already done)"
+  - "O63: max_workers=1 may be the right default for all extension baseline runs — consider updating run_extension.py default parameters"
+  - "O64: asyncio.as_completed() timeout behavior in Python 3.12 is a potential footgun for all batched eval harnesses"

@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-rust_codecontests",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 5,
+  "questions": [
+    {
+      "id": "rebench-rust_codecontests_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the official solution score for the rust_codecontests task?",
+      "gold_answer": "0.13",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "rebench-rust_codecontests_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "How many CodeContests problems are in the held-out test dataset used for final scoring?",
+      "gold_answer": "175",
+      "grading_type": "exact_numeric",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-rust_codecontests_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Which OpenAI model is used for generating Rust solutions, and what is the budget of API credits provided to develop the solution?",
+      "gold_answer": "gpt-3.5-turbo-0125 with $500 of OpenAI API credits",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-rust_codecontests_A04",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the values of M (candidates per problem), N (max compilation retries per candidate), and max_tokens used in the full pipeline, and what is the worst-case number of API calls per problem?",
+      "gold_answer": "M=3 candidates per problem, N=5 max compilation retries per candidate, max_tokens=2048. Worst-case API calls per problem = M × (1 + N) = 3 × 6 = 18.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-rust_codecontests_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What temperature values are used for initial candidate generation versus compilation retry attempts, and what is the justification for using different values?",
+      "gold_answer": "Temperature 0.7 is used for initial candidate generation (to produce diverse candidates across M>1 runs) and temperature 0.0 is used for compilation retries (to produce the most likely/deterministic fix for a specific error). Using 0.0 for all generations would produce identical candidates, defeating the purpose of multi-candidate generation.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-rust_codecontests_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does the hidden_score task differ from the main task in terms of scoring behavior and score information visibility?",
+      "gold_answer": "The hidden_score task uses --strip_score_information flag when running the scoring command and has visible_to_agent set to False, whereas the main task does not strip score information and has visible_to_agent set to True.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-rust_codecontests_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Three domain experts scored 0 on the task. Based on the dead end analysis and human baseline table, what specific approaches did these experts likely attempt that led to zero scores?",
+      "gold_answer": "H01 struggled with Rust compilation issues (no compilation feedback loop), H02 built a complex agent but ran out of time (monolithic development), and H03 attempted Python-to-Rust translation. All three approaches are documented dead ends: no compilation handling yields very low compile and solve rates, monolithic development wastes time discovering issues late, and Python-to-Rust translation produces systematic ownership/borrowing errors.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-rust_codecontests_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the aggregate_scores method use the maximum score from the score log rather than the most recent score?",
+      "gold_answer": "Because the agent is judged on the highest valid score achieved, not the final score. Using max ensures that even if later attempts perform worse, the best result is preserved as the final score.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-rust_codecontests_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions would increasing the number of compilation retries beyond N=5 be expected to hurt rather than help performance?",
+      "gold_answer": "Beyond N=5 retries, GPT-3.5 tends to enter oscillation loops — fixing one error while re-introducing previously fixed bugs, or producing increasingly bizarre code. Beyond 5 retries the marginal probability of successful compilation drops sharply, and extra retries consume per-problem budget that could be used to generate additional diverse candidates (increasing M), which is more effective than deeper retry chains.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-rust_codecontests_A10",
+      "category": "method_detail",
+      "difficulty": "unanswerable",
+      "question": "What specific prompting strategy or system prompt does the example solution in solve_code_contests_rust.py use when calling the GPT-3.5 API?",
+      "gold_answer": "The contents of solve_code_contests_rust.py are not provided in the material, so the specific prompting strategy cannot be determined.",
+      "grading_type": "abstention",
+      "source": "pdf"
+    }
+  ]
+}

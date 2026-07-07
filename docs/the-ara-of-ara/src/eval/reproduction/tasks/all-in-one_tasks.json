@@ -1,0 +1,266 @@
+[
+  {
+    "task_id": "all-in-one_T01",
+    "goal": "Implement the Variance Exploding SDE (VESDE) with drift f(x,t)=0, diffusion g(t), and perturbation kernel using sigma_max=15, sigma_min=0.0001, and time interval [1e-5,1]. Implement the Simformer tokenizer that maps (identifier, value, metadata, condition-state) tuples into token embeddings using learnable identifier embeddings, scalar-repeat value embeddings, random Fourier metadata embeddings, and learned condition-state embeddings. Verify on a simple distribution that the SDE and tokenizer produce valid outputs.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Correct VESDE formulation is a prerequisite for score-based posterior approximation"
+    ],
+    "rubric_requirement_ids": [
+      "0ac16f05-bdb9-48c8-9103-764068f5301a",
+      "1402caf0-ee17-48a4-b0f5-ee4523807747",
+      "396c0b27-9d8c-49d4-a9e8-667b7c1a9e5c",
+      "07f7aac1-c623-46e0-b7cc-3991331cbd9c",
+      "c6cd56ae-e565-4512-978e-80a8afaae037",
+      "ac3759f1-14f6-4859-a64f-84db470eb2db",
+      "437abe9f-4b33-4293-9c64-d9cf83fd2a55",
+      "714bdd7e-b21c-4407-aa3d-f50307633bb4",
+      "af5cd308-83c7-4b2b-bc9f-b006183ea3ed",
+      "2e46fc8d-2ecb-46f3-86b1-0c80fceec733",
+      "2ff0a481-00b4-47e9-939a-4dd7f7a00361",
+      "407dcc3b-5f84-48b4-b5e5-730336b97fbe",
+      "c6eb15a5-65f9-4ac9-9927-f50f3118d8fe"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "all-in-one_T02",
+    "goal": "Implement the Simformer transformer architecture with masked self-attention, single linear decoder producing per-token scalar scores, and diffusion-time conditioning via random Fourier features added after each feed-forward block. Implement the condition mask M_C sampling (joint, posterior, likelihood, Bernoulli p=0.3/0.7) and three attention mask variants (dense, undirected-graph, directed-graph with Webb et al. edge-addition algorithm). Implement the masked denoising score-matching loss with weighting lambda(t)=g(t)^2 applied only to unobserved variables. Implement the Euler-Maruyama reverse-SDE sampler where the reverse process runs on unobserved variables while observed variables are held constant. Verify mask shapes, loss computation, and sampling on synthetic data.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Correct architecture with masked attention is needed for score-based inference",
+      "C02: Condition mask M_C and attention mask M_E jointly determine which conditionals are modeled"
+    ],
+    "rubric_requirement_ids": [
+      "09008e24-26e7-4aa9-8d9a-881feb20538f",
+      "b1b80f04-e17c-49f6-831c-3cd3d15acf26",
+      "25eecc1a-cc2c-48e5-addc-082fdb7f638b",
+      "be65afa3-69f8-4f5a-8b0a-a2f7895b0b85",
+      "3e515973-3a59-46ca-b0b6-be1d8b4fea96",
+      "8e07cc4f-6176-4391-a8bb-578831aa3aa4",
+      "08a90ef1-cf86-4bfa-b17a-9269e223a57e",
+      "6f05f0cf-c61a-4ad9-b2b0-a353b7cab492",
+      "34b6fc70-d083-4bef-986e-336b09845a3c",
+      "0e335268-1035-4b34-b99c-97054665db5c",
+      "b3e915ef-1f57-4b70-b3da-546947d6c1b5",
+      "e3cd228e-467b-4c47-a23d-6e212249115e",
+      "2cb4d86f-19c4-438f-b6f1-52c588ba9d09",
+      "79df6718-c5e7-4967-92b0-4a66d1e8998e",
+      "7c953e3a-a3ec-4c91-a897-c6691ed60a80"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T03",
+    "goal": "Implement baselines and evaluation infrastructure. Implement NPE, NRE, and NLE via the sbi library with neural spline flows, batch size 1000, Adam optimizer, and early stopping. Implement C2ST evaluation using a random forest classifier with 100 trees and 5-fold cross-validation. Set up the 500-step Euler-Maruyama discretization for Simformer sampling. Prepare the four SBIBM benchmark tasks (Gaussian Linear, Gaussian Mixture, Two Moons, SLCP) with their MCMC reference samplers: Two Moons uses 1000 slice-sampling steps + 3000 MHMCMC steps (step size 0.01); SLCP uses 600 slice steps. Generate >=1000 reference samples per task.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Correct baselines and evaluation infrastructure are prerequisites for the benchmark"
+    ],
+    "rubric_requirement_ids": [
+      "23d6d4c9-f750-4f5d-8965-b9c2277d5c6a",
+      "ad5f1aac-30cc-425c-bc8a-409a58a71447",
+      "ee41ea7c-8c0f-4f87-95cc-a1f2258596a6",
+      "31ed240f-4e9c-489b-89ae-6ed46a85e8d8",
+      "6a1ddafa-29df-4e46-bc3e-71236a0b7d76",
+      "56dcd071-8f39-4131-97cd-f6d011e99cf5",
+      "3957cfb9-2e44-4026-be71-7d87d2c91583",
+      "982f7456-e34d-40be-a4a9-76c32826d301",
+      "973db5a3-21f4-48d0-8853-a5047626a637",
+      "23688299-d3fa-43ed-be9f-2fa2b2c40fa4",
+      "9fa888e9-7fb0-4a65-8322-e26c7a021143",
+      "ed3ab4fa-52b1-4328-8d90-988292d02e8f",
+      "e4d0c4d5-593a-432a-b5f7-6216655ab5f5",
+      "92486973-e7a9-4da9-8a38-556e3bae3dd9",
+      "c09ac29b-6e1f-492a-bb28-0fd1e0921ee8"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T04",
+    "goal": "Complete the SBIBM reference data preparation for SLCP (600 slice + 2000 MHMCMC steps, keep last sample per chain). Train NPE on all four SBIBM tasks (Linear Gaussian, Mixture Gaussian, Two Moons, SLCP) at simulation budgets 10^3, 10^4, 10^5. Obtain 10 ground-truth posteriors per task. Generate N posterior samples from each NPE model and compute C2ST scores to establish the NPE baseline for comparison with Simformer.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: NPE baseline establishes the comparison point for Simformer superiority"
+    ],
+    "rubric_requirement_ids": [
+      "af3a4299-578a-4cdd-abb6-021e5c1f5c7d",
+      "028a6cbe-387e-456d-941c-0c4a4b970dd5",
+      "1e941abb-e1d9-4f91-958c-db60dad4c82e",
+      "0051bf87-8706-4531-9b1d-00bbb499d8e4",
+      "bc21d6d1-49a5-45d0-93cc-cb42241275b4",
+      "174cb2a9-b358-4ca7-86e0-ea85ac02cc93",
+      "a5d7b1c2-bf1e-4b84-a3ad-995892f597b8",
+      "f2ad95c5-369c-4c20-859e-2f4931957879",
+      "a4ad0e3d-c2ff-417d-a9b4-6b8bbcd00669",
+      "2ac19789-276a-4951-9d90-ba7a357511fb",
+      "fd64cfd0-746e-4441-bdc5-2b9bbef4e680",
+      "8f6a3486-8f4c-4c48-ab4f-9e0e8f16bf13",
+      "183cc3f0-b19b-4a34-a217-5b912f33b69c",
+      "6a97b353-6945-48ab-96cf-63640b596fbb"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "all-in-one_T05",
+    "goal": "Train three Simformer variants (dense, undirected-graph, directed-graph attention) with 6 layers, token dim 50, 4 heads, key/query/value dim 10, Fourier metadata embedding 128d, Fourier time embedding 256d, FF hidden dim 150, batch size 1000, Adam optimizer, VESDE, on all four SBIBM tasks (Linear Gaussian, Mixture Gaussian, Two Moons, SLCP) at simulation budgets 10^3, 10^4, 10^5. For each trained model, generate N posterior samples from 10 reference observations and compute C2ST. Verify that Simformer variants almost always outperform NPE and that structured attention significantly outperforms dense on Linear Gaussian and SLCP.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: Simformer outperforms NPE on standard benchmark tasks",
+      "C02: Structured attention masks yield significant C2ST improvement on tasks with dependency structure"
+    ],
+    "rubric_requirement_ids": [
+      "cdf1bfdd-53dd-420a-83f6-0a110ba9d765",
+      "e9edc2a0-3809-4e69-b9b6-1686b2955aa9",
+      "32e4ef3f-9fdc-4845-a2ac-7c988141c039",
+      "da87d682-3f30-443c-b318-8bb158048285",
+      "5963d717-2765-4535-80d8-8a92a9052a21",
+      "85db9bf8-1b9c-4d82-8b53-1813b1d31b3a",
+      "b18e9e5a-0079-420f-9222-4380004418ef",
+      "831ca2ca-49a9-46c0-a63a-a39c877050a5",
+      "7ec03b27-0737-4e4a-9581-bc4720744a1a",
+      "237efc4f-17f7-4078-b987-802bebdefa43",
+      "71d1e184-3e0e-46da-883c-c8a55244c3b5",
+      "3628b28c-b00b-458e-8e1d-1ac6f5e47411",
+      "8f4524fc-48f5-4615-bd33-aedc2aa58d3a",
+      "a7604584-412e-4c92-9b49-7063bf40af90",
+      "1755440f-b437-4700-b2c0-5740d5188fa4"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T06",
+    "goal": "Complete the posterior benchmark C2ST evaluation. Train Simformer variants (dense, undirected, directed) on Mixture Gaussian, Two Moons, and SLCP at budgets 10^3, 10^4, 10^5. Generate N posterior samples from each trained model and compute C2ST for all four SBIBM tasks (including Linear Gaussian from T05). Verify that the structured Simformer achieves approximately 10x simulation efficiency over NPE averaged across all benchmark tasks.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: Simformer outperforms NPE across all four benchmark tasks",
+      "C02: Structured attention achieves ~10x simulation efficiency over NPE on average"
+    ],
+    "rubric_requirement_ids": [
+      "20c740b8-19b8-416e-b35b-e4d98db613d1",
+      "152f3333-1368-4e19-a14f-f68c1cc26eb7",
+      "fabc5fd9-a064-48d0-8da2-17bd643b8136",
+      "d47f5e4e-23ec-41f9-96c5-18a471eba572",
+      "629c1323-a808-4f83-9cfd-cdbe4d93cf46",
+      "ec9c4b69-613a-42c3-8224-cef629f103ce",
+      "3859bb58-dad4-4fe6-9c15-1b802e35ac9e",
+      "fe86ca91-12bb-4ceb-bc1b-254a7aa9aa42",
+      "5bbb52eb-424e-4711-9fad-48011f6af612",
+      "3a9eb157-8938-4dcc-be3d-a3a8bd128a6b",
+      "157423ff-ee2b-437e-b2ca-bcec8d433b3b",
+      "56cf845a-2871-4367-ab5f-de7eeca6ad8a",
+      "2270f417-52ab-4467-89ab-abbd8f8bc4ea",
+      "59965170-0553-49cb-9c56-10f156301c77",
+      "1149eae8-db2d-45ae-ac54-77551d12013d"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T07",
+    "goal": "Reproduce the arbitrary-conditional evaluation from Section 4.1 (Figure 4b). Prepare the Tree and HMM structured tasks with HMC-based reference sampling (5000 HMC steps per chain, N>=1000 samples). Train Simformer variants (dense, undirected, directed) with 6 layers at budgets 10^3, 10^4, 10^5 on Tree, HMM, Two Moons, and SLCP. For each task, generate MCMC ground-truth samples for 100 randomly selected conditionals, produce matching Simformer samples, compute C2ST for each conditional, and verify all models achieve mean C2ST below 0.7 at 10^5 simulations.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C03: A single Simformer accurately estimates arbitrary conditionals of the joint distribution",
+      "C06: Training on all conditionals simultaneously does not degrade posterior-only accuracy"
+    ],
+    "rubric_requirement_ids": [
+      "1f652a29-c4c5-4d71-a7e5-9071b6a7da18",
+      "acc664bc-89fb-4b2d-8813-330dc6a109b7",
+      "35e0a7bf-ddf7-429e-a1e3-a298bffcc301",
+      "462ad866-65cb-4e08-bbd4-83dd471d9358",
+      "36605b43-ee09-4877-a74e-c5250de7a110",
+      "6fc3436c-8304-4955-801b-0e35528e425d",
+      "52f952b5-752a-4f30-9b53-edd0a3543361",
+      "293a5a7e-aa99-420c-9af6-9c47e07bedb3",
+      "bc5f359e-8302-4a9d-a617-6e3312aea9cc",
+      "321d7fd3-71de-4092-907f-c6197f0a7f69",
+      "ee48f977-2f31-4cb6-a34f-589699af5fa3",
+      "dbb902c0-3beb-475e-b1e4-e93ba3d9a3d9",
+      "0ec528ea-7dc7-4420-ae51-359d30bacd47",
+      "4a7698c5-edcd-4b67-a17b-a0f1230856a7",
+      "5fdb707e-4c2d-4a5d-96d6-d798c260dd79"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T08",
+    "goal": "Complete the arbitrary-conditional C2ST evaluation for all four tasks (Tree, HMM, Two Moons, SLCP). Compute C2ST between model-generated and MCMC ground-truth samples for each task at all simulation budgets. Verify all Simformer models achieve C2ST below 0.7 at 10^5. Additionally reproduce the Lotka-Volterra experiment from Section 4.2: implement the predator-prey ODE simulator with Gaussian noise sigma=0.1, train an 8-layer dense-attention Simformer at 10^3/10^4/10^5, and verify C2ST<0.65 for posterior and C2ST<0.75 for arbitrary conditionals using the ~10x simulation-efficiency metric.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C03: Simformer estimates arbitrary conditionals accurately across structured tasks",
+      "C04: Simformer handles unstructured irregularly sampled data (Lotka-Volterra)"
+    ],
+    "rubric_requirement_ids": [
+      "5730c287-4b2c-43de-8b46-c60219839c1d",
+      "dd3a0c20-a060-420d-ab30-2d2f306e1592",
+      "82cb5063-8d65-4270-bbf2-263bed38d932",
+      "409deb4c-dab8-4430-ac6d-9ca3026707e3",
+      "c2239ebc-0b8c-4651-9561-353cc0db8ce2",
+      "77fa71bf-bb82-4bfc-b03b-428b37278f91",
+      "913b099a-e731-4a8a-8a91-ccfb4ef5e650",
+      "7413d98d-aa4b-4dd4-90b7-acf047652b39",
+      "a2fe39cd-7147-490e-ad88-49b391d9b2a0",
+      "c1fdd141-a393-4471-abc9-02347a235cbb",
+      "0ece9e6e-a75c-4aa1-aad8-bf5fead43be6",
+      "2a4fd54c-7609-4bca-be6e-821a1b941bd9",
+      "99bb3116-25c7-4b6f-9f09-e97f8b0339eb",
+      "86499107-3abb-4381-9c83-359efa66286a",
+      "b858fec6-3c95-4e5e-89e1-02d441f30cab"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T09",
+    "goal": "Reproduce the Lotka-Volterra (Section 4.2) and SIRD (Section 4.3) application experiments. For Lotka-Volterra: implement the predator-prey ODE simulator with Gaussian noise (sigma=0.1) operating on the full time-series without summary statistics, train an 8-layer Simformer on 10^5 simulations, condition on 4 irregular prey observations to infer posterior and posterior predictives, then add 9 predator observations and verify that uncertainty decreases, ground-truth parameters lie within high-probability regions, and C2ST is below 0.65 for posterior and below 0.75 for arbitrary conditionals.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: Simformer handles unstructured data and function-valued parameters",
+      "C03: Simformer produces well-calibrated posterior predictives for complex simulators"
+    ],
+    "rubric_requirement_ids": [
+      "9f70a4e5-0896-4778-814a-1a3dee705854",
+      "bcf546a2-f0a7-42e5-9956-3bc18b67483a",
+      "efe8edda-ebfa-4363-b13a-28bcb3d95ae3",
+      "aa888ef9-bcd4-429d-801b-c0ec0b989e57",
+      "7ec881a6-1960-450d-a466-12f0ba03d52d",
+      "f4bb304f-5350-49e4-ba0a-c57b664c42ba",
+      "1f9a15cb-263a-4fb9-957f-2eab2212ffb0",
+      "2da3fc50-59bb-466c-b167-7cf44c86e029",
+      "6cae1579-72c2-4f69-8c5f-47a6a3941aa9",
+      "c31c4bfa-12c2-4326-adb4-7cf06384a800",
+      "0f4a0b23-a0d9-4f11-bc99-9af8c899ad7b",
+      "df75afbb-c140-4a59-acb6-df5986ef1780",
+      "2551546a-de57-439f-8a62-0090e278638b",
+      "173a3eec-8d27-4b7f-8960-678a592e926d",
+      "e87233c0-481d-4b86-bae8-bd37448a9231"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "all-in-one_T10",
+    "goal": "Reproduce the SIRD (Section 4.3) and Hodgkin-Huxley (Section 4.4) experiments with guided diffusion for interval constraints (Algorithm 1). For SIRD: implement the epidemic simulator with time-varying contact rate beta(t) from GP+RBF+sigmoid, uniform gamma/delta prior [0,0.5], log-normal noise sigma=0.05, train 8-layer dense Simformer, verify parameter recovery and predictive fit for both scenarios (5 I/R/D observations; 4 beta + 1 death observation). For HH: implement the simulator with 7 parameters, V0=-65mV, 200ms, 4mA input 50-150ms, rate functions, voltage summaries, metabolic energy. Implement Algorithm 1 (self-recurrence r, c(x)=x-u, s(t)=1/sigma^2). Train 8-layer dense Simformer. Verify unconstrained posterior and apply energy-interval constraint (lowest 10% quantile) via guided diffusion.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C05: Guided diffusion enables conditioning on observation intervals without retraining",
+      "C04: Simformer handles function-valued parameters (SIRD time-varying contact rate)"
+    ],
+    "rubric_requirement_ids": [
+      "b96b17cd-fe54-4a06-9c95-5883018d631e",
+      "6c80714a-4f4e-4cae-9792-9fff064e4e5f",
+      "22bc638a-ddbe-40f5-9de2-4436b28f62bf",
+      "4332dc3c-76d7-4b84-b317-35e82990b266",
+      "19f4319f-3056-4264-8fe4-3b4d13fe7a27",
+      "a0b66551-0aea-443f-8936-bc8db21c949b",
+      "e0c85d33-977f-4839-b149-312cdfcd5b34",
+      "a0864d9d-71ad-4650-aa62-150dd52c2b05",
+      "78909e7b-adc2-430f-8d2c-698f870ae046",
+      "81423255-fefa-410a-869f-5fba0a9ce93c",
+      "eeb98ce1-14b2-47f2-af99-c0f06c1ee5f3",
+      "a4c1f3af-b890-4414-947c-83ce4ce49ef4",
+      "aa314a14-d24f-4371-9738-ea3f62cb9a6c",
+      "6e727597-f426-43da-9dd2-481dbc2c2b4b",
+      "296dadfa-105d-4e23-aedd-9ce6cde8836b"
+    ],
+    "n_requirements": 15
+  }
+]

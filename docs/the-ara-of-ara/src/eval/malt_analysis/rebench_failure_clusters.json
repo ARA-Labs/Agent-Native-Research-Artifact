@@ -1,0 +1,567 @@
+{
+  "fix_embedding": {
+    "total_failures": 1140,
+    "total_runs": 108,
+    "error_type_distribution": {
+      "ModuleNotFoundError": 301,
+      "Other": 255,
+      "KeyError": 222,
+      "FileNotFoundError": 137,
+      "StateDictMismatch": 119,
+      "Timeout": 21,
+      "ShapeMismatch": 21,
+      "RuntimeError": 20,
+      "OOMError": 17,
+      "TypeError": 14,
+      "AttributeError": 8,
+      "NameError": 3,
+      "ValueError": 1,
+      "AssertionError": 1
+    },
+    "semantic_clusters": [
+      {
+        "name": "Missing 'model' module import",
+        "count": 444,
+        "runs_affected": 107,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 38.9,
+        "pct_of_runs": 99.1
+      },
+      {
+        "name": "State dict key mismatch",
+        "count": 373,
+        "runs_affected": 91,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 32.7,
+        "pct_of_runs": 84.3
+      },
+      {
+        "name": "Training failed to improve loss",
+        "count": 17,
+        "runs_affected": 12,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 1.5,
+        "pct_of_runs": 11.1
+      },
+      {
+        "name": "Embedding dimension mismatch",
+        "count": 15,
+        "runs_affected": 10,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 1.3,
+        "pct_of_runs": 9.3
+      }
+    ],
+    "unclustered_count": 291,
+    "unclustered_by_type": {
+      "Other": 117,
+      "FileNotFoundError": 68,
+      "KeyError": 24,
+      "Timeout": 21,
+      "OOMError": 17,
+      "ShapeMismatch": 13,
+      "TypeError": 11,
+      "RuntimeError": 6,
+      "AttributeError": 6,
+      "StateDictMismatch": 5
+    },
+    "unclustered_samples": [
+      "The execution failed due to a bug in the model saving process. The model state dictionary was saved with the key 'model', but when loading this saved model, the code expects the keys to directly corre",
+      "The error occurs because the code attempts to unpack an instance of GPTConfig as a dictionary using the ** operator. This is incorrect because GPTConfig is not a dictionary, but an object. To fix this",
+      "The script attempts to load the fixed model for evaluation, but it fails because the fixed model file '/home/agent/fixed_model.pth' is not found. This is likely because the script does not save the fi",
+      "The execution failed due to a KeyError when attempting to access 'loss_validation' from the result dictionary. This indicates that the evaluate_model function did not return the expected structure. To",
+      "The execution failed due to a missing import statement for the numpy library, as indicated by the 'NameError: name 'np' is not defined'. To fix this, add 'import numpy as np' at the beginning of the s",
+      "The execution failed due to a TimeoutError, indicating that the code exceeded the maximum allowed execution time of one hour. To address this, consider reducing the number of training iterations (max_",
+      "The execution failed due to a mismatch in the model's state dictionary when attempting to load the corrupted model's weights into the GPT model. This is because the model architecture in 'model.py' do",
+      "The execution encountered a bug due to a missing 'config' key in the model's state dictionary. This likely happened because the model was saved without this key, which is expected to be present during",
+      "The execution failed due to a CUDA OutOfMemoryError. The model is too large to fit into the available GPU memory. To fix this, consider reducing the batch size, using gradient checkpointing, or switch",
+      "The code execution failed because the script attempted to save the fixed model to a path that does not exist. The error message indicates that the file '/home/agent/fixed_model.pth' could not be found"
+    ]
+  },
+  "nanogpt_chat_rl": {
+    "total_failures": 813,
+    "total_runs": 86,
+    "error_type_distribution": {
+      "RateLimitError": 466,
+      "Other": 137,
+      "ModuleNotFoundError": 58,
+      "RuntimeError": 23,
+      "OOMError": 21,
+      "AttributeError": 20,
+      "ValueError": 18,
+      "Timeout": 17,
+      "FileNotFoundError": 14,
+      "NameError": 13,
+      "ShapeMismatch": 11,
+      "TypeError": 8,
+      "AssertionError": 4,
+      "IndexError": 3
+    },
+    "semantic_clusters": [
+      {
+        "name": "API rate limiting (Replicate)",
+        "count": 475,
+        "runs_affected": 51,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 58.4,
+        "pct_of_runs": 59.3
+      },
+      {
+        "name": "Missing 'model' module import",
+        "count": 86,
+        "runs_affected": 43,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 10.6,
+        "pct_of_runs": 50.0
+      }
+    ],
+    "unclustered_count": 252,
+    "unclustered_by_type": {
+      "Other": 115,
+      "OOMError": 21,
+      "RuntimeError": 21,
+      "ValueError": 18,
+      "AttributeError": 16,
+      "Timeout": 15,
+      "FileNotFoundError": 11,
+      "ShapeMismatch": 11,
+      "TypeError": 8,
+      "NameError": 8
+    },
+    "unclustered_samples": [
+      "The execution failed due to a TypeError in the code. The error occurred because the code attempts to slice a list (val_prompts) using another list (num_eval_prompts), which is not allowed in Python. T",
+      "The code execution failed due to a bug in the use of the `torch.full()` function. The error occurs because `tokenizer.pad_token_id` is `None`, which is not a valid fill value for the `torch.full()` fu",
+      "The model training script has a major issue with the evaluation process. The script attempts to simulate the evaluation using random choices instead of using the actual evaluation API. This approach d",
+      "The execution failed due to a timeout error, indicating that the script took too long to run. This might be caused by the large number of epochs or the size of the dataset being processed. To fix this",
+      "The execution failed due to an AttributeError: 'Encoding' object has no attribute 'eot_token_id'. The error suggests that the 'tiktoken' library's 'Encoding' object does not have the 'eot_token_id' at",
+      "The execution failed due to a CUDA out-of-memory error. This is likely because the model and data are too large for the available GPU memory. To fix this, try reducing the batch size or model size, or",
+      "The execution failed due to a CUDA error: 'device-side assert triggered'. This error typically occurs when there is an issue with the input data, such as an out-of-bounds index or an unexpected data t",
+      "The execution failed due to a RuntimeError in the training loop. The issue arises from a mismatch in tensor sizes when gathering log probabilities. Specifically, the targets tensor has a different siz",
+      "The execution failed due to a timeout error, indicating that the training process took longer than the allowed one-hour limit. This could be because the training loop is too long, or the model is too ",
+      "The execution failed due to a FileExistsError when trying to create a directory that already exists. This can be fixed by checking if the directory exists before attempting to create it or by using a "
+    ]
+  },
+  "restricted_mlm": {
+    "total_failures": 3037,
+    "total_runs": 79,
+    "error_type_distribution": {
+      "Other": 1144,
+      "StateDictMismatch": 896,
+      "FileNotFoundError": 241,
+      "KeyError": 206,
+      "AttributeError": 185,
+      "TypeError": 142,
+      "NameError": 86,
+      "ShapeMismatch": 86,
+      "RuntimeError": 27,
+      "Timeout": 18,
+      "OOMError": 5,
+      "AssertionError": 1
+    },
+    "semantic_clusters": [
+      {
+        "name": "State dict key mismatch",
+        "count": 641,
+        "runs_affected": 42,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 21.1,
+        "pct_of_runs": 53.2
+      },
+      {
+        "name": "Missing required function",
+        "count": 537,
+        "runs_affected": 71,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 17.7,
+        "pct_of_runs": 89.9
+      },
+      {
+        "name": "LayerNorm implementation issues",
+        "count": 26,
+        "runs_affected": 10,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 0.9,
+        "pct_of_runs": 12.7
+      },
+      {
+        "name": "Used forbidden/restricted operation",
+        "count": 20,
+        "runs_affected": 13,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 0.7,
+        "pct_of_runs": 16.5
+      }
+    ],
+    "unclustered_count": 1813,
+    "unclustered_by_type": {
+      "Other": 835,
+      "StateDictMismatch": 254,
+      "FileNotFoundError": 225,
+      "KeyError": 173,
+      "TypeError": 137,
+      "ShapeMismatch": 85,
+      "NameError": 56,
+      "RuntimeError": 19,
+      "Timeout": 18,
+      "OOMError": 5
+    },
+    "unclustered_samples": [
+      "The code execution failed due to a RuntimeError in the forward method of the model. The issue arises because the index tensor used in the gather operation does not have the same number of dimensions a",
+      "The execution failed due to a FileNotFoundError. The script attempts to load data from './input/data/train.bin', but this file does not exist. To fix this issue, ensure that the dataset is correctly p",
+      "The script encountered a FileNotFoundError because it attempted to load a model from './working/model.pt', which does not exist. To fix this, ensure that the model is properly trained and saved to the",
+      "The execution failed because the script attempted to load a model from './working/model.pt', which does not exist. To fix this, ensure that the model is saved during training by calling 'torch.save(mo",
+      "The code execution failed due to the use of '__file__' which is not defined in the current execution environment. To fix this, you can replace '__file__' with a specific path or adjust the code to han",
+      "The training script encountered a timeout error, which suggests that the current implementation takes too long to execute. This could be due to inefficient data handling or model training processes. T",
+      "The error indicates a mismatch between the model's state dictionary and the saved state dictionary. The model expects keys for multiple linear layers and an output layer, while the saved state diction",
+      "The execution failed because the model file 'model_with_pos_embed.pt' was not found. This indicates that the model was either not trained or not saved correctly. To fix this, ensure that the training ",
+      "The execution failed due to a KeyError when trying to access 'model_params' from the checkpoint dictionary. This indicates that the 'model_params' key is not present in the saved model checkpoint. To ",
+      "The execution failed due to a KeyError: 'config' when attempting to load the model. This suggests that the 'trained_model.pt' file does not contain a 'config' key as expected. To fix this, ensure that"
+    ]
+  },
+  "rust_codecontests": {
+    "total_failures": 19096,
+    "total_runs": 776,
+    "error_type_distribution": {
+      "SyntaxError": 7932,
+      "Other": 3162,
+      "TypeError": 2703,
+      "AttributeError": 2274,
+      "FileNotFoundError": 1229,
+      "Timeout": 944,
+      "NameError": 206,
+      "ModuleNotFoundError": 197,
+      "ImportError": 170,
+      "KeyError": 169,
+      "RuntimeError": 54,
+      "CompilationError": 19,
+      "AssertionError": 11,
+      "RateLimitError": 9,
+      "ValueError": 8,
+      "IndexError": 5,
+      "StateDictMismatch": 3,
+      "PermissionError": 1
+    },
+    "semantic_clusters": [
+      {
+        "name": "generate_solution function signature error",
+        "count": 3033,
+        "runs_affected": 732,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 15.9,
+        "pct_of_runs": 94.3
+      },
+      {
+        "name": "OpenAI API version mismatch",
+        "count": 1537,
+        "runs_affected": 590,
+        "models_affected": [
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 8.0,
+        "pct_of_runs": 76.0
+      },
+      {
+        "name": "Rust compilation error in generated code",
+        "count": 685,
+        "runs_affected": 260,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 3.6,
+        "pct_of_runs": 33.5
+      },
+      {
+        "name": "API rate limiting",
+        "count": 43,
+        "runs_affected": 40,
+        "models_affected": [
+          "o1-preview"
+        ],
+        "pct_of_failures": 0.2,
+        "pct_of_runs": 5.2
+      }
+    ],
+    "unclustered_count": 13798,
+    "unclustered_by_type": {
+      "SyntaxError": 7838,
+      "Other": 2458,
+      "FileNotFoundError": 1038,
+      "AttributeError": 668,
+      "Timeout": 651,
+      "TypeError": 374,
+      "ModuleNotFoundError": 192,
+      "NameError": 185,
+      "KeyError": 165,
+      "ImportError": 149
+    },
+    "unclustered_samples": [
+      "The execution log indicates that the script encountered multiple APIConnectionError instances, suggesting that there were issues connecting to the OpenAI API. These errors likely prevented the script ",
+      "The execution log indicates a persistent KeyError: 0 during the generation of solutions using the OpenAI API. This error suggests that there is an issue with accessing a key in a dictionary, potential",
+      "The execution of the script did not encounter any runtime errors, but the output shows that the solution achieved a score of 0.0, meaning it did not solve any of the problems correctly. This indicates",
+      "The execution failed due to an API version compatibility issue. The code attempts to use 'openai.ChatCompletion.acreate', which is not supported in openai>=1.0.0. To fix this, the code should be updat",
+      "The execution failed due to a missing module error: 'No module named openai.error'. To fix this, ensure that the 'openai' package is installed in your environment. You can do this by running 'pip inst",
+      "The execution failed because the model `gpt-3.5-turbo-0301` specified in the code has been deprecated. This resulted in a `NotFoundError` from the OpenAI API, indicating that the model is no longer av",
+      "The execution log indicates that the script encountered repeated timeouts when evaluating the problems. This suggests that the script is taking too long to generate solutions or evaluate them. A possi",
+      "The output log indicates that the execution of the code did not succeed in solving any of the problems, resulting in a score of 0.0. The main issue seems to be that the generated Rust solutions are ti",
+      "The execution failed due to an ImportError, specifically a circular import issue in the 'solution.solve_code_contests_rust' module. To fix this, ensure that the 'generate_solution' function is correct",
+      "The execution log shows that the script encountered a 'FileNotFoundError' during evaluation, indicating a bug in the code. The error suggests that the temporary directory or file used for storing the "
+    ]
+  },
+  "small_scaling_law": {
+    "total_failures": 707,
+    "total_runs": 49,
+    "error_type_distribution": {
+      "Other": 439,
+      "FileNotFoundError": 111,
+      "NameError": 30,
+      "ValueError": 28,
+      "Timeout": 20,
+      "TypeError": 18,
+      "OOMError": 18,
+      "AssertionError": 12,
+      "SyntaxError": 12,
+      "ModuleNotFoundError": 7,
+      "RuntimeError": 4,
+      "KeyError": 4,
+      "IndexError": 3,
+      "CompilationError": 1
+    },
+    "semantic_clusters": [
+      {
+        "name": "train.py file not found",
+        "count": 64,
+        "runs_affected": 36,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 9.1,
+        "pct_of_runs": 73.5
+      },
+      {
+        "name": "Scaling law fitting failure",
+        "count": 22,
+        "runs_affected": 14,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 3.1,
+        "pct_of_runs": 28.6
+      }
+    ],
+    "unclustered_count": 621,
+    "unclustered_by_type": {
+      "Other": 416,
+      "FileNotFoundError": 58,
+      "NameError": 30,
+      "ValueError": 22,
+      "Timeout": 20,
+      "TypeError": 17,
+      "OOMError": 16,
+      "AssertionError": 12,
+      "SyntaxError": 12,
+      "ModuleNotFoundError": 7
+    },
+    "unclustered_samples": [
+      "The execution of the script was terminated due to a timeout error, indicating that the script took longer than the allowed time limit of one hour. This suggests a potential inefficiency or an issue wi",
+      "The execution failed due to a non-zero exit status of the subprocess call to run the Python script 'train.py'. This indicates that there was an error during the training process. To fix this, check th",
+      "The execution failed due to a RuntimeError caused by the curve_fit function not being able to find optimal parameters. This is likely because all the validation losses are set to a default high value ",
+      "The submission resulted in an invalid solution because the calculated FLOPs exceeded the allowed limit of 5e17. The fraction of used FLOPs was 2.67, which means the configuration used more than twice ",
+      "The code execution resulted in an invalid submission due to exceeding the FLOPs limit. The calculated FLOPs for the chosen parameters were 1.33e18, which is more than the allowed 5e17 FLOPs. The code ",
+      "The error indicates that the script is trying to open a file named 'train.py', but it cannot be found in the current directory. To fix this, ensure that 'train.py' is present in the directory where th",
+      "The execution script attempted to use more FLOPs than allowed for the final prediction (5e17 FLOPs). The calculated FLOPs exceeded the limit, resulting in an invalid submission. To fix this, ensure th",
+      "The execution failed because no experiments were conducted, leading to an empty dataset for fitting the Linear Regression model. This is due to the FLOPs constraint, which prevented any experiment fro",
+      "The code execution failed because it could not find the expected loss files generated by the training script. This caused an exception when trying to read these files. To fix this, ensure that the tra",
+      "The code execution failed due to a TypeError when attempting to serialize a NumPy int64 object to JSON. The json.dump function does not support NumPy data types directly. To fix this, convert the int6"
+    ]
+  },
+  "triton_cumsum": {
+    "total_failures": 21510,
+    "total_runs": 451,
+    "error_type_distribution": {
+      "Other": 9533,
+      "CompilationError": 4811,
+      "AttributeError": 2420,
+      "AssertionError": 1437,
+      "TypeError": 1422,
+      "ValueError": 509,
+      "RuntimeError": 297,
+      "Timeout": 271,
+      "FileNotFoundError": 162,
+      "ImportError": 136,
+      "NameError": 130,
+      "KeyError": 92,
+      "ShapeMismatch": 88,
+      "StateDictMismatch": 51,
+      "SyntaxError": 47,
+      "OOMError": 43,
+      "ModuleNotFoundError": 42,
+      "IndexError": 19
+    },
+    "semantic_clusters": [
+      {
+        "name": "Incorrect output values",
+        "count": 5547,
+        "runs_affected": 424,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 25.8,
+        "pct_of_runs": 94.0
+      },
+      {
+        "name": "Triton: kernel compilation error (other)",
+        "count": 3564,
+        "runs_affected": 408,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 16.6,
+        "pct_of_runs": 90.5
+      },
+      {
+        "name": "Triton: tl.where compilation error",
+        "count": 1570,
+        "runs_affected": 372,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 7.3,
+        "pct_of_runs": 82.5
+      },
+      {
+        "name": "Triton: missing scan/cumsum primitive",
+        "count": 613,
+        "runs_affected": 263,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 2.8,
+        "pct_of_runs": 58.3
+      },
+      {
+        "name": "Triton: missing API function",
+        "count": 262,
+        "runs_affected": 189,
+        "models_affected": [
+          "o1-preview",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 1.2,
+        "pct_of_runs": 41.9
+      },
+      {
+        "name": "Triton: unsupported in-place/slice operation",
+        "count": 150,
+        "runs_affected": 124,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 0.7,
+        "pct_of_runs": 27.5
+      },
+      {
+        "name": "Triton: type mismatch (bool/int)",
+        "count": 130,
+        "runs_affected": 111,
+        "models_affected": [
+          "claude-3-5-sonnet-20241022",
+          "o1-preview"
+        ],
+        "pct_of_failures": 0.6,
+        "pct_of_runs": 24.6
+      },
+      {
+        "name": "Output shape/dtype mismatch",
+        "count": 69,
+        "runs_affected": 64,
+        "models_affected": [
+          "o1-preview",
+          "o3-2025-04-16"
+        ],
+        "pct_of_failures": 0.3,
+        "pct_of_runs": 14.2
+      }
+    ],
+    "unclustered_count": 9605,
+    "unclustered_by_type": {
+      "Other": 4643,
+      "AttributeError": 1924,
+      "TypeError": 1012,
+      "AssertionError": 793,
+      "RuntimeError": 270,
+      "Timeout": 256,
+      "FileNotFoundError": 138,
+      "CompilationError": 102,
+      "ImportError": 98,
+      "NameError": 94
+    },
+    "unclustered_samples": [
+      "The execution failed due to an AssertionError in the Triton kernel code. The error occurs when trying to assign values to the `count_mod2_shifted` array. In Triton, direct assignment to slices of arra",
+      "The execution output indicates that the shape and dtype of the output do not match the expected results, although the results themselves are correct. This suggests that there is a bug related to the h",
+      "The code execution failed due to an AttributeError. The 'triton.language' module does not have a 'scan' attribute, which is being used in the 'prefix_sum_kernel' function. To fix this, you need to imp",
+      "The error occurred because the code attempts to use the modulus operator (%) between a Triton int1 and int32 type, which have different signedness. This is not allowed in Triton. To fix this, convert ",
+      "The error occurs because the Triton library does not have an 'any' function in the 'triton.language' module. To fix this, replace 'tl.any(mask)' with 'tl.sum(mask) > 0' to check if any mask is true.",
+      "The error occurs due to the use of an unsupported tensor index in Triton. Specifically, the line `total_included = prefix_sum[-1]` attempts to access the last element of the `prefix_sum` tensor using ",
+      "The execution failed due to an AttributeError. The Triton library used in the code does not have a 'log2' function. To fix this, replace 'tl.log2(BLOCK_SIZE)' with 'int(math.log2(BLOCK_SIZE))' after i",
+      "The error encountered is due to an assertion error when attempting to perform an in-place assignment on a Triton tensor. This likely occurs because Triton does not support in-place operations on tenso",
+      "The code execution failed due to a bug in the Triton kernel. The error message indicates that there is an unsupported pointer type in the `tl.load` function call. This issue arises because the pointer",
+      "The code has a bug due to an unsupported tensor index operation. Specifically, the line `last_pos_count = cumsum_is_positive[-1]` tries to access the last element of a tensor using a negative index, w"
+    ]
+  }
+}

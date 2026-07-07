@@ -1,0 +1,95 @@
+session:
+  id: "2026-03-17_001"
+  timestamp: "2026-03-17T00:30"
+  summary: "Pilot reproduction run for sequential-neural-score-estimation — ARA 74% vs baseline ~14%, 5x advantage"
+
+events_logged:
+  - type: decision
+    id: N57
+    provenance: user
+    summary: "Pilot reproduction on sequential-neural-score-estimation with mega-task design"
+
+  - type: experiment
+    id: N58
+    provenance: ai-executed
+    summary: "ARA condition: 80/108 (74%) — T01-T07 perfect implementation, T08-T10 not completed"
+
+  - type: experiment
+    id: N59
+    provenance: ai-executed
+    summary: "Baseline condition: ~15/108 (14%) — only 2 code files, no RESULT.md"
+
+  - type: decision
+    id: N60
+    provenance: ai-executed
+    summary: "Increased token budget 2M→10M and bash timeout 600s→1800s after first budget exhaustion"
+
+  - type: dead_end
+    id: N61
+    provenance: ai-suggested
+    summary: "PDF token caching makes baseline ~4x more expensive per turn — budget asymmetry needed"
+
+  - type: observation
+    id: O36
+    provenance: ai-suggested
+    summary: "ARA agent pivoted to scipy fallback faster than baseline — structured env.md guides decisions"
+
+  - type: observation
+    id: O37
+    provenance: ai-executed
+    summary: "Implementation tasks perfect under ARA; experimental debugging is the remaining gap"
+
+  - type: observation
+    id: O38
+    provenance: ai-suggested
+    summary: "Cumulative token accounting penalizes PDF caching — need asymmetric budgets or discount"
+
+  - type: observation
+    id: O39
+    provenance: ai-executed
+    summary: "Fixed run_agent.py _read_agent_outputs to rglob subdirectories"
+
+ai_actions:
+  - action: "Cloned snpse_icml repo to code/repos/sequential-neural-score-estimation"
+    provenance: ai-executed
+    files_changed: ["code/repos/sequential-neural-score-estimation/"]
+
+  - action: "Increased MAX_TOTAL_INPUT_TOKENS to 10M, MAX_TOTAL_OUTPUT_TOKENS to 2M, BASH_DEFAULT_TIMEOUT to 1800s"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/run_agent.py"]
+
+  - action: "Fixed _read_agent_outputs to rglob('*.py') and rglob for data files"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/run_agent.py"]
+
+  - action: "Ran ARA condition mega-task (133 turns, 87 min, 8.7M tokens)"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/sequential-neural-score-estimation_ara_seed0/"]
+
+  - action: "Ran baseline condition mega-task (68 turns, 56 min, 1.8M tokens)"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/sequential-neural-score-estimation_baseline_seed0/"]
+
+  - action: "Ran judge on ARA condition — 80/108 (74%) success rate"
+    provenance: ai-executed
+    files_changed: ["code/eval/reproduction/results/sequential-neural-score-estimation_ara_seed0/_judge_result.json"]
+
+  - action: "Sent 4 progress emails via send.py during experiment"
+    provenance: ai-executed
+    files_changed: []
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "Run full-scale reproduction on remaining 14 PaperBench papers"
+  - "Fix token budget asymmetry for PDF-heavy baselines (per-subtask mode or cached-token discounting)"
+  - "Debug NPSE posterior quality issue (C2ST ~1.0) — may need longer training or ODE solver tuning"
+  - "Consider running baseline with larger budget or per-subtask to get fair comparison"
+
+ai_suggestions_pending:
+  - "O36: ARA enables faster dead-end recognition via structured environment.md — could be a new claim"
+  - "O37: ARA's value ceiling may be 'what to build' not 'how to debug' — implications for artifact design"
+  - "O38: Token accounting methodology needs revision for fair ARA-vs-PDF comparison"

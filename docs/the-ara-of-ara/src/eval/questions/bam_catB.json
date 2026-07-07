@@ -1,0 +1,98 @@
+{
+  "paper_id": "bam",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "bam_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Open rubric/requirements.md and find requirement R01 about the BaM algorithm interface. (a) What are ALL the required inputs that BaM must accept? (b) What must BaM output? (c) Which ARA artifact file provides the function signature that satisfies this interface requirement, and does it match R01?",
+      "gold_answer": "R01 states: 'BaM has been implemented such that, at minimum, it takes batch size, inverse regularization (learning rate), the target score function, the initial mean and the initial covariance as input and outputs the estimated variational parameters.' Required inputs: batch size, inverse regularization (learning rate), target score function, initial mean, initial covariance. Required output: estimated variational parameters. The ARA file is src/execution/bam.py (or src/execution/bam_update.py), which should define a BaM function with these arguments.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Lists all 5 required inputs: batch size, inverse regularization, target score function, initial mean, initial covariance",
+        "States the output: estimated variational parameters",
+        "Identifies the correct ARA execution file and checks the function signature"
+      ],
+      "requires": ["rubric/requirements.md", "src/execution/bam.py"],
+      "rubric_requirement_id": "R01",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bam_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "In rubric/requirements.md, find requirements R14 and R15 which describe two ADVI variants. (a) What loss function does R14's variant substitute in place of ELBO? (b) What loss function does R15's variant use instead? (c) Other than the loss function, what does the rubric say must remain identical to standard ADVI for both variants? (d) Which ARA execution file implements these variants?",
+      "gold_answer": "R14 (ADVI Score): substitutes score-based divergence for ELBO. R15 (ADVI Fisher): substitutes Fisher divergence for ELBO. Both requirements state the variant must be 'identical to the ADVI implementation but rather than using ELBO loss, it uses [the new loss]' — meaning all other components (sampling, gradient update via Adam, algorithm structure) must remain the same. The ARA execution file is src/execution/advi.py, which should implement both variants as ADVI subclasses or conditional branches.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R14 uses score-based divergence",
+        "Correctly identifies R15 uses Fisher divergence",
+        "States that everything else (sampling, Adam update, structure) must be identical to ADVI",
+        "Cites src/execution/advi.py (or equivalent)"
+      ],
+      "requires": ["rubric/requirements.md", "src/execution/advi.py"],
+      "rubric_requirement_id": "R14, R15",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bam_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Find requirements R05 and R06 in rubric/requirements.md (both under 'Method Implementation', both with weight 2). (a) What equations must R05 implement for the U and V matrices? (b) What equations must R06 implement for updating the mean and covariance? (c) Which ARA algorithm file documents these equations, and does it provide the complete formula for the match step?",
+      "gold_answer": "R05: 'The match step in BaM has been implemented such that the U and V matrices have been implemented using the accumulated statistics from the batch step, as outlined in equations (10) and (11) and in step 6 of Algorithm 1.' Weight=2. R06: 'The match step has been implemented such that the U and V matrices are used along with the accumulated statistics and the inverse regularization to update the estimated mean and covariance using equations (12) and (13) as shown in step 7 of Algorithm 1.' Weight=2. The ARA file is logic/solution/algorithm.md, which should document equations (10)-(13) as part of the BaM match-step pseudocode.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States R05 concerns equations (10) and (11) for U/V matrices",
+        "States R06 concerns equations (12) and (13) for mean/covariance update",
+        "Notes both requirements have weight=2 (higher priority)",
+        "Identifies logic/solution/algorithm.md as the ARA coverage file"
+      ],
+      "requires": ["rubric/requirements.md", "logic/solution/algorithm.md"],
+      "rubric_requirement_id": "R05, R06",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bam_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "In rubric/requirements.md, search for the requirement about the score function for the deep generative model (VAE/CIFAR-10) experiment. Find the requirement that specifies what must be computed, and answer: (a) What is the exact score function formula required? (b) Which two components must be combined? (c) Which ARA execution file should implement this, and does ARA's artifact specify the formula there?",
+      "gold_answer": "The relevant requirement states: 'Code has been implemented such that the score function for the posterior (s(z) = nabla_z log p(z|x) = nabla_z log p(z) + nabla_z log p(x|z), where p(x|z) is the decoder network) can be computed (likely via an autodiff solution).' The two components are: (1) nabla_z log p(z) from the prior p(z) = N(0, I), and (2) nabla_z log p(x|z) from the Gaussian decoder likelihood. The ARA execution file is src/execution/gsm.py or src/execution/bam.py (VAE section), and the formula should be: s(z) = -z + (1/sigma^2)(x - Omega(z, theta_hat))^T nabla_z Omega, computed via autodiff through the pretrained decoder.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States the score function as s(z) = nabla_z log p(z|x) = nabla_z log p(z) + nabla_z log p(x|z)",
+        "Identifies the two components: prior score (-z) and decoder likelihood score",
+        "Notes autodiff is the recommended implementation approach",
+        "Identifies the ARA execution file"
+      ],
+      "requires": ["rubric/requirements.md", "src/execution/bam.py"],
+      "rubric_requirement_id": "score_function_VAE",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bam_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "In rubric/requirements.md, find the Code Execution requirements that specify minimum iteration counts for BaM experiments on non-Gaussian targets. (a) What minimum number of BaM VI iterations is required for the 10-dimensional sinh-arcsinh experiment with batch size B=5? (b) What minimum is required for the 256-dimensional Gaussian experiment with batch size B=150? (c) Which ARA evidence file contains the figure data from which these iteration counts can be inferred, and what does it show on the x-axis?",
+      "gold_answer": "For the sinh-arcsinh experiment (B=5): at least 10^4 (10,000) iterations of BaM VI must be run. For the 256-dimensional Gaussian experiment (B=150): at least 10^4 iterations (total gradient evaluations), which corresponds to approximately T=67 BaM iterations (10^4 / B = 10000/150 ~ 67). The ARA evidence file is evidence/figures/ (the figure corresponding to Figure 5.1 and 5.2), which shows the x-axis in gradient evaluations extending to approximately 10^4-10^5.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "States at least 10^4 BaM iterations for sinh-arcsinh experiment",
+        "States at least 10^4 gradient evaluations (~67 BaM iterations at B=150) for Gaussian experiment",
+        "Identifies the relevant ARA evidence file (figures showing gradient evaluations on x-axis)"
+      ],
+      "requires": ["rubric/requirements.md", "evidence/figures/"],
+      "rubric_requirement_id": "bam_iteration_requirements",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

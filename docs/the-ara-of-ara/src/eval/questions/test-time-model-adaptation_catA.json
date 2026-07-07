@@ -1,0 +1,101 @@
+{
+  "paper_id": "test-time-model-adaptation",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 9,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "test-time-model-adaptation_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the average accuracy (%) achieved by FOA (full precision, 32-bit) on ImageNet-C severity level 5 with ViT-Base, and how does it compare to TENT's accuracy under the same conditions?",
+      "gold_answer": "FOA achieves 66.3% average accuracy, compared to TENT's 59.6%. FOA outperforms TENT by 6.7 percentage points without using any backpropagation.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "test-time-model-adaptation_A02",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "In FOA's fitness function (Equation 5), what are the two components combined to evaluate candidate prompt solutions?",
+      "gold_answer": "The fitness function combines (1) prediction entropy (the sum of -ŷ_c log ŷ_c over all samples and classes) and (2) activation distribution discrepancy, measured as the L2 distance between the mean and standard deviation of CLS token activations of the test batch and those of the source in-distribution samples, summed over all N layers. These are weighted by a trade-off parameter λ.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "test-time-model-adaptation_A03",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the default values for the number of prompt embeddings (Np), population size (K), batch size (BS), step size (γ), and moving average factor (α) used in FOA's main experiments?",
+      "gold_answer": "Np = 3 (uniform initialization), K = 28 (= 4 + 3 × floor(log(prompt dim))), BS = 64, γ = 1.0, α = 0.1.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "test-time-model-adaptation_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What is the run-time memory usage of FOA (full precision) versus TENT and CoTTA at batch size 64, and what is the memory usage of FOA on an 8-bit quantized ViT at the same batch size? What is the approximate memory reduction ratio between TENT and FOA on 8-bit ViT?",
+      "gold_answer": "At BS=64: FOA (full precision) uses 832 MB, TENT uses 5,165 MB, and CoTTA uses 16,836 MB. FOA on 8-bit quantized ViT uses 208 MB. The reduction ratio is approximately 5,165 / 208 ≈ 24.8×, reported in the paper as a '24-fold' memory reduction.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "test-time-model-adaptation_A05",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does FOA use input prompts as the learnable parameters for CMA-ES optimization rather than directly optimizing model weights (e.g., normalization layer parameters as in TENT)?",
+      "gold_answer": "CMA-ES is intractable for ultra-high-dimensional optimization problems. Even TENT's approach of updating only normalization layer affine parameters involves millions of parameters across a deep model, making CMA infeasible. By restricting optimization to a small prompt (Np=3 embeddings of dimension d), the solution space dimension is drastically reduced to a manageable size for CMA, while also avoiding any modification to the frozen model weights.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "test-time-model-adaptation_A06",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does FOA use exponential moving averages (EMA) to estimate the center of OOD testing features for the activation shifting direction, rather than using only the current batch statistics? What evidence supports this design choice?",
+      "gold_answer": "Using only batch statistics (without EMA) is unreliable for small batch sizes. As shown in Table 14, Activation Shifting without EMA catastrophically fails at BS=1 (accuracy drops to 0.1%, below the NoAdapt baseline of 55.5%) and degrades significantly for BS<8. EMA accumulates statistics across sequentially arriving test batches to provide a more accurate estimate of the overall test distribution center, ensuring stable performance even at BS=1.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "test-time-model-adaptation_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Under what conditions does FOA perform significantly worse than gradient-based methods, and what architectural limitation causes this? What accuracy does FOA achieve on ResNet-50 vs. TENT on the same benchmark?",
+      "gold_answer": "FOA performs significantly worse than gradient-based methods on ResNet-50 (CNN architectures). On ImageNet-C Gaussian noise, FOA achieves only 22.6% accuracy vs. TENT's 29.4% and SAR's 30.7% on ResNet-50. This is because convolution is a local operation, making it hard to add location-invariant input prompts in CNNs that affect the whole network. In contrast, transformers allow prompts to be concatenated with patch embeddings and influence all layers via global self-attention.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "test-time-model-adaptation_A08",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Table 9 shows that using SGD + norm layers + Eq.(5) (exp2) achieves higher accuracy than FOA. Why does FOA not adopt this configuration, and what constraint makes it unsuitable for the paper's target deployment scenario?",
+      "gold_answer": "exp2 (SGD + norm layers + Eq.5) requires backpropagation to compute gradients for updating norm layer affine parameters. FOA's core motivation is to enable TTA on quantized models (non-differentiable discrete quantizers cause vanishing gradients) and hard-coded edge devices where backpropagation is unavailable or unsupported. Therefore, despite higher accuracy, exp2 is incompatible with the target deployment scenario.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "test-time-model-adaptation_A09",
+      "category": "method_detail",
+      "difficulty": "T3_implicit",
+      "question": "How does the back-to-source activation shifting mechanism update its shifting direction online, and what specific feature is being shifted?",
+      "gold_answer": "The shifting direction d_t is updated online as d_t = μ^S_N − μ_N(t), where μ^S_N is the pre-computed mean of the N-th (final) layer's CLS token features over source in-distribution samples, and μ_N(t) is an exponential moving average estimate of the test distribution's CLS feature mean (updated as μ_N(t) = α·μ_N(X_t) + (1−α)·μ_N(t−1) with α=0.1). The feature being shifted is the N-th (final) transformer layer's CLS token e^0_N, which is the input to the final MLP head, shifted by e^0_N ← e^0_N + γd.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "test-time-model-adaptation_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the specific learning rate used by the CMA-ES optimizer's internal step-size adaptation (σ update rule) in FOA, and how was this value tuned on the validation set?",
+      "gold_answer": "This information is not provided in the paper. The paper uses the pycma library with default CMA-ES settings and specifies the population size K and prompt dimensionality, but does not report the internal CMA-ES step-size adaptation learning rate or describe any tuning procedure for it.",
+      "grading_type": "abstention",
+      "source": "both"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "paper_id": "stay-on-topic-with-classifier-free-guidance",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 7,
+  "questions": [
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the exact zero-shot LAMBADA accuracy achieved by LLaMA-7B with CFG at γ=1.5, and what was the previous SOTA score it surpassed?",
+      "gold_answer": "LLaMA-7B with CFG at γ=1.5 achieves 81.3% on LAMBADA zero-shot, surpassing PaLM-540B's previous SOTA of 77.9%.",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A02",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "In the standard CFG implementation for language models, what exactly is used as the unconditional context for the second forward pass, and why is this choice made instead of a truly empty prefix?",
+      "gold_answer": "The unconditional context is set to the last token of the original prompt. This is done to anchor the generation position without providing prompt content, and to avoid out-of-distribution behavior for models not trained on empty prefixes, enabling out-of-the-box use without conditioning dropout training.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A03",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What guidance strength γ values were tested in the human preference chatbot evaluation, and what was the optimal γ identified for system-prompt adherence?",
+      "gold_answer": "The chatbot evaluation tested γ ∈ {1, 2, 3, 4, 5, 6}, randomly assigned per combination. The optimal γ was 3, achieving 75% system-prompt adherence preference without degrading user-prompt relevance.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A04",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The ANCOVA analysis classifies 5/9 benchmarks as showing no significant difference between CFG and a vanilla 2× model. Which specific benchmarks favor CFG, which favor the vanilla 2× model, and what significance threshold was used?",
+      "gold_answer": "Significance threshold: p=.01. CFG wins: Lambada (p=0.000) and SciQ (p=0.008). Vanilla 2× wins: WinoGrande (p=0.003) and TriviaQA (p=0.008). No significant difference: HellaSwag, PiQA, ARC-c, BoolQ, ARC-e.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A05",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Write out the complete CFG guided log-probability formula for the negative prompting variant, defining all variables, and explain how it differs from the standard CFG formula.",
+      "gold_answer": "Negative prompting CFG: log P̂(w_i|w_{<i},c,c̄) = log P(w_i|w_{<i},c̄) + γ(log P(w_i|w_{<i},c) − log P(w_i|w_{<i},c̄)), where c is the positive (custom) prompt and c̄ is the negative (default system) prompt. It differs from standard CFG by replacing the unconditional distribution P(w_i|w_{<i}) with the negative prompt distribution P(w_i|w_{<i},c̄), steering generation away from the negative prompt baseline rather than from a promptless distribution.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A06",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "In the negative prompting chatbot experiment, how many system prompts and user prompts were used, and what was the total number of sampled combinations?",
+      "gold_answer": "There were 25 system prompts (nc=25) and 46 user prompts (np=46), with 1740 random combinations sampled.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does CFG improve pass@1 on HumanEval but tend to hurt pass@100 at higher γ values, and what does this reveal about the fundamental mechanism of CFG?",
+      "gold_answer": "CFG reduces sampling entropy (concentrating probability mass on fewer tokens), which increases the likelihood of the single best completion (improving pass@1) but reduces diversity across samples. Since pass@100 benefits from diverse solutions—any one of 100 samples just needs to be correct—the reduced variance from CFG lowers the probability of exploring the full space of potentially correct solutions. This reveals that CFG trades diversity for fidelity/focus, making it a precision-over-recall mechanism.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A08",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The paper analyzes CFG's effect on sampling entropy. What are the mean entropy values reported for CFG (γ=1.5) versus vanilla prompting, and what model/dataset were used for this analysis?",
+      "gold_answer": "CFG has a mean entropy of 4.7 versus 5.4 for vanilla prompting. This analysis used the Falcon-7b-Base model on 32,902 datapoints sampled from the P3 dataset.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "The paper finds that CFG and instruction-tuned models have similar entropy levels (~4.7) but only ~50% overlap in their top-p=90% vocabulary distributions. What does this imply about whether CFG is a viable substitute for instruction tuning?",
+      "gold_answer": "The similar entropy suggests both methods produce similarly 'focused' distributions, but the ~50% vocabulary overlap indicates they achieve this focus through fundamentally different mechanisms—they concentrate probability mass on different sets of tokens. This implies CFG is not simply approximating instruction tuning; it is a complementary technique that changes generation in a distinct way. CFG cannot be considered a drop-in substitute for instruction tuning, as the two methods likely capture different aspects of prompt adherence and may be combinable for further gains.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the specific wall-clock inference latency overhead (in milliseconds) introduced by CFG compared to standard sampling when running LLaMA-7B on the LAMBADA benchmark?",
+      "gold_answer": "This information is not provided in the paper. The paper only states that CFG 'almost doubles the computation during inference' in terms of FLOPs, but no specific latency measurements in milliseconds are reported.",
+      "grading_type": "abstention",
+      "source": "pdf"
+    }
+  ]
+}

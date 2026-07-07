@@ -1,0 +1,39 @@
+session:
+  id: "2026-05-25_001"
+  date: "2026-05-25"
+  started: "2026-05-25T00:00"
+  last_turn: "2026-05-25T00:00"
+  turn_count: 1
+  summary: "5-min ICML talk restructure: inserted an ecosystem slide (Compiler/LRM/Seal around one canonical ARA) after the design slide, and rebuilt the closing slide into a vision bookend ('the artifact is the infrastructure for science'); deck 7->8 slides"
+
+events_logged:
+  - turn: 1
+    type: observation
+    id: "-"
+    routing: skipped
+    provenance: ai-executed
+    summary: "Talk-design/communication work; no new research claims, experiments, or decisions. Surfaces existing ecosystem framing (ecosystem.tex) — nothing to crystallize."
+
+ai_actions:
+  - turn: 1
+    action: "Added slide 5 'The ecosystem' to the 5-min deck: left-to-right pipeline showing two producers (Live Research Manager born-agent path, ARA Compiler legacy path) authoring one canonical four-layer ARA, gated by the ARA Seal (verify). Closing banner: ARA as the only persistent state shared between humans and agents."
+    provenance: ai-executed
+    files_changed: ["paper/slides-5min/generate_slides.js", "paper/slides-5min/ARA_ICML_5min.pptx", "paper/slides-5min/ARA_ICML_5min.pdf"]
+  - turn: 1
+    action: "Rebuilt the closing slide (was the dense L1-L4 Seal figure) into an elevated vision bookend on dark INK bg matching the title: four-layer motif + 'THE LAST HUMAN-WRITTEN PAPER' kicker callback, two-line headline, three forward pillars (cumulative/verifiable/autonomous), elevation line 'when the reader is an agent, the artifact is the infrastructure for science'. Renumbered footers /7 -> /8."
+    provenance: ai-executed
+    files_changed: ["paper/slides-5min/generate_slides.js"]
+
+claims_touched: []
+
+logic_revisions: []
+
+key_context:
+  - turn: 1
+    excerpt: "User: redesign the last (conclusion) page to elevate the story; and after the 'research package built for agents' slide, add a slide for the whole ecosystem — where the compiler, live manager, and review system fit."
+
+open_threads:
+  - "Talk-design choices not yet reviewed by user; await feedback on the new ecosystem slide and conclusion before propagating any framing back to the paper."
+
+ai_suggestions_pending:
+  - "Closing-slide framing 'when the reader is an agent, the artifact is the infrastructure for science' is an AI-authored elevation of the existing thesis; not user-confirmed."

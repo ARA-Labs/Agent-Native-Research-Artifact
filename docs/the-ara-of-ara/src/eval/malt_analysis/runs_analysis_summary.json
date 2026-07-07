@@ -1,0 +1,74 @@
+{
+  "total_runs": 24008,
+  "failure_rate": 0.315894701766078,
+  "tokens_wasted_on_failures_pct": 0.7986230436776582,
+  "cost_wasted_on_failures_pct": 0.9019792570914151,
+  "total_tokens_M": 24494.117535,
+  "total_cost_usd": 63482.79339,
+  "by_source": {
+    "HCAST": {
+      "runs": 15176,
+      "failure_rate": 0.46955719557195574
+    },
+    "RE-Bench": {
+      "runs": 545,
+      "failure_rate": 0.7339449541284404
+    },
+    "SWAA": {
+      "runs": 8287,
+      "failure_rate": 0.0069989139616266445
+    }
+  },
+  "top_models": {
+    "o1-preview": {
+      "runs": 1661,
+      "failure_rate": 0.40096327513546054,
+      "avg_score": 0.6265139726290788
+    },
+    "GPT-5.3-Codex": {
+      "runs": 1602,
+      "failure_rate": 0.1972534332084894,
+      "avg_score": 0.8442927274193508
+    },
+    "GPT-4 0314": {
+      "runs": 1401,
+      "failure_rate": 0.5153461812990721,
+      "avg_score": 0.49330379505974303
+    },
+    "Claude Opus 4.6 (Inspect)": {
+      "runs": 1391,
+      "failure_rate": 0.16319194823867722,
+      "avg_score": 0.8768934885603882
+    },
+    "GPT-5.1-Codex-Max (Inspect)": {
+      "runs": 1369,
+      "failure_rate": 0.2089116143170197,
+      "avg_score": 0.8340468015827611
+    },
+    "Claude 4 Opus (Inspect)": {
+      "runs": 1368,
+      "failure_rate": 0.27923976608187134,
+      "avg_score": 0.7631355085858919
+    },
+    "GPT-5 (Inspect)": {
+      "runs": 1056,
+      "failure_rate": 0.20265151515151514,
+      "avg_score": 0.8395610855503788
+    },
+    "Claude Opus 4.5 (Inspect)": {
+      "runs": 1044,
+      "failure_rate": 0.17337164750957854,
+      "avg_score": 0.8698241937422414
+    },
+    "GPT-4o (Inspect)": {
+      "runs": 1044,
+      "failure_rate": 0.4731800766283525,
+      "avg_score": 0.5461930578500958
+    },
+    "Gemini 3 Pro": {
+      "runs": 1044,
+      "failure_rate": 0.1867816091954023,
+      "avg_score": 0.8632656574243295
+    }
+  }
+}

@@ -1,0 +1,42 @@
+session:
+  id: "2026-03-17_003"
+  timestamp: "2026-03-17T10:00"
+  summary: "Hardened extension scaffold: 4 fixes for data-loss and score-failure (checkpoint, crash-safe save, exponential backoff, Claude fallback)"
+
+events_logged:
+  - type: decision
+    id: N65
+    provenance: user
+    summary: "Implement 4 hardening fixes to run_extension.py and local_score.py motivated by N62/N63 crash and content-filter failures"
+  - type: heuristic
+    id: H16
+    provenance: user
+    summary: "Atomic checkpoint writes + exception-safe save + per-problem fallback generators for long-running eval harnesses"
+  - type: observation
+    id: O46
+    provenance: ai-suggested
+    summary: "Claude Sonnet 4.6 natural fallback for Azure gpt-5-mini content-filter rejections; different filter calibrations make this robust"
+
+ai_actions:
+  - action: "Added _save_checkpoint() method with atomic .tmp-rename write; called from _track_score()"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/run_extension.py"]
+  - action: "Added except Exception handler in run() to call _save_results() on crash; preserved finally for cleanup"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/run_extension.py"]
+  - action: "Added RETRY_DELAYS=[10,30,60] constant and _api_call_with_retry() method; replaced manual try/sleep/retry block in _run_loop()"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/run_extension.py"]
+  - action: "Added _generate_with_claude_fallback() and modified evaluate_problem() to catch primary generator failures and fall back to Claude Sonnet 4.6"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/env/rust_codecontests/local_score.py"]
+
+claims_touched: []
+
+open_threads:
+  - "Run fresh rust_codecontests seeds with hardened scaffold to confirm crash-free execution and checkpoint behavior"
+  - "triton_cumsum is the next cleaner extension task (no external LLM, no model mismatch confound)"
+  - "Baseline token-budget asymmetry (PDF cached tokens counted equally) still unresolved — consider per-subtask mode or cached-token discount"
+
+ai_suggestions_pending:
+  - "O46: Claude vs Azure content filter calibration difference — unverified empirically, assumed from architecture"

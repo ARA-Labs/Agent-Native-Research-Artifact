@@ -1,0 +1,93 @@
+{
+  "total_runs_scanned": 7179,
+  "rebench_runs": {
+    "fix_embedding": 258,
+    "nanogpt_chat_rl": 244,
+    "small_scaling_law": 113,
+    "rust_codecontests": 935,
+    "triton_cumsum": 631,
+    "restricted_mlm": 151
+  },
+  "failures_per_task": {
+    "fix_embedding": 1140,
+    "nanogpt_chat_rl": 813,
+    "small_scaling_law": 707,
+    "rust_codecontests": 19096,
+    "triton_cumsum": 21510,
+    "restricted_mlm": 3037
+  },
+  "total_failures": 46303,
+  "models_per_task": {
+    "fix_embedding": {
+      "o1-preview": 98,
+      "gpt-4-32k-0613": 1,
+      "claude-3-5-sonnet-20240620": 10,
+      "claude-3-5-sonnet-20241022": 10,
+      "claude-3-7-sonnet-20250219": 102,
+      "fireworks/deepseek-v3": 10,
+      "fireworks/deepseek-v3-0324": 8,
+      "claude-sonnet-4-20250514": 9,
+      "claude-opus-4-20250514": 10
+    },
+    "nanogpt_chat_rl": {
+      "o1-preview": 88,
+      "gpt-4-32k-0613": 1,
+      "claude-3-5-sonnet-20240620": 10,
+      "claude-3-5-sonnet-20241022": 10,
+      "claude-3-7-sonnet-20250219": 100,
+      "fireworks/deepseek-v3": 10,
+      "fireworks/deepseek-v3-0324": 7,
+      "claude-opus-4-20250514": 12,
+      "claude-sonnet-4-20250514": 6
+    },
+    "small_scaling_law": {
+      "o1-preview": 42,
+      "gpt-4-32k-0613": 1,
+      "fireworks/deepseek-v3": 10,
+      "claude-3-5-sonnet-20240620": 10,
+      "claude-3-5-sonnet-20241022": 10,
+      "claude-3-7-sonnet-20250219": 10,
+      "fireworks/deepseek-v3-0324": 8,
+      "claude-opus-4-20250514": 9,
+      "claude-sonnet-4-20250514": 12,
+      "openrouter/deepseek/deepseek-r1-0528": 1
+    },
+    "rust_codecontests": {
+      "o1-preview": 699,
+      "gpt-4-32k-0613": 1,
+      "claude-3-5-sonnet-20240620": 10,
+      "claude-3-5-sonnet-20241022": 10,
+      "claude-3-7-sonnet-20250219": 114,
+      "o3": 12,
+      "fireworks/deepseek-v3": 10,
+      "fireworks/deepseek-v3-0324": 8,
+      "o3-2025-04-16": 59,
+      "claude-opus-4-20250514": 6,
+      "claude-sonnet-4-20250514": 6
+    },
+    "triton_cumsum": {
+      "o1-preview": 434,
+      "gpt-4-32k-0613": 1,
+      "claude-3-5-sonnet-20240620": 10,
+      "claude-3-5-sonnet-20241022": 10,
+      "claude-3-7-sonnet-20250219": 110,
+      "o3": 6,
+      "fireworks/deepseek-v3": 10,
+      "fireworks/deepseek-v3-0324": 8,
+      "o3-2025-04-16": 20,
+      "claude-opus-4-20250514": 13,
+      "claude-sonnet-4-20250514": 9
+    },
+    "restricted_mlm": {
+      "o1-preview": 76,
+      "gpt-4-32k-0613": 1,
+      "claude-3-5-sonnet-20240620": 10,
+      "claude-3-5-sonnet-20241022": 10,
+      "claude-3-7-sonnet-20250219": 14,
+      "fireworks/deepseek-v3": 10,
+      "fireworks/deepseek-v3-0324": 8,
+      "claude-sonnet-4-20250514": 11,
+      "claude-opus-4-20250514": 11
+    }
+  }
+}

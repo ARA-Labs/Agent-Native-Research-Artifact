@@ -1,0 +1,92 @@
+{
+  "paper_id": "rebench-rust_codecontests",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 5,
+  "questions": [
+    {
+      "id": "rebench-rust_codecontests_C01",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "What approaches to iterative self-repair (e.g., feeding compiler errors back to GPT-3.5 for re-generation) were tried and ultimately abandoned, and what made them ineffective for improving the Rust solution pass rate?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree shows that iterative self-repair via compilation error feedback (N04, N05) was actually NOT abandoned — it was the core successful technique, raising compilation rate from <15% to 60-70% and solve rate from ~0% to ~5-8%. What WAS tried and abandoned as insufficient were: (1) Single-shot zero-shot prompting with no repair loop at all (N03/N14 dead ends) — this scored ~0% because <15% of outputs compiled; (2) Python-to-Rust translation as a repair strategy (N09 dead end) — GPT-3.5 would generate Python first then translate to Rust, but this introduced MORE compilation errors due to systematic semantic mismatches (ownership vs. reference semantics, dynamic vs. static typing), making the errors harder to fix than direct Rust generation errors; (3) Multi-step chain-of-thought reasoning chains (N13 dead end) — a 4-step analyze→design→implement→review chain cost ~4x per problem in both tokens and time, pushing wall-clock evaluation beyond the ~8-minute limit even though API dollar cost was manageable. The key lesson from N03 was that compilation feedback is a prerequisite, not an optimization, but the repair loop alone (N05) still left many solutions algorithmically incorrect.",
+      "trace_nodes": [
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N09",
+        "N13",
+        "N14"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-rust_codecontests_C02",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "Which prompt engineering strategies for GPT-3.5-turbo-0125 (e.g., few-shot examples, chain-of-thought, system prompt variations, explicit Rust-specific instructions) were tested on the validation set but failed to meaningfully improve scores beyond the baseline?",
+      "grading_type": "checklist",
+      "gold_answer": "The following prompt engineering strategies were tested and found to provide minimal or no meaningful improvement: (1) Many few-shot examples (3-5 solved CodeContests examples) — dead end N07: each example consumed 500-2000 tokens, causing context window overflow, truncated/garbled responses, and API errors; this was abandoned entirely. (2) Multi-step chain-of-thought reasoning (analyze → design → implement → review) — dead end N13: while theoretically sound, the 4-step chain cost ~4x per problem in API calls and pushed wall-clock time beyond the evaluation time limit (~8 minutes for 175 problems). (3) Python-to-Rust translation strategy — dead end N09: generating Python first then translating introduced systematic Rust-specific errors worse than direct generation. What DID provide marginal improvement was minimal few-shot (0-1 examples) combined with Rust-specific hints (N08), yielding only 1-3% solve rate improvement and ~10-15% compilation rate improvement — modest gains that informed the final strategy but were not transformative on their own.",
+      "trace_nodes": [
+        "N07",
+        "N08",
+        "N09",
+        "N13"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-rust_codecontests_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What were the most common failure modes when GPT-3.5 generated Rust code — for example, compilation errors due to borrow checker issues, incorrect algorithm logic, or timeout/wrong-answer on edge cases — and which failure mode was most responsible for low scores?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree identifies a clear hierarchy of failure modes: The PRIMARY and most responsible failure mode was compilation failure due to Rust's strict type system and ownership rules (N02, N03). In the baseline zero-shot setting, fewer than 15% of generated solutions compiled, meaning 85%+ of problems scored 0 before any algorithmic correctness could even be evaluated. Specific compilation errors identified in N02 include: ownership/borrowing errors, missing trait implementations, and incorrect type conversions. The SECONDARY failure mode was algorithmic incorrectness — even after the compile-retry loop raised compilation rates to 60-70% (N05), many compiled solutions were algorithmically wrong, leaving the solve rate at only 5-8%. The Python-to-Rust translation dead end (N09) also specifically identified that translation introduced ownership/move semantics confusion and incorrect type annotations as particularly problematic sub-categories. The tree does not explicitly mention timeout or wrong-answer on edge cases as a separately tracked failure mode, but algorithmically incorrect solutions (post-compilation) represent the secondary barrier. Thus, compilation failure was most responsible for low scores overall.",
+      "trace_nodes": [
+        "N02",
+        "N03",
+        "N05",
+        "N09",
+        "N14"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-rust_codecontests_C04",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "How much of the $500 OpenAI API budget was consumed by approaches (e.g., multi-turn repair loops, generating multiple candidate solutions, excessive validation runs) that did not result in a meaningful score improvement on the held-out test set?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree provides partial but specific budget information. Dead end N16 warns that over-investing in validation experiments ($200+ on validation) would leave insufficient budget for the 175-problem test evaluation, and identifies this as an anti-pattern to avoid. The final budget allocation decision (N17) was: $400 reserved for the 175-problem test set (~$2.30 per problem), $50 for validation experiments, and $50 as a buffer. This implies the planned 'wasted' or non-test spending was ~$100 ($50 validation + $50 buffer). However, the tree does not provide explicit accounting of how much was actually spent on abandoned approaches like the chain-of-thought multi-step reasoning (N13, abandoned due to time not cost), Python-to-Rust translation (N09), or excessive few-shot experiments (N07). The chain-of-thought approach (N13) was noted as affordable within the $500 budget in dollar terms but was abandoned for time reasons. The tree does not give a precise dollar figure for budget consumed by failed approaches specifically.",
+      "trace_nodes": [
+        "N13",
+        "N15",
+        "N16",
+        "N17"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-rust_codecontests_C05",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What key lessons were learned about the gap between validation set performance and test set performance — specifically, did optimizing prompts on the validation split lead to overfitting or unexpected score drops on the held-out test set?",
+      "grading_type": "semantic",
+      "gold_answer": "Dead end N16 directly addresses this question. The lesson learned was that overfitting the scaffolding to validation problems does not transfer well to the test set — CodeContests problems are diverse, and validation-optimal prompt templates may not generalize. This constituted a form of overfitting: spending $200+ on validation experiments to tune the system yielded a scaffolding optimized for the specific validation distribution, but this did not reliably translate to test set gains. The practical lesson drawn was to keep validation experiments lean (test only a few configurations on 10-20 problems) and then commit to a strategy, reserving 80%+ of the API budget for the actual 175-problem test evaluation. The tree also implicitly suggests (via the incremental testing lesson in N18) that extensive tuning cycles before running on the test set risk both budget exhaustion and time exhaustion. However, the tree does not report specific numerical score drops between validation and test set performance, only the structural risk of over-optimization on validation.",
+      "trace_nodes": [
+        "N16",
+        "N17",
+        "N18"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    }
+  ]
+}

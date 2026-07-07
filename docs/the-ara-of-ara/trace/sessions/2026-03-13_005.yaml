@@ -1,0 +1,83 @@
+session:
+  id: "2026-03-13_005"
+  timestamp: "2026-03-13T22:30"
+  summary: "Rubric-supplemented re-ingestion + dual-source questions → ARA leads overall 76.1% vs 68.2%"
+
+events_logged:
+  - type: decision
+    id: N42
+    provenance: user
+    summary: "Dual-source question generation (PDF + ARA independently, then LLM merge)"
+  - type: decision
+    id: N43
+    provenance: user
+    summary: "Report PaperBench, RE-Bench, Speedrun results separately"
+  - type: experiment
+    id: N44
+    provenance: ai-executed
+    summary: "Re-ingested 18/23 PaperBench papers with rubric supplementation"
+  - type: experiment
+    id: N45
+    provenance: ai-executed
+    summary: "Dual-source Cat A question generation for all 31 papers (310 questions)"
+  - type: experiment
+    id: N46
+    provenance: ai-executed
+    summary: "Full Understanding eval — ARA 76.1% vs PDF 68.2% overall (+8.0pp)"
+  - type: dead_end
+    id: N47
+    provenance: ai-executed
+    summary: "2 papers have persistent ARA agent 1-answer failures"
+  - type: observation
+    id: O27
+    provenance: ai-executed
+    summary: "Rubric supplementation dramatically improves ARA quality"
+  - type: observation
+    id: O28
+    provenance: ai-executed
+    summary: "Cat B ARA advantage contradicts earlier parity observation"
+  - type: observation
+    id: O29
+    provenance: ai-executed
+    summary: "Dual-source questions eliminated Cat A gap — was evaluation bias not info loss"
+
+ai_actions:
+  - action: "Modified ingestor to accept rubric_path parameter"
+    provenance: ai-executed
+    files_changed: ["code/ingestor/prompt.py", "code/ingestor/ingestor.py", "code/scripts/run_ingest.py"]
+  - action: "Created batch_reingest.py for parallel rubric re-ingestion"
+    provenance: ai-executed
+    files_changed: ["code/scripts/batch_reingest.py"]
+  - action: "Created generate_catA_dual.py for dual-source question generation"
+    provenance: ai-executed
+    files_changed: ["code/eval/generate_catA_dual.py"]
+  - action: "Updated run_question_generation.py to use dual-source generator"
+    provenance: ai-executed
+    files_changed: ["code/eval/run_question_generation.py"]
+  - action: "Re-ran full eval pipeline (answer + judge + analyze) multiple times"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/"]
+  - action: "Updated evaluation.tex with per-benchmark breakdown table and revised prose"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+
+claims_touched:
+  - id: C04
+    action: advanced
+    provenance: ai-executed
+  - id: C06
+    action: confirmed
+    provenance: ai-executed
+  - id: C16
+    action: advanced
+    provenance: ai-executed
+
+open_threads:
+  - "5/23 PaperBench papers still need rubric re-ingestion (re-ingestion running in background)"
+  - "adaptive-pruning and robust-clip have persistent ARA agent 1-answer failures — root cause unknown"
+  - "Statistical tests (McNemar) not run — scipy not available in eval environment"
+  - "Layers 2 (Reproduction) and 3 (Extension) evaluation still pending"
+
+ai_suggestions_pending:
+  - "O29 suggests Cat A gap was largely evaluation bias — should this change the narrative from 'restructuring costs fidelity' to 'ARA preserves information faithfully'?"
+  - "O28 suggests rubric-supplemented Ingestor creates information gain, not just reformatting — may warrant a new claim"

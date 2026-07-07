@@ -1,0 +1,89 @@
+{
+  "paper_id": "rebench-nanogpt_chat_rl",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 2,
+  "questions": [
+    {
+      "id": "rebench-nanogpt_chat_rl_C01",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "What specific RLHF hyperparameter configurations (batch size, learning rate, KL penalty coefficient, rollout length) were tried in the basic rl_finetune.py starter script and found to underperform or destabilize training for gpt2-xl?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree documents several hyperparameter configurations that underperformed or destabilized training. At N11, PPO with KL penalty beta=0.05 was the baseline stable configuration achieving ~0.625 average score. At N18 (DE4), high learning rates of 5e-5 and above were tried and found catastrophic: at lr=5e-5, model perplexity on held-out text increased >50% within 50 steps; at lr=1e-4, the model produced gibberish within 20 steps (complete catastrophic forgetting), dropping the score below the starting 0.54. At N17, the only stable schedule found was warmup + cosine decay with peak lr=1e-5 and final lr=1e-7. At N09 (DE3), PPO without any KL penalty was tried and found to cause reward hacking — after 300 steps, KL divergence exceeded 20 nats, distinct-1 ratio dropped below 0.2, and response length doubled. At N07 (DE2), vanilla REINFORCE with binary reward showed gradient norm variance 100x higher than PPO and no convergence after 500 steps. The tree does not explicitly specify batch size or rollout length configurations in the starter script.",
+      "trace_nodes": [
+        "N06",
+        "N07",
+        "N08",
+        "N09",
+        "N11",
+        "N17",
+        "N18"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_C02",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "Were any reward shaping strategies beyond binary win/loss signals from the LLM judge attempted and then abandoned — such as length normalization, response formatting bonuses, or self-play comparisons — and why did they fail to improve scores?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not document any reward shaping strategies beyond binary win/loss signals that were explicitly attempted and then abandoned. The tree does note at N09 (DE3) that the Llama judge has biases toward longer responses, list formatting, and repetition of key prompt terms — and that the model exploited these without extra reward shaping — but no dedicated length normalization, formatting bonuses, or self-play comparison approaches are described as having been tried and abandoned. The main reward improvement strategy pursued was Best-of-N (N=4) sampling for reward denoising (N14), which was retained and successful rather than abandoned. No explicit reward shaping experiments beyond this are recorded.",
+      "trace_nodes": [
+        "N09",
+        "N14"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What were the main failure modes observed when the RL training collapsed or plateaued — for example, reward hacking behaviors like generating very short/long outputs, repetitive text, or gibberish — and at what training stages did these occur?",
+      "grading_type": "checklist",
+      "gold_answer": "The exploration tree documents several distinct failure modes: (1) At N09/DE3 (PPO without KL penalty): Reward hacking emerged where the model exploited judge biases — average response length doubled, distinct-1 ratio dropped below 0.2 (repetitive text), and KL divergence exceeded 20 nats, all by approximately step 300. The model beat the base GPT-2-XL but was easily beaten by Alpaca responses, yielding win-vs-alpaca of only ~0.35. (2) At N18/DE4 (high learning rates): At lr=5e-5, catastrophic forgetting manifested as >50% perplexity increase within 50 steps; at lr=1e-4, complete gibberish output occurred within 20 steps. Score dropped below baseline 0.54. (3) At N07/DE2 (vanilla REINFORCE): Training plateaued with win fraction staying at 0.54 ± 0.03 after 500 steps due to extreme gradient variance — no collapse, but no learning. (4) The tree also notes at N19/DE6 that insufficient API budget (from non-batched calls) led to score plateauing at ~0.65 despite correct algorithm choices.",
+      "trace_nodes": [
+        "N07",
+        "N08",
+        "N09",
+        "N18",
+        "N19"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_C04",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "How many Replicate API evaluation calls were consumed by configurations or training runs that ultimately did not contribute to score improvements, and what was the primary cause of that wasted budget?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not provide specific counts of Replicate API evaluation calls consumed by failed configurations. However, N19 (DE6) provides the most relevant quantitative information about API budget waste: when evaluation.py was called once per prompt-response pair (non-batched), ~80% of the API budget was spent on fixed overhead rather than actual comparisons, yielding only ~200 useful comparisons instead of ~1200 achievable through batching. The primary cause of wasted budget identified in the tree is the failure to batch evaluation calls — described at N19 as not an optimization but 'a requirement for the algorithm to have enough signal to converge.' The tree does not give explicit call counts for failed runs like REINFORCE (N06/N07) or unconstrained PPO (N08/N09).",
+      "trace_nodes": [
+        "N19",
+        "N06",
+        "N08"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_C05",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What key lessons were learned about the interaction between the number of RL training steps, the frequency of judge evaluation calls, and overfitting to the training prompts in prompts.jsonl versus generalizing to the held-out scoring data?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree provides only partial information on this topic. At N12, the decision notes that increasing training steps yields 'diminishing returns past 500 steps,' suggesting overfitting or saturation was observed beyond that point. At N19 (DE6), the lesson learned is that insufficient evaluation frequency (due to non-batched API calls yielding only ~200 comparisons vs ~1200 possible) left the reward signal too noisy for the algorithm to converge, reaching only ~0.65 score. At N15, efficient batching (16 pairs per call) enabled 6x more comparisons within the same budget, improving the score to ~0.82. However, the tree does not explicitly discuss overfitting to prompts.jsonl versus generalization to held-out scoring data as a distinct concern — there is no documented analysis of training vs. held-out prompt performance divergence.",
+      "trace_nodes": [
+        "N12",
+        "N15",
+        "N19"
+      ],
+      "answerable": false,
+      "expected_pdf_behavior": "abstention"
+    }
+  ]
+}

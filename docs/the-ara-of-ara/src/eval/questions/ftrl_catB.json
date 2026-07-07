@@ -1,0 +1,115 @@
+{
+  "paper_id": "ftrl",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "ftrl_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "(a) According to R29 in rubric/requirements.md, how is the diagonal of the Fisher matrix computed for the EWC implementation in the RoboticSequence environment, and what sample size is used for the outer expectation? (b) Which ARA file in src/execution/ covers the RoboticSequence environment implementation, and what does it reveal about how this Fisher matrix computation is structured? (c) Given R30's additional constraint on the Fisher matrix values, what does this imply for the numerical stability of the EWC auxiliary loss defined in R31?",
+      "gold_answer": "R29 states: 'For the RoboticSequence environment, for the elastic weight consolidation (EWC) implementation, the diagonal of the Fisher matrix is correctly computed as F_k = E_{x ~ D} E_{y ~ p_theta(.|x)} (nabla_{theta_k} log p_{theta_k}(y|x))^2, where the outer expectation is approximated with a sample of 2560 examples from the replay buffer D, and the inner expectation is computed following the previous equation' (referencing R28 for the analytical form). R30 further specifies that 'the diagonal of the Fisher matrix is clipped so the minimal value is 10^{-5}'. The relevant ARA file is src/execution/robotic_sequence.py, which covers the RoboticSequence environment execution and should contain the Fisher matrix sampling logic using 2560 replay buffer examples and the clipping to 10^{-5}. The implication for R31's EWC loss L_aux(theta) = sum_i F^i(theta_star^i - theta^i)^2 is that clipping at 10^{-5} prevents any parameter from having a near-zero Fisher weight, which would cause the EWC regularization to have no effect on that parameter — ensuring numerical stability and preventing degenerate cases where the penalty vanishes.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies the outer expectation uses 2560 samples from the replay buffer D as stated in R29",
+        "Correctly identifies src/execution/robotic_sequence.py as the cross-referenced ARA file",
+        "Correctly states R30's clipping threshold of 10^{-5} as a minimum value for the Fisher diagonal",
+        "Correctly explains that clipping prevents near-zero Fisher weights, ensuring EWC regularization is non-degenerate per R31's auxiliary loss formulation"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/robotic_sequence.py"
+      ],
+      "rubric_requirement_id": "R29",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "ftrl_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) R56 in rubric/requirements.md specifies a particular scaling and decay schedule for the kickstarting (KS) auxiliary loss when fine-tuning NetHack models — what exactly does it say? (b) R55 imposes an additional constraint on entropy during KS fine-tuning — what is this constraint, and which ARA file in src/configs/ documents the training hyperparameters where this interaction can be verified? (c) What does the combination of R56's exponential decay and R55's entropy constraint imply about how the total training objective evolves over the course of fine-tuning?",
+      "gold_answer": "R56 states: 'When fine-tuning models in the NetHack environment using kickstarting (KS), the auxiliary loss is scaled by a factor of 0.5 and an exponential decay of 0.99998 is used, where the coefficient is decayed every training step.' R55 states: 'When fine-tuning models in the NetHack environment using either elastic weight consolidation (EWC), behavioral cloning (BS), or kickstarting (KS), the entropy maximization loss is not used when computing the total loss.' The relevant ARA file is src/configs/training.md, which documents training hyperparameters and where the entropy cost setting and KS coefficient schedule would be reflected. The combined implication is that during KS fine-tuning, the total objective starts as APPO_loss + 0.5 * KS_auxiliary_loss (with no entropy term), and as training progresses the KS coefficient decays exponentially at rate 0.99998 per step, meaning the influence of the frozen pre-trained teacher policy pi_star gradually diminishes toward zero, eventually leaving only the APPO objective — effectively annealing from knowledge retention toward pure task performance.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R56's KS auxiliary loss scaling factor of 0.5 and exponential decay of 0.99998 per training step",
+        "Correctly identifies R55's constraint that entropy maximization loss is excluded from the total loss during KS fine-tuning",
+        "Correctly identifies src/configs/training.md as the cross-referenced ARA file for training hyperparameters",
+        "Correctly explains that the combined effect is a gradual annealing of the teacher policy's influence over training, starting at 0.5 and decaying toward zero while entropy regularization is absent throughout"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/configs/training.md"
+      ],
+      "rubric_requirement_id": "R56",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "ftrl_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) R21 in rubric/requirements.md defines a reward augmentation scheme for the RoboticSequence environment — what is the exact formula and what are the values of the constants involved? (b) R19 and R20 describe two additional state augmentations for the same environment — what are they? (c) The ARA file src/execution/robotic_sequence.py implements the RoboticSequence environment — given R21, R19, and R20 together, what does this imply about the total structure of the input observation vector and the reward signal that the SAC agent (R25) receives at each timestep?",
+      "gold_answer": "R21 states: 'In the RoboticSequence environment, when the episode ends with success, the agent is provided with the remaining reward it would get until the end of the episode; if the last reward was originally r_t, the augmented reward is given by r_t' = beta * r_t * (T - t), where beta is defined as 1.5, and T is the maximal number of steps.' R19 states: 'In the RoboticSequence environment, the Stage ID is encoded as a one-hot vector and provided to the agent.' R20 states: 'In the RoboticSequence environment, the normalized timestep (i.e. the timestep divided by the maximal number of steps in the environment) is appended to the state vector.' The cross-referenced ARA file is src/execution/robotic_sequence.py. Together, these requirements imply that the SAC agent's observation is the base environment state concatenated with (1) a one-hot encoded Stage ID vector and (2) a scalar normalized timestep t/T. The reward signal is standard except at successful episode termination, where it is multiplied by beta=1.5 and scaled by the remaining steps (T-t), providing a large terminal bonus that incentivizes faster task completion.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states R21's formula r_t' = beta * r_t * (T - t) with beta = 1.5 and identifies T as the maximal number of steps",
+        "Correctly identifies R19's one-hot Stage ID encoding and R20's normalized timestep t/T as state augmentations",
+        "Correctly identifies src/execution/robotic_sequence.py as the cross-referenced ARA file",
+        "Correctly describes that the full observation vector concatenates base state + one-hot stage ID + normalized timestep, and the reward is augmented only at successful episode termination with the remaining-steps multiplier"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/robotic_sequence.py"
+      ],
+      "rubric_requirement_id": "R21",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "ftrl_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "(a) R10 in rubric/requirements.md specifies how the diagonal Fisher matrix is computed for the EWC implementation in NetHack — what is the exact formula and what dataset is used? (b) R58 specifies the regularization coefficient used when fine-tuning with EWC on NetHack — what is this value? (c) The ARA file evidence/tables/table1_nethack_hyperparams.md documents NetHack hyperparameters — what does the combination of R10's dataset requirement (8000 monk trajectories over 10000 batches) and R58's coefficient of 2*10^6 imply about the sensitivity of the EWC method and the scale of the auxiliary loss relative to the APPO objective?",
+      "gold_answer": "R10 states: 'For NetHack, the diagonal Fisher matrix can be computed as F_{ii} = E[Delta_theta l(theta)_i^2], where the expectation is computed using the squared gradients of the loss wrt. each parameter over 10000 batches sampled from the NLD-AA subset of 8000 monk trajectories.' R58 states: 'When fine-tuning models in the NetHack environment using EWC, a regularization coefficient of 2 * 10^6 is used.' The cross-referenced ARA file is evidence/tables/table1_nethack_hyperparams.md, which documents the NetHack architecture and training hyperparameters following Table 1. The combination implies that the Fisher matrix is estimated from a large fixed dataset (NLD-AA monk trajectories, 10000 batches), making it a stable offline estimate rather than an online one. The very large regularization coefficient of 2*10^6 suggests that the raw Fisher-weighted parameter distances F^i(theta_star^i - theta^i)^2 are very small in magnitude, requiring large scaling to produce an auxiliary loss comparable to the APPO policy gradient objective — implying the EWC penalty must be heavily amplified to meaningfully constrain parameter drift from the pre-trained model.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R10's Fisher computation formula F_{ii} = E[Delta_theta l(theta)_i^2] using 10000 batches from NLD-AA subset of 8000 monk trajectories",
+        "Correctly identifies R58's EWC regularization coefficient as 2 * 10^6",
+        "Correctly identifies evidence/tables/table1_nethack_hyperparams.md as the cross-referenced ARA file",
+        "Correctly reasons that the large coefficient (2*10^6) implies the raw EWC penalty terms are numerically small and must be scaled up to compete with the APPO objective"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table1_nethack_hyperparams.md"
+      ],
+      "rubric_requirement_id": "R10",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "ftrl_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "(a) R33 in rubric/requirements.md specifies how behavioural cloning (BC) auxiliary losses are applied to the actor and critic in the RoboticSequence environment — what exactly does it say about which loss functions are used for each component and when the auxiliary loss is activated? (b) R27 imposes a constraint on the SAC critic regarding regularization — what is this constraint, and how does it interact with R33? (c) The ARA file src/execution/knowledge_retention.py covers knowledge retention method implementations — what does the combination of R33 and R27 imply about the asymmetric treatment of actor vs. critic during BC fine-tuning in the RoboticSequence setting?",
+      "gold_answer": "R33 states: 'For the RoboticSequence environment, for the behavioural cloning (BC) implementation, in all tasks apart from the first and second, auxiliary loss is added to the SAC's objective to imitate the expert data; for the actor, KL divergence is used, and for the critics, the L2 loss is used (which can be derived as KL divergence between mean-parameterized Gaussian distributions).' R27 states: 'In the RoboticSequence environment, the SAC critic is not regularized.' The cross-referenced ARA file is src/execution/knowledge_retention.py, which implements the knowledge retention methods. The combination of R33 and R27 reveals an apparent tension: R33 says the critic receives an L2 auxiliary BC loss (starting from task 3 onward), while R27 says the critic is not regularized. This implies that the 'not regularized' in R27 refers specifically to EWC-style regularization (not BC), while BC's L2 critic loss is treated as a separate imitation objective rather than a regularization constraint. Thus the actor receives KL-divergence-based BC loss and the critic receives L2-based BC loss, but the critic is exempt from EWC/Fisher-based weight regularization — creating an asymmetric fine-tuning regime where the actor is knowledge-retained via both KL and potentially EWC, but the critic only via BC's L2 imitation.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R33's specification: KL divergence for actor BC loss and L2 loss for critic BC loss, applied from task 3 onward (not first or second tasks)",
+        "Correctly identifies R27's constraint that the SAC critic is not regularized in the RoboticSequence environment",
+        "Correctly identifies src/execution/knowledge_retention.py as the cross-referenced ARA file",
+        "Correctly explains that R27's 'not regularized' applies to EWC-style regularization while R33's L2 critic BC loss is a distinct imitation objective, resulting in asymmetric treatment where the critic is exempt from Fisher-based regularization but still receives BC imitation loss"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/knowledge_retention.py"
+      ],
+      "rubric_requirement_id": "R33",
+      "info_gap_rating": "absent",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

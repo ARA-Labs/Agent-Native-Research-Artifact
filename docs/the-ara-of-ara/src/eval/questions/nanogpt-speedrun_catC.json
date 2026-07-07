@@ -1,0 +1,89 @@
+{
+  "paper_id": "nanogpt-speedrun",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 5,
+  "questions": [
+    {
+      "id": "nanogpt-speedrun_C01",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What specific failure mode caused cuDNN attention to be abandoned as a speedup strategy at short sequences, and at what sequence length does it become beneficial?",
+      "grading_type": "semantic",
+      "gold_answer": "According to node N07a, cuDNN attention was abandoned because at the current short sequence lengths (~4K tokens), the overhead of cuDNN attention exceeded the kernel speedup, resulting in a net slight regression in wall-clock time (Record 7 showed 12.8 min → 12.9 min regression, as noted in N07). The lesson recorded in N07a is that cuDNN attention only becomes beneficial at longer sequences — specifically at Record 11 and beyond, where 64K context sequences are used (noted as 'Record 11+ at 64K context'). So the beneficial threshold is approximately 64K tokens.",
+      "trace_nodes": [
+        "N07",
+        "N07a",
+        "N12"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "nanogpt-speedrun_C02",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "Why was removing 2 or more transformer layers explored and then abandoned as an optimization, and what observable metric caused the team to revert?",
+      "grading_type": "semantic",
+      "gold_answer": "Node N17a documents this dead end. The hypothesis was that 2 or more transformer layers could be removed because the U-Net skip connections (introduced in Record 8/N08) would compensate for lost depth. Record 16 (N17) successfully removed the 8th attention layer with only a minor regression (4.0 → 3.9 min, val_loss 3.2773). However, attempting to remove additional layers caused the val_loss to exceed the 3.28 threshold — the observable quality metric that triggered the revert. The lesson recorded is that there is a minimum depth below which skip connections cannot maintain representation quality, and one layer removal is the practical limit at this scale.",
+      "trace_nodes": [
+        "N17",
+        "N17a",
+        "N08"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "nanogpt-speedrun_C03",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "What went wrong when Muon orthogonalization was applied to embedding parameters or 1D parameters, and what failure mode resulted from not partitioning optimizer groups correctly?",
+      "grading_type": "semantic",
+      "gold_answer": "Node N03 describes Muon as using OrthogonalNesterov momentum specifically for 2D+ (weight matrix) parameters, with AdamW reserved for 1D parameters. Node N07 explicitly describes the correct partitioning into 3 optimizer groups: Muon for 2D parameters, AdamW for the LM head, and AdamW for 1D parameters. The failure mode implied by N03 and N07 is that applying Muon's Newton-Schulz orthogonalization to embedding parameters or 1D parameters (vectors) is mathematically inappropriate — orthogonalization is defined for matrices, not vectors or embedding tables. Applying it incorrectly to 1D parameters or embeddings would either produce errors or degrade training quality. The exploration tree references this in the evidence tag [C03] for N03, indicating that not partitioning optimizer groups correctly was a known failure mode that the team had to solve (resolved in Record 7 with the explicit 3-group partitioning in N07).",
+      "trace_nodes": [
+        "N03",
+        "N04",
+        "N07"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "nanogpt-speedrun_C04",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What two pivot points in the optimization trajectory indicated that a class of techniques had hit diminishing returns, and what triggered each pivot decision?",
+      "grading_type": "checklist",
+      "gold_answer": "Two explicit pivot points are documented in the tree: (1) Node N09 marks the pivot from architectural innovations to precision engineering. The trigger was 'diminishing returns from architecture changes alone' after Records 5-8 had extracted the major gains from architectural changes (21.7→11.0 min). The justification was that the next frontier required eliminating framework overhead (autocast, dtype conversions, memory copies) rather than further architectural modification. (2) Node N19 marks the pivot from software-level algorithmic/architectural optimizations to hardware-specific optimizations (FP8, custom CUDA). The trigger was 'software-level optimizations approaching diminishing returns' after Records 13-17 yielded only 4.8→3.7 min (23% total). The justification was that further gains required exploiting H100-specific hardware features not exposed by standard PyTorch.",
+      "trace_nodes": [
+        "N09",
+        "N19",
+        "N14",
+        "N15",
+        "N16",
+        "N17",
+        "N18"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "nanogpt-speedrun_C05",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "What happens when LLM agents attempt to independently implement the distributed training optimizations from this speedrun, and which specific implementation categories cause the most failures?",
+      "grading_type": "semantic",
+      "gold_answer": "Node N25 documents this dead end comprehensively. When LLM agents attempt to independently implement the distributed training optimizations, all frontier models fail even when given pseudocode hints (the highest hint level tested in the BoN benchmark described in N24). The key finding in N25 is that agents understand the optimization direction correctly — it is not a knowledge gap — but produce buggy distributed training code. The specific implementation categories causing the most failures are: NCCL errors (distributed communication), torch.compile incompatibilities, numerical precision issues, and CUDA kernel errors. The lesson recorded is that this represents a systems engineering capability gap, not a knowledge gap, and that the gap between knowing what to do and implementing it in production distributed training code is currently insurmountable for LLMs.",
+      "trace_nodes": [
+        "N23",
+        "N24",
+        "N25",
+        "N26"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    }
+  ]
+}

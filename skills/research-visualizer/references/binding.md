@@ -75,7 +75,7 @@ real transcribed `src/execution/` file exists (legacy / paper-only code) do you 
     {
       "id": "N02",
       "type": "experiment",        // question|experiment|decision|dead_end|pivot|insight|<other ok>
-      "parent": "N01",             // id of the nesting parent, or null for a root
+      "parent": "N01",             // spine parent — derived per parsing.md §1 (nesting / declared parent: / pivot→root / else most-recent also_depends_on); null for a root
       "title": "<normalized step title>",            // see parsing.md
       "body":  "<what the step did / its outcome>",
       "thinking": "<the step's narrative in PLAIN, human language — a grounded translation, NOT a verbatim paste (SKILL.md 5c); OPTIONAL>", // primary block; falls back to body

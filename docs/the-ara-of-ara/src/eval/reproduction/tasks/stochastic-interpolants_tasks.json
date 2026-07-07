@@ -1,0 +1,190 @@
+[
+  {
+    "task_id": "stochastic-interpolants_T01",
+    "goal": "Set up the U-Net velocity model architecture from lucidrains' denoising-diffusion-pytorch repository with the exact hyperparameters specified in the paper: dim=256, dim_mults=(1,1,2,3,4), learned_sinusoidal_cond=True, learned_sinusoidal_dim=32, attn_dim_head=64, attn_heads=4, random_fourier_features=False. Verify the model instantiates correctly and accepts the expected input tensor shapes (batch of images with variable channel counts for conditioning).",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H01: The U-Net architecture from lucidrains can be instantiated with the paper's non-default hyperparameters without modification"
+    ],
+    "rubric_requirement_ids": [
+      "fa71af11-bf4e-47c1-bd63-1733ef30029c",
+      "748d82fe-9f02-4d0c-bbb3-b7be65feca15",
+      "ba327b00-fdd7-4073-b129-93e5e176e204",
+      "0bd8d434-8fae-4159-b89b-199a83f18bbf",
+      "9c00369e-a138-48b5-b2e7-d8abe24fba7a",
+      "33409f2f-bbef-4e46-bb41-b2d3e0787ca4",
+      "c4401ce0-0110-4207-81b6-2193ea7abe15",
+      "f0329e30-4cd9-41d8-9916-8af46fb59b83",
+      "eaf72173-961d-4f44-aad3-a67eb4298868"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "stochastic-interpolants_T02",
+    "goal": "Set up the shared training infrastructure and evaluation pipeline. Implement ImageNet data loading for train and validation splits. Configure the Adam optimizer (lr=2e-4, no weight decay), StepLR scheduler (gamma=0.99 every 1000 steps), gradient norm clipping at 10000, batch size 32, and 200k training steps. Set up the Dopri ODE solver from torchdiffeq for inference. Implement FID-50k computation using a standard Inception-v3 feature extractor. Verify the training loop runs for a small number of steps without errors.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H02: The paper's training infrastructure (optimizer, scheduler, gradient clipping) can be faithfully reconstructed from reported hyperparameters",
+      "H03: The Dopri ODE solver from torchdiffeq integrates correctly with the U-Net velocity model"
+    ],
+    "rubric_requirement_ids": [
+      "46ca1cd4-7129-4337-98d7-484d69e98ea0",
+      "67af86d8-2639-49fb-9a96-9e3c90812565",
+      "cd04efc2-b2b5-493f-b412-c32f72f7fdba",
+      "cb0f23e1-3efc-49cc-a71b-28a65ab3bb22",
+      "ebc3e8cf-b1bc-43bc-b24f-8168213cbbc1",
+      "7de84bdb-63f9-4a76-99f9-ae89546b1f32",
+      "7c7ebd70-364d-4bae-ac1c-dcc3ce514c4a",
+      "190a2c3f-cc9d-4fa7-ac4a-119bcc1d3419"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "stochastic-interpolants_T03",
+    "goal": "Implement the Uncoupled Interpolant training and sampling procedures for ImageNet inpainting (Section 4.1 baseline). Training: for each sample in a mini-batch, (1) sample x_0 ~ N(0,I), (2) add a class-conditioning channel uniformly filled with the class label, (3) sample t ~ U(0,1), (4) compute the interpolant I_t = t*x_0 + (1-t)*x_1, (5) compute the time-derivative dI_t = x_1 - x_0, (6) compute the quadratic velocity regression loss, and (7) train with Adam. Sampling: initialize X_0 ~ N(0,I), then iterate X_{i+1} = X_i + (1/N)*b_{i/N}(X_i) for N steps. Verify the full pipeline produces valid outputs.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H04: The quadratic velocity regression objective produces a valid generative model under independent Gaussian coupling",
+      "H05: The Euler-step sampler correctly generates images from the uncoupled base distribution"
+    ],
+    "rubric_requirement_ids": [
+      "3f74c905-def6-44eb-a739-1e17ce51fa8f",
+      "f823b47a-bc58-4ab5-b59a-eec1f7b04183",
+      "d5402a39-7e66-47ae-a577-686aeceb7e0b",
+      "3a9c64b6-5def-4278-ae63-f194f873c488",
+      "44d89bd8-3321-4f3d-842f-8e7421e91cdd",
+      "4730f7b6-cbae-4b1f-8527-7c451cc50c97",
+      "74e1ae29-3878-4030-b964-b9b46d8ce6d2",
+      "5afccb74-6140-4766-9aa6-8e7c486e7db4",
+      "e9d03723-1f93-496f-aaa1-9800fea87b1c"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "stochastic-interpolants_T04",
+    "goal": "Implement the Dependent Coupling training procedure for ImageNet inpainting (Section 4.1). For each sample in a mini-batch: (1) draw a random binary tile mask by dividing the image into 64 tiles, each selected with probability p=0.3, shared across channels, (2) construct the masked image x_0 = xi*x_1 + (1-xi)*zeta where zeta ~ N(0,I), (3) add a class-conditioning channel, (4) sample t ~ U(0,1), (5) compute I_t = t*x_0 + (1-t)*x_1 and dI_t = x_1 - x_0, (6) mask the velocity field output to zero in unmasked regions, (7) compute the quadratic loss, and (8) train with Adam.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H06: The simulation-free quadratic regression objective remains valid under data-dependent coupling",
+      "H07: The tile-mask construction with p=0.3 and channel-shared masking correctly implements the dependent coupling from Section 4.1"
+    ],
+    "rubric_requirement_ids": [
+      "e04c1c97-d217-4385-b328-17086c66bad3",
+      "036df75d-d021-4560-b6d0-906ddc881275",
+      "551ad22d-eaf1-42b1-b662-704f748d0c5d",
+      "75cc97d2-9f78-4d91-8cdd-406e86c92c70",
+      "ee1e4da3-1dd9-4aea-b537-356b46205382",
+      "8c2b4e77-f1ed-4e73-98e9-71be856aa0e2",
+      "2326b8d4-922a-42ca-8e25-2fc0d5e546e6",
+      "718205ed-8bb4-40d5-8a9a-7c8c4694e4b0",
+      "cbe7cd9e-8c54-46c7-8b13-b7d36f755814",
+      "8190541a-ba46-4229-bd12-5d9bc99b0ac6"
+    ],
+    "n_requirements": 10
+  },
+  {
+    "task_id": "stochastic-interpolants_T05",
+    "goal": "Implement the Euler-step sampling procedure (Algorithm 2) for the Dependent Coupling inpainting model. Construct the masked initial image x_0 = xi*x_1 + (1-xi)*zeta using the tile-mask scheme (64 tiles, p=0.3, channel-shared mask taking the same value across channels at each spatial location), where x_1 is from the ImageNet validation set. Add the class-conditioning channel, then iterate X_{i+1} = X_i + (1/N)*b_{i/N}(X_i) for N steps. Verify the sampling pipeline produces valid 256x256 inpainted images with known pixels preserved.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H08: The dependent coupling's masked initialization preserves known pixels through the sampling trajectory",
+      "H09: The Euler update with masked velocity correctly reconstructs only the masked regions"
+    ],
+    "rubric_requirement_ids": [
+      "4b3e6602-1f2d-4680-978b-cd195cee0d71",
+      "c6ba9100-ddf4-4188-8416-a63081e4ceea",
+      "d9883334-d824-4aee-8f98-ac4eb660fd5c",
+      "3fd598f3-f9a3-421c-abfc-db3edee67cfe",
+      "35183fae-4786-4b84-b1e7-a49ef31ba90c"
+    ],
+    "n_requirements": 5
+  },
+  {
+    "task_id": "stochastic-interpolants_T06",
+    "goal": "Train both the Uncoupled Interpolant and Dependent Coupling inpainting models on ImageNet for 50k gradient steps each (25% of full budget, 1 seed). Generate 50k inpainted samples from each model using the Euler sampler and compute FID-50k on the ImageNet validation set for both. Verify the Uncoupled Interpolant achieves FID-50k in the neighborhood of 1.35 and the Dependent Coupling model achieves FID-50k in the neighborhood of 1.15, confirming that dependent coupling strictly improves over the independent baseline.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H10: The uncoupled interpolant baseline achieves the reported FID on ImageNet inpainting",
+      "H11: Dependent coupling improves FID on ImageNet inpainting compared to the independent Gaussian baseline",
+      "H12: Data-dependent coupling and class-label conditioning are orthogonal mechanisms that combine without conflict"
+    ],
+    "rubric_requirement_ids": [
+      "1fb894bd-0b1c-40a4-b1bf-fc67d4ccf7da",
+      "948edecc-0bbb-42e9-b2a1-0ecf3dab4e1a",
+      "499e91ba-45c2-410a-8f1a-15cdb5ad2394",
+      "2933a4be-d28a-4bc0-bd5e-dac5e7d37560",
+      "9edcca4e-a0ce-44e7-b200-4c8298bb5986",
+      "79043fe8-a08a-415a-ba2a-7adb16ca0ff0"
+    ],
+    "n_requirements": 6
+  },
+  {
+    "task_id": "stochastic-interpolants_T07",
+    "goal": "Implement the data preparation pipeline for the Dependent Coupling super-resolution training (Section 4.2). For each sample: (1) downsample the 256x256 ImageNet image to 64x64 by cropping, (2) upsample back to 256x256 via nearest-neighbor interpolation, (3) add Gaussian noise x_0 = U(D(x_1)) + zeta where zeta ~ N(0,I), (4) append the upsampled low-res image along the channel dimension as conditioning input, (5) add a class-label channel. Verify the corrupted image has the correct shape and the low-frequency structure is preserved in the conditioning channel.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H13: The downsample-upsample-noise coupling correctly degrades images while preserving low-frequency content",
+      "H14: External conditioning (low-resolution image + class label) can be appended along the channel dimension without conflicting with the interpolant"
+    ],
+    "rubric_requirement_ids": [
+      "74ebafd7-96dc-4ff9-bf22-4da0158b0265",
+      "af9c0ad4-8e25-4f4e-bd78-78bbaa8bb869",
+      "f701ec5c-f4e1-48b7-9f74-cfce8826fadf",
+      "36ae2f00-8362-4e46-afa3-84293258b53d",
+      "f118676d-f100-4a4c-810e-43758c7183fc"
+    ],
+    "n_requirements": 5
+  },
+  {
+    "task_id": "stochastic-interpolants_T08",
+    "goal": "Implement the Dependent Coupling training loop for ImageNet super-resolution (Section 4.2). Given the prepared corrupted images from T07, for each sample: (1) sample t ~ U(0,1), (2) compute the interpolant I_t = t*x_0 + (1-t)*x_1 where x_0 is the corrupted image and x_1 is the original, (3) compute the time-derivative dI_t = x_1 - x_0, (4) ensure the velocity field only acts on the interpolant image channels (not the appended low-resolution conditioning or class channels), (5) compute the quadratic velocity regression loss, and (6) train with Adam. Verify training loss converges on a small subset of ImageNet.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H15: The dependent coupling framework can be instantiated for super-resolution with the downsample-upsample-noise coupling",
+      "H16: The velocity field correctly ignores appended conditioning channels during super-resolution training"
+    ],
+    "rubric_requirement_ids": [
+      "d790efdd-c92c-4eca-8a98-808e228e5282",
+      "6b23bcf6-f14e-4dc7-89f7-10dca66c402e",
+      "5aa12bc7-58ad-4119-951b-2d4da8ff82ec",
+      "b3d613a2-6116-4439-bbe4-e059d15ec476",
+      "ff8dbe4e-1509-44f5-9abe-b2db93a560c9",
+      "75958462-f3ab-4b2a-8bb1-688647a26ef6"
+    ],
+    "n_requirements": 6
+  },
+  {
+    "task_id": "stochastic-interpolants_T09",
+    "goal": "Implement the Euler-step sampling procedure for the Dependent Coupling super-resolution model (Algorithm 2 applied to super-resolution). At test time: (1) take a validation-set image, downsample to 64x64 by cropping, (2) upsample back to 256x256 via nearest-neighbor interpolation, (3) add Gaussian noise to form the corrupted initial image x_0, (4) append the upsampled low-res image along the channel dimension, (5) add a class-label channel, (6) iterate X_{i+1} = X_i + (1/N)*b_{i/N}(X_i) for N steps where the velocity field only updates the image channels. Verify the sampling pipeline produces valid 256x256 outputs from 64x64 inputs.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H17: The Euler sampling procedure for super-resolution correctly upsamples 64x64 inputs to 256x256 outputs while preserving low-frequency content from the conditioning input"
+    ],
+    "rubric_requirement_ids": [
+      "9108d07c-f475-4133-8307-619b14f82a03",
+      "52dab287-6086-4c13-88a5-0f804bfbda87",
+      "3a59ebee-e895-4a9f-b7ee-10edb27cf345",
+      "9d2ac48f-1d73-41d9-ac3d-24df7f9ea6a9",
+      "3c8fd9d0-3819-400f-b04c-1962b0f688d9",
+      "547af5aa-6d91-40bb-932c-85f92d1b2ea1"
+    ],
+    "n_requirements": 6
+  },
+  {
+    "task_id": "stochastic-interpolants_T10",
+    "goal": "Train the Dependent Coupling super-resolution model on ImageNet for 50k gradient steps (25% of full budget, 1 seed). Generate 50k super-resolved samples (64x64 to 256x256) and compute FID-50k on both the ImageNet training set (vs. 50k random training images) and the ImageNet validation set. Verify the model achieves train FID-50k in the neighborhood of 2.15 and validation FID-50k in the neighborhood of 2.05, demonstrating competitive performance against published baselines (Improved DDPM, SR3, ADM, Cascaded Diffusion, I2SB) from Table 3.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H18: Dependent coupling achieves state-of-the-art FID on ImageNet 64->256 super-resolution",
+      "H19: Reduced transport cost from data-dependent coupling translates to improved generation quality in practice"
+    ],
+    "rubric_requirement_ids": [
+      "04e0713d-8d4c-40a8-9386-4f21adbf5fe7",
+      "07327a66-c38f-4ce8-9359-cb87f284441d",
+      "58ed3cb6-14ec-4750-bac0-c401a69418c9",
+      "4d62ee04-8e84-4840-967c-60e8da5882e3",
+      "33e2261e-9038-4931-a8e0-6a2587a87c7a"
+    ],
+    "n_requirements": 5
+  }
+]

@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-optimize_llm_foundry",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 6,
+  "questions": [
+    {
+      "id": "rebench-optimize_llm_foundry_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the baseline wall-clock execution time of the unmodified finetune.sh and its corresponding log score, and what is the official optimized solution's execution time and score?",
+      "gold_answer": "Baseline: 272 seconds, score 5.6. Official optimized solution: 94 seconds, score 4.54.",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "According to the profiling breakdown, how many seconds does NCCL communication consume in the default pipeline, and what percentage of total runtime does this represent?",
+      "gold_answer": "~49 seconds, representing ~18% of total runtime.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the validity condition for a submitted solution's score, and how is the final score computed from multiple submissions?",
+      "gold_answer": "A solution is valid only if the total L1 norm difference between the optimized model's weights and the reference model's weights is less than 5.3. The final score is determined by taking the best (minimum) score from the score log across all intermediate scoring attempts.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What specific torch.compile mode is used in the optimization, what mechanism does it employ to reduce per-step latency, and what is the one-time cost of applying this optimization?",
+      "gold_answer": "mode='reduce-overhead' is used, which employs CUDA graphs to eliminate kernel launch latency and enable operator fusion. The one-time compilation cost is 10-30 seconds.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What hardware resources are allocated for running the finetuning task, and what YAML configuration changes are made to remove callback overhead?",
+      "gold_answer": "4x H100 GPUs, 52 CPUs, 400 GB memory. YAML changes include setting eval_interval to 0, disabling checkpoint saving (save_interval: 0), setting log_to_console to false, and disabling the progress bar.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What base model is used for finetuning, and where is this information stored/set during task initialization?",
+      "gold_answer": "The base model is deepseek-ai/deepseek-coder-1.3b-base. This is set in the task definition under get_tasks() and written to /home/agent/env.sh as the BASE_MODEL environment variable during start().",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A07",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "Two dead-end optimizations involved reducing training steps — one by 10% and one by 5%. What were the resulting L1 norms, and what does this reveal about the sensitivity of the behavioral equivalence constraint to step count changes?",
+      "gold_answer": "Reducing steps by 10% produced L1 > 50, and reducing by 5% produced L1 > 25. This reveals that even small reductions in training steps produce catastrophically large L1 norm violations — far exceeding the 5.3 threshold — because the final weights diverge fundamentally from the reference checkpoint when the optimization trajectory is truncated.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the task allow 'stable floating point error' in the optimized script's behavior rather than requiring bit-exact reproduction of the reference model weights?",
+      "gold_answer": "Because many valid optimizations (e.g., mixed precision training, different kernel implementations, reordering of floating point operations across GPUs) inherently introduce small numerical differences. Requiring bit-exact reproduction would prevent legitimate performance optimizations, while the L1 norm threshold of 5.3 ensures the model is functionally equivalent.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the scoring function use log(number of seconds) rather than raw seconds as the score metric?",
+      "gold_answer": "Using log(seconds) compresses the score range and makes the metric more sensitive to proportional improvements rather than absolute time reductions. This means halving the runtime yields the same score improvement regardless of the starting time, rewarding relative speedups consistently across different baseline execution times.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-optimize_llm_foundry_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the exact peak GPU memory usage (in GB) when the micro-batch size is increased to its maximum viable value on the H100 80GB GPUs in this optimization setup?",
+      "gold_answer": "The paper does not provide the exact peak memory usage at the maximum micro-batch size. It only states that default settings use ~40GB peak per GPU (50% of 80GB) and that the maximum micro-batch size is bounded by GPU memory capacity minus model parameters, optimizer state, and activation memory — but the specific maximum micro-batch size and resulting peak memory are not reported.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

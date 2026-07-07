@@ -1,0 +1,116 @@
+{
+  "paper_id": "bbox",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "bbox_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirement R13 specifies an optimizer configuration for adapter training. (a) What exact optimizer, learning rate, and weight decay does R13 require? (b) Which source execution file in the ARA would be expected to implement this optimizer setup — look at src/execution/nce_adapter.py — and what does its content reveal about whether AdamW with lr=5e-6 and weight_decay=0.01 is present? (c) Given that R50 separately specifies gradient updates with η=5e-6, what is the relationship between R13's learning rate and R50's η, and what does this imply about how the optimizer and NCE gradient update are coordinated in the implementation?",
+      "gold_answer": "R13 states exactly: 'The AdamW optimizer has been configured with learning rate 5e-6 and weight decay 0.01.' (a) The optimizer is AdamW, learning rate is 5e-6, weight decay is 0.01. (b) The file src/execution/nce_adapter.py is the ARA artifact expected to implement NCE-based adapter training; inspecting it should reveal whether torch.optim.AdamW (or equivalent) is instantiated with lr=5e-6 and weight_decay=0.01. (c) R50 states: 'The gradient updates ∇_θ L_NCE have been implemented with η=5e-6 as specified in Appendix H.2.' The learning rate η=5e-6 in R50 matches the lr=5e-6 in R13, confirming they refer to the same optimizer learning rate — the AdamW optimizer IS the mechanism for applying the NCE gradient updates, so both requirements jointly constrain the same parameter. This implies the implementation must use a single AdamW optimizer with lr=5e-6 to simultaneously satisfy both R13 and R50.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly identifies R13's optimizer as AdamW with lr=5e-6 and weight_decay=0.01",
+        "Correctly identifies src/execution/nce_adapter.py as the relevant ARA file for this requirement",
+        "Correctly identifies that R50's η=5e-6 matches R13's learning rate, explaining they refer to the same optimizer parameter",
+        "Explains that both R13 and R50 must be satisfied by the same AdamW instantiation in the training loop"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/nce_adapter.py"
+      ],
+      "rubric_requirement_id": "R13",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bbox_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R18, R19, and R20 together define LoRA hyperparameters for adapter comparisons. (a) What exact rank values and scaling parameter values do R18, R19, and R20 collectively require, and for which adapter sizes? (b) The ARA file evidence/tables/table8_lora_hyperparams.md is expected to document these hyperparameters — what does cross-referencing this table reveal about whether r=128, r=384, and α=2r are consistently recorded? (c) R24 adds further LoRA constraints; list every additional parameter R24 specifies and explain what this combined set of requirements (R18–R24) implies about the total configuration space that must be reproduced for the LoRA baseline comparison in the paper.",
+      "gold_answer": "(a) R18 states: 'The rank parameter r has been set to 128 for the 0.1B adapter comparison.' R19 states: 'The rank parameter r has been set to 384 for the 0.3B adapter comparison.' R20 states: 'The scaling parameter α has been set to 2r (256 and 768 respectively) for both adapter versions.' So: 0.1B adapter uses r=128, α=256; 0.3B adapter uses r=384, α=768. (b) evidence/tables/table8_lora_hyperparams.md should document these values; cross-referencing should confirm whether r=128/384 and α=256/768 appear in the table, providing evidence of correct configuration. (c) R24 states: 'The remaining parameters have been configured: LoRA dropout is set to 0.1, number of epochs is set to 3, maximum gradient norm is set to 0.3, optimizer is set to Paged AdamW 32bit, and scheduler is set to Cosine.' Combined, R18–R24 define: two rank variants (128, 384), two alpha variants (256, 768), dropout=0.1, epochs=3, max_grad_norm=0.3, optimizer=Paged AdamW 32bit, scheduler=Cosine. Additionally R21 sets lr=2e-4, R22 sets weight_decay=0.001, R23 sets batch_size=8 per GPU. This implies a fully specified 9-parameter configuration that must be reproduced exactly to replicate the LoRA baseline.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly states r=128 for 0.1B and r=384 for 0.3B per R18/R19, and α=256/768 per R20",
+        "Identifies evidence/tables/table8_lora_hyperparams.md as the cross-reference file and explains what consistency check it enables",
+        "Lists all five parameters from R24: dropout=0.1, epochs=3, max_grad_norm=0.3, Paged AdamW 32bit optimizer, Cosine scheduler",
+        "Explains that R18–R24 collectively define the complete LoRA configuration needed to reproduce the baseline comparison"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/table8_lora_hyperparams.md"
+      ],
+      "rubric_requirement_id": "R18",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bbox_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirement R66 addresses a fundamental design principle of the BBox-Adapter system. (a) What does R66 require exactly, and under which parent context does it appear in rubric/requirements.md? (b) Examine src/execution/bbox_adapter.py — how does its structure and any API call patterns reflect (or potentially violate) the black-box constraint R66 imposes? (c) R65 is a companion requirement to R66; quote R65 exactly and explain what the pairing of R65 and R66 implies about the interface contract between the LLM component and the adapter component — specifically, what information CAN and CANNOT flow from the LLM to the adapter according to these two requirements together?",
+      "gold_answer": "(a) R66 states exactly: 'Code has been written such that the LLM is treated as a black box without accessing internal parameters or probabilities.' Its parent context is: 'The LLM outputs can be used as proposals in the adapter framework.' (b) src/execution/bbox_adapter.py should show that the adapter only receives text outputs (sampled sequences) from the LLM, never logits, hidden states, or token probabilities. The file's API call patterns should rely solely on text completion endpoints rather than log-probability endpoints, consistent with black-box treatment. (c) R65 states exactly: 'Code has been written such that the LLM can generate candidate proposals for the adapter to score.' Together, R65 and R66 define a strict interface: the LLM CAN provide sampled text strings as proposals (R65), but CANNOT expose internal parameters, probability distributions, or gradients to the adapter (R66). This means the adapter's scoring function g_θ(x,y) must operate solely on the text content of (x,y) pairs, and the training signal must come entirely from the adapter's own NCE loss — not from any LLM-internal signal. This is the defining feature that makes the approach 'black-box'.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes R66 exactly: 'Code has been written such that the LLM is treated as a black box without accessing internal parameters or probabilities.'",
+        "Identifies src/execution/bbox_adapter.py and explains what black-box compliance looks like in that file (text-only outputs, no logit access)",
+        "Quotes R65 exactly: 'Code has been written such that the LLM can generate candidate proposals for the adapter to score.'",
+        "Correctly explains that R65+R66 together permit text proposals but prohibit any internal LLM signal (logits, gradients, hidden states) from reaching the adapter"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/bbox_adapter.py"
+      ],
+      "rubric_requirement_id": "R66",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bbox_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Requirements R40 and R41 define the scaling experiment configurations for beam size and iteration count. (a) Quote R40 and R41 exactly as stated in rubric/requirements.md, including the specific values each requires. (b) The ARA contains two figure files relevant to these experiments: evidence/figures/fig3a_beam_scaling.md and evidence/figures/fig3b_iteration_scaling.md — which requirement maps to which figure file, and what evidence should each file contain to confirm compliance? (c) R42 is an execution-level requirement paired with R41; quote R42 and explain what distinction the rubric draws between R41 (a Code Development requirement) and R42 (a Code Execution requirement), and what that distinction implies about what an evaluator must verify separately for each.",
+      "gold_answer": "(a) R40 states exactly: 'The adapter has been configured to run with beam sizes k = 1, 3, and 5.' R41 states exactly: 'The online adaptation has been configured to run with T = 0, 1, 2, 3, and 4 iterations.' (b) fig3a_beam_scaling.md maps to R40 (beam size experiment), as it should contain accuracy or performance results across k=1, 3, 5. fig3b_iteration_scaling.md maps to R41 (iteration experiment), as it should contain results across T=0,1,2,3,4 iterations. Each file should provide numerical evidence that the corresponding configurations were actually run and produced results. (c) R42 states exactly: 'The training and inference has been executed for each iteration configuration.' The rubric distinguishes R41 as 'Code Development / Experimental Setup' (meaning code exists that can run the T=0..4 configurations) from R42 as 'Code Execution / Experimental Setup' (meaning those configurations were actually run and produced results). An evaluator must verify R41 by inspecting code configuration files, and must verify R42 by checking for actual output artifacts (e.g., result tables or figures showing T=0..4 results), treating them as independent criteria.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes R40 exactly with k=1,3,5 and R41 exactly with T=0,1,2,3,4",
+        "Correctly maps fig3a_beam_scaling.md to R40 and fig3b_iteration_scaling.md to R41 with explanation of what evidence each should contain",
+        "Quotes R42 exactly: 'The training and inference has been executed for each iteration configuration.'",
+        "Correctly explains the Code Development vs Code Execution distinction between R41 and R42 and what each requires an evaluator to verify"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/figures/fig3a_beam_scaling.md",
+        "evidence/figures/fig3b_iteration_scaling.md"
+      ],
+      "rubric_requirement_id": "R40",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "bbox_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Requirements R69 and R70 define two distinct pathways for selecting positive and negative training samples in the BBox-Adapter framework. (a) Quote R69 and R70 exactly from rubric/requirements.md and identify the key condition that determines which pathway is used. (b) Examine src/execution/online_adaptation.py — what code structures (conditional branches, function signatures, or data flow patterns) would need to be present to satisfy both R69 and R70 simultaneously, and which external model does R70 specifically require access to? (c) R36, R37, and R38 define three adapter training variants (Ground-Truth, AI Feedback, Combined); explain how each variant maps to the R69/R70 pathways, and what the 'Combined' variant in R38 implies about how positive sample selection must be implemented to satisfy all five requirements (R36, R37, R38, R69, R70) in a unified codebase.",
+      "gold_answer": "(a) R69 states exactly: 'When ground truth data is available, positive samples are taken from ground truth solutions while negative samples are generated using an adapter with random parameters.' R70 states exactly: 'When ground truth data is unavailable, positive samples are selected based on AI feedback (using GPT-4) from generated candidates, while remaining candidates serve as negative samples.' The key condition is whether ground truth data is available. (b) src/execution/online_adaptation.py should contain a conditional branch (e.g., if ground_truth_available) that routes to: (i) GT pathway: positives from ground truth labels, negatives from randomly-initialized adapter samples; (ii) AI feedback pathway: positives selected by GPT-4 from LLM-generated candidates, negatives = remaining candidates. R70 specifically requires GPT-4 API access for the AI feedback selection step. (c) R36 ('The adapter has been trained using ground truth data') maps to R69's GT pathway. R37 ('The adapter has been trained using AI feedback') maps to R70's AI feedback pathway. R38 ('The adapter has been trained using combined feedback') implies a third pathway that merges both — likely using ground truth when available and AI feedback otherwise, or combining both signal types. To satisfy all five requirements, the implementation must support three training modes with a unified interface, where the sample selection logic is parameterizable and the 'Combined' mode in R38 exercises both R69 and R70 branches within the same training run or sequentially.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Quotes R69 and R70 exactly, correctly identifying ground truth availability as the branching condition",
+        "Identifies src/execution/online_adaptation.py and describes the conditional branching structure needed, naming GPT-4 as R70's required external model",
+        "Correctly maps R36→R69 (GT pathway), R37→R70 (AI feedback pathway), and R38→Combined pathway",
+        "Explains that satisfying R38 alongside R69/R70 requires a unified codebase supporting three parameterizable training modes"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/online_adaptation.py"
+      ],
+      "rubric_requirement_id": "R69",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

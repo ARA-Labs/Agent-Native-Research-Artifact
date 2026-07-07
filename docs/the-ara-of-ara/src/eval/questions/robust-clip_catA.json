@@ -1,0 +1,101 @@
+{
+  "paper_id": "robust-clip",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 2,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "robust-clip_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the mean targeted attack success rate of FARE4-CLIP against LLaVA-1.5 7B at ε=4/255 using 10,000 APGD iterations across all 6 target strings?",
+      "gold_answer": "0% (0 out of 25 images succeeded for every target, mean success rate = 0%)",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the mean clean embedding loss E[L_clean(x)] for TeCoA4 versus FARE4 on the ImageNet validation set at ε=4/255?",
+      "gold_answer": "TeCoA4: 292.7; FARE4: 47.6",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A03",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "What is the FARE loss function used for unsupervised adversarial fine-tuning of the CLIP vision encoder?",
+      "gold_answer": "L_FARE(φ, x) = max_{||z-x||_∞ ≤ ε} ||φ(z) - φ_Org(x)||²_2, which enforces that the features of perturbed points stay close to the unperturbed ones of the original CLIP model.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "robust-clip_A04",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What PGD step size (α) and number of inner maximization steps (T) are used during FARE training, and what is the rationale for choosing T=10 rather than 2–3 steps?",
+      "gold_answer": "α = 1/255 and T = 10 steps. The rationale is that FARE trains for only 2 epochs (short fine-tuning), so more PGD steps are needed to find strong adversarial examples; with longer training (e.g., 300 epochs), 2–3 steps would suffice.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Why does TeCoA's supervised fine-tuning degrade performance on downstream tasks like LVLMs, and what two specific problems does the paper identify with TeCoA's approach?",
+      "gold_answer": "First, TeCoA trains only on ImageNet's fixed set of text embeddings, so it does not account for other text embeddings (unseen classes), causing heavy distortions for zero-shot tasks on other datasets. Second, the cosine similarity loss only cares about the projection on the hypersphere, so the embedding can be changed arbitrarily in the radial direction, causing performance losses in LVLMs that use unnormalized embeddings.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "robust-clip_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "Comparing FARE2-CLIP and TeCoA2-CLIP on LLaVA-1.5 7B: what are their average clean scores across the four benchmarks (Table 1), and how does this difference relate to the embedding loss values reported in Table 14?",
+      "gold_answer": "FARE2 achieves an average clean score of 71.1 vs. TeCoA2's 61.6 on LLaVA-1.5 7B (a gap of +9.5 for FARE2). Table 14 shows FARE2 has E[L_clean]=32.7 vs. TeCoA2's 236.9, meaning FARE2 distorts the original CLIP embedding far less on clean inputs, which directly explains its superior clean LVLM performance.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does TeCoA's use of cosine similarity loss specifically harm LVLMs even when it preserves zero-shot classification accuracy on ImageNet, while FARE's squared ℓ₂ loss avoids this problem?",
+      "gold_answer": "Cosine similarity is scale-invariant, so TeCoA's loss does not constrain the magnitude (norm) of the embedding vector — only its direction. LVLMs use unnormalized embeddings (not cosine similarity), so large changes in embedding magnitude caused by TeCoA's fine-tuning distort the inputs to the projection layer and LLM, degrading LVLM performance. FARE's squared ℓ₂ loss constrains both direction and magnitude of the embedding, preserving the full unnormalized embedding that LVLMs rely on. Table 14 confirms TeCoA has E[L_clean]=236.9–292.7 vs. FARE's 32.7–47.6.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does FARE not require any image labels or the CLIP text encoder during fine-tuning, and what theoretical guarantee ensures that zero-shot classification performance is still preserved?",
+      "gold_answer": "FARE's loss is purely the ℓ₂ distance between the fine-tuned encoder's output on adversarial inputs and the frozen original encoder's output on clean inputs — no class labels or text embeddings are needed. Theorem 3.1 guarantees that if this ℓ₂ distance is small, the cosine similarity between the fine-tuned image embedding and any text embedding is also preserved (bounded by the ℓ₂ distance divided by the embedding norm). Thus, as the FARE loss approaches zero, zero-shot classification performance is automatically preserved for any label set.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does FARE fail to provide complete robustness against targeted stealth attacks, and what does the attack iteration analysis reveal about the importance of attack strength in evaluating this failure?",
+      "gold_answer": "FARE2-CLIP (trained at ε=2/255) fails to provide complete robustness at ε=4/255: 2/25 successes for the 'Sell your stocks' target and 1/25 for the URL target at ε=4/255. With only 500 APGD iterations (vs. 10,000), the attack on standard CLIP achieves only 59.3% success at ε=2/255 (vs. 100% with 10,000 iterations), demonstrating that weak attacks underestimate vulnerability and that strong attacks are necessary to correctly characterize failure conditions.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "robust-clip_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the minimum number of ImageNet training images required for FARE to achieve non-trivial robustness, and how does performance degrade if fewer than this threshold are used?",
+      "gold_answer": "The paper does not provide this information. It only states that FARE trains for 2 epochs on the full ImageNet dataset (1.28M images) and that this constitutes ~0.2% of original CLIP training cost. No ablation on dataset size or minimum data requirements is reported.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

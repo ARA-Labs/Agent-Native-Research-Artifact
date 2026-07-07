@@ -1,0 +1,101 @@
+{
+  "paper_id": "bridging-data-gaps",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 7,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "bridging-data-gaps_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the FID score achieved by DPMs-TAN (ADMT) on the FFHQ → 10-shot Sunglasses task as reported in Table 2, and what was the prior best FID on that task?",
+      "gold_answer": "TAN achieves FID of 20.06 on FFHQ→Sunglasses; the prior best was 34.75 (DDPM-PA / ADMT).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bridging-data-gaps_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What are the adaptor bottleneck hyperparameters c and d for DDPM-TAN versus LDM-TAN, and what learning rate is used for DDPM fine-tuning?",
+      "gold_answer": "For DDPM-TAN: c=4, d=8. For LDM-TAN: c=2, d=8. The learning rate for DDPM fine-tuning is 5×10^-5.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bridging-data-gaps_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe how the adaptor layer is integrated with the pre-trained U-Net in TAN, including the mathematical formulation and what parameters are updated during training.",
+      "gold_answer": "The adaptor layer is linked to the pre-trained U-Net as x^l_t = θ^l(x^{l-1}_t) + ψ^l(x^{l-1}_t), where θ^l is the frozen pre-trained U-Net layer and ψ^l is the trainable adaptor layer. The adaptor performs a down-projection (Wdown), non-linear activation f(·), and up-projection (Wup). Only the adaptor parameters ψ are updated during training; the pre-trained model parameters θ are kept constant.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "bridging-data-gaps_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the complete PGD inner loop used for adversarial noise selection, including the update rule, normalization step, number of steps, and step size used in experiments.",
+      "gold_answer": "Starting from ε⁰ ~ N(0,I), each step computes ε^(j+1) = Norm(ε^j + ω·∇_{ε^j}‖ε^j − ε_θ(x_t^j, t)‖²), where Norm enforces zero mean and unit standard deviation. This runs for J=10 steps with step size ω=0.02. The similarity-guidance term is excluded from the inner loop for computational tractability.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "bridging-data-gaps_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "What is the ablation study FID progression across the four model variants on FFHQ→Sunglasses at 300 iterations, and what does this reveal about the contribution of each component?",
+      "gold_answer": "FID progresses: Baseline (direct fine-tuning) = 38.65 → Adaptor only = 41.88 → DPMs-TAN w/o adversarial noise = 26.41 → Full DPMs-TAN = 20.06. This shows that the adaptor alone slightly hurts FID vs. baseline at 300 iterations, similarity-guided training provides the largest single improvement, and adversarial noise selection provides additional improvement on top.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "bridging-data-gaps_A06",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does TAN's computational efficiency compare to direct DDPM fine-tuning in terms of GPU hours, memory, iterations, and percentage of parameters trained?",
+      "gold_answer": "DDPM-TAN requires ~300 iterations (vs. ~5000), 3 GPU hours (vs. 7.5 GPU hours), 9 GB memory (vs. 20 GB), and trains only 1.3% of parameters (vs. 100% for all baselines).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bridging-data-gaps_A07",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does TAN use a binary classifier operating on noised images x_t rather than on clean generated images to estimate domain gap, and why is the source-domain gradient term dropped during fine-tuning?",
+      "gold_answer": "DPMs cannot produce clean images during training—only blurry intermediate predictions—so comparing clean generated images with target images is infeasible. Using a classifier on noised images x_t avoids this requirement. The source-domain gradient term ∇_{x_t} log p_φ(y=S|x_t) is dropped because when x_t comes from target images, p_φ(y=S|x_t) ≈ 0, making its gradient large and chaotic (near-zero probability region), so it is discarded for stability.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "bridging-data-gaps_A08",
+      "category": "failure_conditions",
+      "difficulty": "T2_scattered",
+      "question": "What failure modes are observed when the similarity guidance scale γ is set too high (e.g., γ=9) versus too low (e.g., γ=1) in the FFHQ→Sunglasses task, and what metric values signal these failures?",
+      "gold_answer": "At γ=9, FID increases to 29.48 and Intra-LPIPS drops to 0.592, indicating generated images become too similar to target images or degrade (overfitting, lower diversity and fidelity). At γ=1, FID is 20.75 and Intra-LPIPS is 0.641, meaning images are more diverse but less faithful to the target domain (underfitting the target style).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bridging-data-gaps_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "In the adversarial noise selection PGD update, why is the similarity-guided term (∇_{x_t} log p_φ(y=T|x_t)) excluded from the inner maximization step?",
+      "gold_answer": "The similarity-guided term is hard to compute differentially with respect to ε (it requires differentiating through the classifier gradient with respect to the noise), and it is almost unchanged during the inner maximization process. Therefore, it is disregarded in the inner maximization to make the PGD update tractable.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "bridging-data-gaps_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What specific ImageNet backbone architecture (e.g., ResNet-50, ViT-B/16) is used for the binary classifier in TAN, and how many fine-tuning epochs are used to train it on the 10 target-domain images?",
+      "gold_answer": "The paper does not specify the exact ImageNet backbone architecture used for the binary classifier, nor the number of fine-tuning epochs. It only states that a pre-trained ImageNet model is fine-tuned with a binary classification head on 10 target-domain images.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "paper_id": "rebench-nanogpt_chat_rl",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 7,
+  "n_from_ara": 3,
+  "questions": [
+    {
+      "id": "rebench-nanogpt_chat_rl_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the official solution score and the starting score for the main task in this benchmark?",
+      "gold_answer": "The official solution score is 0.85 and the starting score is 0.54.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A02",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the highest baseline score achieved in the main task, and how does it compare to the official solution score?",
+      "gold_answer": "The highest baseline score is 0.97, which exceeds the official solution score of 0.85.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What two reference models is the student model scored against, and how is the final score computed from those comparisons?",
+      "gold_answer": "The student model is scored against gpt2-xl and gpt2-alpaca. The final score is the fraction of prompts the student model wins against each reference model, summed together (i.e., the sum of win rates against both models).",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What judge model is used to evaluate response quality, and through what API is it accessed?",
+      "gold_answer": "llama-3-8b-instruct is used as the judge model, accessed through the Replicate API (via evaluation.py).",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A05",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What GPU resources are allocated for the main task, and how many CPUs and how much memory are provided?",
+      "gold_answer": "2 H100 GPUs, 26 CPUs, and 200 GB of memory.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A06",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What are the three generation hyperparameters (max tokens, temperature, top_p) used when sampling candidate responses from the policy model during training?",
+      "gold_answer": "max_tokens=256, temperature=0.8, top_p=0.95",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A07",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does the hidden_score task differ from the main task in terms of scoring visibility and score information stripping?",
+      "gold_answer": "In hidden_score, scoring is not visible to the agent (visible_to_agent: false) and strip_score_information is set to True, whereas in main, scoring is visible to the agent and strip_score_information is False.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A08",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How is the advantage estimate computed per token in the PPO update, and what exponential moving average decay coefficient is used for the reward baseline?",
+      "gold_answer": "The advantage per sequence is A(x,y) = R_KL(x,y) - b, where b is an EMA of R_KL values with decay coefficient alpha=0.95. This sequence-level advantage is then divided uniformly across all T tokens: A_t = A(x,y) / T for each token t.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A09",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why is the agent prohibited from using the Replicate API directly (outside of evaluation.py), and why can't it train on hand-written responses or ground truth answers?",
+      "gold_answer": "The Replicate API restriction prevents the agent from using the judge model arbitrarily beyond the controlled evaluation interface, ensuring fair and consistent evaluation. The prohibition on hand-written/ground-truth responses enforces that the agent must use RL or similar methods based solely on binary preference feedback, making the task specifically about learning from reward signals rather than supervised imitation.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "rebench-nanogpt_chat_rl_A10",
+      "category": "failure_conditions",
+      "difficulty": "unanswerable",
+      "question": "What is the specific random seed or shuffling strategy used by the Prompt Sampler when selecting prompts per batch from the Alpaca dataset, and how does the oversampling of low-win-vs-alpaca prompts in Phase 2 quantitatively weight those prompts relative to others?",
+      "gold_answer": "The paper does not provide this information. While shuffled sampling without replacement within each epoch and Phase 2 oversampling of low-win-vs-alpaca prompts are mentioned, no specific random seed, oversampling ratio, or quantitative weighting scheme is given anywhere in the artifact.",
+      "grading_type": "abstention",
+      "source": "ara"
+    }
+  ]
+}

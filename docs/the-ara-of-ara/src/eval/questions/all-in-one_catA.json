@@ -1,0 +1,101 @@
+{
+  "paper_id": "all-in-one",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 7,
+  "n_from_ara": 6,
+  "questions": [
+    {
+      "id": "all-in-one_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What C2ST score indicates perfect alignment with the ground truth posterior in the benchmark evaluation?",
+      "gold_answer": "0.5",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "all-in-one_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What are the five condition mask types sampled during Simformer training, and with what probability is each selected?",
+      "gold_answer": "At each training batch, one of five mask types is selected uniformly at random: (1) joint mask (all zeros), (2) posterior mask (data=1, params=0), (3) likelihood mask (data=0, params=1), (4) Bernoulli(p=0.3) random mask, (5) Bernoulli(p=0.7) random mask.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "all-in-one_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "How does the Simformer handle conditioning during training? Specifically, what happens to variables that are conditioned on versus those that are not during the noising process?",
+      "gold_answer": "During training, the condition mask MC is sampled at random. Variables marked as conditioned on (MC=1) remain clean (unnoised) at their original values, while variables to be inferred (MC=0) are noised according to the diffusion process. The partially noisy sample is defined as x_hat^MC_t = (1-MC)*x_hat_t + MC*x_hat_0, so conditioned variables stay at x_hat_0 while unconditioned variables are noised.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "all-in-one_A04",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What are the VESDE hyperparameter values used in the Simformer experiments, and how many reverse SDE steps are used by default for inference?",
+      "gold_answer": "For VESDE: sigma_max=15, sigma_min=0.0001. The time interval is [1e-5, 1.]. For inference, 500 steps (Euler-Maruyama discretization) are used by default.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "all-in-one_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "The Simformer uses 6 transformer layers for benchmark tasks but 8 layers for physical simulator tasks. Which specific tasks use 8 layers, and what is the feed-forward hidden dimension used in all tasks?",
+      "gold_answer": "8 layers are used for Lotka-Volterra, SIRD, and Hodgkin-Huxley. The feed-forward hidden dimension is 150 (= token dimension 50 × widening factor 3) for all tasks.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "all-in-one_A06",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "By approximately how many times fewer simulations does the Simformer require compared to NPE on average across benchmark tasks, and what is the one benchmark task/condition where Simformer did not outperform NPE?",
+      "gold_answer": "The Simformer required about 10 times fewer simulations than NPE on average. The exception was the Gaussian linear task with 10k simulations.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "all-in-one_A07",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "In the guided diffusion algorithm (Algorithm 1), what is the scaling function s(t) used for VESDE, and what is the constraint function c(x̂) for conditioning on an upper bound u?",
+      "gold_answer": "For VESDE, the scaling function is s(t) = 1/σ(t)², where σ(t)² = σ_min² · (σ_max/σ_min)^{2t}. The constraint function for an upper bound u is c(x̂) = x̂ − u (so that c(x̂) ≤ 0 enforces x̂ ≤ u).",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "all-in-one_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the Simformer train on the joint distribution p(θ, x) rather than directly targeting the posterior p(θ|x) as in NPE, and what key capability does this design choice enable?",
+      "gold_answer": "Training on the joint distribution allows the Simformer to sample any conditional of the joint at inference time by simply changing the condition mask MC. This means a single trained network can produce the posterior, likelihood, and arbitrary parameter/data conditionals without retraining. If it only targeted the posterior, it would be locked into that specific conditional and could not flexibly answer other inference queries.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "all-in-one_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does the Simformer's approach of estimating all conditionals become disadvantageous compared to methods that only target the posterior, and what workaround does the paper suggest?",
+      "gold_answer": "When the data is high-dimensional (e.g., images or long time series) and there are few parameters, estimating the full joint distribution (including the likelihood over high-dimensional data) is much harder than just estimating the posterior. In such cases, the Simformer can be restricted to target only specific conditionals of interest (e.g., posterior and missing data posteriors) by limiting the condition mask distribution, and embedding networks can be used to compress high-dimensional data into a single token.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "all-in-one_A10",
+      "category": "cross_section",
+      "difficulty": "unanswerable",
+      "question": "What is the exact wall-clock training time in hours required to train the Simformer on the SLCP benchmark task at 10⁵ simulations, and how does it compare to NPE training time on the same hardware?",
+      "gold_answer": "This information is not provided in the paper. The paper mentions sampling times but does not report training wall-clock times for any specific task, nor does it provide direct wall-clock comparisons between Simformer and NPE training.",
+      "grading_type": "abstention",
+      "source": "both"
+    }
+  ]
+}

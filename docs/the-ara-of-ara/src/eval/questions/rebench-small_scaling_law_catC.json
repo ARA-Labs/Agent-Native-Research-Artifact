@@ -1,0 +1,105 @@
+{
+  "paper_id": "rebench-small_scaling_law",
+  "category": "C",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "n_answerable": 5,
+  "questions": [
+    {
+      "id": "rebench-small_scaling_law_C01",
+      "category": "failed_configurations",
+      "difficulty": "T3_implicit",
+      "question": "What n_embd and max_iters combinations were tried that resulted in invalid solutions due to exceeding the 5e17 FLOP budget, and what was the typical failure pattern when agents miscalculated the FLOP formula?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree does not directly enumerate specific (n_embd, max_iters) combinations that exceeded the 5e17 FLOP budget for the target submission. However, the tree describes related failure patterns: N22 (DE7) describes agents predicting very large n_embd values (e.g., n_embd>1500, even up to 2000), which would result in max_iters as low as 26 — far too few for convergence. The typical failure pattern involved misapplying the FLOP formula C = 4,718,592 × n_embd^2 × max_iters: agents either ignored the quadratic dependence on n_embd (leading to overestimates of feasible n_embd) or failed to enforce the iso-FLOP constraint during optimization (N17, DE3), producing configurations like (512, 10000) that only consumed ~1/9 of the FLOP budget. N18/N19 (DE4) shows the Chinchilla-based approach predicted n_embd≈730, max_iters≈31600 — technically within budget but badly misallocated. The Chinchilla approach did not exceed the budget but allocated it suboptimally by being too wide and undertrained relative to the ground truth (554, 88914).",
+      "trace_nodes": [
+        "N17",
+        "N18",
+        "N19",
+        "N22",
+        "N16"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-small_scaling_law_C02",
+      "category": "abandoned_approaches",
+      "difficulty": "T3_implicit",
+      "question": "What scaling law fitting approaches were tried using small training runs (<=1e16 FLOPs) that failed to correctly extrapolate to 5e17 FLOPs, and why did they produce poor predictions compared to the ground truth n_embd=554, max_iters=88914?",
+      "grading_type": "semantic",
+      "gold_answer": "Several fitting approaches failed: (1) Single large experiment (N02/N03, DE1): spending the entire budget on one run at ~1e16 FLOPs (e.g., n_embd=512, max_iters=828) provided one data point with no basis for extrapolation. (2) Fitting a power law with only 2-3 data points (N06/N07, DE2): with 5 free parameters and 2-3 points, the system was underconstrained. The fit achieved zero training residual (a red flag) but extrapolated catastrophically, with predicted n_embd ranging from 50 to 3000, producing scores as low as -11. (3) Single n_embd extrapolation (N14/N15, DE5): fitting L(max_iters) at only n_embd=256, then fixing n_embd=256 for the 5e17 budget, which completely missed the width dependence — the optimal n_embd is 554, not 256. (4) Independent optimization of n_embd and max_iters (N16/N17, DE3): treating them as independent gave (512, 10000), which used only ~1/9 of the FLOP budget and missed max_iters by nearly 9×. (5) Chinchilla ratios without fitting (N18/N19, DE4): predicted n_embd≈730, max_iters≈31600, because the fixed architecture constraints (n_layer=4, n_head=4) shift the compute-optimal allocation away from the standard Chinchilla ratio. The successful approach (N08) fit L = A·w^(-α) + B·t^(-β) + E to ~22 data points across a grid, achieving training RMSE=0.03 nats and predicting n_embd≈540-560, max_iters≈85000-92000.",
+      "trace_nodes": [
+        "N02",
+        "N03",
+        "N06",
+        "N07",
+        "N14",
+        "N15",
+        "N16",
+        "N17",
+        "N18",
+        "N19",
+        "N08"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "partial"
+    },
+    {
+      "id": "rebench-small_scaling_law_C03",
+      "category": "dead_end_analysis",
+      "difficulty": "T3_implicit",
+      "question": "What were the main failure modes that caused agents to score negatively (e.g., -1.69, -11.06, -1.48) — specifically, did they tend to over-optimize toward large hidden sizes with few steps, or toward many steps with small hidden sizes, and how far off were their n_embd predictions from the optimal 554?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree describes several failure modes that would produce negative scores. The tendency to over-optimize toward large hidden sizes (n_embd too large, max_iters too small) appears prominently: N22 (DE7) describes predicting very large n_embd (e.g., n_embd>1500, up to 2000) with max_iters as low as 26 — extreme over-width with near-zero training steps. The Chinchilla approach (N18/N19) predicted n_embd≈730 (32% too large) with max_iters≈31600 (64% too short), also biased toward large width/few steps. The underconstrained fit with 2-3 data points (N06/N07, DE2) produced the most severe negative scores (as low as -11), with n_embd predictions ranging anywhere from 50 to 3000 — errors of hundreds to thousands from the optimal 554. The independent optimization approach (N16/N17) gave n_embd=512 (close to optimal at ~8% off) but max_iters=10000 (only ~11% of optimal 88914), making it budget-wasteful. The tree does not explicitly attribute specific scores (-1.69, -11.06, -1.48) to named nodes, but DE2 (N07) is cited as producing scores 'as low as -11 in human baselines,' consistent with the catastrophic overfitting of underconstrained fits. The dominant failure mode was over-widening (large n_embd, insufficient max_iters) rather than the reverse.",
+      "trace_nodes": [
+        "N06",
+        "N07",
+        "N16",
+        "N17",
+        "N18",
+        "N19",
+        "N22"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-small_scaling_law_C04",
+      "category": "lessons_learned",
+      "difficulty": "T3_implicit",
+      "question": "What was learned about loss prediction accuracy — specifically, did agents systematically over- or under-estimate the achievable loss at 5e17 FLOPs, and how much did inaccurate loss_prediction values hurt the final score relative to wrong n_embd/max_iters choices?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree provides limited but relevant information. N09 shows that the mini-extrapolation test (fit on ≤1e15 FLOPs, predict 1e15–1e16 FLOPs) had RMSE=0.08 nats and that 'predictions slightly overestimate loss at higher compute (conservative bias)' — indicating a systematic tendency to over-predict loss (i.e., under-estimate the achievable improvement). The successful fit (N08) had training RMSE=0.03 nats and CV RMSE=0.05 nats, with the predicted loss at 5e17 being approximately 3.28 nats. The tree does not explicitly quantify how much wrong loss_prediction values hurt scores relative to wrong n_embd/max_iters choices. However, the scoring function is described as penalizing 'both suboptimal hyperparameters and inaccurate loss predictions' (N01). The catastrophic negative scores (-11) described in N07 arose from severely wrong n_embd/max_iters rather than loss prediction errors, suggesting that wrong hyperparameter choices dominate the score penalty. The conservative bias (overestimating loss) is noted as a minor issue — the main damage came from wrong (n_embd, max_iters) allocations.",
+      "trace_nodes": [
+        "N01",
+        "N08",
+        "N09",
+        "N07"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    },
+    {
+      "id": "rebench-small_scaling_law_C05",
+      "category": "resource_waste",
+      "difficulty": "T3_implicit",
+      "question": "How much compute time was wasted on running training experiments at or near the 1e16 FLOP limit (e.g., large n_embd sweeps) versus simpler analytical approaches, and which experimental strategies proved redundant given that the scoring function uses a fixed interpolation table?",
+      "grading_type": "semantic",
+      "gold_answer": "The exploration tree identifies several wasteful experimental strategies. N02/N03 (DE1) describes spending the entire budget on a single large experiment at ~1e16 FLOPs, which provided only one data point and zero extrapolation basis — the entire budget was wasted on information-free high-quality loss. N20/N21 (DE6) describes running 3 experiments each at ~3e15 FLOPs (total ~1e16 FLOPs), which exhausted the budget on too-few points for fitting a 5-parameter model. N22 (DE7) implies wasted effort predicting large n_embd values that were computationally infeasible. By contrast, N04 and N05 advocate spreading the budget across 20-25 small experiments (each at 1e13–1e15 FLOPs range), which proved information-efficient. The Chinchilla approach (N18/N19) was analytically simple but wrong — it required no experiments but still failed. The tree notes in N21 that 'many small experiments (1e13-1e15 FLOPs each) are more valuable than a few large ones.' The exploration tree does not directly address which strategies were redundant specifically because the scoring function uses a fixed interpolation table — this detail is not mentioned in the tree. The single-large-run and few-large-runs strategies (N02, N20) are identified as the primary sources of compute waste within the experimental budget.",
+      "trace_nodes": [
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "N20",
+        "N21",
+        "N22",
+        "N18",
+        "N19"
+      ],
+      "answerable": true,
+      "expected_pdf_behavior": "abstention"
+    }
+  ]
+}

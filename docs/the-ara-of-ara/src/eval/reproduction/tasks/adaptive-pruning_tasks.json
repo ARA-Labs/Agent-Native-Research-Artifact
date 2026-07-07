@@ -1,0 +1,247 @@
+[
+  {
+    "task_id": "adaptive-pruning_T1",
+    "goal": "Set up the infrastructure for reproducing APT: load RoBERTa-base and T5-base (t5-lm-adapt) into memory, set up data pipelines for SST2 and MNLI (GLUE), SQuAD 2.0, and CNN/DailyMail, implement evaluation metrics (dev accuracy for SST2/MNLI, dev F1 for SQuAD, ROUGE 1/2/L for CNN/DM), and implement efficiency measurement utilities (97% time-to-accuracy, peak GPU memory via torch.cuda.max_memory_allocated, inference throughput, inference memory). Set up LoRA so it can be applied to transformer modules and merged before inference.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: APT maintains ~98% task performance at 60% sparsity (prerequisite infrastructure)"
+    ],
+    "rubric_requirement_ids": [
+      "9ad77547-04b6-4558-993b-f22d91203bf1",
+      "fa5309a4-2d43-45ef-80f6-df26a5559be2",
+      "c9daa9ee-7667-4795-9c83-3f5c9c88a65f",
+      "5fef034a-5a8f-4ada-848c-336469238e68",
+      "8605df37-4a11-4c87-8eae-bfb10b6bf5b9",
+      "4e1da193-e3eb-4cc0-af44-74314ba83668",
+      "1fdb66d7-04b9-479e-bcf4-32791841707f",
+      "d43a1c9e-74f8-4725-91be-58a38063639a",
+      "698b1e1c-4947-4365-a49f-10c6ab66e263",
+      "3aeea066-bf35-4baa-a1e5-864de953d68f",
+      "79a20612-83df-424a-9355-068dc18032d7",
+      "240b99e2-f34e-4a0c-86c2-4454e31b6517",
+      "1ff3dcb3-be14-4770-93a8-dcf721c4e3bd",
+      "48e1cbcb-4226-4f00-a456-7a8d2025263c",
+      "d5ec9b1a-d8cb-4196-8cfc-2923638b8483"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "adaptive-pruning_T2",
+    "goal": "Implement the APT adapter architecture (Section 4.1) for RoBERTa-base. The APT adapter extends LoRA by adding learnable binary pruning masks on both input (m_i) and output (m_o) dimensions, a frozen original weight matrix W, and two learnable low-rank matrices W_A (r_apt x d_i) and W_B (d_o x r_apt) whose rank r_apt can vary dynamically per layer. The forward pass computes (W + 2 * W_B * W_A) applied to the masked input (X * m_i), with the result masked by m_o. When applied to MHA layers, m_i prunes the hidden dimension and m_o prunes attention heads; for FFN layers, m_i prunes the hidden dimension and m_o prunes internal neurons. Attach APT adapters to query/value projections in MHA and the up-projection in FFN layers. APT parameters must be merged before inference.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: APT adapter architecture correctly extends LoRA with pruning masks and dynamic ranks",
+      "C05: Adaptive tuning requires dynamic rank infrastructure in the adapter"
+    ],
+    "rubric_requirement_ids": [
+      "b16c44c6-58e1-4660-a60b-f66b21d43437",
+      "a1686474-6def-4ed5-8b88-7a6af0659cab",
+      "169a5eb2-e201-49be-bf7f-f977933291f1",
+      "3a628b4e-ba0c-457f-ac35-fdf18c8fd356",
+      "18060c53-6871-4aa5-93d5-49f962f7187d",
+      "ee70fcc6-17cf-490f-ba08-3f2dba12b190",
+      "c99479b2-0e4e-435e-a574-53a7ae8d4c7f",
+      "bf86efe4-a3cb-4ee3-8c7b-19ab0a3cdf49",
+      "bb7ec9df-02b9-43e0-92c9-dc1b5429ef23",
+      "5f68b482-6b70-43d8-973b-da59eab1f6ee",
+      "9500d7e2-8f9a-446a-8da0-7f0e4621db39",
+      "472390c9-f791-4705-ab68-92c155f904d1",
+      "ca6ea57b-3ed0-40ee-96e8-123036828dfb",
+      "dde4b5f2-f505-4592-a0ca-2fa8b50ddf12",
+      "2a3669df-4e69-464a-b0c5-47b9001e2281"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "adaptive-pruning_T3",
+    "goal": "Implement all baseline methods for RoBERTa-base: (1) Fine-tuning (FT) baseline by full fine-tuning a pre-trained model; (2) LoRA+Prune baseline by first adding LoRA adapters, fine-tuning, then applying Mask Tuning (from retraining-free-pruning); (3) Prune+Distill baseline using CoFi (from CoFiPruning); (4) LoRA+Prune+Distill baseline using CoFi pruning and distillation with LoRA parameters only, where only L_0 modules and LoRA parameters are tunable. Configure dataset-specific hyperparameters: lr 2e-4 for GLUE/SQuAD, 1e-4 for CNN/DM; batch size 32 for GLUE/SQuAD, 16 for CNN/DM; 40 epochs for GLUE/SQuAD (non-FT), 16 for CNN/DM (non-FT); FT baseline 10 epochs; initial APT rank 8.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: Fair baseline comparison requires correct implementation of all competing methods",
+      "C03: Prune+Distill and LoRA+Prune+Distill provide the distillation baselines APT must match"
+    ],
+    "rubric_requirement_ids": [
+      "3ec70bbe-9d13-49f5-8145-1dc9682d27e6",
+      "791e26f6-38ea-4e1a-89a9-b0bd251a48ea",
+      "c4790fad-070e-401b-bb6b-a163971ba23a",
+      "e2236b08-c76c-4236-b3d6-f4c2bcd3e9e5",
+      "95d71d15-54a0-421b-b2af-9e6c65e5a004",
+      "1ad3cbb6-04ad-4947-88c9-f4461fa33596",
+      "92a96898-e039-4a9e-98a1-0b8143bab0d5",
+      "a7b5b5ae-5a7b-425c-b286-b753e36610d0",
+      "e193b120-5b15-442f-ad9c-8d817dea5c66",
+      "83a476b8-e3d9-4ce5-b956-e3cac8d8a499",
+      "d441dc31-a89e-483a-996f-4a62517c47e5",
+      "452a6371-176b-4a01-b29b-e74f9278c08e",
+      "6287838a-d855-40c2-ba76-b3057ecfc68e"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "adaptive-pruning_T4",
+    "goal": "Implement the outlier-aware salience scoring and low-cost adaptive pruning algorithm (Sections 4.2, Appendix B). For non-adapter parameters, salience is |W_{i,j} * dL/dW_{i,j}|; for APT adapter layers, salience follows Equation 9. The outlier-aware salience augments base salience with sqrt(kurtosis) of the activation. Maintain an exponential moving average of salience (coefficient 0.85). Implement block parameter counting (MHA head = 4*d_m*d_m/n_h, FFN neuron = 2*d_m, hidden dimension = n_L*(4*d_m + 2*n_f)), salience density (salience / param count), and block category function f. Implement the binary search procedure to select top-i blocks by salience density, and decrease pruned blocks' masks by 0.01. Implement the cubic sparsity schedule gamma_t = gamma_T + (1 - gamma_T)(1 - t/T)^3.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C04: Outlier-aware salience scoring with kurtosis is critical for accurate pruning",
+      "C08: Adaptive pruning via salience density enables superior Pareto efficiency"
+    ],
+    "rubric_requirement_ids": [
+      "56fadbbe-1aab-4a95-9fd6-08accc31726b",
+      "67496368-0dd9-4422-b0f2-6fca77abe7a6",
+      "7f8d2c8b-7078-4e1f-b6f2-7e2c92240b89",
+      "6c5119f5-f5ff-43bd-a2ce-3965c4befe2c",
+      "293d6fac-aff3-4b99-b709-e803ff9d11a4",
+      "4a6f0dfe-c9c0-43b6-b910-7b7257b56fe6",
+      "87383bb6-5e78-4acd-a7fb-ce8cdcef77d1",
+      "1d80f3a3-58f0-4419-976c-5786053c9b4c",
+      "a3ae8772-f9aa-4f65-a8d2-7a1f94c9ae3c",
+      "8e4cb47d-9829-4357-b3c3-c44799d7f6f2",
+      "4221dd78-0c29-416e-abd1-fa9b0a69d0ed",
+      "50d7ad1a-8908-427c-9830-585bfd7086f4",
+      "c32d372a-826a-4bce-b9a0-5b5100afdd43",
+      "7de18cb9-893c-4faf-9fff-59347b183ec3",
+      "256c6f16-a3d6-46ce-a5b4-edc6c2a96653"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "adaptive-pruning_T5",
+    "goal": "Implement the adaptive tuning mechanism (Section 4.3) and integrate it with the pruning algorithm. Compute adapter importance I(H_apt) = sum of W_B salience scores, sort adapters by importance, and linearly increase the rank of the top-half adapters by concatenating Gaussian-initialized rows to W_A and zero rows to W_B. Implement the remaining pruning algorithm components: the top-i parameter count computation following Equation 14 (C_top-i = (4*d_h'*n_h' + 2*n_f')*d_m'), and binary search for block selection. Verify that mask updates (decrease by 0.01 for pruned blocks) work correctly in conjunction with rank updates.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C05: Adaptive tuning (dynamic rank growth) substantially improves training speed and performance",
+      "C02: Joint pruning and tuning enables 8x faster convergence than sequential LoRA+Prune"
+    ],
+    "rubric_requirement_ids": [
+      "664da958-cb9d-4efd-aec5-9c30d4e0c64f",
+      "7fd4d11b-41d3-4036-b203-9bd71cc003b5",
+      "0e3baed9-9122-4c55-9326-29edf8f0b4c4",
+      "48d8285a-bcee-412a-995e-dea44e2fff2f",
+      "d3dcd793-2ff9-4ef2-89a2-0e38815a1637",
+      "b424b0fc-5ca1-40d0-95c6-095dea897198",
+      "215e9429-279e-4fb5-9bce-7cbf69c1f76e",
+      "50acfee7-499d-4b68-8205-a346d6aa16e1"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "adaptive-pruning_T6",
+    "goal": "Implement efficient self-knowledge distillation (Section 4.4) and configure the two-phase training pipeline. Self-distillation randomly samples 4 teacher layers (one per quarter slice), dynamically maps them to the closest non-pruned student layers via MSE with a learnable linear transform (initialized as identity), and re-computes the mapping every step. The distillation loss combines layer-wise MSE (L_layer) with KL-divergence on output logits (L_pred), weighted 0.9*L_layer + L_pred for GLUE and 0.9*L_layer + 0.1*L_pred for SQuAD/CNN-DM. A linearly ramping mu blends L_distill with supervised fine-tuning loss. Configure the two-phase schedule: first prune+distill (20 epochs GLUE/SQuAD, 6 epochs CNN/DM), then fine-tune (20 epochs GLUE/SQuAD, 10 epochs CNN/DM).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C03: Self-distillation with shared frozen parameters achieves comparable recovery at lower training cost",
+      "C01: Correct training pipeline configuration is essential for reproducing APT results"
+    ],
+    "rubric_requirement_ids": [
+      "2b494437-89dd-4517-b9fb-634cbc20de15",
+      "92744e38-5ae3-4873-8ed1-c0c431e77ad3",
+      "39282784-429b-4b1f-97a1-729417989069",
+      "28658a50-5fa0-47d4-92c2-cdafb0d751aa",
+      "4b5df1a0-8ade-4ffa-a0b6-07fe15c74174",
+      "8f4b756f-947a-4194-929a-06e791900ec7",
+      "1e6df51c-71c6-4712-95bd-c3ff8f9b8d69",
+      "16f88c2e-9b4d-44b0-8417-44d14a96f729",
+      "3f534396-e443-46f3-9ea8-a215dd653142",
+      "43b7fa8c-b6d9-43fb-be02-91df6e3ac7ce",
+      "fe34b5f1-93eb-4175-b53c-5b18b04b032d",
+      "a5c6d56b-c273-40cf-9ded-82a9267d9c42",
+      "908deb8d-c35b-415f-9a18-0d086bab4a87"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "adaptive-pruning_T7",
+    "goal": "Train and evaluate RoBERTa-base with APT and all baselines (FT, LoRA, LoRA+Prune, Prune+Distill, LoRA+Prune+Distill) at 60% sparsity on SST2 and MNLI. Report dev accuracy for each method on both tasks. Use GLUE hyperparameters: lr 2e-4, batch size 32, 40 epochs (20+20 for distillation methods), FT 10 epochs. Verify that: (1) APT achieves equal or higher task performance than LoRA+Prune on both SST2 and MNLI, (2) APT has similar task accuracy to Prune+Distill, and (3) APT achieves better task performance than LoRA+Prune+Distill.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: APT maintains ~98% task performance at 60% sparsity on RoBERTa",
+      "C03: APT matches Prune+Distill accuracy while outperforming LoRA+Prune+Distill"
+    ],
+    "rubric_requirement_ids": [
+      "01d90251-7fc3-4c86-9a5a-aab6ed12d987",
+      "8e9dce7a-d32e-4636-9da7-df9918647823",
+      "cdcbff81-1647-42dd-85fa-851fc14037d7",
+      "ec378300-5912-40de-a90e-d5d28f7bea31",
+      "e1fe1c33-bdce-4ee4-a5cb-7ec2b210f6a6",
+      "9662eaea-80a1-42d8-969f-c6d3b051806d",
+      "89b01087-4722-4de3-8e4e-8d75f82f6904",
+      "c99c524a-17bd-4f7d-93c1-2f4b2b2753d1"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "adaptive-pruning_T8",
+    "goal": "Measure and compare efficiency metrics for RoBERTa-base at 60% sparsity across APT, LoRA+Prune, Prune+Distill, and LoRA+Prune+Distill on SST2/MNLI. Measure: 97% time-to-accuracy (training convergence speed), peak GPU training memory, inference throughput, and inference memory. Verify that: (1) APT converges ~8x faster than LoRA+Prune, (2) APT uses similar GPU memory as LoRA+Prune during training and inference, (3) APT costs ~40% of Prune+Distill's training memory and converges 2.5x faster, and (4) APT requires less training time and memory than LoRA+Prune+Distill.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C02: APT trains 8x faster than LoRA+Prune",
+      "C03: APT achieves on-par distillation with 41.6% training memory",
+      "C08: APT achieves superior inference efficiency vs LoRA+Prune at same accuracy"
+    ],
+    "rubric_requirement_ids": [
+      "d075f77c-9383-4f7c-8b35-dbb8ad9507a8",
+      "be593611-3cdd-4a6c-89c6-726831a9382c",
+      "37612400-aa24-4650-9402-9b9c536b86a5",
+      "9f477ec1-f090-482a-919d-c9050cac0802",
+      "dc200210-82d1-4f50-ae44-b30bd24cc22b",
+      "5a2b6715-3de9-4527-b9ae-86e28d4713b5",
+      "939d1034-157f-460e-8cf6-fb589ea1f417",
+      "00ce14bb-60bc-461a-8958-897ca6c75a3d"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "adaptive-pruning_T9",
+    "goal": "Train and evaluate T5-base (t5-lm-adapt) with APT, FT, LoRA, and LoRA+Prune at 60% sparsity on SST2 and CNN/DM. Use dataset-specific hyperparameters: lr 2e-4/batch 32/40 epochs for SST2; lr 1e-4/batch 16/16 epochs (6+10 for APT) for CNN/DM. Report dev accuracy for SST2, ROUGE 1/2/L for CNN/DM, plus efficiency metrics (training time, training memory, inference throughput, inference memory). Verify that: (1) APT converges ~8x faster than LoRA+Prune for T5, (2) APT uses similar GPU memory as LoRA+Prune, (3) APT has ~5% better end-task performance than LoRA+Prune on average, (4) APT's inference efficiency is slightly worse than LoRA+Prune on T5, and (5) compute the relative accuracy metric for the Pareto analysis.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C01: APT maintains ~98% task performance at 60% sparsity on T5",
+      "C02: APT trains 8x faster than LoRA+Prune on T5",
+      "C08: T5 APT achieves 60% faster inference and 25% less memory than LoRA+Prune at matched accuracy"
+    ],
+    "rubric_requirement_ids": [
+      "dcc716d8-6f57-45be-b4d5-5c1b774b4b6b",
+      "7fb47445-dde2-4b4a-957a-777aedae4eae",
+      "c6179a9c-02b7-428b-b019-16d2d490b271",
+      "de57690a-d1e9-4606-b8d7-dc198bc976da",
+      "737f8df7-95b8-42cb-9e59-8e05bae93052",
+      "fbdc9a9e-6d1a-44a4-972d-995e33e35234",
+      "e32c3c58-2be6-4435-a181-9c46588f4945",
+      "2fff2695-43e9-4392-ada2-77604e02babc",
+      "f0f7160e-44ba-49de-89eb-d581aed006ee",
+      "93cb26c7-4166-42c5-8718-8c27d892d682",
+      "b7607af8-bc54-4840-9153-9a8b55409c84",
+      "0c47a836-4eec-478f-9be1-b7c9abd768f1",
+      "24223a79-763d-4cb8-9f73-27fdd358d543",
+      "8df3184f-06b6-4df1-8234-055b81384970"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "adaptive-pruning_T10",
+    "goal": "Reproduce the ablation study (Section 5.6, Table 4) on RoBERTa-base at 60% sparsity. Run three ablation variants: (1) APT w/o adaptive pruning (w/o A_P) on SST2 and MNLI, verifying ~94 SST2, ~87.5 MNLI, ~20% faster training than FT, ~60% of FT memory; (2) APT w/o adaptive tuning (w/o A_T) on SST2 and MNLI, verifying ~93 SST2, ~84 MNLI, similar to LoRA+Prune performance, ~15% slower convergence than full APT; (3) APT w/o self-distillation (w/o D_S), verifying ~20% faster training time and ~10% less memory than full APT. Also run APT on RoBERTa at sparsities 40%-95% on SST2/MNLI for the Pareto analysis, and compute relative accuracy vs the FT baseline. Verify APT dominates LoRA+Prune on the Pareto frontier (~20% faster inference, ~7% less memory at matched accuracy for RoBERTa).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C05: Adaptive tuning improves convergence and accuracy; removing it drops to LoRA+Prune level",
+      "C04: Outlier-aware salience (kurtosis) is critical for pruning quality",
+      "C03: Self-distillation adds cost but substantially improves pruned model quality"
+    ],
+    "rubric_requirement_ids": [
+      "e9fa1766-f3bd-447a-918d-e6696bf20ecf",
+      "7525718b-1307-426a-9c08-1d1505a08ade",
+      "16db85a1-c6ea-4e23-86f7-5d538f4f438a",
+      "66039c65-91df-4270-9216-1a31aab5756e",
+      "859bffed-bd82-43db-bed1-443bdf4b1ef0",
+      "011cf2f5-5a70-44ba-954c-0a3620075f08",
+      "1a57a576-01a5-42e4-bb42-cdcdaa3f45e2",
+      "26fbd16f-a67f-4464-be72-818898a86f41",
+      "70a1b6da-2a1f-475e-b61e-8dbbd1911766",
+      "e7ad0e1d-93d3-46c9-98c2-cff17945550d",
+      "10f451dd-7fac-4566-9e55-1d66c7beceb5",
+      "9c90df0a-aa9f-4c71-be71-69f5cac2ccc0",
+      "5a92263e-e824-4fe3-bc4f-661fc7ab5c1a",
+      "d406c635-3506-4ed8-bf4f-ed80d54bc7b2"
+    ],
+    "n_requirements": 14
+  }
+]

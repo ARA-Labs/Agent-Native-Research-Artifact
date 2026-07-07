@@ -1,0 +1,80 @@
+session:
+  id: "2026-03-21_001"
+  timestamp: "2026-03-21T03:30"
+  summary: "ARA seed10 rust_codecontests completed: v9 achieves 0.6485 test set (5.0x reference); scorer's semaphore + backoff + test-fix loop identified as optimal architecture"
+
+events_logged:
+  - type: experiment
+    id: "N76"
+    provenance: ai-executed
+    summary: "solution_final.py: scorer's semaphore + backoff, single candidate, 0.5818 test set (96/165)"
+
+  - type: dead_end
+    id: "N77"
+    provenance: ai-executed
+    summary: "Custom rate limiters (token bucket, module semaphore, sleep) fail under shared API key — 9 approaches tried before scorer's semaphore insight"
+
+  - type: experiment
+    id: "N78"
+    provenance: ai-executed
+    summary: "v9 test failure correction loop: 0.6838 validation (80/117), 0.6485 test (107/165) — +6.7pp over solution_final"
+
+  - type: observation
+    id: "O65"
+    provenance: ai-executed
+    summary: "Scorer's semaphore is correct and minimal rate-limiting primitive; all custom approaches failed"
+
+  - type: observation
+    id: "O66"
+    provenance: ai-executed
+    summary: "ARA seed10 v9 final: 0.6485 test (5.0x reference), 3h25m run, 7 batch timeouts expected"
+
+  - type: observation
+    id: "O67"
+    provenance: ai-suggested
+    summary: "Seed10 (0.6485) slightly below seed8 checkpoint (0.6585) — different API conditions or batch parameters"
+
+ai_actions:
+  - action: "Waited for v9 test set run (PID 80566, 165 problems, 3h25m) to complete"
+    provenance: ai-executed
+    files_changed: []
+
+  - action: "Read test set output (0.6485, 107/165) from bc82383.output after process exit"
+    provenance: ai-executed
+    files_changed: []
+
+  - action: "Wrote RESULT.md with complete score trajectory, what worked, what failed, dead ends from ARA trace"
+    provenance: ai-executed
+    files_changed:
+      - "code/eval/extension/results/rust_codecontests_ara_seed10/RESULT.md"
+
+  - action: "Added N76, N77, N78 to exploration tree (ARA seed10 experiment arc)"
+    provenance: ai-executed
+    files_changed:
+      - "ara/trace/exploration_tree.yaml"
+
+  - action: "Added O65, O66, O67 to staging observations"
+    provenance: ai-executed
+    files_changed:
+      - "ara/staging/observations.yaml"
+
+claims_touched:
+  - id: C05
+    action: advanced
+    provenance: ai-executed
+    note: "Extension experiment grows: rust_codecontests ARA seed10 final score 0.6485 (5.0x reference)"
+
+  - id: C06
+    action: advanced
+    provenance: ai-executed
+    note: "Test failure correction loop (H05 applied at fix stage) produces +6.7pp — negative knowledge helps even within a single-problem solve loop"
+
+open_threads:
+  - "ARA seed8 full test set run (PID 21361, solve_rust_v2.py) still running — will produce final seed8 score when complete"
+  - "Extension experiment: need triton_cumsum ARA vs baseline runs (clean comparison without model-mismatch confound)"
+  - "Extension experiment needs more seeds per condition for statistical power on rust_codecontests"
+  - "RESULT.md written for seed10 but not yet committed to git"
+
+ai_suggestions_pending:
+  - "O67: seed10 slightly below seed8 checkpoint — may be API condition variance; unconfirmed"
+  - "Seed8's batch_size=5, max_workers=2, max_time_per_batch=1000 may be slightly better params than seed10's batch_size=10, max_workers=3, max_time_per_batch=600 — not yet validated"

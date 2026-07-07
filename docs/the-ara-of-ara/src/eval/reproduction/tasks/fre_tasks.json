@@ -1,0 +1,258 @@
+[
+  {
+    "task_id": "fre_T01",
+    "goal": "Implement the FRE encoder-decoder architecture. Build the transformer-based variational encoder with reward discretization into 32 bins, learned reward and state embeddings, permutation-invariant attention (no positional embeddings), and a variational bottleneck producing a Gaussian latent z. Implement the MLP decoder that independently predicts rewards for query states given z. Verify the architecture matches the hyperparameters specified in Appendix A.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: FRE produces accurate functional encodings of arbitrary reward functions"
+    ],
+    "rubric_requirement_ids": [
+      "ea36bca4-ce04-4d7c-a287-b1083812ecbf",
+      "04d679d0-0bca-4103-a118-76df6a2b2473",
+      "7297f42f-cad1-4777-8f1a-f8162637eed6",
+      "a9ad5a0c-8b63-4801-861e-50b22ee57859",
+      "4afafbc9-4040-40dd-8d33-6506edc2678a",
+      "90b8884f-8bdd-4027-a927-790015380e3b",
+      "e812f3c1-5afa-4b52-8e07-0f878cb43f9e",
+      "b57031ba-92a4-4b93-b32f-175b1cc678de",
+      "17bdcdac-2c97-4f1e-b7a9-c50bd16d060e",
+      "aa264dc2-4e1b-4301-9dd6-770c0d5c3081",
+      "0748e789-817a-4dbe-89e9-b98bc37689c4",
+      "6a54735c-e526-48fb-bc87-4a3a116083f8",
+      "6d38f122-a3dd-464b-8a85-37f2fd538364"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "fre_T02",
+    "goal": "Implement the FRE-conditioned IQL policy network and the full FRE training pipeline. The policy must include an actor, critic, and value function conditioned on the latent z by concatenation. Implement the information-bottleneck ELBO loss (Eq. 6) for encoder-decoder training. Implement the strided training procedure where the encoder-decoder is first trained and then frozen before the IQL policy is trained on FRE-conditioned rewards. Verify policy hyperparameters match Appendix A.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C01: FRE produces accurate functional encodings of arbitrary reward functions"
+    ],
+    "rubric_requirement_ids": [
+      "6b6edf6b-bb31-4655-a24f-156f6dd5be12",
+      "40d26271-b5b9-4c00-abe7-3f5fb4c231d4",
+      "95ebb4b4-110a-421f-8ca4-185cacaaffd0",
+      "143af012-ca25-4037-a318-f17f62e7e984",
+      "bad4958f-dcc0-4f8f-9328-198a6b1d58d1",
+      "15d902cd-80ef-4af9-8c10-7bed54c10d50",
+      "8b30922a-67a0-4ae8-98d5-3c14aa1c4529",
+      "d922ee95-cda8-4ccc-bb4d-07af9a8ee238",
+      "422ffe1f-c3f0-4562-ba99-05e5c69a4e87",
+      "5ff98598-e932-4fa7-8d81-342c04348da5",
+      "31e4d8ce-e490-4bba-b371-8a6a8e16e66e",
+      "f0ab7926-f357-41a2-b39d-3af3a94d4022",
+      "29cebba5-18e7-43e1-90d3-6424117ef1c2"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "fre_T03",
+    "goal": "Implement the three baseline agent architectures: GC-IQL (goal-conditioned IQL with actor/critic/value, Gaussian actor, and sparse goal-reaching reward), GC-BC (3-hidden-layer MLP with Gaussian output and discretized goal conditioning), and OPAL (permutation-invariant trajectory encoder producing latent z, MLP decoder primitive policy, and hierarchical meta-controller). Implement training procedures for each baseline including OPAL's sub-trajectory autoencoding loss.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "C03: FRE matches or outperforms state-of-the-art zero-shot and offline RL baselines"
+    ],
+    "rubric_requirement_ids": [
+      "4bbda5e1-08af-4448-be55-a74b27109b85",
+      "d1495479-c0b0-44d3-b327-d3f2e380adc2",
+      "55e9351f-7627-4664-afac-e76327412716",
+      "83fd90f6-0652-485b-a977-a9bb84af9d0d",
+      "620a2b18-8964-4c29-86e0-fad951820c68",
+      "714d7e4a-a799-460a-84f4-b78d6e065449",
+      "d297b5ab-65b6-49f4-8f92-e9944afeb159",
+      "424bb63c-fc0a-4c1c-9014-03c90a967ddc",
+      "b4c6e00e-7da1-43e5-8d56-18d3162980e0",
+      "0389ff82-4e00-4553-9dd6-816d3f816df0",
+      "c41ecad0-c7ef-4af1-bb7a-7009167b2c54",
+      "7b768bcc-eecd-4cfa-a226-4b9fd827ce2c",
+      "b6fbd20b-f697-4031-8f1e-48ec275608f9",
+      "caaf32fc-df77-4d3b-8f74-de48997e4b97",
+      "2507c345-a631-4170-89fe-ecf49b63c65f"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "fre_T04",
+    "goal": "Set up the AntMaze (antmaze-large-diverse-v2) and ExORL (cheetah-RND, walker-RND) datasets and environments. Implement the three reward function families for AntMaze: singleton goal-reaching rewards (with XY discretization into 32 bins), random linear reward functions (with weight normalization and bias), and random MLP reward functions (with 2-hidden-layer architecture). Implement ExORL-specific reward families with physics information appended per Appendix C.2.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: FRE produces accurate functional encodings of arbitrary reward functions",
+      "C04: Performance scales smoothly with reward diversity; FRE-all dominates all reward-subset ablations"
+    ],
+    "rubric_requirement_ids": [
+      "595c44a3-25a3-4f38-80d1-d3376b12476e",
+      "5b3ccceb-d946-4ce3-96f1-6cb9c3ef8030",
+      "bccaf966-1315-49b8-9d49-df1b0f30d109",
+      "15a0dc98-8a9f-4173-a7a0-ba07770200f2",
+      "2b14e66b-18a7-45ad-9dc9-94dd728cb448",
+      "534f0b86-f31e-4b6e-8bc3-50159bfdd0a3",
+      "f9cc6afc-346e-4f24-b8c5-63ce36bb74b6",
+      "2ed48cb3-713f-44b0-b318-591d610cffd3",
+      "425c9fc8-538e-4143-abab-a33fa9e68d7f",
+      "9d761158-1a97-467d-9390-5c34e5f0fbcf",
+      "d2ad5f82-d2db-41c3-b970-e39b78fb8f63",
+      "76cccc3d-c5e9-4bba-acd1-806120e12801",
+      "b8b9bd34-918e-45fb-a1bf-e8be3a65ec57",
+      "b2fddd01-5de1-41b6-baf4-e0aaa98df12e"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "fre_T05",
+    "goal": "Train a single FRE-all agent on antmaze-large-diverse-v2 with the uniform 1/3 mixture prior over goal-reaching, random linear, and random MLP reward families. Implement the ant-goal-reaching evaluation task with its reward specification. Evaluate the FRE-all agent on ant-goal-reaching over 5 seeds and 20 episodes per seed. Also train and evaluate FB and SF baselines on AntMaze goal-reaching to compare sample efficiency (FRE uses 32 samples vs FB/SF using 5120).",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C02: FRE outperforms SF/FB baselines on goal-reaching tasks despite using 160x fewer evaluation samples",
+      "C01: FRE achieves competitive zero-shot performance across diverse reward families using only 32 samples"
+    ],
+    "rubric_requirement_ids": [
+      "df64e51f-da9f-4fd0-9a2c-c8d6dbd53e96",
+      "8d4bd046-febb-441e-af20-03a543ae4cea",
+      "64d49648-6eab-4147-b455-a606c2d70473",
+      "66e8abac-44b0-4a9f-8975-8c3e23f44889",
+      "d9bf8c02-ce28-4005-87e9-913791e71807",
+      "f5dc7467-50c8-46a1-ba2d-0ae10b43b9a0",
+      "f4430c7e-445c-4492-bdd7-1cb1f766999f",
+      "ca9b0276-199e-45ec-9483-058caa982237",
+      "d21d6d68-6dff-4eb6-80db-d4bbbfc7aa77",
+      "14d5ca37-69e4-419d-add4-b87fa29d5ffe",
+      "6db428ff-d03c-4656-99a2-df1d2ed72393",
+      "fa867daf-5b7c-44b9-8400-64fc4043fbda",
+      "599da9c6-ab0f-43c4-a432-ce71d842b02f",
+      "d3c7236a-5bab-4ed5-a07d-097d2b27a865"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "fre_T06",
+    "goal": "Implement the ant-directional and ant-random-simplex evaluation tasks with their reward specifications. Train GC-IQL, GC-BC, and OPAL baselines on antmaze-large-diverse-v2. Evaluate the FRE-all agent (from T05) and all baselines on ant-directional and ant-random-simplex over 5 seeds and 20 episodes per seed. Verify that FRE-all outperforms goal-conditioned baselines (GC-IQL, GC-BC) on non-goal-reaching tasks and outperforms OPAL overall.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C03: FRE generalizes to non-goal-reaching structured rewards while maintaining goal-reaching competitiveness",
+      "C01: FRE achieves competitive zero-shot performance across diverse reward families using only 32 samples"
+    ],
+    "rubric_requirement_ids": [
+      "53a057fc-5ffd-4e73-8a7c-02aa42696f48",
+      "e6193543-b632-4855-853e-40f64e39b1fe",
+      "68f27cfa-dd32-4bf1-9062-904f70b929ad",
+      "8a6209c8-4cb5-4e2f-8401-64089b88b171",
+      "2ff868ca-cb09-4867-8ba2-46340e1039a2",
+      "3b6b5d48-afec-4ec3-b44f-3dd0119b28db",
+      "f4f6c096-cb80-43cc-a32b-d11b02b48264",
+      "1c9a402d-66ec-49db-88f3-9d2a1047bb8b",
+      "65f07ab6-1d8b-43b6-bf2f-0f2f637504d0",
+      "3d7c6335-03c0-494f-88a7-6d8b7913f2b1",
+      "617c421b-1bcd-4b92-9e4f-39f8e06c1cc4",
+      "448f277f-d512-44c2-8525-c01c6e0ca803",
+      "32f02dcc-bff3-43a7-92e4-aa831cd4d35d",
+      "2839bbbb-e381-4cae-8100-998b50f220f0"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "fre_T07",
+    "goal": "Reproduce the reward family diversity ablation (Table 4 / Figure 5) on AntMaze. Train seven FRE agent variants on antmaze-large-diverse-v2: FRE-goals, FRE-lin, FRE-mlp, FRE-goal-lin, FRE-goal-mlp, FRE-lin-mlp, and FRE-all. Each variant uses the correct prior mixture probabilities. Evaluate all seven on the four AntMaze evaluation task categories (goal-reaching, directional, random-simplex, path tasks) over 5 seeds. Verify that FRE-all achieves the highest total aggregate score and that performance scales with reward diversity.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C04: Training on diverse reward families produces better generalization than any single family",
+      "C01: FRE achieves competitive zero-shot performance across diverse reward families using only 32 samples"
+    ],
+    "rubric_requirement_ids": [
+      "8cd85ad2-a145-4bb7-97c4-7cb1bbd40569",
+      "61a28b5f-f2a6-4faa-a163-60b323098150",
+      "b40be6bd-1225-4755-b60e-dd16f5e43665",
+      "61af561b-335b-47bb-a194-c47827bac7e9",
+      "1cc28c97-59c7-4733-8a2e-45d44b367a2e",
+      "6e6558f9-765b-463e-a170-becf47ed9f0c",
+      "b08d7709-bb81-40f5-9a98-f48b7784cac3",
+      "03cec4d5-1fc2-488e-a786-975793861d3f",
+      "c9914ca1-9135-417d-be08-2c0772a1434b",
+      "1b4a1806-0a39-400a-8b12-91a75db328e2",
+      "3963a475-7aeb-417b-9391-e5fbbd503cc1",
+      "5f01970b-62b9-4c59-9cc4-1b81958f506a",
+      "4860910a-d4bf-4d67-b599-d9ede5491eb0"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "fre_T08",
+    "goal": "Train FRE-all agents on ExORL cheetah (RND) and walker (RND) datasets. Implement the exorl-cheetah-velocity, exorl-walker-velocity, exorl-cheetah-goals, and exorl-walker-goals evaluation tasks. Train FB, SF, OPAL, GC-IQL, and GC-BC baselines on both ExORL domains. Evaluate all agents on velocity and goals tasks over 5 seeds and 20 episodes per seed. Verify FRE outperforms SF/FB on goal-reaching tasks with 160x fewer samples and outperforms all baselines on velocity tasks.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C02: FRE outperforms SF/FB baselines on goal-reaching tasks despite using 160x fewer evaluation samples",
+      "C03: FRE generalizes to non-goal-reaching structured rewards while maintaining goal-reaching competitiveness"
+    ],
+    "rubric_requirement_ids": [
+      "5508cfda-56f4-48fd-b0bd-a417a43743d3",
+      "a51dc0ea-9fd5-492b-9adc-cea1865dad5e",
+      "0b794c64-9483-4ca3-9097-901ed7a7c635",
+      "11bd7539-4847-405c-ae7f-a0b616d73305",
+      "20b53e62-fb49-41bf-8553-ac7a7a55a29d",
+      "9e20fc23-3d36-4bdb-8165-289b0d3b6952",
+      "355ad887-e94a-4c14-b291-4c5c71d91130",
+      "152a0cb1-280d-48fd-8b50-13a751d61780",
+      "f8a8ff9c-16c6-4ec5-8231-0c84b6586f85",
+      "74f98f7f-fb30-4f2b-9c48-433396c9ea0d",
+      "484d1b87-8cf0-4ccb-b962-424dda13c7e8",
+      "8eceb966-2eef-4959-af07-67bb229ffff5",
+      "2392fdea-cf2d-4915-9db4-ad39e26cdea4",
+      "25b99cdd-8e28-471e-b811-737c12b68312"
+    ],
+    "n_requirements": 14
+  },
+  {
+    "task_id": "fre_T09",
+    "goal": "Reproduce the domain knowledge augmentation experiment (FRE-hint). Train FRE-hint agents on antmaze-large-diverse-v2 (using directional/XY-based augmented prior), on ExORL cheetah (using velocity-based augmented prior), and on ExORL walker (using velocity-based augmented prior). Evaluate FRE-hint on ant-directional, exorl-cheetah-velocity, and exorl-walker-velocity tasks. Compare FRE-hint performance to FRE-all on the same tasks and verify FRE-hint outperforms FRE-all on tasks matching the augmented prior.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "C05: Domain-specific reward priors (FRE-hint) further improve performance on targeted task distributions",
+      "C04: Training on diverse reward families produces better generalization than any single family"
+    ],
+    "rubric_requirement_ids": [
+      "6c4fce0f-cda0-443e-81a0-8dc320d5e107",
+      "b0d6d6b4-b7d7-4424-afc2-611090b447e5",
+      "6a19acfd-2ce1-43a8-b47c-2303f1329626",
+      "631eca30-68dd-413e-b88f-21e1782fc3ba",
+      "390a671a-f24d-4132-8971-005ccde1bcca",
+      "a2b00b9a-dc67-4a00-9540-5469b7640e5f",
+      "77f406ad-abab-4468-be37-d6ed28067dc7",
+      "ff48b670-3096-4cf5-9fec-7a481540f46d",
+      "39866a97-304e-47e8-b3fe-e263fc5cb643",
+      "474b4b95-7317-4987-aac5-d489853562ea",
+      "19d94a96-5dce-486b-85fa-ea0be685fe85",
+      "62aa743f-e54c-4796-8ce5-951ded8b20b4",
+      "076e55aa-699b-4835-98b4-8ca4066bab21",
+      "0431ce4a-43e6-409c-9dd0-66f9a91a484d",
+      "ecf0ca0d-5753-44d4-a6fe-f31d3a990658"
+    ],
+    "n_requirements": 15
+  },
+  {
+    "task_id": "fre_T10",
+    "goal": "Set up the Kitchen (kitchen-complete-v0) dataset and environment. Implement Kitchen-specific reward functions. Train FRE-all, FB, SF, OPAL, GC-IQL, and GC-BC agents on Kitchen. Implement the kitchen evaluation task with sparse binary rewards. Evaluate all agents over 5 seeds and 20 episodes per seed. Verify that Table 1 aggregate results hold: FRE matches or outperforms all baselines across goal-reaching tasks (ant, exorl, kitchen) and dominates on non-goal-reaching tasks.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "C01: FRE achieves competitive zero-shot performance across diverse reward families using only 32 samples",
+      "C03: FRE generalizes to non-goal-reaching structured rewards while maintaining goal-reaching competitiveness"
+    ],
+    "rubric_requirement_ids": [
+      "4eb72ad4-06cc-48ee-891f-a3851d850ea0",
+      "190df881-45b2-409f-a204-e924be3eab79",
+      "2eb7183e-dfe1-433b-8f22-5afc08076539",
+      "83202f54-a253-445f-87c5-b20c2073cf85",
+      "4c9cfa23-a8b8-478e-998e-a4a1f0a0d2f6",
+      "bb2371d7-b938-487a-94d5-be868b8b6d4c",
+      "3fc9b62f-ca5e-4d7b-93a2-4617443cc987",
+      "c46c155a-e146-4489-b4ea-d2aabe650195",
+      "a8265cc7-2215-4395-a8c0-44af2c0100fc",
+      "2f2d443f-aadb-455b-95e0-5bff35e369f9",
+      "081c9d9f-838d-4ac1-9564-ea7e0d0c54ca",
+      "6ff5f645-a29c-4705-8d80-533f8269c8d2",
+      "0a57fe73-6b37-400a-843f-53e66f8945a6",
+      "2f455b0f-b596-4bd1-a793-64aa3bc493ed"
+    ],
+    "n_requirements": 14
+  }
+]

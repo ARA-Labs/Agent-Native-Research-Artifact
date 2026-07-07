@@ -1,0 +1,48 @@
+session:
+  id: "2026-03-15_001"
+  timestamp: "2026-03-15T05:00"
+  summary: "Re-ingested 5 PaperBench papers with new unified ingestor, ran Understanding eval — results identical to old ingestor (ARA 80%, PDF 81.3%)"
+
+events_logged:
+  - type: experiment
+    id: N51
+    provenance: ai-executed
+    summary: "Re-ingested 5 papers with unified ingestor (bam, bridging-data-gaps, ftrl, pinn, semantic-self-consistency). All L1=PASS, 1.61-1.74M tokens/paper. Ran Understanding eval: ARA 60/75 vs PDF 61/75, identical to old ingestor."
+  - type: dead_end
+    id: N52
+    provenance: ai-suggested
+    summary: "New ingestor architecture does not improve Understanding scores. Bottleneck is content (figures, cross-refs), not ingestor architecture."
+  - type: observation
+    id: O32
+    provenance: ai-suggested
+    summary: "ARA over-assertion: structured format gives agents false confidence on implied/inferred information."
+  - type: observation
+    id: O33
+    provenance: ai-suggested
+    summary: "PDF agent dominant Cat B failure: 'paper does not provide this' for details that ARE present but buried."
+
+ai_actions:
+  - action: "Re-ingested 5 PaperBench papers with new unified single-agent-loop ingestor"
+    provenance: ai-executed
+    files_changed: ["code/artifacts/bam/", "code/artifacts/bridging-data-gaps/", "code/artifacts/ftrl/", "code/artifacts/pinn/", "code/artifacts/semantic-self-consistency/"]
+  - action: "Ran Understanding eval pipeline (answer + judge + analyze) on 5 papers"
+    provenance: ai-executed
+    files_changed: ["code/eval/results/understanding/"]
+  - action: "Question-level analysis of ARA wins vs PDF wins across all 5 papers"
+    provenance: ai-executed
+    files_changed: []
+
+claims_touched:
+  - id: C04
+    action: "no change — still supported, new ingestor does not improve or worsen fidelity"
+    provenance: ai-suggested
+
+open_threads:
+  - "Re-generate remaining 18 PaperBench ARAs with new unified ingestor"
+  - "Run full 31-paper Understanding eval after all ARAs regenerated"
+  - "Investigate ARA over-assertion issue (O32) — ingestor should mark inferred vs explicit"
+
+ai_suggestions_pending:
+  - "New ingestor is ready for full 23-paper rollout despite no Understanding improvement on 5-paper subset"
+  - "Consider improving evidence encoding (figures/tables) to address Cat A deficit"
+  - "Consider adding provenance markers (explicit vs inferred) to ingestor output to reduce over-assertion"

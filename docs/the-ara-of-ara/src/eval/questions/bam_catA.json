@@ -1,0 +1,105 @@
+{
+  "paper_id": "bam",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 8,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "bam_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What is the closed-form solution for the BaM covariance update Σ_{t+1} given matrices U and V?",
+      "gold_answer": "Σ_{t+1} = 2V[I + (I + 4UV)^{1/2}]^{-1}, which is the unique symmetric positive-definite solution to the quadratic matrix equation ΣUΣ + Σ = V, where U = λ_t Γ + (λ_t/(1+λ_t)) ḡḡ^T (PSD) and V = Σ_t + λ_t C + (λ_t/(1+λ_t))(μ_t − z̄)(μ_t − z̄)^T (PD).",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "bam_A02",
+      "category": "method_detail",
+      "difficulty": "T1_explicit",
+      "question": "Under what limiting conditions on batch size B and regularization parameter λ do the BaM updates reduce exactly to the Gaussian Score Matching (GSM) updates of Modi et al. (2023)?",
+      "gold_answer": "When B = 1 and λ_t → ∞ (no regularization with a single sample), the BaM updates reduce exactly to the GSM updates.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "bam_A03",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What learning rate λ did BaM use for batch size B=300 in the CIFAR-10 deep generative model experiment, and how was it selected?",
+      "gold_answer": "λ = 7500, selected via a 100-iteration pilot run searching over the grid {1000, 5000, 7500, 10000} and picking the value that achieved the lowest MSE.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "bam_A04",
+      "category": "hyperparameters",
+      "difficulty": "T2_scattered",
+      "question": "What batch sizes and corresponding constant λ_t values were used for BaM across the four Gaussian target dimensions (D=4, 16, 64, 256)?",
+      "gold_answer": "D=4: B=5, λ_t=20; D=16: B=15, λ_t=240; D=64: B=40, λ_t=2560; D=256: B=150, λ_t=38400. All use the formula λ_t = BD (constant). ADVI and Fisher divergence methods use a learning rate of 0.01 selected via grid search.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bam_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How does the score-based divergence D(q;p) relate to the KL divergence when both p and q are multivariate Gaussians with the same covariance matrix but different means?",
+      "gold_answer": "When p and q are multivariate Gaussians with the same covariance Σ but different means μ and ν, then (1/2)D(q;p) = KL(q;p) = KL(p;q) = (1/2)(ν−μ)^T Σ^{-1}(ν−μ). The score-based divergence equals twice the KL divergence.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "bam_A06",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the computational complexity of the BaM covariance update in the general case (B ≥ D) versus the low-rank case (B ≪ D), and what formula enables the low-rank computation?",
+      "gold_answer": "The general case costs O(D³) via matrix square root and inversion. The low-rank case (when U = QQ^T with Q ∈ R^{D×K} and K ≪ D, i.e., B ≪ D) costs O(D²B + B³), enabled by the low-rank solver: X = V − V^T Q[(1/2)I + (Q^T VQ + (1/4)I)^{1/2}]^{-2} Q^T V.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bam_A07",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "In the deep generative model experiment on CIFAR-10, what batch size and number of iterations does ADVI use to achieve its lowest MSE under a budget of 3000 gradient evaluations, and what does BaM use to achieve a comparable result?",
+      "gold_answer": "Under a budget of 3000 gradient evaluations, ADVI achieves its lowest MSE with B=10 and T=300, while BaM achieves a comparable result with B=300 and T=10.",
+      "grading_type": "checklist",
+      "source": "pdf"
+    },
+    {
+      "id": "bam_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does the score-based divergence D(q;p) = E_q[||∇log(q/p)||²_{Cov(q)}] achieve affine invariance while the standard (unweighted) Fisher divergence E_q[||∇log(q/p)||²] does not?",
+      "gold_answer": "Affine invariance requires the weight matrix to transform appropriately under affine maps. The covariance matrix Cov(q) transforms as A Cov(q) A^T under an affine map h(z) = Az + b, which exactly cancels the transformation of the score difference terms, leaving the divergence value unchanged. A fixed weight matrix (e.g., the identity) in the standard Fisher divergence does not adapt to the transformation, so cancellation does not occur.",
+      "grading_type": "semantic",
+      "source": "both"
+    },
+    {
+      "id": "bam_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions does BaM fail to converge or perform poorly, based on both theoretical analysis and empirical observations in the paper?",
+      "gold_answer": "BaM performs poorly when: (1) the batch size B is too small relative to the latent dimension D (e.g., B=10 for D=256 in the deep generative model); (2) the learning rate λ is small (λ ≪ 1), slowing convergence; (3) the variational mean is poorly initialized (large ||ε₀||²) or the initial covariance is nearly singular. For non-Gaussian targets, a constant learning rate is insufficient and a decaying schedule is needed; without decay, BaM may oscillate or diverge. For the eight-schools model, BaM converges to a larger relative SD error than GSM, indicating it does not always dominate.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "bam_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "ara_difficulty": "T3_implicit",
+      "question": "What specific Adam optimizer beta parameters (β₁ and β₂) were used for ADVI across all experiments in the paper?",
+      "gold_answer": "The paper does not specify the Adam optimizer beta parameters used for ADVI. Only the learning rate (0.01, selected via grid search) is reported.",
+      "ara_gold_answer": "β₁ = 0.9, β₂ = 0.999. The artifact's src/execution/advi.py defines the adam_update function with explicit defaults: 'beta1: float = 0.9, beta2: float = 0.999'. These are standard PyTorch/JAX Adam defaults, captured in the artifact's ADVI implementation. The paper itself does not state these values.",
+      "grading_type": "abstention",
+      "ara_grading_type": "exact_numeric",
+      "source": "ara",
+      "design_note": "PDF-centric gold marks this unanswerable because the paper does not state Adam betas. ARA gold reflects that the artifact's advi.py implementation makes these values recoverable as T3_implicit."
+    }
+  ]
+}

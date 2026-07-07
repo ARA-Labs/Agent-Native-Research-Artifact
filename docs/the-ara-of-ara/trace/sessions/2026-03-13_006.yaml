@@ -1,0 +1,27 @@
+session:
+  id: "2026-03-13_006"
+  timestamp: "2026-03-13T23:30"
+  summary: "Updated evaluation prose to match final table numbers (81.9/83.2/63.5/44.4/80.0/17.5)"
+
+events_logged:
+  - type: observation
+    id: O30
+    provenance: ai-executed
+    summary: "Prose-table mismatch fixed: Cat A 83.5→81.9%, Cat B 54.8→63.5%, deltas updated"
+
+ai_actions:
+  - action: "Updated Cat A and Cat B results prose in evaluation.tex to match final table numbers"
+    provenance: ai-executed
+    files_changed: ["paper/sections/evaluation.tex"]
+  - action: "Recompiled paper (36 pages)"
+    provenance: ai-executed
+    files_changed: ["paper/main.pdf"]
+
+claims_touched: []
+
+open_threads:
+  - "Layers 2 (Reproduction) and 3 (Extension) evaluation still pending"
+  - "adaptive-pruning and robust-clip have persistent ARA agent 1-answer failures"
+  - "Statistical tests (McNemar) not run"
+
+ai_suggestions_pending: []

@@ -1,0 +1,64 @@
+session:
+  id: "2026-03-16_001"
+  timestamp: "2026-03-16T00:00"
+  summary: "Extension experiment early signal: rust_codecontests baseline 0.80 vs ARA 0.50; discovered stale heuristic confound (gpt-3.5→gpt-5-mini model mismatch)"
+
+events_logged:
+  - type: experiment
+    id: N57
+    provenance: ai-executed
+    summary: "Ran 5 agent runs on rust_codecontests (2 baseline, 3 ARA) — baseline 0.80±0.00, ARA 0.50 (1 valid seed after fix)"
+  - type: dead_end
+    id: N58
+    provenance: ai-suggested
+    summary: "ARA heuristic H02 (temperature=0.7) from gpt-3.5 trace breaks gpt-5-mini reasoning model — 2 seeds scored 0.0"
+  - type: decision
+    id: N59
+    provenance: ai-executed
+    summary: "Added shared temperature warning to extension agent instructions; fixed return format to require raw Rust code"
+  - type: observation
+    id: O36
+    provenance: ai-suggested
+    summary: "rust_codecontests is confounded by model mismatch; triton_cumsum is cleaner comparison"
+  - type: observation
+    id: O37
+    provenance: ai-suggested
+    summary: "ARA agent spends 4-6 turns reading trace before coding vs baseline starting by turn 3-4"
+  - type: observation
+    id: O38
+    provenance: ai-suggested
+    summary: "Baseline converges reliably (0.80 both seeds); ARA score trajectories are more volatile"
+
+ai_actions:
+  - action: "Built run_extension.py agent harness with CLI, workspace isolation, score tracking"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/run_extension.py"]
+  - action: "Created local_score.py for rust_codecontests (replacing Docker scorer)"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/env/rust_codecontests/local_score.py"]
+  - action: "Ran 5 agent experiments (baseline×2, ARA×3) with monitoring"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/results/"]
+  - action: "Fixed temperature warning and return format in shared agent instructions"
+    provenance: ai-executed
+    files_changed: ["code/eval/extension/run_extension.py"]
+  - action: "Updated experiment design memo with early results and confound analysis"
+    provenance: ai-executed
+    files_changed: ["memo/extension_experiment_design.md"]
+
+claims_touched:
+  - id: C06
+    action: "related — stale heuristic is a negative knowledge transfer case"
+    provenance: ai-suggested
+  - id: C16
+    action: "advanced — Layer 3 (Extension) now has preliminary data"
+    provenance: ai-executed
+
+open_threads:
+  - "Run triton_cumsum as cleaner extension comparison (no model mismatch confound)"
+  - "Investigate whether ARA cognitive load overhead is reducible (lazy trace loading?)"
+  - "Determine if heuristic versioning or model-conditional annotations could prevent stale knowledge harm"
+
+ai_suggestions_pending:
+  - "rust_codecontests results should be reported with strong caveats about model mismatch confound"
+  - "Consider adding heuristic staleness detection to ARA protocol (flag model-specific params)"

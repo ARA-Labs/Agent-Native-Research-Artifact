@@ -1,0 +1,115 @@
+{
+  "paper_id": "stay-on-topic-with-classifier-free-guidance",
+  "category": "B",
+  "eval_layer": "understanding",
+  "n_questions": 5,
+  "question_type": "rubric_alignment",
+  "design_note": "All Cat B questions require reading rubric/requirements.md (ARA-exclusive) and cross-referencing a second ARA artifact file. PDF+repo agents fail because they lack the structured rubric/requirements.md.",
+  "questions": [
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_B01",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the CFG decoding implementation for Chain-of-Thought evaluation: (a) What does R29 in rubric/requirements.md specify about the guidance strengths that must be used when evaluating Guanaco65B on GSM8k? (b) Which ARA file contains the CFG decoding execution code, and what guidance-strength-related parameters or variables can you find there? (c) What does the combination of R29's requirement and the decoding code imply about how the sweep over gamma values must be structured in the implementation?",
+      "gold_answer": "(a) R29 (Rubric ID: 0979bbed-aa76-4f3e-b9ed-c9de82f6ab9d) states: 'For the evaluation of Guanaco65B on GSM8k with Wang et al. 2023 self-consistency Chain-of-Thought has been correctly executed for guidance strengths [1, 1.1, 1.25, 1.5, 1.75, 2] as outlined in section 3.2'. This requirement carries a weight of 2, marking it as higher-priority. The six specific gamma values are: 1, 1.1, 1.25, 1.5, 1.75, and 2. (b) The file src/execution/cfg_decoding.py contains the CFG decoding execution code. This file should include parameters or variables corresponding to the guidance strength gamma (or equivalent), and the logic for applying classifier-free guidance during token generation. (c) The combination implies that the implementation must support iterating over exactly the six gamma values [1, 1.1, 1.25, 1.5, 1.75, 2] — not a continuous range, not a different set — and that gamma=1 serves as the no-CFG baseline. The decoding loop in cfg_decoding.py must be callable with each of these discrete values, and results for all six must be collected to satisfy R29's requirement for 'correctly executed for guidance strengths [1, 1.1, 1.25, 1.5, 1.75, 2]'.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes or closely paraphrases R29's exact guidance strength list [1, 1.1, 1.25, 1.5, 1.75, 2] and notes the weight-2 priority",
+        "Correctly identifies src/execution/cfg_decoding.py as the relevant ARA execution file",
+        "Explains that gamma=1 is the no-CFG baseline and the remaining five values represent CFG conditions",
+        "States that all six discrete gamma values must be evaluated (not a subset or continuous range) to satisfy the rubric requirement"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/cfg_decoding.py"
+      ],
+      "rubric_requirement_id": "R29",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_B02",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Concerning the zero-shot benchmark result analysis requirements: (a) What exact claim does R26 in rubric/requirements.md make about when CFG does NOT outperform the baseline, and what weight is assigned to this requirement? (b) Which ARA evidence table file most directly contains the zero-shot benchmark results across models and datasets that would be used to verify R26, and what datasets are represented there? (c) Given R26's specific exception for ARC (challenge) and Winogrande, what does this imply about how a reproducer should interpret results in the evidence table — specifically, should they expect CFG to outperform on these two datasets, and what would a passing vs. failing result look like?",
+      "gold_answer": "(a) R26 (Rubric ID: db320ab7-c3bc-4c86-8739-53267fbfd40e, weight=2) states: 'The measured performance metrics on the zero-shot benchmark show that using CFG (gamma=1.5) outperforms not using CFG (gamma=1) across all evaluated models and datasets, with the exception of ARC (challenge) and Winogrande.' This is a result-analysis requirement, meaning it must be verified against actual experimental output, not just implemented. (b) The ARA evidence table files evidence/tables/table2_zero_shot_benchmarks.md or evidence/tables/zero_shot_benchmarks.md (and related files evidence/tables/fig2a_zero_shot_arc_boolq_hellaswag.md and evidence/tables/fig2b_zero_shot_piqa_sciq_trivia_wino_lambada.md) contain the zero-shot benchmark results spanning datasets ARC-c, ARC-e, BoolQ, HellaSwag, PiQA, SciQ, TriviaQA, WinoGrande, and Lambada for GPT2 and Pythia model families. (c) R26 explicitly carves out ARC (challenge) and Winogrande as exceptions where CFG is NOT expected to outperform the baseline. This means a reproducer should expect gamma=1.5 to yield lower or equal performance on ARC-c and WinoGrande compared to gamma=1, while all other datasets should show CFG improvement. A passing result means CFG improves on at least BoolQ, HellaSwag, PiQA, SciQ, TriviaQA, Lambada, and ARC-e, while ARC-c and WinoGrande may show degradation — this pattern would satisfy R26.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R26's exact exception clause naming 'ARC (challenge) and Winogrande' as the two datasets where CFG need not outperform, and notes the weight-2 assignment",
+        "Identifies the correct ARA evidence table file(s) (e.g., evidence/tables/zero_shot_benchmarks.md or equivalent fig2a/fig2b files) and lists the datasets covered",
+        "Explains that for ARC-c and WinoGrande, lower CFG performance than baseline is the expected/acceptable outcome per R26",
+        "Describes what a passing result looks like: CFG (gamma=1.5) outperforms baseline (gamma=1) on all datasets except ARC-c and WinoGrande across both GPT2 and Pythia families"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/zero_shot_benchmarks.md"
+      ],
+      "rubric_requirement_id": "R26",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_B03",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Regarding the toxicity detection experiment dataset and model requirements: (a) What do R14 and R15 in rubric/requirements.md together specify about the data source and the pretrained classifier needed for the toxicity experiment — including the exact HuggingFace repository identifiers mentioned? (b) Which ARA file documents the entropy analysis used in conjunction with the toxicity experiment, and what does that file reveal about how toxicity is operationalized in the analysis? (c) What does the combination of R14's specific dataset URL and R15's classifier ('unitary/toxic-bert') imply about the design of the toxicity pipeline — specifically, why must these two components be used together rather than substituting either one independently?",
+      "gold_answer": "(a) R14 (Rubric ID: 9d5cdecf-8f7d-4df3-a58f-83c6ae6ed7bd) states: 'Code has been implemented such that the toxicity dataset (https://huggingface.co/datasets/thesofakillers/jigsaw-toxic-comment-classification-challenge) can be used, obtaining it from the huggingface repository specified in the addendum.' R15 (Rubric ID: 784f3d0a-d203-4d73-9735-c796e9d01640) states: 'Code has been implemented such that the pretrained classifier used for toxicity evaluation and guidance (unitary/toxic-bert) can be used, as noted in footnote 10 and Section 6.' Together they specify: (i) a specific HuggingFace dataset at thesofakillers/jigsaw-toxic-comment-classification-challenge, and (ii) the unitary/toxic-bert model for both guidance and evaluation. (b) The file src/execution/entropy_analysis.py contains entropy analysis code related to the toxicity and other CFG experiments. This file likely operationalizes toxicity by computing token-level or sequence-level entropy distributions under CFG guidance, showing how toxic-bert scores correlate with entropy changes. (c) The combination is necessary because unitary/toxic-bert serves dual roles: it is the guidance signal (steering generation away from toxic content) AND the evaluation metric (measuring toxicity of generated text). Using a different classifier for guidance would change what the model is steered toward, while using a different dataset would change the distribution of prompts. The rubric requires both to be used together to faithfully reproduce the experimental setup from Section 6 and footnote 10.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes both R14 and R15 including the exact HuggingFace identifiers 'thesofakillers/jigsaw-toxic-comment-classification-challenge' and 'unitary/toxic-bert'",
+        "Identifies src/execution/entropy_analysis.py as the relevant ARA file for the toxicity entropy analysis",
+        "Explains that unitary/toxic-bert serves dual roles as both guidance classifier and evaluation classifier per R15",
+        "States that substituting either component independently would break the experimental fidelity required by rubric requirements referencing Section 6 and footnote 10"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "src/execution/entropy_analysis.py"
+      ],
+      "rubric_requirement_id": "R14",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_B04",
+      "category": "rubric_alignment",
+      "difficulty": "T2_scattered",
+      "question": "Regarding the CodeGen HumanEval pass@k evaluation requirements: (a) What do R52, R53, and R54 in rubric/requirements.md collectively specify about the guidance strengths, sampling temperatures, and pass@k values that must be used for the CodeGen HumanEval evaluation? (b) Which ARA evidence table file most directly documents the full CodeGen HumanEval results across these configurations, and what does the table structure reveal about how the results are organized? (c) What does the intersection of R53's temperature requirement [0.2, 0.6, 0.8] and R54's pass@k requirement (k=1, 10, 100) imply about the minimum number of distinct experimental runs or result cells that must be produced for a single CodeGen model variant?",
+      "gold_answer": "(a) R52 (Rubric ID: 8b8c4106-59a9-47f3-bfaf-3390f9b25c4f) states: 'Code has been implemented such that the CodeGen model family can be evaluated on HumanEval with guidance strengths [1.0, 1.1, 1.25, 1.5, 1.75, 2.0] as outlined in Footnote 3.' R53 (Rubric ID: 78e019d5-21f7-4358-b5e8-1c898dbfa93a) states: 'Code has been implemented such that the CodeGen model family can be evaluated on HumanEval with a sampling temperatures of [0.2, 0.6, 0.8] as outlined in Figure 3.' R54 (Rubric ID: fdddda96-3a26-4234-b00f-dccd5cadc763) states: 'Code has been implemented such that the CodeGen model family performance on HumanEval can be measured with pass@k, for k = 1, 10, 100 as outlined in Section 3.3.1 and in Footnote 4.' Collectively: 6 guidance strengths × 3 temperatures × 3 k-values define the evaluation space. (b) The file evidence/tables/codegen_humaneval_full.md (or evidence/tables/table2_codegen_humaneval.md) most directly documents the full CodeGen HumanEval results. The table structure organizes results by model size, guidance strength, temperature, and pass@k metric. (c) For a single CodeGen model variant, the minimum number of result cells is 6 guidance strengths × 3 temperatures × 3 k-values = 54 distinct result entries. This means each model (CodeGen-350M-mono, CodeGen-2B-mono, CodeGen-6B-mono) requires 54 result cells, and the full experiment across all three model sizes requires at least 162 result entries to fully satisfy R52+R53+R54.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes all three requirements R52, R53, R54 with their exact parameter lists: guidance strengths [1.0, 1.1, 1.25, 1.5, 1.75, 2.0], temperatures [0.2, 0.6, 0.8], and k values [1, 10, 100]",
+        "Identifies the correct ARA evidence table file (evidence/tables/codegen_humaneval_full.md or table2_codegen_humaneval.md) and describes its organizational structure",
+        "Correctly computes the minimum number of result cells per model as 6 × 3 × 3 = 54",
+        "Notes that the full experiment across three CodeGen model sizes requires at least 162 total result entries"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/codegen_humaneval_full.md"
+      ],
+      "rubric_requirement_id": "R52",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    },
+    {
+      "id": "stay-on-topic-with-classifier-free-guidance_B05",
+      "category": "rubric_alignment",
+      "difficulty": "T3_implicit",
+      "question": "Concerning the P3 dataset requirement for the instruction-following experiment in Section 5: (a) What does R13 in rubric/requirements.md specify about the P3 dataset — including the approximate sample count, the source URL, and which paper section it is tied to? (b) Which ARA evidence file documents the similarity analysis between P3-based CFG and instruction-tuning, and what does that file suggest about how the ~32k samples are used in the experimental design? (c) Given that R13 specifies 'around 32k samples' rather than an exact number, and references both 'Section 5 and the addendum', what does this imply about the tolerance in dataset size and why might the rubric use approximate language here — connecting this to what the evidence file reveals about the experiment's sensitivity to dataset scale?",
+      "gold_answer": "(a) R13 (Rubric ID: 7c686377-f0e3-46aa-a305-cabe1856ff559) states: 'Code has been implemented such that around 32k samples from the P3 dataset (https://huggingface.co/datasets/bigscience/P3) can be used, obtaining the dataset from its official source or equivalent mirrors. As outlined in Section 5 and the addendum.' Key details: approximately 32,000 samples, sourced from HuggingFace at bigscience/P3, and the experiment is described in both Section 5 of the paper and an addendum document. (b) The file evidence/tables/p3_cfg_instruct_similarity.md documents the similarity analysis between P3-based CFG outputs and instruction-tuned model outputs. This file reveals that the ~32k samples are used to construct a pseudo-instruction-following condition via CFG (using P3 prompts as conditional context), and the analysis measures how similar the resulting generations are to those from a model explicitly fine-tuned on instructions. (c) The approximate language ('around 32k') implies that the rubric permits minor variation in the exact sample count — for example, 30k or 34k samples would likely satisfy the requirement. This tolerance exists because P3 is a large multi-task dataset and the exact split used may vary by sampling strategy or dataset version. The evidence file's similarity analysis likely shows that the key finding (CFG with P3 prompts approximates instruction tuning) is robust to moderate variation in dataset size, meaning the experiment's conclusions do not hinge on hitting exactly 32,768 samples. The addendum reference suggests that precise sampling details are documented there, explaining why the main rubric uses approximate language.",
+      "grading_type": "checklist",
+      "grading_criteria": [
+        "Correctly quotes R13's exact text including 'around 32k samples', the URL 'https://huggingface.co/datasets/bigscience/P3', and the dual reference to 'Section 5 and the addendum'",
+        "Identifies evidence/tables/p3_cfg_instruct_similarity.md as the relevant ARA evidence file and explains its role in measuring similarity between P3-CFG and instruction tuning",
+        "Explains that 'around 32k' implies tolerance for minor variation in sample count (e.g., ±a few thousand) rather than requiring an exact number",
+        "Connects the approximate language to the robustness of the experiment's main finding, noting that the addendum contains precise sampling details not captured in the main rubric"
+      ],
+      "requires": [
+        "rubric/requirements.md",
+        "evidence/tables/p3_cfg_instruct_similarity.md"
+      ],
+      "rubric_requirement_id": "R13",
+      "info_gap_rating": "partial",
+      "gap_type": "rubric_exclusive"
+    }
+  ]
+}

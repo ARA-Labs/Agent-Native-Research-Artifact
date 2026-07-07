@@ -1,0 +1,215 @@
+[
+  {
+    "task_id": "sequential-neural-score-estimation_T01",
+    "goal": "Set up all 9 simulation tasks used in the paper: the 8 standard SBI benchmark tasks from the sbibm library (Gaussian Linear, Gaussian Mixture, Two Moons, Gaussian Linear Uniform, Bernoulli GLM, SLCP, SIR, Lotka Volterra) and the 31-parameter Pyloric neuroscience simulator (Cancer Borealis stomatogastric ganglion producing 18 summary statistics). For each task, verify that parameters can be sampled from the prior and observations generated from the simulator. Confirm correct dimensionality of parameters and observations for each task.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: All 9 simulator tasks produce outputs with correct dimensionalities matching the paper specifications"
+    ],
+    "rubric_requirement_ids": [
+      "18fa145c-1614-4c29-8cc7-b99386a75872",
+      "3a845c86-5343-4145-b38a-4f54fa8f065d",
+      "b0e7463b-dc2d-4a42-84c6-b59c34a0f5ac",
+      "636b493d-6459-4c02-9d26-e11ab99a0e43",
+      "8ffe1960-87c2-48fb-9c6a-0e17cfe064bd",
+      "f6f6e39c-0759-4cd7-8efc-5d20db3b67c7",
+      "584fceff-d6b8-406b-a605-4b1671e74659",
+      "b84bf196-46d7-4a15-b8a4-ff6a6a1e6177",
+      "33a68532-f8bc-45bf-9794-fc4d54a7562a"
+    ],
+    "n_requirements": 9
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T02",
+    "goal": "Implement the Variance-Exploding SDE (VESDE) forward noising process following Section 2.2 and Appendix E.3. Implement the VESDE drift term f(x,t)=0 and diffusion term g(t)=sigma_min*(sigma_max/sigma_min)^t*sqrt(2*log(sigma_max/sigma_min)). Set sigma_min=0.01 for SIR and Two Moons, sigma_min=0.05 for the remaining 6 benchmark tasks, and sigma_max to the maximum pairwise Euclidean distance in the training data (first-round data for sequential methods). Use time interval (0,1]. Implement code to compute the VESDE transition log-density gradients. Verify the forward process correctly adds increasing noise on at least two benchmark tasks.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: VESDE forward process produces monotonically increasing noise variance as t increases from 0 to 1",
+      "H2: VESDE transition log-density gradients are numerically consistent with finite-difference approximations"
+    ],
+    "rubric_requirement_ids": [
+      "7cc9e28d-36c6-4895-b52e-cac1bf192f94",
+      "5cbe0a62-71be-4aa8-9985-58970518ecf4",
+      "d6a4a408-756f-4efb-9de0-a2b39c92cb46",
+      "0d28b6c7-3fa1-47c7-8bbf-7eaafb6e9077",
+      "394139bd-20d1-4bf3-b43e-b7af3507435d",
+      "47bbd386-53c3-41ee-8068-172ff6496c6e",
+      "ee6fc1b6-ab2d-4773-ae59-fe29c9f8c39a",
+      "7a91c729-63e7-4f4f-866d-d3d0f37c3a67"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T03",
+    "goal": "Implement the Variance-Preserving SDE (VPSDE) forward noising process following Appendix E.3. Implement the VPSDE drift term f(x,t)=-0.5*beta_t*theta_t where beta_t=beta_min+t*(beta_max-beta_min), and diffusion term g(t)=sqrt(beta_t). Set beta_min=0.1 and beta_max=11.0, time interval (0,1]. Implement code to compute the VPSDE transition log-density gradients. Verify the forward process correctly perturbs samples and that the marginal distribution at t=1 approximates a unit Gaussian.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: VPSDE marginal distribution at t=1 approximates a standard Gaussian (KL divergence < threshold)",
+      "H2: VPSDE transition log-density gradients match finite-difference approximations"
+    ],
+    "rubric_requirement_ids": [
+      "13d28eb6-fd14-4738-985b-1335e2b5b9b5",
+      "da121c46-2949-4214-9050-56a3d0817994",
+      "c4621fe1-4c93-48a9-a8bb-4830b351ddd6",
+      "17102a8e-565c-46c6-908e-708d2ab7efc0",
+      "6a5e82b9-6d49-435d-9a63-c6f210154c1e",
+      "648352ef-2fbe-480a-bf77-acd8f89bef81"
+    ],
+    "n_requirements": 6
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T04",
+    "goal": "Implement the conditional score network architecture exactly as specified in Appendix E.3. Build: (1) the parameter embedding network, a 3-layer MLP with 256 hidden units per layer and output dimension max(30, 4*d); (2) the observation embedding network, a 3-layer MLP with 256 hidden units per layer and output dimension max(30, 4*p); (3) the sinusoidal time embedding into 64 dimensions using sin(t/10000^((i-1)/31)) for i<=32 and cos(t/10000^((i-33)/31)) for i>32; (4) the score network MLP, a 3-layer MLP with 256 hidden units taking concatenated [theta_emb, x_emb, t_emb] with standardization of embeddings, outputting dimension d. All MLPs use SiLU activations. Verify correct output shapes for multiple benchmark tasks.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: The score network architecture produces correct output dimensions for all benchmark task dimensionalities"
+    ],
+    "rubric_requirement_ids": [
+      "97d46d53-507a-4a3d-9fad-1bd3dcaaa2f3",
+      "3dcddd21-9771-40b6-8fdf-0a1a23f3f945",
+      "6e0acedb-7a05-416f-9863-aed1f683e05e",
+      "a3351355-61be-411c-961d-6d7db8b397b1",
+      "31a17217-0f10-4522-bda9-89614df502ec",
+      "f7eafffb-aea8-460c-8f4c-6fb4be964de5",
+      "91963fec-c1e8-4b95-874f-9b85dfd087d3",
+      "cd67e43e-f1fd-4aad-9e4d-e909e2b55ec3",
+      "0203c1b6-f3c2-45f9-892b-e141f1e6e5c6",
+      "20d5ed76-f928-40a2-8248-3f1dbaf2102e",
+      "50b24eb8-9494-4f6a-83a0-ee0b9b9f1321"
+    ],
+    "n_requirements": 11
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T05",
+    "goal": "Implement the NPSE training and sampling pipeline. For training: (1) sample parameters from the prior and generate observations via the simulator; (2) simulate the forward diffusion to obtain perturbed parameters theta_t; (3) compute the denoising score matching loss as a Monte Carlo estimate. Configure the Adam optimizer with lr=1e-4, 15% validation split, early stopping with 1000-step patience, max 3000 iterations, batch size 50 for non-sequential experiments with budget <=10k, batch size 500 for budget 100k. For sampling: draw initial samples from unit Gaussian, solve the reverse-time probability flow ODE using RK45. Verify the training loop converges and posterior samples are generated on the Two Moons task.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: The NPSE denoising score matching loss converges during training on benchmark data",
+      "H2: Reverse-time probability flow ODE sampling produces valid posterior approximations"
+    ],
+    "rubric_requirement_ids": [
+      "74bb4c17-5d8f-4c1e-ba22-08a1c1e5ac45",
+      "2dc54398-e427-4caf-8ae2-88f5914b59c9",
+      "da18282b-be9d-4e41-ae08-aca90181a908",
+      "3b1bf848-c43c-4179-b76e-ab4cd14b59de",
+      "eb61bf5c-7f24-4bb0-92eb-853205a8784c",
+      "c1c7b1ce-bfc5-46bf-a701-78c98139bc74",
+      "e32788d4-0ee0-4542-864e-eec5a6e5b779",
+      "6113057c-227b-45a4-820f-942878d80a33",
+      "3a7eaa80-8b59-4ca1-b87f-4d71d979fdce",
+      "46eb9ccc-c7eb-40c3-a34d-cc91e9e4db87",
+      "b69e449f-2d50-4a36-be43-b0ee00a2c1e3",
+      "7f97ba49-e042-4a5b-af23-48e1df11ae8a"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T06",
+    "goal": "Implement the three baseline methods and the C2ST evaluation metric. Set up Neural Posterior Estimation (NPE) using the sbibm library with training code. Set up Sequential Neural Posterior Estimation (SNPE-C) using the sbibm library with training code. Implement Truncated Sequential Neural Posterior Estimation (TSNPE) using the tsnpe_neurips GitHub repository. Implement the C2ST metric using the default sbibm implementation with 10000 samples from both the true and approximate posteriors. Configure the batch size to 200 for sequential experiments with budget <=10k. Verify that all three baselines can be trained and evaluated on at least one benchmark task.",
+    "difficulty": "easy",
+    "hypotheses_tested": [
+      "H1: NPE baseline produces valid posterior samples when trained on sbibm benchmark tasks",
+      "H2: SNPE-C and TSNPE sequential baselines converge across multiple rounds on at least one task"
+    ],
+    "rubric_requirement_ids": [
+      "3a389c28-41da-4eff-a2c9-49b423541dbc",
+      "4c097da3-7391-40b2-adee-c08ec59b0539",
+      "4c1cc604-a4fe-4bf1-99e3-0bbbfc54c6a5",
+      "e73d1064-f820-4d47-ba52-e06d79b39711",
+      "02b42ffb-c304-49d2-b6f5-3cd61cd3e131",
+      "e7b8bc58-f9f5-45dd-b701-16bdd85c0975",
+      "ac2ef197-1e19-4e8b-9f2e-7a218dc7484e",
+      "dc9bd609-b5f3-428d-bff9-4d56843bbe06"
+    ],
+    "n_requirements": 8
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T07",
+    "goal": "Implement the Truncated Sequential Neural Posterior Score Estimation (TSNPSE) algorithm following Section 4.1. The algorithm operates over R=10 rounds with budget evenly split (M=N/R per round). In round 1, the proposal prior equals the task prior. In subsequent rounds: (a) generate 20000 approximate posterior samples via the probability flow ODE; (b) compute sample log-probabilities using the instantaneous change-of-variables formula; (c) set the truncation boundary as the epsilon=5e-4 percentile; (d) implement truncated proposal sampling via rejection: draw from prior, reject outside the empirical hyperrectangle, compute log-probability, accept only if above threshold, repeat until M samples obtained. Each round, construct a new dataset from the truncated proposal and retrain the score network. Use the final-round score network for posterior sampling. Verify the algorithm runs for multiple rounds on at least one task.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: TSNPSE truncated proposal concentrates probability mass in high-posterior regions across rounds",
+      "H2: The rejection sampling acceptance rate remains computationally feasible across all 10 rounds"
+    ],
+    "rubric_requirement_ids": [
+      "08b7d601-6d74-42ed-bd7a-6984e1f7507b",
+      "48600e77-0489-4561-9e25-ab3007d95db2",
+      "2fecc389-0e27-464c-afec-7e959ed15525",
+      "34fde1e1-8684-48e4-8fa0-4858fa6ef3c4",
+      "5a98077f-3db6-462c-85de-da243375ccc9",
+      "dc661069-d24d-4070-9d44-df19553d78d2",
+      "c70a513b-018e-4566-b5af-ab611effe4ce",
+      "c2e78e8a-de60-4cde-8fcc-2616f94ac186",
+      "e17ca159-67a6-4117-8a6a-227c77ebc489",
+      "eb56d7bc-ce49-4033-94fe-a284b151e2b9",
+      "6cf7e83a-748e-42f0-b7d7-55cb4e955f07",
+      "d2f135a0-7aec-4df3-93db-3be72b20057b",
+      "2d2d46c3-6627-47eb-b42d-ef5abaefefce"
+    ],
+    "n_requirements": 13
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T08",
+    "goal": "Train and evaluate all non-sequential methods (NPSE-VE, NPSE-VP, NPE) on all 8 benchmark tasks at simulation budgets 1000, 10000, and 100000, reproducing Figure 2 from Section 5.2. Evaluate using C2ST with 10000 samples. Verify per-task patterns: (1) Lotka Volterra: all three methods within +-0.15 C2ST; (2) SLCP: NPSE-VE and NPSE-VP roughly equivalent, both lower than NPE; (3) Gaussian Linear Uniform: NPE lower than both NPSE variants; (4) Bernoulli GLM: all roughly equivalent; (5) SIR: NPE lower than NPSE-VP; (6) Two Moons: NPE lower than NPSE-VP; (7) Gaussian Mixture: NPE and NPSE-VE roughly equivalent, both lower than NPSE-VP; (8) Gaussian Linear: all roughly equivalent.",
+    "difficulty": "medium",
+    "hypotheses_tested": [
+      "H1: NPSE-VE achieves competitive C2ST scores with NPE across the majority of benchmark tasks",
+      "H2: NPSE-VP underperforms NPE on low-dimensional tasks (SIR, Two Moons) but matches on higher-dimensional ones",
+      "H3: VE SDE is preferable over VP SDE for low-dimensional problems"
+    ],
+    "rubric_requirement_ids": [
+      "d221f378-c075-4f37-9dad-5dc4c763891e",
+      "c32110eb-720f-4103-88db-9b0865929073",
+      "e5ea6fe2-b69c-410c-a0ba-09df2dad95f9",
+      "089460fd-533f-46c4-a148-1f9084898704",
+      "26b43594-7ddb-41d4-8846-a2908f9a0ab8",
+      "54cccd02-52ae-44d0-9ad7-a2a7c12ae49c",
+      "f4adb128-d3ee-47e9-bae3-c609ae8fc041",
+      "9a4dbff1-55f9-4498-8e83-c84e3f831d6f",
+      "b40d156e-54a4-4102-855a-e797b9fad75b",
+      "0e6a12ee-fae2-48b6-8c57-05e7fef83a44",
+      "54e2553a-4f34-4c43-ab47-d83cb1d00e94",
+      "d560a5b0-9324-4b25-bb31-d9dcf2fd90d6"
+    ],
+    "n_requirements": 12
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T09",
+    "goal": "Train and evaluate all sequential methods (TSNPSE-VE, TSNPSE-VP, SNPE-C, TSNPE) for 10 rounds on all 8 benchmark tasks at simulation budgets 10000 and 100000, reproducing Figure 3 from Section 5.2. Evaluate using C2ST. Verify: (1) on SLCP, Lotka Volterra, and Bernoulli GLM, TSNPSE-VE and TSNPSE-VP achieve lower or roughly equivalent C2ST compared to SNPE-C and TSNPE; (2) on Gaussian Linear, TSNPSE variants achieve lower or equivalent C2ST compared to TSNPE; (3) on simpler tasks (GLU, Bernoulli GLM, SIR, Two Moons, Gaussian Mixture, Gaussian Linear), TSNPSE-VE and TSNPSE-VP achieve equivalent or higher C2ST compared to SNPE-C; (4) on GLU, SIR, Two Moons, Gaussian Mixture, TSNPSE-VE achieves equivalent or higher C2ST compared to TSNPE; (5) on GLU, Bernoulli GLM, SIR, Two Moons, Gaussian Mixture, Gaussian Linear, TSNPSE-VP achieves equivalent or higher C2ST compared to TSNPE.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: TSNPSE outperforms SNPE-C and TSNPE on challenging tasks (SLCP, Lotka Volterra, Bernoulli GLM)",
+      "H2: TSNPSE achieves comparable or superior performance to SNPE-C and TSNPE across all benchmark tasks",
+      "H3: Sequential truncation provides larger gains on higher-dimensional or multimodal problems"
+    ],
+    "rubric_requirement_ids": [
+      "3edc4750-98e6-4214-836c-8bba322e3000",
+      "4f22134a-8d9f-41a1-accb-6c43332f2f9b",
+      "9176d64d-5d35-444c-be41-99cb2d4ccb74",
+      "5cb794a0-9d35-4010-8f73-5c06f7d6d836",
+      "e4090d0e-af0b-42e0-87e3-e02c002e3697",
+      "4da588d3-ed23-4938-ae45-6f3330b145b9",
+      "1e34fed1-7c74-4eb5-a590-759ab003563c"
+    ],
+    "n_requirements": 7
+  },
+  {
+    "task_id": "sequential-neural-score-estimation_T10",
+    "goal": "Reproduce the Pyloric neuroscience experiment from Section 5.3 (Figures 4a-c). Run TSNPSE-VP for 9 rounds: 30000 initial simulations from the prior, then 20000 additional simulations per round from the truncated proposal. After each round, compute the percentage of valid summary statistics (non-NaN outputs from the Pyloric simulator). At the end of the final round, compute a posterior mean-predictive sample by taking the mean of approximate posterior samples and running it through the simulator. Verify: (1) TSNPSE-VP achieves approximately 80% valid summary statistics in the final round; (2) TSNPSE-VP has a higher percentage of valid statistics than TSNPE and SNVI for all simulation budgets below 200k; (3) the posterior predictive samples closely match the experimentally observed voltage traces.",
+    "difficulty": "hard",
+    "hypotheses_tested": [
+      "H1: TSNPSE-VP achieves approximately 80% valid summary statistics by the final round on the Pyloric problem",
+      "H2: TSNPSE-VP outperforms TSNPE and SNVI in valid-statistic rate for budgets below 200k simulations",
+      "H3: The posterior mean-predictive sample produces voltage traces closely matching experimental observations"
+    ],
+    "rubric_requirement_ids": [
+      "1512d34f-61e1-452d-9d1a-97562bca29bd",
+      "db05a3d3-1026-4576-b4de-3a188c567ec8",
+      "13c6dc3c-1578-48a4-9cc9-399a61cd22f2",
+      "46447a4d-bc28-4a37-8124-9db627b9f6b6",
+      "3fb824b3-9455-4ad1-a8ec-31af2dffad76",
+      "445ce9cf-4bb6-40fc-b6d4-c96e32698ddc"
+    ],
+    "n_requirements": 6
+  }
+]

@@ -1,0 +1,33 @@
+session:
+  id: "2026-03-12_001"
+  timestamp: "2026-03-12"
+  summary: "Downloaded PaperBench rubrics and arXiv PDFs for two new eval papers (stochastic-interpolants, sequential-neural-score-estimation)"
+
+events_logged:
+  - type: decision
+    id: N01
+    provenance: user
+    summary: "Selected stochastic-interpolants (Generative Models) and sequential-neural-score-estimation (Probabilistic Methods) as two new PaperBench eval papers from different domains than the existing test-time-model-adaptation (OOD)"
+
+ai_actions:
+  - action: "Browsed PaperBench GitHub repo (openai/preparedness) to enumerate 22 papers and their domains"
+    provenance: ai-executed
+    files_changed: []
+  - action: "Downloaded rubric.json for stochastic-interpolants (94 nodes, depth 5) and sequential-neural-score-estimation (123 nodes, depth 5)"
+    provenance: ai-executed
+    files_changed:
+      - "code/eval/rubrics/stochastic-interpolants.json"
+      - "code/eval/rubrics/sequential-neural-score-estimation.json"
+  - action: "Downloaded arXiv PDFs: 2310.03725 (stochastic-interpolants, 27MB) and 2210.04872 (sequential-neural-score-estimation, 4.5MB)"
+    provenance: ai-executed
+    files_changed:
+      - "code/pdfs/stochastic-interpolants.pdf"
+      - "code/pdfs/sequential-neural-score-estimation.pdf"
+
+claims_touched: []
+
+open_threads:
+  - "Need to generate question sets for the two new papers (code/questions/{paper}.json)"
+  - "Need to create ARA artifacts for the two new papers for ARA-vs-PDF eval"
+
+ai_suggestions_pending: []

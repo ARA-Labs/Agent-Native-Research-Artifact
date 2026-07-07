@@ -1,0 +1,86 @@
+session:
+  id: "2026-03-12_003"
+  timestamp: "2026-03-12"
+  summary: "PM audit: recorded full paper progress — 10 sections written, 10 claims extracted, 12 exploration tree nodes, 8 heuristics, 6 observations"
+
+events_logged:
+  - type: claim
+    id: C01-C10
+    provenance: user
+    summary: "Extracted 10 falsifiable claims from paper: Storytelling Tax (C01), Engineering Tax (C02), tripartite architecture (C03), Ingestor fidelity (C04), execution capabilities (C05), negative knowledge (C06), Seal verification (C07), Live PM (C08), PDF information gap (C09), model consistency (C10)"
+
+  - type: decision
+    id: N03-N12
+    provenance: user
+    summary: "Recorded 10 major design decisions: paper title (N03), tripartite architecture (N04), dual kernel/repo mode (N05), 3-level Seal (N06), Live PM as skill (N07), 20-paper corpus (N08), 3-tier eval (N09), Ingestor architecture (N10), RIC eval with PaperBench (N11), PDF info gap experiment (N12)"
+
+  - type: observation
+    id: O01-O06
+    provenance: ai-suggested
+    summary: "6 observations: all eval tables empty (O01), info gap results not in paper yet (O02), review system appendix scope (O03), placeholder citations (O04), open-source TODO (O05), ara/ was sparse (O06)"
+
+ai_actions:
+  - action: "Populated ara/logic/problem.md with 4 observations, 2 gaps, key insight, 4 assumptions"
+    provenance: ai-executed
+    files_changed: ["ara/logic/problem.md"]
+
+  - action: "Populated ara/logic/claims.md with 10 falsifiable claims (C01-C10)"
+    provenance: ai-executed
+    files_changed: ["ara/logic/claims.md"]
+
+  - action: "Populated ara/logic/solution/heuristics.md with 8 design heuristics (H01-H08)"
+    provenance: ai-executed
+    files_changed: ["ara/logic/solution/heuristics.md"]
+
+  - action: "Extended ara/trace/exploration_tree.yaml from 2 to 12 nodes (N01-N12)"
+    provenance: ai-executed
+    files_changed: ["ara/trace/exploration_tree.yaml"]
+
+  - action: "Populated ara/staging/observations.yaml with 6 observations (O01-O06)"
+    provenance: ai-executed
+    files_changed: ["ara/staging/observations.yaml"]
+
+claims_touched:
+  - id: C01
+    action: created
+    provenance: user
+  - id: C02
+    action: created
+    provenance: user
+  - id: C03
+    action: created
+    provenance: user
+  - id: C04
+    action: created
+    provenance: user
+  - id: C05
+    action: created
+    provenance: user
+  - id: C06
+    action: created
+    provenance: user
+  - id: C07
+    action: created
+    provenance: user
+  - id: C08
+    action: created
+    provenance: user
+  - id: C09
+    action: created
+    provenance: user
+  - id: C10
+    action: created
+    provenance: user
+
+open_threads:
+  - "Fill all evaluation tables with experimental results (Tier 1, 2, 3)"
+  - "Aggregate pdf_information_gap.py results into Introduction text"
+  - "Verify PLACEHOLDER_ citations in references.bib"
+  - "Decide scope of ARA-native review system appendix"
+  - "Run the full 20-paper × 20-question × 3-model evaluation"
+  - "Complete the research extension case study (Section 7.4)"
+  - "Write open-source release plan (Section 5.6)"
+
+ai_suggestions_pending:
+  - "O02 suggests the info gap results are ready to fill into the Introduction"
+  - "O04 suggests two placeholder citations need verification"

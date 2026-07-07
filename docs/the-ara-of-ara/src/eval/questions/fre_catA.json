@@ -1,0 +1,101 @@
+{
+  "paper_id": "fre",
+  "category": "A",
+  "eval_layer": "understanding",
+  "generation_method": "dual_source_merged",
+  "n_questions": 10,
+  "n_from_pdf": 6,
+  "n_from_ara": 8,
+  "questions": [
+    {
+      "id": "fre_A01",
+      "category": "surface_results",
+      "difficulty": "T1_explicit",
+      "question": "What normalized score does FRE achieve on the Kitchen benchmark in the zero-shot offline RL comparison (Table 1)?",
+      "gold_answer": "66 ± 3",
+      "grading_type": "exact_numeric",
+      "source": "both"
+    },
+    {
+      "id": "fre_A02",
+      "category": "hyperparameters",
+      "difficulty": "T1_explicit",
+      "question": "What discount factor γ is used in FRE's IQL training, and how does it differ from the standard value?",
+      "gold_answer": "γ = 0.88, which is lower than the standard 0.99 used in most RL settings.",
+      "grading_type": "semantic",
+      "source": "ara"
+    },
+    {
+      "id": "fre_A03",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "Describe the complete pipeline for encoding a reward function at test time in FRE, including the reward discretization step and the transformer architecture used.",
+      "gold_answer": "At test time, K=32 (state, reward) pairs are sampled. Scalar rewards are discretized into one of 32 bins via r_disc = floor(clip((r+1)/2, 0, 1) * 32), then mapped to learned embeddings. State features are projected via a linear layer. The two embeddings are concatenated per token, forming K tokens fed into a 4-layer permutation-invariant transformer (hidden dim 256, no causal masking, no positional encodings). The mean of final-layer representations is projected to mean and log-std of a Gaussian, from which z is sampled.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "fre_A04",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What are the three families of random reward functions used in FRE's prior reward distribution, and what specific architectural choices are made for the random MLP reward family?",
+      "gold_answer": "The three families are: (1) singleton goal-reaching rewards using HER-style goal sampling, (2) random linear functions with sparse binary mask (p=0.9 zeroing), and (3) random 2-layer MLPs. The random MLP uses architecture (state_dim → 32 → 1) with tanh activation between layers, output clipped to [-1, 1], and weights initialized from a normal distribution scaled by 1/sqrt((in_dim + out_dim)/2).",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "fre_A05",
+      "category": "cross_section",
+      "difficulty": "T2_scattered",
+      "question": "How many reward-annotated samples does FRE use at evaluation time compared to the FB and SF methods, and what is FRE's overall 'all' score versus FB's in Table 1?",
+      "gold_answer": "FRE uses 32 samples at evaluation while FB and SF use 5120 samples (160× more). FRE achieves an overall 'all' score of 57 ± 9 versus FB's 24 ± 12.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "fre_A06",
+      "category": "method_detail",
+      "difficulty": "T2_scattered",
+      "question": "What is the strided training scheme used in FRE, and why is it important for policy learning?",
+      "gold_answer": "In the strided scheme, the FRE encoder is first trained using only decoder gradients until convergence, while RL components are not trained. Then the encoder is frozen and RL networks are trained using the frozen encoder's outputs. This is important because it makes the mapping from reward functions to latent vectors stationary during policy learning, which is necessary to correctly estimate multi-task Q values using TD learning. Joint training causes non-stationarity in Q-function targets, violating the stationary reward signal assumption required for convergent TD learning.",
+      "grading_type": "checklist",
+      "source": "both"
+    },
+    {
+      "id": "fre_A07",
+      "category": "surface_results",
+      "difficulty": "T2_scattered",
+      "question": "In the reward subset ablation (Table 4), what is the total score for FRE-all versus FRE-goal-lin, and which variant achieves the highest total score?",
+      "gold_answer": "FRE-all achieves a total score of 47.3 ± 7, while FRE-goal-lin achieves 46.9 ± 7. FRE-all achieves the highest total score among all variants.",
+      "grading_type": "exact_numeric",
+      "source": "ara"
+    },
+    {
+      "id": "fre_A08",
+      "category": "design_rationale",
+      "difficulty": "T3_implicit",
+      "question": "Why does FRE use a probabilistic encoder with a KL divergence penalty rather than a deterministic encoder, and what role does the information bottleneck play?",
+      "gold_answer": "FRE uses a probabilistic encoder with an information bottleneck penalty (KL divergence) to learn a maximally compressive yet informative latent representation. The information bottleneck objective encourages z to be maximally predictive of held-out reward samples while being as compressive as possible, preventing overfitting to the specific encoder states and encouraging generalization across reward functions. A deterministic encoder lacks this compression mechanism.",
+      "grading_type": "semantic",
+      "source": "pdf"
+    },
+    {
+      "id": "fre_A09",
+      "category": "failure_conditions",
+      "difficulty": "T3_implicit",
+      "question": "Under what conditions would FRE's zero-shot adaptation be expected to fail or degrade significantly, based on the assumptions and boundary conditions stated in the paper?",
+      "gold_answer": "FRE would degrade when: (1) the offline dataset does not cover states relevant to the downstream task (distribution shift between training and test states), (2) the downstream reward function is not compressible from K=32 samples (e.g., highly complex or discontinuous rewards), (3) the downstream reward structure falls outside the span of the prior distribution (goal-reaching, linear, MLP), or (4) rewards are not approximately normalized to [-1, 1], causing discretization to fail. Additionally, if the encoder has not converged before policy training (violating strided training), Q-function instability would occur.",
+      "grading_type": "checklist",
+      "source": "ara"
+    },
+    {
+      "id": "fre_A10",
+      "category": "hyperparameters",
+      "difficulty": "unanswerable",
+      "question": "What is the dimensionality of the latent vector z produced by the FRE encoder, and how was this dimension chosen relative to the reward embedding dimension?",
+      "gold_answer": "The paper does not specify the dimensionality of the latent vector z. While the reward embedding dimension (128) and number of reward embeddings (32) are given, the output dimension of z is not stated in the hyperparameter table or elsewhere in the paper.",
+      "grading_type": "abstention",
+      "source": "pdf"
+    }
+  ]
+}

@@ -157,6 +157,8 @@ The supervision gap is not hand-waving — it shows up as measurable cost. Acros
 
 **→ [The Last Human-Written Paper: Agent-Native Research Artifacts](https://amberljc.github.io/blog/2026-04-24-the-last-human-written-paper.html)**
 
+This paper practices what it proposes — its own ARA lives at [`docs/the-ara-of-ara`](docs/the-ara-of-ara).
+
 ---
 
 ## Compatibility
