@@ -1,7 +1,7 @@
 # Agent-Native Research Artifact (ARA)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-5%20skills-green)](skills/)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-6%20skills-green)](skills/)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.24658-b31b1b.svg)](https://arxiv.org/abs/2604.24658)
 [![Poster](https://img.shields.io/badge/Poster-PDF-orange.svg)](docs/poster.pdf)
 [![Demo](https://img.shields.io/badge/Demo-ARA--Demo-purple.svg)](https://github.com/ARA-Labs/ARA-Demo)
@@ -65,33 +65,8 @@ Then reach for a skill by what you need:
 | **Compile** an existing paper, repo, or notes into a structured ARA | **compiler** | `/compiler <path>` |
 | **Verify** an artifact's epistemic rigor before you trust, publish, or submit it | **rigor-reviewer** | `/rigor-reviewer <dir>` |
 | **Observe** the full research trajectory in an interactive process map | **research-visualizer** | `/research-visualizer <ara-dir>` |
+| **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
 | **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
-| **Ask** an ARA anything — what to try next, why something worked, what happens if you change X | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
-
-### Ask your artifact: `research-foresight`
-
-The ARA is not just a record — it is a **world model** your agent can query. `research-foresight`
-turns any coding agent into a read-only reasoning engine over one ARA: it retrieves precedent from
-the artifact's native files (claims, trace nodes, dead ends, evidence), then answers the question
-you actually asked — grounded in citations, with the speculative part labelled. No SDK, no API key;
-the agent itself is the LLM.
-
-```text
-/research-foresight ./ara "what if I double the warmup steps?"
-```
-
-It returns the **answer** plus an honesty envelope:
-
-- `basis` — the native refs it actually read (`trace:N31`, `logic/claims.md#C05`, …)
-- `grounded_inference` vs `speculative_leap` — what follows from the artifact vs the named extrapolation beyond it
-- `confidence` + `confidence_reason` — how much to trust it, and the real limiting factor
-- `falsifiable` — the concrete observation that would overturn the answer
-
-Any question works: *why did this ablation help? is claim C07 still sound? compare the two
-optimizer branches; what should I try next?* — the answer takes whatever shape the question calls for. Ruled-out
-directions (dead ends, refuted claims) are surfaced and honoured rather than silently repeated.
-The engine is read-only by construction (`allowed-tools: Read, Grep, Glob`) — it never writes to
-the artifact.
 
 **Make capture automatic.** Append this to your agent's system-prompt file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) so the record fills itself in every session:
 
@@ -106,8 +81,8 @@ See each skill's `SKILL.md` for the full specification:
 [compiler](skills/compiler/SKILL.md) ·
 [rigor-reviewer](skills/rigor-reviewer/SKILL.md) ·
 [research-visualizer](skills/research-visualizer/SKILL.md) ·
-[submit-ara](skills/submit-ara/SKILL.md) ·
-[research-foresight](skills/research-foresight/SKILL.md)
+[research-foresight](skills/research-foresight/SKILL.md) ·
+[submit-ara](skills/submit-ara/SKILL.md)
 
 ---
 

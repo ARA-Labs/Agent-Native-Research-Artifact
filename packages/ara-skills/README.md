@@ -67,4 +67,4 @@ In dev mode the CLI reads skills from the sibling `../../skills/` directory. On 
 
 ## Upstream source of truth
 
-The five skill directories live at the repo root under `skills/`. Edit them there — never edit the copy inside this package, which is created on demand by `prepack`.
+The six skill directories live at the repo root under `skills/`. Edit them there — never edit the copy inside this package, which is created on demand by `prepack`.
