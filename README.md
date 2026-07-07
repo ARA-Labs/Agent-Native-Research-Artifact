@@ -68,8 +68,6 @@ Then reach for a skill by what you need:
 | **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
 | **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
 
-If the directory you point a skill at turns out not to be an ARA (a plain paper, repo, or notes folder), compile it into one first with `/compiler <path>`, then rerun the skill.
-
 **Make capture automatic.** Append this to your agent's system-prompt file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) so the record fills itself in every session:
 
 ```markdown

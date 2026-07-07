@@ -32,7 +32,8 @@ it may contain spaces):
 ## Inputs
 
 From the user's message (or `$ARGUMENTS`): an **`<ara_dir>`** (the ARA in scope) and a free-text
-**query**.
+**query**. If `<ara_dir>` turns out not to be an ARA (a plain paper, repo, or notes folder),
+compile it into one first with `/compiler <path>`, then rerun this skill.
 
 ## Procedure
 
