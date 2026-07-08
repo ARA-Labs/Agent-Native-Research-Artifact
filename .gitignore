@@ -24,3 +24,9 @@ __pycache__/
 
 # Artifacts (generated outputs)
 ara-output/
+
+# Generated stargazer list (snapshot, regenerated via gh api)
+STARGAZERS.md
+
+# Remotion demo video project (rendered GIF lives at docs/ara-skills-demo.gif)
+video/

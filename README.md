@@ -1,4 +1,5 @@
-# Agent-Native Research Artifact (ARA)
+# 🔬 ARA (Agent-Native Research Artifact)
+### The Essential Toolkit to Supercharge Your Autoresearch
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-6%20skills-green)](skills/)
@@ -7,23 +8,12 @@
 [![Demo](https://img.shields.io/badge/Demo-ARA--Demo-purple.svg)](https://github.com/ARA-Labs/ARA-Demo)
 
 
-> **The ecosystem layer for AI scientists.** A protocol and skill bundle that makes autoresearch **verifiable, crystallized, and observable** — so trust scales with speed instead of collapsing under it.
-
----
-
-## The new bottleneck in science
-
-AI scientists can now generate hypotheses, execute experiments, and produce results at near-infinite speed. But this acceleration has created a new fundamental bottleneck: **How do we verify it? And how do we effectively guardrail the process?**
-
-When an AI generates thousands of exploratory steps, human researchers cannot manually untangle the logs to ensure empirical rigor. We need a fundamental shift in how research is documented and supervised.
+> **Autoresearch is blindingly fast, but fundamentally unobservable.**
+> When AI agents run experiments, they leave behind a graveyard of overwritten code, scattered logs, and undocumented dead ends. ARA is the essential toolkit that forces your AI scientists to work in a **structured, verifiable, and traceable** format—so you can actually trust the science they produce without reverse-engineering thousands of lines of terminal output.
 
 <p align="center">
-  <img src="docs/figures/fig_legacy_vs_ara_v6.png" alt="Legacy PDF vs ARA" width="100%"/>
+  <img src="docs/ara-skills-demo.gif" alt="ARA Skills Demo" width="100%"/>
 </p>
-
-*Publishing compiles a rich research process into a lossy narrative (left). ARA preserves it as a structured, machine-executable knowledge package the AI scientist writes and the human reads (right).*
-
-**ARA is a bundle of agent skills and protocols** built to solve this bottleneck. It provides a rigorous, structured way to document research knowledge, strategically crystallize insights over time, and make autonomous scientific processes entirely observable and verifiable. [Jump to how to use it ↓](#quickstart)
 
 ---
 
@@ -47,9 +37,10 @@ Research is rarely a straight line; it is a messy graph of pivots and dead ends.
 
 Supervising AI scientists shouldn't require reading endless terminal outputs. The system translates complex agent behaviors and exploration graphs into a clean, minimalist interface. It lets human researchers maintain high-level oversight, seamlessly stepping in to course-correct or guide the AI's behavior with zero friction.
 
-## 🛠️ Quickstart: The Six Core Skills
+<a id="quickstart"></a>
+## 🛠️ The Toolkit: Six Core Skills
 
-To operationalize these design principles, ARA provides six specialized agent skills. You can install them via:
+To operationalize these design principles, ARA provides a suite of six specialized agent skills. You can install the toolkit via:
 
 ```bash
 npx @ara-commons/ara-skills
