@@ -16,7 +16,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent
 # --- Load GEMINI_API_KEY from environment, falling back to a sibling .env file ---
 API_KEY = os.environ.get("GEMINI_API_KEY")
 if not API_KEY:
-    env_path = OUTPUT_DIR.parent / ".env"
+    env_path = OUTPUT_DIR.parent.parent / ".env"
     if env_path.exists():
         for line in env_path.read_text().splitlines():
             line = line.strip()
