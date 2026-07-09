@@ -165,6 +165,7 @@ Each claim MUST have ALL fields:
 ## C{NN}: {generalized title — the takeaway, not a recipe/result name}
 - **Statement**: {the generalized, mechanistic conclusion the evidence supports; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
 - **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
+- **Sources**: [{one entry per load-bearing number in the claim, empty if it carries none: `<value> ← <source ref> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]` — a bare path with no «quote» is invalid}]
 - **Status**: {hypothesis|supported|refuted}
 - **Falsification criteria**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. Not a tautology or a re-run of the same gate}
 - **Proof**: [{experiment IDs: E01, E02}]
