@@ -4,7 +4,7 @@ description: |
   End-of-turn research process recorder with progressive crystallization. Invoked at the END of
   EVERY turn, after the user's current request has been fully addressed and before yielding control
   back to the user. Reviews what happened in the turn, extracts research-significant events, and
-  writes them into the ara/ artifact through a three-stage pipeline: Context Harvester → Event
+  writes them into the ARA artifact through a three-stage pipeline: Context Harvester → Event
   Router → Maturity Tracker. Trace events (decisions, experiments, dead ends, pivots) are recorded
   immediately as journey facts. Knowledge events (claims, heuristics, concepts, constraints) are
   staged first and crystallize into typed layers ONLY when closure signals appear — topic
@@ -22,10 +22,19 @@ metadata:
 # Live Research Project Manager (Live PM)
 
 You are the Live PM. You run a per-turn epilogue that captures research activity into the
-`ara/` artifact while honoring the principle of **progressive crystallization**: forcing
+ARA artifact while honoring the principle of **progressive crystallization**: forcing
 premature structure distorts the record. Most observations are staged and only mature into
 formal entries when externally observable closure signals indicate the researcher has
 treated them as settled.
+
+## The ARA Root
+
+The artifact directory is located by **structure, not name**: an ARA root is any directory
+whose top level has `PAPER.md` plus `logic/` or `trace/` (shallow glob — `PAPER.md` and
+`*/PAPER.md` from the project root). Exactly one match → that is the root, whatever it is
+named (`ara/`, `ara-nanogpt/`, …). Multiple matches → ask the user which one this project
+records to; never guess. None → bootstrap a new one (see Initialization). Throughout this
+document `ara/` is shorthand for the located root.
 
 ## Layer Mutability
 
@@ -302,7 +311,7 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
 ## Per-Turn Procedure
 
 ```
-1. Read existing ara/ files (current state, next IDs).
+1. Locate the ARA root (see The ARA Root); backfill any missing mandatory files (see Initialization). Read existing files (current state, next IDs).
 2. Stage 1 — harvest this turn's candidate events.
 3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; interpretive events staged to staging/observations.yaml.
 4. Stage 3 — crystallize staged observations whose closure signal fired; flag contradictions; mark 3+-day-idle observations stale.
@@ -530,25 +539,35 @@ entries:
       - "Routed N12 as dead_end rather than experiment — code was abandoned mid-run."
 ```
 
-## Initialization (if `ara/` does not exist)
+## Initialization (missing or incomplete ARA)
 
-Create the structure on the first turn that contains research-significant activity. Do not
-ask unprompted on a purely conversational opener.
+Runs inside step 1 of the per-turn procedure, on any turn with research-significant
+activity. Do not ask unprompted on a purely conversational opener.
 
-```
-mkdir -p ara/{logic/solution,src,trace/sessions,evidence/{tables,figures},staging}
-```
+- **No ARA root found** → create one at the path the user has already named in
+  conversation, else `ara/`.
+- **Root exists but mandatory-core files are missing** (an ARA sedimented from scratch is
+  usually incomplete) → create ONLY the missing pieces. Never overwrite an existing file.
 
-Seed:
-1. `ara/PAPER.md` — root manifest (infer title, authors, venue from project context)
-2. `ara/trace/sessions/session_index.yaml` — `sessions: []`
-3. `ara/trace/exploration_tree.yaml` — `tree: []`
-4. `ara/trace/pm_reasoning_log.yaml` — `entries: []`
-5. `ara/staging/observations.yaml` — `observations: []`
-6. `ara/logic/claims.md` — `# Claims`
-7. `ara/logic/problem.md` — `# Problem`
-8. `ara/logic/solution/heuristics.md` — `# Heuristics`
-9. `ara/evidence/README.md` — `# Evidence Index`
+**Mandatory core** (same as the compiler's — every ARA must have these):
+- `PAPER.md` — frontmatter (title, authors, year, venue, doi, ara_version, domain,
+  keywords, claims_summary, abstract) + Layer Index; infer values from project context,
+  placeholder what you can't
+- `logic/problem.md`, `logic/claims.md`, `logic/concepts.md`, `logic/experiments.md`,
+  `logic/related_work.md`, `logic/solution/constraints.md`
+- `src/environment.md`
+- `trace/exploration_tree.yaml` — `tree: []`
+- `evidence/README.md` + `evidence/tables/`, `evidence/figures/`
+
+**Live-PM files** (this skill's own record, beyond the compiler core):
+- `trace/sessions/session_index.yaml` — `sessions: []`
+- `trace/pm_reasoning_log.yaml` — `entries: []`
+- `staging/observations.yaml` — `observations: []`
+- `logic/solution/heuristics.md` — `# Heuristics`
+
+Markdown seeds are header-only stubs — content accrues through sedimentation, never
+invented at init. (The compiler's per-figure/table evidence rule applies to compiling an
+existing source; a live project's evidence accrues as runs produce it.)
 
 Then run the per-turn procedure normally.
 
