@@ -15,7 +15,7 @@ argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.4.0"
+  version: "2.5.0"
   tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management]
 ---
 
@@ -78,6 +78,10 @@ previous epilogue). Identify research-significant activity in two categories:
   literature searches, benchmark numbers.
 - **Researcher directions** expressed or confirmed: hypotheses, design choices, abandoned
   approaches, questions, affirmations, revisions.
+- **Reader reports** (cross-agent feedback): structured `contradiction_report`s produced against
+  this ARA by a reader engine (e.g. `research-foresight` PREDICT §7) and supplied as input this
+  turn — open `reader-report` issues on the ARA's repository, or report files handed to this run
+  (shape: `templates/reader-report.md`). Each is a candidate event, NEVER an edit to apply.
 
 Output a flat list of candidate events with raw context.
 
@@ -166,6 +170,16 @@ When a new event contradicts something already staged or crystallized:
 - Append an `unresolved` `decision` node to the exploration tree referencing both, with
   provenance reflecting who introduced the contradiction.
 - Stop. Adjudication is the researcher's job at a future turn.
+
+#### Reader reports (cross-agent feedback)
+
+A reader report targeting a crystallized entry is handled by the contradiction trigger above as
+externally-contributed contradicting evidence: flag the entry (`<!-- CONFLICT: see reader-report
+<ref> -->`), append an `unresolved` decision node referencing both the entry and the report, and
+defer — adjudication remains the researcher's job. A report targeting nothing in `logic/` is staged
+as an ordinary observation (`provenance: ai-suggested`, report ref recorded in `context`). Reports
+are never auto-applied, and the single-writer rule is unchanged: readers never write the ARA — this
+manager is the only writer, and a report is INPUT to it, not an edit.
 
 #### Stale-flagging
 
