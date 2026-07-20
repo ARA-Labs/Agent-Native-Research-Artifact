@@ -15,7 +15,7 @@ argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.4.0"
+  version: "2.5.0"
   tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management]
 ---
 
@@ -78,6 +78,10 @@ previous epilogue). Identify research-significant activity in two categories:
   literature searches, benchmark numbers.
 - **Researcher directions** expressed or confirmed: hypotheses, design choices, abandoned
   approaches, questions, affirmations, revisions.
+- **Reader reports** (cross-agent feedback): structured `contradiction_report`s produced against
+  this ARA by a reader engine (e.g. `research-foresight` PREDICT §7) and supplied as input this
+  turn — open `reader-report` issues on the ARA's repository, or report files handed to this run
+  (shape: `templates/reader-report.md`). Each is a candidate event, NEVER an edit to apply.
 
 Output a flat list of candidate events with raw context.
 
@@ -166,6 +170,41 @@ When a new event contradicts something already staged or crystallized:
 - Append an `unresolved` `decision` node to the exploration tree referencing both, with
   provenance reflecting who introduced the contradiction.
 - Stop. Adjudication is the researcher's job at a future turn.
+
+#### Reader reports (cross-agent feedback)
+
+Reader reports are **adjudicated by this manager in the turn they arrive** — every report leaves
+the turn with a verdict. This is the one sanctioned exception to the contradiction trigger's defer
+rule, scoped to reader reports only (the manager's own mid-research contradictions still defer as
+above). A report targeting nothing in `logic/` is simply staged as an ordinary observation
+(`provenance: ai-suggested`, report ref recorded in `context`). For a report targeting a
+crystallized entry:
+
+1. **Verify.** Resolve the report's `basis` refs and re-read the targeted entry. The report is
+   **upheld** only when evidence resolvable *inside the ARA* (trace nodes, evidence files, session
+   records) corroborates the observation and genuinely contradicts the cited clause. Reader-side
+   pointers the manager cannot resolve are recorded but do not count toward upholding.
+2. **Upheld** → fold the correction in as a Stage 4 content revision: edit the entry (provenance
+   `ai-suggested`, report ref recorded), record full before/after under `logic_revisions:`, and
+   append a `decision` node (`status: resolved`) referencing both the entry and the report. Status
+   changes follow the ordinary transition rules — an upheld report counts as empirical resolution.
+3. **Rejected** — resolvable evidence positively shows the report wrong (does not support the
+   observation, or does not contradict the clause) → the entry is untouched; append a `decision`
+   node (`status: resolved`) recording the verdict and its specific reason.
+4. **Unverifiable** — the ARA contains nothing that can corroborate *or* refute the observation
+   (a report resting only on reader-side pointers) → do NOT close it as rejected: this one case
+   falls back to the defer rule above. Flag the entry (`<!-- CONFLICT: see reader-report <ref>
+   -->`) and append an `unresolved` `decision` node referencing both, carrying the report's
+   `repro` for a future run to execute. A possibly-true dispute stays visible on the entry rather
+   than dying in the session record.
+5. **Notify, don't wait.** In every case the human receives an after-the-fact summary: the verdict
+   and its grounds go into the session record and the turn's `[PM]` summary line (e.g.
+   `reader-report on C02 upheld → Conditions revised`; `reader-report on C04 rejected:
+   evidence does not contradict clause`; `reader-report on C07 unverifiable → CONFLICT flagged,
+   repro preserved`). The manager reaches a verdict every time.
+
+The single-writer rule is unchanged: readers never write the ARA — this manager is the only
+writer, and a report is INPUT to it, not an edit.
 
 #### Stale-flagging
 

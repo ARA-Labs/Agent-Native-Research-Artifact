@@ -15,7 +15,7 @@ allowed-tools: Read, Grep, Glob
 metadata:
   author: ara-commons
   category: research-tooling
-  version: "1.0.0"
+  version: "1.1.0"
   tags: [research, world-model, retrieval, prediction, grounded-answering]
 ---
 

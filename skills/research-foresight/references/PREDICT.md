@@ -12,7 +12,7 @@ metadata:
   category: world-model-engine
   layer: L2-predictor
   binds-to: CONTRACT.md §0, §2, §3, §4
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Predictor — Grounded Answering over One ARA (PREDICT.md)
@@ -175,6 +175,14 @@ Answer:
   falsifiable: "<the concrete observation that would overturn this answer if checked — a run result for
                a forecast, contradicting evidence for an explanation; or `n/a — <reason>` for a purely
                definitional/descriptive answer. `n/a` may NOT cover an actually-checkable claim.>"
+  contradiction_report:      # OPTIONAL — only when reading surfaced evidence that CONTRADICTS an
+                             # inherited entry (§7); omit otherwise. This is OUTPUT, not a write —
+                             # CONTRACT.md §4b holds unchanged.
+    target: "logic/claims.md#C{NN}"     # the contradicted entry (native ref, verbatim)
+    contradicted_clause: "<the specific Statement/Conditions clause the evidence conflicts with>"
+    observation: "<what was observed — telegraphic, quantitative>"
+    basis: ["<native refs actually read and/or reader-side evidence pointers>"]
+    repro: "<how to re-check the observation, if applicable>"
 ```
 
 Notes on the schema:
@@ -267,3 +275,22 @@ A thin ARA is **not** grounds for a refusal. Instead:
 The cure for thin coverage is a richer ARA, not a refusal — but a clearly-labelled, low-confidence
 answer is a legitimate, useful response. Do **not** manufacture refs to look better-grounded than you
 are, and do **not** downgrade to "I cannot say".
+
+---
+
+## 7. Contradiction reports (reader-side feedback — still read-only)
+
+While answering, you may find that refs you read, or observations supplied with the query,
+**contradict an inherited entry** — a claim whose `Statement`/`Conditions` no longer matches the
+evidence in front of you. When it happens:
+
+- Attach a `contradiction_report` to the Answer (§3). This is **output, not a write**: you still
+  write nothing, anywhere — CONTRACT.md §4b is untouched. The **caller owns transport**: e.g. filing
+  the report as a `reader-report` issue on the ARA's repository, or handing the file to the next
+  `research-manager` run, whose existing contradiction trigger adjudicates it author-side.
+- Use the shared shape in `research-manager`'s `templates/reader-report.md` when the report leaves
+  this engine as a standalone artifact.
+- Report only **positive conflicting evidence** — never a mere absence (`coverage: thin` is §6, not
+  a contradiction). One report per contradicted entry; cite the clause you dispute verbatim.
+- Emitting a report does not change your Answer's duties: the negative still shapes the answer
+  (§4.3), and your confidence still reflects the unresolved tension.
