@@ -4,9 +4,10 @@
      on the ARA's repository, or hand the file to the ARA's research-manager run as input.
      Consumed by research-manager Stage 1 as a candidate event and adjudicated in the same turn:
      verified against evidence resolvable inside the ARA, then upheld (correction folded in, full
-     provenance and before/after recorded) or rejected (verdict + reason recorded) — the human is
-     notified of the conclusion after the fact, not asked to decide. The ARA's research-manager
-     remains the single writer. -->
+     provenance and before/after recorded), rejected (verdict + reason recorded), or — when the
+     ARA contains nothing that can corroborate or refute it — flagged unverifiable (CONFLICT flag
+     + unresolved node, repro preserved for a future run). The human is notified of the verdict
+     after the fact, not asked to decide. The ARA's research-manager remains the single writer. -->
 
 - **Target entry**: <!-- native ref, verbatim — e.g. logic/claims.md#C02 -->
 - **Contradicted clause**: <!-- quote the specific Statement/Conditions clause you dispute -->
