@@ -1,0 +1,35 @@
+name: ARA Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ara-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Clean artifacts: enforce --strict so they stay warning-free.
+          - artifact: examples/minimal-artifact
+            strict: "true"
+          - artifact: examples/resnet-ara-example
+            strict: "true"
+          # Non-strict: the trace nodes carry ARA provenance/timestamp fields
+          # that the ara-cli linter schema does not yet recognize, so they
+          # surface as (non-fatal) warnings. Keep this warning-tolerant until
+          # ara-cli's schema catches up to the fields the skills emit.
+          - artifact: examples/the-ara-of-ara
+            strict: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint ${{ matrix.artifact }}
+        uses: ARA-Labs/ara-cli/.github/actions/check@v0.1.11
+        with:
+          path: ${{ matrix.artifact }}
+          version: v0.1.11
+          strict: ${{ matrix.strict }}
