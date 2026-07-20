@@ -127,6 +127,34 @@ This paper practices what it proposes — its own ARA lives at [`examples/the-ar
 
 ---
 
+## Wire ARA into your agent
+
+If you are working on a research project with an AI coding agent, teach the agent to reach for ARA on its own. Run the command below from your project root to append the routing rules to `CLAUDE.md`, so every session carries them in context. Each line maps a situation to the skill that handles it, so the agent invokes the right one without being told which command to run:
+
+```bash
+cat >> CLAUDE.md <<'EOF'
+
+## ARA: agent-native research artifacts
+This project uses ARA (https://github.com/ARA-Labs/Agent-Native-Research-Artifact).
+Route research work to the matching ARA skill:
+- At the END of every research or coding session → run `/research-manager` to
+  capture decisions, experiments, dead ends, and claims into the `ara/` artifact.
+- When turning an existing paper, repo, or notes into a structured artifact →
+  run `/compiler <path>`.
+- Before trusting, publishing, or submitting an artifact → run `/rigor-reviewer <dir>`.
+- To inspect the full research trajectory as a process map → run `/research-visualizer <ara-dir>`.
+- To answer "what should I try next / why did this work / what if I change X" →
+  run `/research-foresight <ara-dir> "<question>"`.
+- When an artifact is ready to publish and list on the ARA Hub → run `/submit-ara <dir>`.
+EOF
+```
+
+Using a different agent? Swap `CLAUDE.md` for `AGENTS.md`, `.cursorrules`, or `GEMINI.md`.
+
+This extends the end-of-session capture snippet above into a full task-routing map across all six skills.
+
+---
+
 ## Compatibility
 
 These skills follow the [Agent Skills open standard](https://agentskills.io/specification) and work with:
