@@ -282,9 +282,7 @@ are, and do **not** downgrade to "I cannot say".
 
 While answering, you may find that refs you read, or observations supplied with the query,
 **contradict an inherited entry** — a claim whose `Statement`/`Conditions` no longer matches the
-evidence in front of you. Historically such findings had nowhere sanctioned to go and ended up as
-comments inside the claim body (cf. C02 in `ARA-Labs/ara-ls20`: two sessions of contrary RESET
-observations parked in HTML comments awaiting a researcher). When it happens:
+evidence in front of you. When it happens:
 
 - Attach a `contradiction_report` to the Answer (§3). This is **output, not a write**: you still
   write nothing, anywhere — CONTRACT.md §4b is untouched. The **caller owns transport**: e.g. filing

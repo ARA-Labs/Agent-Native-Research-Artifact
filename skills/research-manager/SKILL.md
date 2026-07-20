@@ -173,13 +173,32 @@ When a new event contradicts something already staged or crystallized:
 
 #### Reader reports (cross-agent feedback)
 
-A reader report targeting a crystallized entry is handled by the contradiction trigger above as
-externally-contributed contradicting evidence: flag the entry (`<!-- CONFLICT: see reader-report
-<ref> -->`), append an `unresolved` decision node referencing both the entry and the report, and
-defer — adjudication remains the researcher's job. A report targeting nothing in `logic/` is staged
-as an ordinary observation (`provenance: ai-suggested`, report ref recorded in `context`). Reports
-are never auto-applied, and the single-writer rule is unchanged: readers never write the ARA — this
-manager is the only writer, and a report is INPUT to it, not an edit.
+Reader reports are **adjudicated by this manager in the turn they arrive** — they never sit as open
+tickets. This is the one sanctioned exception to the contradiction trigger's defer rule, scoped to
+reader reports only (the manager's own mid-research contradictions still defer as above). A report
+targeting nothing in `logic/` is simply staged as an ordinary observation (`provenance:
+ai-suggested`, report ref recorded in `context`). For a report targeting a crystallized entry:
+
+1. **Verify.** Resolve the report's `basis` refs and re-read the targeted entry. The report is
+   **upheld** only when evidence resolvable *inside the ARA* (trace nodes, evidence files, session
+   records) corroborates the observation and genuinely contradicts the cited clause. Reader-side
+   pointers the manager cannot resolve are recorded but do not count toward upholding; a report
+   resting only on them is **rejected (unverifiable basis)**, its `repro` preserved for a future
+   run to execute.
+2. **Upheld** → fold the correction in as a Stage 4 content revision: edit the entry (provenance
+   `ai-suggested`, report ref recorded), record full before/after under `logic_revisions:`, and
+   append a `decision` node (`status: resolved`) referencing both the entry and the report. Status
+   changes follow the ordinary transition rules — an upheld report counts as empirical resolution.
+3. **Rejected** → the entry is untouched; append a `decision` node (`status: resolved`) recording
+   the verdict and its specific reason (evidence does not support the observation / does not
+   contradict the clause / unverifiable basis).
+4. **Notify, don't wait.** Either way the human receives an after-the-fact summary: the verdict
+   and its grounds go into the session record and the turn's `[PM]` summary line (e.g.
+   `reader-report on C02 upheld → Conditions revised`; `reader-report on C04 rejected:
+   evidence does not contradict clause`). The manager reaches a conclusion every time.
+
+The single-writer rule is unchanged: readers never write the ARA — this manager is the only
+writer, and a report is INPUT to it, not an edit.
 
 #### Stale-flagging
 

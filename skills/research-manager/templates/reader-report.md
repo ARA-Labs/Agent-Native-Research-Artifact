@@ -2,9 +2,11 @@
 
 <!-- Shape shared by agent-filed and human-filed reports. File as a `reader-report`-labeled issue
      on the ARA's repository, or hand the file to the ARA's research-manager run as input.
-     Consumed by research-manager Stage 1 as a candidate event and handled by the contradiction
-     trigger (flag CONFLICT, append an unresolved decision node, defer to the researcher).
-     Reports are never auto-applied; the ARA's research-manager remains the single writer. -->
+     Consumed by research-manager Stage 1 as a candidate event and adjudicated in the same turn:
+     verified against evidence resolvable inside the ARA, then upheld (correction folded in, full
+     provenance and before/after recorded) or rejected (verdict + reason recorded) — the human is
+     notified of the conclusion after the fact, not asked to decide. The ARA's research-manager
+     remains the single writer. -->
 
 - **Target entry**: <!-- native ref, verbatim — e.g. logic/claims.md#C02 -->
 - **Contradicted clause**: <!-- quote the specific Statement/Conditions clause you dispute -->
