@@ -162,15 +162,18 @@ resolution, field presence, YAML parsing) is handled entirely by Level 1.
 
 ---
 
-## Overall Grade Mapping
+## Overall Quality Tier Mapping
 
-| Grade | Condition |
-|-------|-----------|
-| **Strong Accept** | mean ≥ 4.5 AND no dimension < 3 |
-| **Accept** | mean ≥ 3.8 AND no dimension < 2 |
-| **Weak Accept** | mean ≥ 3.0 AND no dimension < 2 |
-| **Weak Reject** | mean ≥ 2.0 AND (mean < 3.0 OR any dimension < 2) |
-| **Reject** | mean < 2.0 OR any dimension = 1 |
+Venue-agnostic epistemic-quality tiers. The skill takes no venue as input and has no
+acceptance bar, so it reports absolute quality, not a publication verdict.
+
+| Tier | Condition |
+|------|-----------|
+| **Exemplary** | mean ≥ 4.5 AND no dimension < 3 |
+| **Sound** | mean ≥ 3.8 AND no dimension < 2 |
+| **Adequate** | mean ≥ 3.0 AND no dimension < 2 |
+| **Weak** | mean ≥ 2.0 AND (mean < 3.0 OR any dimension < 2) |
+| **Unsound** | mean < 2.0 OR any dimension = 1 |
 
 ## Finding Severity Definitions
 
