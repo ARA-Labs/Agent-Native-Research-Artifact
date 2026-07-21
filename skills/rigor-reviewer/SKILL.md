@@ -6,15 +6,15 @@ description: |
   validation has already passed. Evaluates six dimensions of epistemic quality
   through semantic reasoning over the ARA's content. Produces a scored review
   with per-dimension strengths/weaknesses/suggestions, severity-ranked findings,
-  and an overall recommendation (Strong Accept to Reject).
+  and an overall epistemic-quality tier (Exemplary to Unsound).
 
   TRIGGERS: level2, seal level 2, verify level 2, epistemic audit, review ara, audit claims
 argument-hint: "<artifact_dir>"
 allowed-tools: Read, Write, Glob, Grep
 metadata:
   category: research-tooling
-  version: "3.0.0"
-  last_updated: "2026-04-16"
+  version: "3.1.0"
+  last_updated: "2026-07-20"
 user-invocable: true
 ---
 
@@ -235,17 +235,22 @@ Collect all issues found across the six dimensions into a single findings list. 
 
 Sort findings by severity: critical first, then major, minor, suggestion.
 
-### Step 6: Compute Overall Grade
+### Step 6: Compute Overall Quality Tier
 
-Calculate the mean of the six dimension scores. Apply the grade mapping:
+Calculate the mean of the six dimension scores. Apply the tier mapping:
 
-| Grade | Condition |
-|-------|-----------|
-| **Strong Accept** | mean ≥ 4.5 AND no dimension < 3 |
-| **Accept** | mean ≥ 3.8 AND no dimension < 2 |
-| **Weak Accept** | mean ≥ 3.0 AND no dimension < 2 |
-| **Weak Reject** | mean ≥ 2.0 AND (mean < 3.0 OR any dimension < 2) |
-| **Reject** | mean < 2.0 OR any dimension = 1 |
+| Tier | Condition | Meaning |
+|------|-----------|---------|
+| **Exemplary** | mean ≥ 4.5 AND no dimension < 3 | Epistemically excellent across the board |
+| **Sound** | mean ≥ 3.8 AND no dimension < 2 | Well-supported; no dimension is weak |
+| **Adequate** | mean ≥ 3.0 AND no dimension < 2 | Competent; some dimensions need strengthening |
+| **Weak** | mean ≥ 2.0 AND (mean < 3.0 OR any dimension < 2) | Notable epistemic gaps that undermine claims |
+| **Unsound** | mean < 2.0 OR any dimension = 1 | Fundamental epistemic flaws |
+
+The tier measures the ARA's **absolute epistemic quality**, not a publication decision.
+It is deliberately venue-agnostic: the skill takes no venue as input and has no
+acceptance bar, so it does not emit accept/reject verdicts. Whether a given tier clears
+a specific venue's bar is a downstream decision the author makes with a venue in hand.
 
 ### Step 7: Write Report
 
@@ -255,11 +260,11 @@ Write `level2_report.json` to the artifact root:
 {
   "artifact": "<name>",
   "artifact_dir": "<path>",
-  "review_version": "3.0.0",
+  "review_version": "3.1.0",
   "prerequisite": "Level 1 passed",
 
   "overall": {
-    "grade": "Accept",
+    "tier": "Sound",
     "mean_score": 4.1,
     "one_line_summary": "<1 sentence: what makes this ARA strong or weak>",
     "strengths_summary": ["<top 2-3 strengths across all dimensions>"],
