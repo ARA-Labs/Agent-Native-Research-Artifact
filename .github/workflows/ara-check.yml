@@ -1,0 +1,48 @@
+name: ARA Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  # Pin the ara-cli release used to lint the example artifacts.
+  ARA_VERSION: v0.1.11
+
+jobs:
+  ara-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ara
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf \
+            "https://github.com/ARA-Labs/ara-cli/releases/download/${ARA_VERSION}/ara-cli-installer.sh" | sh
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Show ara version
+        run: ara --version
+
+      - name: Check example artifacts
+        run: |
+          set -uo pipefail
+          rc=0
+
+          # Clean artifacts: enforce --strict so they stay warning-free.
+          for dir in examples/minimal-artifact examples/resnet-ara-example; do
+            echo "::group::ara check $dir (--strict)"
+            ara check "$dir" --strict || rc=1
+            echo "::endgroup::"
+          done
+
+          # the-ara-of-ara: trace nodes carry ARA provenance/timestamp fields
+          # the ara-cli linter schema does not recognize yet, so they surface as
+          # non-fatal warnings. Keep this warning-tolerant until the schema
+          # catches up to the fields the skills emit.
+          echo "::group::ara check examples/the-ara-of-ara"
+          ara check examples/the-ara-of-ara || rc=1
+          echo "::endgroup::"
+
+          exit $rc
