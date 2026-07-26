@@ -53,11 +53,10 @@ If genuinely unsure which the user wants, ask; don't silently pick one.
    referenced. For hub mode (`--hub`), resolve `--ara-root <dir>` instead — a directory whose
    immediate subdirectories are each their own ARA (e.g. this repo's `examples/`).
 
-2. **Confirm the binary exists**: `which ara`. If missing, tell the user and offer the two
-   install paths from the README — do not install silently, since it changes their machine:
-   - macOS/Linux prebuilt: `brew install ARA-Labs/tap/ara`
-   - Any platform via Cargo: `cargo install ara-cli`
-   Then `ara --version` to confirm before continuing.
+2. **Confirm the binary exists**: `which ara`. If missing, follow
+   `references/install.md` (Homebrew recommended; Cargo-from-source as a fallback that first
+   checks for `cargo`) — never install anything without the user's confirmation first. Then
+   `ara --version` to confirm before continuing.
 
 3. **Lint first.** Run `ara check <dir>` (add `--strict` if the user wants warnings to fail
    too). This is cheap and catches the common issues before you spend a cycle on `serve`:
