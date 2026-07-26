@@ -88,6 +88,10 @@ If genuinely unsure which the user wants, ask; don't silently pick one.
      some network/VM-mounted mounts).
    - It keeps running until stopped — tell them how (`pkill -f "ara serve"`, or however you
      started it) so it doesn't linger as an orphaned process after the conversation ends.
+   If the user seems new to the viewer (first time you're serving for them, or they ask "how do
+   I use this"), pull the relevant bits from `references/viewer-ux.md` — pan/zoom, click/keyboard
+   selection, search + filters, the graph/tree and stack/split toggles, and the replay stepper.
+   Don't dump the whole file; surface what's relevant to what they're trying to do.
 
 ## Boundaries (do not exceed)
 
