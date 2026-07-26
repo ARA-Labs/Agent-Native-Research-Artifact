@@ -34,6 +34,26 @@ which cargo
 after install (e.g. `~/.cargo/bin` not yet on `PATH`), that's a shell/PATH issue — say so plainly
 rather than guessing at a fix or silently retrying.
 
+## Check the installed version against this repo's pinned release
+
+This repo pins the `ara-cli` release its own CI lints against, in
+`.github/workflows/ara-check.yml` (the `ARA_VERSION` env var — `v0.1.11` as of this writing).
+Whatever's installed should match that, or at least not be older:
+
+```bash
+grep 'ARA_VERSION' .github/workflows/ara-check.yml
+```
+
+- **Installed matches, or is newer** → carry on, nothing to flag.
+- **Installed is older** → say so and suggest an upgrade (`brew upgrade ara`, or
+  `cargo install ara-cli --force` on the Cargo path) before relying on results — an older binary
+  can silently miss newer ARA schema fields (surfacing as spurious "unknown field" warnings, the
+  same class of drift `the-ara-of-ara`'s CI job is deliberately warning-tolerant for) or lack
+  `--fix` rules added since. Don't upgrade without asking first — same rule as install.
+- **Can't find the pin** (e.g. this skill is running outside this repo, or the workflow moved) →
+  don't block on it, and don't claim compatibility either; just proceed with whatever
+  `ara --version` reports.
+
 ## The rule that applies regardless of path
 
 Never run `brew install` or `cargo install` without the user's confirmation first — installing
