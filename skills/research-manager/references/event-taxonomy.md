@@ -140,6 +140,7 @@ Reviewers and downstream tools (e.g., rigor-reviewer L2) inspect this distributi
 | Heuristic | H | H01, H02 | Global; assigned at crystallization |
 | Experiment plan | E | E01, E02 | Global |
 | Observation | O | O01, O02 | Global; assigned at staging |
+| Taste comment (trace-node) | T | T01, T02 | Global; `trace/taste_log.yaml` only — see `references/taste-comments.md` |
 | Session | date_seq | 2026-04-27_001 | Unique per calendar day |
 
 Always read the target file to find the highest existing ID before assigning a new one.

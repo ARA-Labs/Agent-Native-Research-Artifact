@@ -10,13 +10,15 @@ description: |
   staged first and crystallize into typed layers ONLY when closure signals appear — topic
   abandonment, verbal affirmation, empirical resolution, or artifact commitment. NEVER mid-turn.
   All entries carry provenance tags (user / ai-suggested / ai-executed / user-revised).
+  Also supports optional, user-triggered taste comments — free-form evaluative reactions to a
+  claim, heuristic, or trace node — independent of the crystallization pipeline.
 user-invocable: true
 argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.5.0"
-  tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management]
+  version: "2.6.0"
+  tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management, taste-comments]
 ---
 
 # Live Research Project Manager (Live PM)
@@ -365,6 +367,7 @@ ara/
   trace/                            # APPEND-ONLY — the journey, never rewritten
     exploration_tree.yaml           #   Research DAG: decisions, experiments, dead_ends, pivots, questions
     pm_reasoning_log.yaml           #   Manager's own organizational decisions per turn
+    taste_log.yaml                  #   OPTIONAL — researcher's taste comments on trace nodes (pointer-only, never edits the node)
     sessions/
       session_index.yaml            #   Master session index (one entry per calendar day)
       YYYY-MM-DD_NNN.yaml           #   Per-day session record, incl. logic_revisions
@@ -428,6 +431,8 @@ tree:
 - **Dependencies**: [C{YY}, ...]
 - **Tags**: {comma-separated}
 - **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
+- **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one
+  - [YYYY-MM-DD] `endorse | uncertain | reject` — {free-text comment}
 ```
 
 **The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,
@@ -462,6 +467,8 @@ marker, not a resting state — see Stage 4.
 - **Sensitivity**: low | medium | high | unknown   # "unknown" until the turn establishes it — never guess
 - **Code ref**: [{file paths, or "pending"}]
 - **Last revised**: YYYY-MM-DD (turn-id)   # absent until first revision
+- **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one
+  - [YYYY-MM-DD] `endorse | uncertain | reject` — {free-text comment}
 ```
 
 Current-state snapshot only (same as claims); history lives in the trace.
@@ -569,6 +576,22 @@ entries:
       - "Routed N12 as dead_end rather than experiment — code was abandoned mid-run."
 ```
 
+### Taste Log (`trace/taste_log.yaml`) — optional, append-only
+
+Researcher's taste comments on trace nodes. Never edits `exploration_tree.yaml` — points at
+it instead, the same way a promoted observation points at its logic-layer destination
+without rewriting itself. See `references/taste-comments.md` for trigger detection, target
+resolution, and the confirm-before-write procedure. File does not exist until the first entry.
+
+```yaml
+entries:
+  - id: T{XX}
+    timestamp: "YYYY-MM-DDTHH:MM"
+    target: N{XX}                         # trace node this comments on; never edited
+    tag: endorse | uncertain | reject
+    comment: "{free-text comment}"
+```
+
 ## Initialization (if `ara/` does not exist)
 
 Create the structure on the first turn that contains research-significant activity. Do not
@@ -603,6 +626,17 @@ Surface relevant pieces only when they bear on the user's first task — never l
 formal briefing the researcher did not ask for. If the user asks "where did we leave off",
 deliver the full briefing.
 
+## Taste Comments (optional, user-triggered)
+
+Separate from the four-stage pipeline above. When the user reacts evaluatively to a specific
+claim, heuristic, or trace node this turn ("我觉得C07的证据有点单薄", "那个baseline选得不太
+公平"), record it as a taste comment: always `provenance: user`, never staged, never affects
+`Status` or crystallization. → Use `references/taste-comments.md` for trigger detection, target
+resolution, the confirm-before-write procedure, and the attitude-tag rules; schemas above.
+
+Runs inline within the normal epilogue when triggered — not a separate interactive prompt, and
+not asked about on turns where it doesn't come up.
+
 ## Rules
 
 1. **End-of-turn only; never mid-turn.** Skip empty turns (greetings, ack, formatting).
@@ -613,3 +647,4 @@ deliver the full briefing.
 6. **Respect layer mutability** (see top): `logic/` overwrites in place; `trace/` and `staging/` are append-only except forward-reference pointers. Every logic edit gets a `logic_revisions:` before/after in the session record — the only place pre-edit content is kept.
 7. **Never silently overwrite contradictions** — flag both, append an `unresolved` decision node, defer.
 8. **Read target files first** (correct IDs, no dupes); establish forensic bindings (claim→proof, heuristic→code, decision→evidence), `[pending]`+TODO if not yet bindable. Keep YAML valid; summary line terse.
+9. **Taste comments never guess.** Confirm the target before writing (see references/taste-comments.md); claim/heuristic taste is inline, trace-node taste goes to `taste_log.yaml` and never edits the node.
