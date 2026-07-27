@@ -29,3 +29,16 @@ Suggested order:
 1. Read `resnet-walkthrough.md`
 2. Open `resnet-paper.pdf`
 3. Compare the paper against `resnet-ara-example/`
+
+## nanogpt-taste-fixture
+
+A regression fixture for the `research-manager` taste-comment capability —
+`before`/`after` ARA snapshots (built from a real excerpt of
+`the-ara-of-ara`, not synthetic content) plus a dependency-free checker.
+Run locally with:
+
+```
+node examples/nanogpt-taste-fixture/check.mjs
+```
+
+See `nanogpt-taste-fixture/README.md` for what it asserts.

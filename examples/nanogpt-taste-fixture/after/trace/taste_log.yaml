@@ -1,0 +1,7 @@
+entries:
+  - id: T01
+    timestamp: "2026-07-27T15:00"
+    target: N21
+    tag: reject
+    object: priority
+    comment: "Building the full 12-file artifact for nanogpt_chat_rl wasn't worth it relative to what it taught us — most of the signal was in the KL-reward-hacking dead end."

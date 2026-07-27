@@ -1,0 +1,21 @@
+tree:
+  - id: N21
+    type: experiment
+    title: "Build complete ARA artifact for RE-Bench NanoGPT Chat RL task"
+    provenance: ai-executed
+    timestamp: "2026-03-12T22:00"
+    result: >
+      Created 12-file ARA artifact for the nanogpt_chat_rl RE-Bench task.
+      19-node exploration tree with 7 dead ends (SFT constraint violation,
+      vanilla REINFORCE extreme variance, PPO without KL reward hacking,
+      high learning rate catastrophic forgetting, downloading better model
+      constraint violation, single-call API budget waste, direct API
+      distillation constraint violation). 8 claims covering PPO+KL as only
+      viable algorithm, reward hacking dynamics, progressive training benefit,
+      Best-of-N reward denoising, LR scheduling necessity, API batching
+      criticality, and final score matching reference (0.85). 7 concepts
+      (RLHF, PPO, Reward Hacking, KL Penalty, Pairwise Preference, Mode
+      Collapse, Alpaca Benchmark). 6 heuristics. 4 experiments. 10 questions
+      (5N/3P/2T). This is the 4th RE-Bench artifact and the first focused
+      on RL finetuning rather than constrained optimization/systems tasks.
+    evidence: ["code/artifacts/rebench-nanogpt_chat_rl/"]
