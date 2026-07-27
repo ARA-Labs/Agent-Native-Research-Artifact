@@ -1,8 +1,10 @@
 # Flattened to top-level nodes for legibility — in the source artifact
 # (examples/resnet-ara-example) these are nested several levels deep under
-# N01's children. IDs N01/N04/N05/N06/N07 are real, copied verbatim; any id
-# ≥ N50 is demo-added (never present in the source artifact), so there's no
-# ambiguity between real and taste/pipeline-generated content.
+# N01/N06/N13's children. IDs N01-N15 are real, copied verbatim (including
+# their `also_depends_on` cross-references, which stay valid since every id
+# they point to is also present here); any id ≥ N50 is demo-added (never
+# present in the source artifact), so there's no ambiguity between real and
+# taste/pipeline-generated content.
 
 tree:
   - id: N01
@@ -14,6 +16,29 @@ tree:
       Central research question that frames the entire paper. The introduction
       explicitly poses this question and uses CIFAR-10 plain-{20, 56} curves
       (Fig. 1) to motivate why the answer is "no, not in the obvious way."
+
+  - id: N02
+    type: experiment
+    support_level: explicit
+    source_refs: ["Fig. 1", "Fig. 6 left"]
+    title: "Plain-net depth scan on CIFAR-10 (depths 20-110)"
+    description: >-
+      Train plain CNNs of depth {20, 32, 44, 56, 110} on CIFAR-10 with
+      BN + MSRA init. Observe whether deeper plain nets improve.
+    result: >-
+      Deeper plain nets degrade. Plain-110 fails badly (>60% error,
+      not displayed in Fig. 6). Plain-56 is worse than plain-20.
+
+  - id: N03
+    type: experiment
+    support_level: explicit
+    source_refs: ["Table 2", "Fig. 4 left"]
+    title: "Plain-net depth scan on ImageNet (18 vs. 34)"
+    description: >-
+      Train plain-{18, 34} on ImageNet with the standard recipe (§3.4).
+    result: >-
+      plain-34 = 28.54% top-1, plain-18 = 27.94% top-1 -> degradation
+      confirmed on a large dataset, not specific to CIFAR.
 
   - id: N04
     type: dead_end
@@ -62,6 +87,111 @@ tree:
     rationale: >-
       No parameters, no FLOPs added, lets the deeper variant exactly
       match the shallower one's parameter budget for clean ablation.
+
+  - id: N08
+    type: experiment
+    support_level: explicit
+    source_refs: ["Table 2", "Fig. 4 right"]
+    title: "Plain vs. ResNet at 18/34 layers on ImageNet"
+    description: >-
+      Train ResNet-{18, 34} (option A shortcuts) under the same
+      recipe as plain-{18, 34}.
+    result: >-
+      ResNet-34 = 25.03% top-1 (3.51 pts better than plain-34, 2.85
+      pts better than ResNet-18). Degradation is removed.
+
+  - id: N09
+    type: experiment
+    support_level: explicit
+    source_refs: ["Table 3", "Identity vs. Projection Shortcuts section"]
+    title: "Shortcut option ablation on ResNet-34 (A vs. B vs. C)"
+    description: >-
+      Ablation comparing parameter-free identity (A), projection on
+      dimension changes only (B), and projection on every shortcut (C).
+    result: >-
+      A = 25.03, B = 24.52, C = 24.19 top-1. Differences are small;
+      option C is rejected as not worth the parameter / memory cost.
+
+  - id: N10
+    type: dead_end
+    support_level: explicit
+    source_refs: ["§3.2"]
+    title: "Single-layer residual function F"
+    description: >-
+      Authors note Eqn. (1) with a single-layer F is similar to a
+      linear layer.
+    why_failed: >-
+      "We have not observed advantages." Authors require F to have
+      >=2 weighted layers.
+
+  - id: N11
+    type: decision
+    support_level: explicit
+    source_refs: ["Deeper Bottleneck Architectures section", "Fig. 5 right"]
+    title: "Adopt 1×1 → 3×3 → 1×1 bottleneck blocks for >=50 layers"
+    description: >-
+      Replace the basic 2-layer block with a 3-layer bottleneck of
+      comparable per-block time complexity.
+    rationale: >-
+      Lets us push depth to 50/101/152 layers at FLOPs comparable to
+      ResNet-34 (3.8 / 7.6 / 11.3 GFLOPs vs. 3.6 GFLOPs).
+
+  - id: N12
+    type: experiment
+    support_level: explicit
+    source_refs: ["Table 3", "Table 4", "Table 5"]
+    title: "Depth scan with bottleneck blocks (50 / 101 / 152 layers)"
+    description: >-
+      Train ResNet-50 / 101 / 152 with option B shortcuts under the
+      same ImageNet recipe.
+    result: >-
+      Top-1 error drops monotonically (22.85 -> 21.75 -> 21.43);
+      6-model ensemble achieves 3.57% top-5 on the test set,
+      winning ILSVRC 2015.
+    also_depends_on: [N09, N11]
+
+  - id: N13
+    type: experiment
+    support_level: explicit
+    source_refs: ["Table 6", "Fig. 6", "§4.2"]
+    title: "CIFAR-10 depth scan (20 -> 1202 layers)"
+    description: >-
+      Train ResNet-{20, 32, 44, 56, 110, 1202} on CIFAR-10. ResNet-110
+      uses LR warmup (LR 0.01 for ~400 iters until train err <80%,
+      then restore LR 0.1).
+    result: >-
+      Test error decreases through depth 110 (6.43% mean, best
+      6.61 ± 0.16). ResNet-1202 trains successfully (training error
+      <0.1%) but overfits to 7.93% test error.
+
+  - id: N14
+    type: decision
+    support_level: explicit
+    source_refs: ["§4.2 paragraph on n=18", "footnote 5"]
+    title: "Warm up LR for the 110-layer CIFAR ResNet"
+    description: >-
+      At depth 110, LR 0.1 from iter 0 fails to start converging
+      cleanly. Pre-warm at LR 0.01 for ~400 iters (until train
+      error <80%), then restore LR 0.1.
+    rationale: >-
+      Gets the optimizer into a basin where the standard LR
+      schedule then trains stably. LR 0.1 from start eventually
+      reaches similar accuracy after several epochs of >90%
+      error, but warmup is the chosen recipe.
+    also_depends_on: [N13]
+
+  - id: N15
+    type: experiment
+    support_level: explicit
+    source_refs: ["Table 7", "Table 8", "Appendix A"]
+    title: "Detection transfer with ResNet-101 (PASCAL VOC, COCO)"
+    description: >-
+      Swap VGG-16 for ResNet-101 in baseline Faster R-CNN; fine-tune
+      on PASCAL VOC and COCO.
+    result: >-
+      PASCAL VOC07 mAP: 73.2 -> 76.4. COCO mAP@.5: 41.5 -> 48.4. COCO
+      mAP@[.5, .95]: 21.2 -> 27.2 (28% relative improvement).
+    also_depends_on: [N12]
 
   - id: N50
     type: question

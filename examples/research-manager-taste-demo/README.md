@@ -22,18 +22,24 @@ produced, one increment per PR that touches this capability.
 
 ## Provenance
 
-`ara/` was seeded from a real excerpt of `examples/resnet-ara-example`: claims
-`C01`, `C02`, `C04`, `C06`, `C07`; heuristics `H01`, `H03`, `H04`; trace nodes
-`N01`, `N04`, `N05`, `N06`, `N07` (five different node types — question, two
-dead_ends, an insight, and a decision — flattened to top-level for legibility;
-in the source they're nested several levels under `N01`). `C07`/`H04`/`N05`
-are the same three elements used in the PR #32 review discussion. Any trace
-node id ≥ `N50` is demo-added by a taste reaction's co-fired pipeline event,
-never present in the source artifact — there's no ambiguity between real and
-generated content. It is not synthetic content invented for this demo, and
-`ara/` is deliberately kept separate from `resnet-ara-example/` itself so this
-one can keep mutating without touching the compiler walkthrough that example
-serves elsewhere.
+`ara/` was seeded from the **complete** `logic/claims.md` (all 8 claims),
+`logic/solution/heuristics.md` (all 6 heuristics), and `trace/exploration_tree.yaml`
+(all 15 nodes, across 5 node types — question, experiment, dead_end, insight,
+decision) of `examples/resnet-ara-example` — not a hand-picked subset, so
+there's no question of what got left out or why. The tree is flattened to
+top-level nodes for legibility (in the source it's nested several levels deep
+under `N01`/`N06`/`N13`); every `also_depends_on` cross-reference stays valid
+since both ends of every reference are included. `C07`/`H04`/`N05` are the
+same three elements used in the PR #32 review discussion. Any trace node id
+≥ `N50` is demo-added by a taste reaction's co-fired pipeline event, never
+present in the source artifact — there's no ambiguity between real and
+generated content. None of this is synthetic content invented for the demo,
+and `ara/` is deliberately kept separate from `resnet-ara-example/` itself so
+this one can keep mutating without touching the compiler walkthrough that
+example serves elsewhere. (Earlier versions of this demo tried
+`examples/the-ara-of-ara` — too large/complex for a quick local read — then a
+hand-picked subset of `resnet-ara-example` — too thin, and it invited the
+question of why those particular elements were chosen.)
 
 ## What `check.mjs` asserts
 

@@ -33,8 +33,9 @@ Suggested order:
 ## research-manager-taste-demo
 
 A living reference ARA for the `research-manager` taste-comment capability —
-not a frozen fixture, but a small real example (seeded from `resnet-ara-example`)
-that contributors re-run and update whenever they touch that capability. See
+not a frozen fixture, but the complete claims/heuristics/trace content of
+`resnet-ara-example` (not a hand-picked subset) that contributors re-run and
+update whenever they touch that capability. See
 `research-manager-taste-demo/README.md` for the workflow, `prompt.md` for the
 copy-pasteable test prompt, and run the invariant checker locally with:
 
