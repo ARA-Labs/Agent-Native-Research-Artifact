@@ -30,15 +30,14 @@ Suggested order:
 2. Open `resnet-paper.pdf`
 3. Compare the paper against `resnet-ara-example/`
 
-## nanogpt-taste-fixture
+## research-manager-taste-demo
 
-A regression fixture for the `research-manager` taste-comment capability —
-`before`/`after` ARA snapshots (built from a real excerpt of
-`the-ara-of-ara`, not synthetic content) plus a dependency-free checker.
-Run locally with:
+A living reference ARA for the `research-manager` taste-comment capability —
+not a frozen fixture, but a small real example (seeded from `resnet-ara-example`)
+that contributors re-run and update whenever they touch that capability. See
+`research-manager-taste-demo/README.md` for the workflow, `prompt.md` for the
+copy-pasteable test prompt, and run the invariant checker locally with:
 
 ```
-node examples/nanogpt-taste-fixture/check.mjs
+node examples/research-manager-taste-demo/check.mjs
 ```
-
-See `nanogpt-taste-fixture/README.md` for what it asserts.

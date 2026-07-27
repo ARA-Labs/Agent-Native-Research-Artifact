@@ -1,19 +1,21 @@
 #!/usr/bin/env node
-// Validates the structural invariants a taste-comment write must never break, by
-// diffing a "before" ARA snapshot against an "after" snapshot (same layout as
-// research-manager would produce). No dependencies — the parsing below only needs
-// to handle the specific shapes taste-comments.md defines, not general YAML/Markdown.
+// Validates the structural invariants a taste-comment write must never break, by diffing
+// the current examples/research-manager-taste-demo/ara/ against its state at a git ref
+// (the living ARA evolves via commits, so "before" is git history, not a hand-maintained
+// second copy). No dependencies — the parsing below only needs to handle the specific
+// shapes taste-comments.md defines, not general YAML/Markdown.
 //
-// Usage: node check.mjs [beforeDir] [afterDir]
-// Defaults to ./before and ./after (this fixture).
+// Usage: node check.mjs [araDir] [gitRef]
+// Defaults to ./ara (this demo) and origin/main.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const beforeDir = path.resolve(process.argv[2] ?? path.join(HERE, 'before'));
-const afterDir = path.resolve(process.argv[3] ?? path.join(HERE, 'after'));
+const araDir = path.resolve(process.argv[2] ?? path.join(HERE, 'ara'));
+const gitRef = process.argv[3] ?? 'origin/main';
 
 const ATTITUDE_TAGS = new Set(['endorse', 'uncertain', 'reject']);
 const OBJECT_TAGS = new Set(['claim', 'evidence', 'framing', 'priority']);
@@ -22,14 +24,35 @@ const failures = [];
 const fail = (msg) => failures.push(msg);
 const pass = (msg) => console.log(`  ok — ${msg}`);
 
-function readIfExists(p) {
+let repoRoot = null;
+try {
+  repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: araDir, encoding: 'utf8' }).trim();
+} catch {
+  console.warn('warning: not inside a git checkout — skipping before/after diff checks, running static checks only.');
+}
+
+function readCurrent(relPath) {
+  const p = path.join(araDir, relPath);
   return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
+}
+
+function readAtRef(relPath) {
+  if (!repoRoot) return null;
+  const araRelToRepo = path.relative(repoRoot, araDir);
+  const gitPath = path.join(araRelToRepo, relPath).split(path.sep).join('/');
+  try {
+    return execFileSync('git', ['show', `${gitRef}:${gitPath}`], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+  } catch {
+    return null; // file didn't exist at that ref — legitimate for a first write.
+  }
 }
 
 // --- Markdown entry parsing (claims.md / heuristics.md) -------------------------
 
-// Splits a claims.md/heuristics.md file into { id -> { header, body } } blocks,
-// where body is the raw text of the entry after its `## ID: title` header line.
 function parseMarkdownEntries(text) {
   if (text === null) return new Map();
   const lines = text.split('\n');
@@ -53,9 +76,6 @@ function parseMarkdownEntries(text) {
   return entries;
 }
 
-// Splits an entry body into { core, tasteBullets } — core is everything except
-// the "- **Taste** (optional):" subsection and its bullets; tasteBullets is the
-// raw bullet lines (in order) under it, if present.
 function splitTaste(body) {
   const lines = body.split('\n');
   const tasteHeaderIdx = lines.findIndex((l) => l.trim().startsWith('- **Taste**'));
@@ -71,18 +91,17 @@ function splitTaste(body) {
   return { core, tasteBullets };
 }
 
-const TASTE_BULLET_RE =
-  /^- \[(\d{4}-\d{2}-\d{2})\] `([a-z]+)` on `([a-z]+)` — (.+)$/;
+const TASTE_BULLET_RE = /^- \[(\d{4}-\d{2}-\d{2})\] `([a-z]+)` on `([a-z]+)` — (.+)$/;
 
-function checkMarkdownFile(label, beforePath, afterPath) {
+function checkMarkdownFile(label, relPath) {
   console.log(`\n${label}`);
-  const beforeEntries = parseMarkdownEntries(readIfExists(beforePath));
-  const afterEntries = parseMarkdownEntries(readIfExists(afterPath));
+  const beforeEntries = parseMarkdownEntries(readAtRef(relPath));
+  const afterEntries = parseMarkdownEntries(readCurrent(relPath));
 
   for (const [id, beforeBody] of beforeEntries) {
     const afterBody = afterEntries.get(id);
     if (afterBody === undefined) {
-      fail(`${label}: entry ${id} present in before/ is missing from after/`);
+      fail(`${label}: entry ${id} present at ${gitRef} is missing now`);
       continue;
     }
     const beforeSplit = splitTaste(beforeBody);
@@ -90,7 +109,7 @@ function checkMarkdownFile(label, beforePath, afterPath) {
     if (beforeSplit.core !== afterSplit.core) {
       fail(`${label}: entry ${id} changed outside its Taste subsection — taste writes must not touch other fields`);
     } else {
-      pass(`${id}: non-Taste fields unchanged`);
+      pass(`${id}: non-Taste fields unchanged since ${gitRef}`);
     }
     for (let i = 0; i < beforeSplit.tasteBullets.length; i++) {
       if (afterSplit.tasteBullets[i] !== beforeSplit.tasteBullets[i]) {
@@ -99,6 +118,9 @@ function checkMarkdownFile(label, beforePath, afterPath) {
     }
   }
 
+  if (afterEntries.size === 0) {
+    console.log('  (no entries found)');
+  }
   for (const [id, afterBody] of afterEntries) {
     const { tasteBullets } = splitTaste(afterBody);
     for (const bullet of tasteBullets) {
@@ -108,12 +130,8 @@ function checkMarkdownFile(label, beforePath, afterPath) {
         continue;
       }
       const [, , attitude, object] = m;
-      if (!ATTITUDE_TAGS.has(attitude)) {
-        fail(`${label}: entry ${id} taste bullet has invalid attitude tag "${attitude}"`);
-      }
-      if (!OBJECT_TAGS.has(object)) {
-        fail(`${label}: entry ${id} taste bullet has invalid object tag "${object}"`);
-      }
+      if (!ATTITUDE_TAGS.has(attitude)) fail(`${label}: entry ${id} taste bullet has invalid attitude tag "${attitude}"`);
+      if (!OBJECT_TAGS.has(object)) fail(`${label}: entry ${id} taste bullet has invalid object tag "${object}"`);
       if (ATTITUDE_TAGS.has(attitude) && OBJECT_TAGS.has(object)) {
         pass(`${id} taste bullet: \`${attitude}\` on \`${object}\` — valid`);
       }
@@ -123,7 +141,6 @@ function checkMarkdownFile(label, beforePath, afterPath) {
 
 // --- exploration_tree.yaml parsing (top-level nodes only) -----------------------
 
-// Splits the tree into { id -> raw block text } for top-level `  - id: N{XX}` nodes.
 function parseTreeNodes(text) {
   if (text === null) return new Map();
   const lines = text.split('\n');
@@ -147,21 +164,23 @@ function parseTreeNodes(text) {
   return nodes;
 }
 
-function checkExplorationTree(beforePath, afterPath) {
+function checkExplorationTree(relPath) {
   console.log('\ntrace/exploration_tree.yaml');
-  const beforeNodes = parseTreeNodes(readIfExists(beforePath));
-  const afterNodes = parseTreeNodes(readIfExists(afterPath));
+  const beforeNodes = parseTreeNodes(readAtRef(relPath));
+  const afterNodes = parseTreeNodes(readCurrent(relPath));
 
   for (const [id, beforeBlock] of beforeNodes) {
     const afterBlock = afterNodes.get(id);
     if (afterBlock === undefined) {
-      fail(`trace/exploration_tree.yaml: node ${id} present in before/ is missing from after/`);
+      fail(`trace/exploration_tree.yaml: node ${id} present at ${gitRef} is missing now`);
     } else if (afterBlock !== beforeBlock) {
       fail(`trace/exploration_tree.yaml: node ${id} was mutated — trace nodes must never be edited, only pointed at`);
     } else {
-      pass(`node ${id}: byte-identical (never edited)`);
+      pass(`node ${id}: byte-identical since ${gitRef} (never edited)`);
     }
   }
+  const newIds = [...afterNodes.keys()].filter((id) => !beforeNodes.has(id));
+  if (newIds.length > 0) pass(`new node(s) appended since ${gitRef}: ${newIds.join(', ')}`);
   return new Set(afterNodes.keys());
 }
 
@@ -187,9 +206,9 @@ function parseTasteLog(text) {
   return entries;
 }
 
-function checkTasteLog(afterPath, validNodeIds) {
+function checkTasteLog(relPath, validNodeIds) {
   console.log('\ntrace/taste_log.yaml');
-  const entries = parseTasteLog(readIfExists(afterPath));
+  const entries = parseTasteLog(readCurrent(relPath));
   if (entries.length === 0) {
     pass('no entries (file absent or empty) — nothing to check');
     return;
@@ -204,23 +223,17 @@ function checkTasteLog(afterPath, validNodeIds) {
       seenNums.push(Number(numMatch[1]));
     }
 
-    if (!ATTITUDE_TAGS.has(e.tag)) {
-      fail(`taste_log.yaml: ${e.id} has invalid tag "${e.tag}"`);
-    }
-    if (!OBJECT_TAGS.has(e.object)) {
-      fail(`taste_log.yaml: ${e.id} has invalid object "${e.object}"`);
-    }
+    if (!ATTITUDE_TAGS.has(e.tag)) fail(`taste_log.yaml: ${e.id} has invalid tag "${e.tag}"`);
+    if (!OBJECT_TAGS.has(e.object)) fail(`taste_log.yaml: ${e.id} has invalid object "${e.object}"`);
     if (!e.target || !validNodeIds.has(e.target)) {
-      fail(`taste_log.yaml: ${e.id} targets "${e.target}", which does not resolve to a real node in after/trace/exploration_tree.yaml`);
+      fail(`taste_log.yaml: ${e.id} targets "${e.target}", which does not resolve to a real node in trace/exploration_tree.yaml`);
     } else {
       pass(`${e.id}: target ${e.target} resolves; tag=${e.tag} object=${e.object}`);
     }
   }
 
   const uniqueNums = new Set(seenNums);
-  if (uniqueNums.size !== seenNums.length) {
-    fail('taste_log.yaml: T ids are not unique');
-  }
+  if (uniqueNums.size !== seenNums.length) fail('taste_log.yaml: T ids are not unique');
   const sorted = [...uniqueNums].sort((a, b) => a - b);
   const expected = sorted.map((_, i) => i + 1);
   if (JSON.stringify(sorted) !== JSON.stringify(expected)) {
@@ -232,20 +245,13 @@ function checkTasteLog(afterPath, validNodeIds) {
 
 // --- run ---------------------------------------------------------------------
 
-console.log(`before: ${beforeDir}`);
-console.log(`after:  ${afterDir}`);
+console.log(`ara dir: ${araDir}`);
+console.log(`diffing against: ${repoRoot ? gitRef : '(no git — static checks only)'}`);
 
-checkMarkdownFile('logic/claims.md', path.join(beforeDir, 'logic/claims.md'), path.join(afterDir, 'logic/claims.md'));
-checkMarkdownFile(
-  'logic/solution/heuristics.md',
-  path.join(beforeDir, 'logic/solution/heuristics.md'),
-  path.join(afterDir, 'logic/solution/heuristics.md')
-);
-const validNodeIds = checkExplorationTree(
-  path.join(beforeDir, 'trace/exploration_tree.yaml'),
-  path.join(afterDir, 'trace/exploration_tree.yaml')
-);
-checkTasteLog(path.join(afterDir, 'trace/taste_log.yaml'), validNodeIds);
+checkMarkdownFile('logic/claims.md', 'logic/claims.md');
+checkMarkdownFile('logic/solution/heuristics.md', 'logic/solution/heuristics.md');
+const validNodeIds = checkExplorationTree('trace/exploration_tree.yaml');
+checkTasteLog('trace/taste_log.yaml', validNodeIds);
 
 console.log('');
 if (failures.length > 0) {

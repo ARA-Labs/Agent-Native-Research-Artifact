@@ -1,0 +1,23 @@
+tree:
+  - id: N05
+    type: dead_end
+    support_level: inferred
+    source_refs: ["§4.1 (footnote 3)"]
+    title: "More training iterations alone (3×) on plain nets"
+    description: >-
+      The footnote reports that the authors tried training plain nets
+      for 3× more iterations and still observed the degradation problem.
+    why_failed: >-
+      The degradation is not just slow optimization; longer training
+      does not close the gap.
+
+  - id: N06
+    type: question
+    provenance: user
+    timestamp: "2026-07-27T15:10"
+    title: "Has the residual gap after 3× training ever been quantified?"
+    description: >-
+      Footnote 3 reports the degradation problem persisted under 3× training
+      but gives no gap number. Worth checking whether any follow-up work
+      quantifies how much (if any) the gap closed, before treating "not just
+      slow optimization" as fully settled.

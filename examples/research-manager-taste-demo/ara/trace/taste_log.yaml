@@ -1,0 +1,7 @@
+entries:
+  - id: T01
+    timestamp: "2026-07-27T15:10"
+    target: N05
+    tag: uncertain
+    object: evidence
+    comment: "Footnote 3 gives no quantitative gap for the 3× run — calling this a fully closed dead end on a qualitative-only footnote feels a bit early."
