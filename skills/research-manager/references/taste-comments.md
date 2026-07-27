@@ -15,8 +15,7 @@ without affecting anything else in the artifact.
 
 Only when the user's message this turn expresses an evaluative reaction to an **identifiable**
 element already in `logic/claims.md`, `logic/solution/heuristics.md`, or
-`trace/exploration_tree.yaml` — the reaction must be traceable to one specific entry, in
-either language the researcher is working in.
+`trace/exploration_tree.yaml` — the reaction must be traceable to one specific entry.
 
 Does not fire for:
 - General feedback about the conversation, the AI's tone, or process, with no research
@@ -46,8 +45,7 @@ Never write a taste comment on a guess. Every write is confirmed first.
 
 Every taste comment carries exactly one tag: `endorse | uncertain | reject`.
 
-- Derive it from the user's own phrasing when the sentiment is unambiguous, in whatever
-  language the researcher used.
+- Derive it from the user's own phrasing when the sentiment is unambiguous.
 - If the sentiment is genuinely ambiguous, ask which of the three it is rather than
   guessing — a wrong tag is worse than a short clarifying question.
 - There is no fourth "suggestion" tag. If the comment carries a suggestion, it lives in the
