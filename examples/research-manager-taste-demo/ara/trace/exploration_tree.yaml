@@ -1,4 +1,34 @@
+# Flattened to top-level nodes for legibility — in the source artifact
+# (examples/resnet-ara-example) these are nested several levels deep under
+# N01's children. IDs N01/N04/N05/N06/N07 are real, copied verbatim; any id
+# ≥ N50 is demo-added (never present in the source artifact), so there's no
+# ambiguity between real and taste/pipeline-generated content.
+
 tree:
+  - id: N01
+    type: question
+    support_level: explicit
+    source_refs: ["§1 introduction", "Fig. 1"]
+    title: "Is learning better networks as easy as stacking more layers?"
+    description: >-
+      Central research question that frames the entire paper. The introduction
+      explicitly poses this question and uses CIFAR-10 plain-{20, 56} curves
+      (Fig. 1) to motivate why the answer is "no, not in the obvious way."
+
+  - id: N04
+    type: dead_end
+    support_level: explicit
+    source_refs: ["§4.1 plain networks discussion"]
+    title: "Vanishing-gradient hypothesis"
+    description: >-
+      A natural first explanation for plain-net degradation. The authors
+      rule it out by noting BN keeps forward signals at non-zero variance
+      and that backward gradient norms are healthy.
+    why_failed: >-
+      With BN in place, signals do not vanish; the plain-34 net still
+      reaches competitive accuracy (24.19% top-1 with 10-crop, Table 3),
+      showing SGD is making progress — just slowly.
+
   - id: N05
     type: dead_end
     support_level: inferred
@@ -12,6 +42,28 @@ tree:
       does not close the gap.
 
   - id: N06
+    type: insight
+    support_level: explicit
+    source_refs: ["§1", "§3.1"]
+    title: "Reformulate layers to fit a residual mapping F(x) := H(x) - x"
+    description: >-
+      Key creative leap. Identity mapping should be expressible cheaply,
+      so let stacked nonlinear layers learn the *residual* from identity.
+
+  - id: N07
+    type: decision
+    support_level: explicit
+    source_refs: ["§3.2", "Fig. 2"]
+    title: "Use parameter-free identity shortcuts (Eqn. 1)"
+    description: >-
+      Decision to add x via an unparameterized skip connection,
+      rather than a gated or projected one (contrasts with highway
+      networks, RW01).
+    rationale: >-
+      No parameters, no FLOPs added, lets the deeper variant exactly
+      match the shallower one's parameter budget for clean ablation.
+
+  - id: N50
     type: question
     provenance: user
     timestamp: "2026-07-27T15:10"

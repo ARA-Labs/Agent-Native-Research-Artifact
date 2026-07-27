@@ -5,3 +5,21 @@ entries:
     tag: uncertain
     object: evidence
     comment: "Footnote 3 gives no quantitative gap for the 3× run — calling this a fully closed dead end on a qualitative-only footnote feels a bit early."
+  - id: T02
+    timestamp: "2026-07-27T15:15"
+    target: N04
+    tag: endorse
+    object: evidence
+    comment: "Well-supported dead end: healthy gradient norms plus plain-34 still reaching 24.19% top-1 directly rules out vanishing gradients as the mechanism, not just asserts it."
+  - id: T03
+    timestamp: "2026-07-27T15:15"
+    target: N06
+    tag: endorse
+    object: claim
+    comment: "This is the actual creative leap the whole paper turns on, and it's framed exactly right — a cheap reformulation, not a new capacity source."
+  - id: T04
+    timestamp: "2026-07-27T15:20"
+    target: N07
+    tag: uncertain
+    object: priority
+    comment: "Clean-ablation is a reasonable justification for starting with identity shortcuts, but it optimizes for measurement convenience over just shipping the best-performing option (which C04 later shows is closer than expected) — worth naming that tradeoff explicitly rather than only the ablation benefit."

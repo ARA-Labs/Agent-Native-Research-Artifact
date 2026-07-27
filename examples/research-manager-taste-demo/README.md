@@ -22,12 +22,18 @@ produced, one increment per PR that touches this capability.
 
 ## Provenance
 
-`ara/` was seeded from a real excerpt of `examples/resnet-ara-example`
-(claim `C07`, heuristic `H04`, trace node `N05` — the same three elements used
-in the PR #32 review discussion), trimmed to a flat, minimal tree for legibility.
-It is not synthetic content invented for this demo, and it is deliberately kept
-separate from `resnet-ara-example/` itself so this one can keep mutating without
-touching the compiler walkthrough that example serves elsewhere.
+`ara/` was seeded from a real excerpt of `examples/resnet-ara-example`: claims
+`C01`, `C02`, `C04`, `C06`, `C07`; heuristics `H01`, `H03`, `H04`; trace nodes
+`N01`, `N04`, `N05`, `N06`, `N07` (five different node types — question, two
+dead_ends, an insight, and a decision — flattened to top-level for legibility;
+in the source they're nested several levels under `N01`). `C07`/`H04`/`N05`
+are the same three elements used in the PR #32 review discussion. Any trace
+node id ≥ `N50` is demo-added by a taste reaction's co-fired pipeline event,
+never present in the source artifact — there's no ambiguity between real and
+generated content. It is not synthetic content invented for this demo, and
+`ara/` is deliberately kept separate from `resnet-ara-example/` itself so this
+one can keep mutating without touching the compiler walkthrough that example
+serves elsewhere.
 
 ## What `check.mjs` asserts
 
