@@ -1,205 +1,180 @@
-# Flattened to top-level nodes for legibility — in the source artifact
-# (examples/resnet-ara-example) these are nested several levels deep under
-# N01/N06/N13's children. IDs N01-N15 are real, copied verbatim (including
-# their `also_depends_on` cross-references, which stay valid since every id
-# they point to is also present here); any id ≥ N50 is demo-added (never
-# present in the source artifact), so there's no ambiguity between real and
-# taste/pipeline-generated content.
+# Journey-fact nodes only (question/decision/experiment/dead_end/pivot), in the order the
+# paper's own narrative presents them (§1, §3, §4). Every node's content is grounded in the
+# paper (short paraphrase + section/table pointer, not extended quotation); the only thing
+# not "from the paper" is the turn-by-turn framing itself, which follows research-manager's
+# own taxonomy (see skills/research-manager/references/event-taxonomy.md) rather than the
+# paper's prose structure. N16 is the one node not present in the paper at all — it's a
+# question that a live taste reaction on N05 raised during this test run (see taste_log.yaml).
 
 tree:
   - id: N01
     type: question
-    support_level: explicit
-    source_refs: ["§1 introduction", "Fig. 1"]
-    title: "Is learning better networks as easy as stacking more layers?"
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:00"
     description: >-
-      Central research question that frames the entire paper. The introduction
-      explicitly poses this question and uses CIFAR-10 plain-{20, 56} curves
-      (Fig. 1) to motivate why the answer is "no, not in the obvious way."
+      Is learning better networks as easy as stacking more layers? The paper opens
+      by showing CIFAR-10 plain-net curves at depths 20 and 56 where the deeper net
+      trains worse, not just tests worse — motivating the rest of the study (§1, Fig. 1).
 
   - id: N02
     type: experiment
-    support_level: explicit
-    source_refs: ["Fig. 1", "Fig. 6 left"]
-    title: "Plain-net depth scan on CIFAR-10 (depths 20-110)"
-    description: >-
-      Train plain CNNs of depth {20, 32, 44, 56, 110} on CIFAR-10 with
-      BN + MSRA init. Observe whether deeper plain nets improve.
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:10"
+    evidence: ["Fig. 1", "Fig. 6 left"]
     result: >-
-      Deeper plain nets degrade. Plain-110 fails badly (>60% error,
-      not displayed in Fig. 6). Plain-56 is worse than plain-20.
+      Plain-net depth scan on CIFAR-10, depths {20,32,44,56,110}: deeper plain nets
+      degrade; plain-110 fails badly, plain-56 worse than plain-20.
 
   - id: N03
     type: experiment
-    support_level: explicit
-    source_refs: ["Table 2", "Fig. 4 left"]
-    title: "Plain-net depth scan on ImageNet (18 vs. 34)"
-    description: >-
-      Train plain-{18, 34} on ImageNet with the standard recipe (§3.4).
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:15"
+    evidence: ["Table 2", "Fig. 4 left"]
+    also_depends_on: [N02]
     result: >-
-      plain-34 = 28.54% top-1, plain-18 = 27.94% top-1 -> degradation
-      confirmed on a large dataset, not specific to CIFAR.
+      Plain-net depth scan on ImageNet, 18 vs. 34 layers: plain-34 reaches 28.54%
+      top-1, plain-18 reaches 27.94% — degradation confirmed at scale, not CIFAR-specific.
 
   - id: N04
     type: dead_end
-    support_level: explicit
-    source_refs: ["§4.1 plain networks discussion"]
-    title: "Vanishing-gradient hypothesis"
-    description: >-
-      A natural first explanation for plain-net degradation. The authors
-      rule it out by noting BN keeps forward signals at non-zero variance
-      and that backward gradient norms are healthy.
-    why_failed: >-
-      With BN in place, signals do not vanish; the plain-34 net still
-      reaches competitive accuracy (24.19% top-1 with 10-crop, Table 3),
-      showing SGD is making progress — just slowly.
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:25"
+    hypothesis: "Vanishing gradients explain the degradation."
+    failure_mode: >-
+      With batch norm in place (H02), forward-signal variance stays non-zero and
+      backward gradient norms are healthy — plain-34 still reaches competitive
+      accuracy (24.19% top-1 10-crop, Table 3), so SGD is making progress, just slowly.
+    lesson: "The degradation is not a vanishing-signal problem."
 
   - id: N05
     type: dead_end
-    support_level: inferred
-    source_refs: ["§4.1 (footnote 3)"]
-    title: "More training iterations alone (3×) on plain nets"
-    description: >-
-      The footnote reports that the authors tried training plain nets
-      for 3× more iterations and still observed the degradation problem.
-    why_failed: >-
-      The degradation is not just slow optimization; longer training
-      does not close the gap.
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:30"
+    hypothesis: "Training plain nets longer (3x iterations) closes the gap."
+    failure_mode: >-
+      A footnote reports the degradation persisted under 3x training — longer
+      training alone does not close the gap.
+    lesson: "The degradation is not just slow optimization."
 
   - id: N06
-    type: insight
-    support_level: explicit
-    source_refs: ["§1", "§3.1"]
-    title: "Reformulate layers to fit a residual mapping F(x) := H(x) - x"
-    description: >-
-      Key creative leap. Identity mapping should be expressible cheaply,
-      so let stacked nonlinear layers learn the *residual* from identity.
+    type: pivot
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:40"
+    also_depends_on: [N04, N05]
+    from: "Treat degradation as an optimization pathology to fix via training tricks."
+    to: "Reformulate the target of each block to a residual mapping F(x) := H(x) - x, on the reasoning that identity should be cheap to express if that's what's actually needed."
+    trigger: >-
+      Both the vanishing-gradient and longer-training explanations for the
+      degradation were ruled out (N04, N05) — the fix has to be structural,
+      not a training-procedure tweak.
 
   - id: N07
     type: decision
-    support_level: explicit
-    source_refs: ["§3.2", "Fig. 2"]
-    title: "Use parameter-free identity shortcuts (Eqn. 1)"
-    description: >-
-      Decision to add x via an unparameterized skip connection,
-      rather than a gated or projected one (contrasts with highway
-      networks, RW01).
-    rationale: >-
-      No parameters, no FLOPs added, lets the deeper variant exactly
-      match the shallower one's parameter budget for clean ablation.
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:50"
+    also_depends_on: [N06]
+    choice: "Use parameter-free identity shortcuts (Eqn. 1) to realize the residual reformulation."
+    alternatives: ["a gated shortcut", "a projected shortcut on every block (contrasts with highway networks)"]
+    evidence: >-
+      No parameters or FLOPs added, so the deeper variant exactly matches the
+      shallower one's parameter budget for a clean ablation (§3.2, Fig. 2).
 
   - id: N08
     type: experiment
-    support_level: explicit
-    source_refs: ["Table 2", "Fig. 4 right"]
-    title: "Plain vs. ResNet at 18/34 layers on ImageNet"
-    description: >-
-      Train ResNet-{18, 34} (option A shortcuts) under the same
-      recipe as plain-{18, 34}.
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:00"
+    also_depends_on: [N07]
+    evidence: ["Table 2", "Fig. 4 right"]
     result: >-
-      ResNet-34 = 25.03% top-1 (3.51 pts better than plain-34, 2.85
-      pts better than ResNet-18). Degradation is removed.
+      ResNet-{18,34} (option A shortcuts) vs. plain-{18,34} on ImageNet:
+      ResNet-34 reaches 25.03% top-1 (3.51pts better than plain-34, 2.85pts
+      better than ResNet-18) — degradation removed.
 
   - id: N09
     type: experiment
-    support_level: explicit
-    source_refs: ["Table 3", "Identity vs. Projection Shortcuts section"]
-    title: "Shortcut option ablation on ResNet-34 (A vs. B vs. C)"
-    description: >-
-      Ablation comparing parameter-free identity (A), projection on
-      dimension changes only (B), and projection on every shortcut (C).
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:10"
+    also_depends_on: [N07]
+    evidence: ["Table 3", "Identity vs. Projection Shortcuts section"]
     result: >-
-      A = 25.03, B = 24.52, C = 24.19 top-1. Differences are small;
-      option C is rejected as not worth the parameter / memory cost.
+      Shortcut option ablation on ResNet-34 (A=identity, B=projection on
+      dimension change, C=projection everywhere): A=25.03, B=24.52, C=24.19
+      top-1 — differences small; C rejected as not worth the parameter/memory cost.
 
   - id: N10
     type: dead_end
-    support_level: explicit
-    source_refs: ["§3.2"]
-    title: "Single-layer residual function F"
-    description: >-
-      Authors note Eqn. (1) with a single-layer F is similar to a
-      linear layer.
-    why_failed: >-
-      "We have not observed advantages." Authors require F to have
-      >=2 weighted layers.
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:20"
+    hypothesis: "A single-layer residual function F could work."
+    failure_mode: >-
+      The paper notes a single-layer F with Eqn. (1) resembles a plain linear
+      layer, and reports no observed advantage from it — F needs ≥2 weighted layers.
+    lesson: "The residual function needs enough capacity to be non-trivial."
 
   - id: N11
     type: decision
-    support_level: explicit
-    source_refs: ["Deeper Bottleneck Architectures section", "Fig. 5 right"]
-    title: "Adopt 1×1 → 3×3 → 1×1 bottleneck blocks for >=50 layers"
-    description: >-
-      Replace the basic 2-layer block with a 3-layer bottleneck of
-      comparable per-block time complexity.
-    rationale: >-
-      Lets us push depth to 50/101/152 layers at FLOPs comparable to
-      ResNet-34 (3.8 / 7.6 / 11.3 GFLOPs vs. 3.6 GFLOPs).
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:30"
+    also_depends_on: [N09]
+    choice: "Adopt 1x1 -> 3x3 -> 1x1 bottleneck blocks for depths >=50 layers."
+    alternatives: ["keep the 2-layer 3x3 block and accept the compute increase at depth"]
+    evidence: >-
+      Lets depth scale to 50/101/152 layers at FLOPs comparable to ResNet-34
+      (3.8/7.6/11.3 GFLOPs vs. 3.6 GFLOPs, Table 1) — motivated by the small A-vs-C
+      gap in N09 (parameter-light identity remains the right default even at
+      bottleneck scale).
 
   - id: N12
     type: experiment
-    support_level: explicit
-    source_refs: ["Table 3", "Table 4", "Table 5"]
-    title: "Depth scan with bottleneck blocks (50 / 101 / 152 layers)"
-    description: >-
-      Train ResNet-50 / 101 / 152 with option B shortcuts under the
-      same ImageNet recipe.
-    result: >-
-      Top-1 error drops monotonically (22.85 -> 21.75 -> 21.43);
-      6-model ensemble achieves 3.57% top-5 on the test set,
-      winning ILSVRC 2015.
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:45"
     also_depends_on: [N09, N11]
+    evidence: ["Table 3", "Table 4", "Table 5"]
+    result: >-
+      ResNet-50/101/152 with bottleneck blocks: top-1 error drops monotonically
+      (22.85 -> 21.75 -> 21.43); a 6-model ensemble reaches 3.57% top-5 on the
+      test set, winning ILSVRC 2015.
 
   - id: N13
     type: experiment
-    support_level: explicit
-    source_refs: ["Table 6", "Fig. 6", "§4.2"]
-    title: "CIFAR-10 depth scan (20 -> 1202 layers)"
-    description: >-
-      Train ResNet-{20, 32, 44, 56, 110, 1202} on CIFAR-10. ResNet-110
-      uses LR warmup (LR 0.01 for ~400 iters until train err <80%,
-      then restore LR 0.1).
+    provenance: ai-executed
+    timestamp: "2026-07-27T11:00"
+    also_depends_on: [N08]
+    evidence: ["Table 6", "Fig. 6", "Section 4.2"]
     result: >-
-      Test error decreases through depth 110 (6.43% mean, best
-      6.61 ± 0.16). ResNet-1202 trains successfully (training error
-      <0.1%) but overfits to 7.93% test error.
+      ResNet-{20,32,44,56,110,1202} on CIFAR-10 (110-layer variant uses LR
+      warmup, see N14): test error decreases through depth 110 (6.43% mean);
+      ResNet-1202 trains successfully (training error <0.1%) but overfits to 7.93% test error.
 
   - id: N14
     type: decision
-    support_level: explicit
-    source_refs: ["§4.2 paragraph on n=18", "footnote 5"]
-    title: "Warm up LR for the 110-layer CIFAR ResNet"
-    description: >-
-      At depth 110, LR 0.1 from iter 0 fails to start converging
-      cleanly. Pre-warm at LR 0.01 for ~400 iters (until train
-      error <80%), then restore LR 0.1.
-    rationale: >-
-      Gets the optimizer into a basin where the standard LR
-      schedule then trains stably. LR 0.1 from start eventually
-      reaches similar accuracy after several epochs of >90%
-      error, but warmup is the chosen recipe.
+    provenance: ai-executed
+    timestamp: "2026-07-27T11:05"
     also_depends_on: [N13]
+    choice: "Warm up the LR (0.01 for ~400 iterations until train error <80%, then restore the standard rate) for the 110-layer CIFAR ResNet."
+    alternatives: ["train at the standard LR from iteration 0", "lower the standard LR permanently for this depth"]
+    evidence: >-
+      At depth 110, the standard LR is too large to start converging cleanly;
+      warmup gets the optimizer into a basin where the standard rate then trains
+      stably (§4.2 n=18 paragraph, footnote 5).
 
   - id: N15
     type: experiment
-    support_level: explicit
-    source_refs: ["Table 7", "Table 8", "Appendix A"]
-    title: "Detection transfer with ResNet-101 (PASCAL VOC, COCO)"
-    description: >-
-      Swap VGG-16 for ResNet-101 in baseline Faster R-CNN; fine-tune
-      on PASCAL VOC and COCO.
-    result: >-
-      PASCAL VOC07 mAP: 73.2 -> 76.4. COCO mAP@.5: 41.5 -> 48.4. COCO
-      mAP@[.5, .95]: 21.2 -> 27.2 (28% relative improvement).
+    provenance: ai-executed
+    timestamp: "2026-07-27T11:20"
     also_depends_on: [N12]
+    evidence: ["Table 7", "Table 8", "Appendix A"]
+    result: >-
+      Swap VGG-16 for ResNet-101 in baseline Faster R-CNN, fine-tune on PASCAL
+      VOC and COCO: PASCAL VOC07 mAP 73.2 -> 76.4; COCO mAP@.5 41.5 -> 48.4;
+      COCO mAP@[.5,.95] 21.2 -> 27.2 (28% relative improvement).
 
-  - id: N50
+  - id: N16
     type: question
     provenance: user
     timestamp: "2026-07-27T15:10"
-    title: "Has the residual gap after 3× training ever been quantified?"
+    also_depends_on: [N05]
     description: >-
-      Footnote 3 reports the degradation problem persisted under 3× training
-      but gives no gap number. Worth checking whether any follow-up work
-      quantifies how much (if any) the gap closed, before treating "not just
-      slow optimization" as fully settled.
+      Raised by a live taste reaction on N05 (see taste_log.yaml T01): has the
+      residual gap after 3x training on plain nets ever been quantified anywhere,
+      rather than only reported qualitatively in a footnote?

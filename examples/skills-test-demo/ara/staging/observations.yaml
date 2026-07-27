@@ -1,0 +1,172 @@
+# All 14 observations below were staged and crystallized within the same trajectory replay
+# (see trace/sessions/2026-07-27_001.yaml for the turn each fired on). None are stale or
+# unpromoted — this is a from-scratch build, not a long-running project with a backlog.
+
+observations:
+  - id: O01
+    timestamp: "2026-07-27T09:10"
+    provenance: ai-executed
+    content: "Batch norm right after every conv, before the activation; no dropout."
+    context: "AI action: read the paper's methodology section (§3.3-3.4) before the first experiment."
+    potential_type: heuristic
+    bound_to: []
+    promoted: true
+    promoted_to: "logic/solution/heuristics.md:H02"
+    crystallized_via: "artifact-commitment"
+    stale: false
+
+  - id: O02
+    timestamp: "2026-07-27T09:15"
+    provenance: ai-executed
+    content: "Plain CNNs exhibit a depth-induced degradation problem, confirmed on ImageNet as well as CIFAR-10."
+    context: "N03's ImageNet result generalizes N02's CIFAR-10 finding."
+    potential_type: claim
+    bound_to: [N02, N03]
+    promoted: true
+    promoted_to: "logic/claims.md:C01"
+    crystallized_via: "artifact-commitment"
+    stale: false
+
+  - id: O03
+    timestamp: "2026-07-27T09:50"
+    provenance: ai-executed
+    content: "Down-sample by stride-2 convolutions, not pooling."
+    context: "Design convention adopted alongside the identity-shortcut decision (N07)."
+    potential_type: heuristic
+    bound_to: [N07]
+    promoted: true
+    promoted_to: "logic/solution/heuristics.md:H05"
+    crystallized_via: "artifact-commitment"
+    stale: false
+
+  - id: O04
+    timestamp: "2026-07-27T09:50"
+    provenance: ai-executed
+    content: "Match shortcut down-sampling to the residual function's stride."
+    context: "Design convention adopted alongside the identity-shortcut decision (N07)."
+    potential_type: heuristic
+    bound_to: [N07]
+    promoted: true
+    promoted_to: "logic/solution/heuristics.md:H06"
+    crystallized_via: "artifact-commitment"
+    stale: false
+
+  - id: O05
+    timestamp: "2026-07-27T10:00"
+    provenance: ai-executed
+    content: "Residual reformulation removes the degradation problem."
+    context: "N08's result directly confirms the mechanism N07 was designed to test."
+    potential_type: claim
+    bound_to: [N07, N08]
+    promoted: true
+    promoted_to: "logic/claims.md:C02"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O06
+    timestamp: "2026-07-27T10:10"
+    provenance: ai-executed
+    content: "Identity shortcuts are sufficient; projection shortcuts give only marginal gains."
+    context: "N09's ablation directly produces the comparative result."
+    potential_type: claim
+    bound_to: [N09]
+    promoted: true
+    promoted_to: "logic/claims.md:C04"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O07
+    timestamp: "2026-07-27T10:10"
+    provenance: ai-executed
+    content: "Default to identity shortcuts (Option A) for parameter-free residual learning."
+    context: "Same N09 ablation licenses the practical recommendation, not just the claim."
+    potential_type: heuristic
+    bound_to: [N09]
+    promoted: true
+    promoted_to: "logic/solution/heuristics.md:H01"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O08
+    timestamp: "2026-07-27T10:45"
+    provenance: ai-executed
+    content: "Accuracy keeps improving with depth up to 152 layers on ImageNet, once bottleneck blocks are used."
+    context: "N12's monotonic result directly confirms the depth-scan hypothesis."
+    potential_type: claim
+    bound_to: [N11, N12]
+    promoted: true
+    promoted_to: "logic/claims.md:C03"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O09
+    timestamp: "2026-07-27T10:45"
+    provenance: ai-executed
+    content: "Bottleneck blocks make 50/101/152-layer ResNets practical."
+    context: "N12's compute/accuracy numbers directly confirm N11's compute-tractability rationale."
+    potential_type: claim
+    bound_to: [N11, N12]
+    promoted: true
+    promoted_to: "logic/claims.md:C05"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O10
+    timestamp: "2026-07-27T10:45"
+    provenance: ai-executed
+    content: "Use bottleneck blocks once depth exceeds ~50 layers."
+    context: "Same N12 result licenses the practical recommendation."
+    potential_type: heuristic
+    bound_to: [N11, N12]
+    promoted: true
+    promoted_to: "logic/solution/heuristics.md:H04"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O11
+    timestamp: "2026-07-27T11:00"
+    provenance: ai-executed
+    content: "Residual nets generalize to extreme CIFAR-10 depths."
+    context: "N13's depth scan directly produces the result."
+    potential_type: claim
+    bound_to: [N13]
+    promoted: true
+    promoted_to: "logic/claims.md:C06"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O12
+    timestamp: "2026-07-27T11:05"
+    provenance: ai-executed
+    content: "The 110-layer CIFAR ResNet needs a warmup phase to start converging at the target learning rate."
+    context: "N14's decision plus N13's result together establish the need."
+    potential_type: claim
+    bound_to: [N13, N14]
+    promoted: true
+    promoted_to: "logic/claims.md:C07"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O13
+    timestamp: "2026-07-27T11:05"
+    provenance: ai-executed
+    content: "Warm up the LR for the 110-layer CIFAR ResNet."
+    context: "Same N14 decision licenses the practical recommendation."
+    potential_type: heuristic
+    bound_to: [N13, N14]
+    promoted: true
+    promoted_to: "logic/solution/heuristics.md:H03"
+    crystallized_via: "empirical-resolution"
+    stale: false
+
+  - id: O14
+    timestamp: "2026-07-27T11:20"
+    provenance: ai-executed
+    content: "ResNet representations transfer to detection, improving over a VGG-16 backbone."
+    context: "N15's detection-transfer result directly confirms this."
+    potential_type: claim
+    bound_to: [N12, N15]
+    promoted: true
+    promoted_to: "logic/claims.md:C08"
+    crystallized_via: "empirical-resolution"
+    stale: false

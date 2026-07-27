@@ -1,0 +1,72 @@
+session:
+  id: "2026-07-27_001"
+  date: "2026-07-27"
+  started: "2026-07-27T09:00"
+  last_turn: "2026-07-27T15:10"
+  turn_count: 17
+  summary: >-
+    Replayed the ResNet paper's own research narrative turn by turn: opened
+    with the depth-vs-degradation question, ruled out two explanations,
+    pivoted to the residual reformulation, validated it, scaled it with
+    bottlenecks and to extreme CIFAR depth, transferred it to detection, then
+    closed with a few live taste-comment reactions from the person running
+    this test.
+
+events_logged:
+  - { turn: 1, type: question, id: N01, routing: direct, provenance: ai-executed, summary: "Opened: is stacking layers alone enough?" }
+  - { turn: 2, type: observation, id: O01, routing: staged, provenance: ai-executed, summary: "Staged BN-placement convention as candidate heuristic." }
+  - { turn: 3, type: experiment, id: N02, routing: direct, provenance: ai-executed, summary: "Plain-net CIFAR depth scan: degrades." }
+  - { turn: 3, type: observation, id: O01, routing: crystallized, provenance: ai-executed, summary: "O01 -> H02 via artifact-commitment." }
+  - { turn: 4, type: experiment, id: N03, routing: direct, provenance: ai-executed, summary: "Plain-net ImageNet depth scan: confirms at scale." }
+  - { turn: 4, type: observation, id: O02, routing: staged, provenance: ai-executed, summary: "Staged degradation claim." }
+  - { turn: 5, type: dead_end, id: N04, routing: direct, provenance: ai-executed, summary: "Vanishing-gradient hypothesis ruled out." }
+  - { turn: 6, type: dead_end, id: N05, routing: direct, provenance: ai-executed, summary: "3x-training hypothesis ruled out." }
+  - { turn: 7, type: pivot, id: N06, routing: direct, provenance: ai-executed, summary: "Pivot to residual reformulation." }
+  - { turn: 7, type: observation, id: O02, routing: crystallized, provenance: ai-executed, summary: "O02 -> C01 via artifact-commitment (N06 depends on it)." }
+  - { turn: 8, type: decision, id: N07, routing: direct, provenance: ai-executed, summary: "Decided: parameter-free identity shortcuts." }
+  - { turn: 8, type: observation, id: O03, routing: staged, provenance: ai-executed, summary: "Staged stride-downsample convention." }
+  - { turn: 8, type: observation, id: O04, routing: staged, provenance: ai-executed, summary: "Staged shortcut-stride-matching convention." }
+  - { turn: 8, type: observation, id: O03, routing: crystallized, provenance: ai-executed, summary: "O03 -> H05 via artifact-commitment." }
+  - { turn: 8, type: observation, id: O04, routing: crystallized, provenance: ai-executed, summary: "O04 -> H06 via artifact-commitment." }
+  - { turn: 9, type: experiment, id: N08, routing: direct, provenance: ai-executed, summary: "ResNet-18/34 vs. plain: degradation removed." }
+  - { turn: 9, type: observation, id: O05, routing: crystallized, provenance: ai-executed, summary: "O05 -> C02 via empirical-resolution (staged and crystallized same turn)." }
+  - { turn: 10, type: experiment, id: N09, routing: direct, provenance: ai-executed, summary: "Shortcut option ablation A/B/C." }
+  - { turn: 10, type: observation, id: O06, routing: crystallized, provenance: ai-executed, summary: "O06 -> C04 via empirical-resolution." }
+  - { turn: 10, type: observation, id: O07, routing: crystallized, provenance: ai-executed, summary: "O07 -> H01 via empirical-resolution." }
+  - { turn: 11, type: dead_end, id: N10, routing: direct, provenance: ai-executed, summary: "Single-layer residual function ruled out." }
+  - { turn: 12, type: decision, id: N11, routing: direct, provenance: ai-executed, summary: "Decided: bottleneck blocks for >=50 layers." }
+  - { turn: 13, type: experiment, id: N12, routing: direct, provenance: ai-executed, summary: "Bottleneck depth scan 50/101/152: monotonic improvement, wins ILSVRC." }
+  - { turn: 13, type: observation, id: O08, routing: crystallized, provenance: ai-executed, summary: "O08 -> C03 via empirical-resolution." }
+  - { turn: 13, type: observation, id: O09, routing: crystallized, provenance: ai-executed, summary: "O09 -> C05 via empirical-resolution." }
+  - { turn: 13, type: observation, id: O10, routing: crystallized, provenance: ai-executed, summary: "O10 -> H04 via empirical-resolution." }
+  - { turn: 14, type: experiment, id: N13, routing: direct, provenance: ai-executed, summary: "CIFAR depth scan 20->1202 layers." }
+  - { turn: 14, type: observation, id: O11, routing: crystallized, provenance: ai-executed, summary: "O11 -> C06 via empirical-resolution." }
+  - { turn: 15, type: decision, id: N14, routing: direct, provenance: ai-executed, summary: "Decided: LR warmup for 110-layer CIFAR ResNet." }
+  - { turn: 15, type: observation, id: O12, routing: crystallized, provenance: ai-executed, summary: "O12 -> C07 via empirical-resolution." }
+  - { turn: 15, type: observation, id: O13, routing: crystallized, provenance: ai-executed, summary: "O13 -> H03 via empirical-resolution." }
+  - { turn: 16, type: experiment, id: N15, routing: direct, provenance: ai-executed, summary: "Detection transfer with ResNet-101." }
+  - { turn: 16, type: observation, id: O14, routing: crystallized, provenance: ai-executed, summary: "O14 -> C08 via empirical-resolution." }
+  - { turn: 17, type: decision, id: T01, routing: direct, provenance: user, summary: "Live taste reaction on N05; co-fired N16." }
+
+ai_actions:
+  - { turn: 2, action: "Read paper §3.3-3.4 (design rules, implementation) before running the first experiment.", provenance: ai-executed, files_changed: ["staging/observations.yaml"] }
+
+claims_touched:
+  - { id: C01, action: crystallized, turn: 7 }
+  - { id: C02, action: crystallized, turn: 9 }
+  - { id: C03, action: crystallized, turn: 13 }
+  - { id: C04, action: crystallized, turn: 10 }
+  - { id: C05, action: crystallized, turn: 13 }
+  - { id: C06, action: crystallized, turn: 14 }
+  - { id: C07, action: crystallized, turn: 15 }
+  - { id: C08, action: crystallized, turn: 16 }
+
+logic_revisions: []
+
+key_context:
+  - { turn: 17, excerpt: "Taste reaction on N05 doubled as a live pipeline event — resolved per taste-comments.md's co-firing rule rather than picking one or the other." }
+
+open_threads:
+  - "N16: has the 3x-training gap on plain nets ever been quantified anywhere, rather than reported only qualitatively?"
+
+ai_suggestions_pending: []

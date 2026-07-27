@@ -1,8 +1,13 @@
 #!/usr/bin/env node
-// Validates the structural invariants a research-manager taste-comment write must never
-// break, by diffing the shared skills-test-demo/ara/ against its state at a git ref (the
+// Supporting, mechanical check for ONE part of a much bigger human-reviewed artifact: the
+// shape of research-manager's taste-comment writes within examples/skills-test-demo/ara/.
+// The primary judgment on a trajectory replay (prompts/research-manager-trajectory.md) is a
+// human reading the resulting ara/ and deciding whether the routing/staging/crystallization
+// decisions look right — that's not something a script can assert. What this script CAN
+// assert is the taste-comment shape specifically: does it diff cleanly against a git ref (the
 // living ARA evolves via commits, so "before" is git history, not a hand-maintained second
-// copy). No dependencies — the parsing below only needs to handle the specific shapes
+// copy) without breaking append-only-ness, valid tag enums, or trace-node immutability.
+// No dependencies — the parsing below only needs to handle the specific shapes
 // taste-comments.md defines, not general YAML/Markdown.
 //
 // One of possibly several checks/*.mjs files sharing the same ara/ — each one validates a

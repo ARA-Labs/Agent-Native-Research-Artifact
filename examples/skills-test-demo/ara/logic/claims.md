@@ -1,91 +1,96 @@
 # Claims
 
 ## C01: Plain CNNs exhibit a depth-induced degradation problem
-- **Statement**: For sufficiently deep "plain" CNNs (no shortcuts), increasing depth strictly increases *training* error on both CIFAR-10 and ImageNet, even with BN and competent initialization.
+- **Statement**: For sufficiently deep "plain" (shortcut-free) CNNs, increasing depth increases training error relative to a shallower counterpart, even with batch normalization and standard initialization — not explained by vanishing gradients or insufficient training time.
+- **Conditions**: Observed on both a small-image benchmark (CIFAR-10, depths up to 110) and a large-image benchmark (ImageNet, depths 18 vs. 34), so not a small-scale artifact.
+- **Sources**: [28.54 ← plain-34 ImageNet top-1 val error, Table 2 [result]; 27.94 ← plain-18 ImageNet top-1 val error, Table 2 [result]]
 - **Status**: supported
-- **Falsification criteria**: A controlled depth scan (e.g. plain-{18, 34, 56, 110}) trained with BN and standard SGD in which deeper models show monotonically lower or equal training error.
-- **Proof**: [E01]
-- **Evidence basis**: Table 2 (plain-18 = 27.94%, plain-34 = 28.54% top-1 ImageNet val); Fig. 4 left (training-error curves cross with deeper plain-34 above plain-18 throughout training); Fig. 6 left for plain-{20, 32, 44, 56, 110} on CIFAR-10.
-- **Interpretation**: The authors argue (but do not formally prove) that this reflects an *optimization* difficulty rather than overfitting or vanishing gradients.
+- **Provenance**: ai-executed
+- **Falsification**: A controlled depth scan under matched training in which deeper plain nets show training error equal to or lower than shallower ones.
+- **Proof**: [N02, N03]
 - **Dependencies**: none
-- **Tags**: degradation, optimization, depth-scaling, plain-baseline
-- **Taste** (optional):
-  - [2026-07-27] `endorse` on `evidence` — Exactly the controlled comparison the falsification criteria calls for: matched training setup, depth as the only variable, training error (not just test error) reported so it isn't confoundable with overfitting.
+- **Tags**: degradation, optimization, depth-scaling
+- **Last revised**: 2026-07-27 (2026-07-27_001#7)
 
-## C02: Residual learning eliminates the degradation problem
-- **Statement**: Replacing each pair of stacked 3×3 layers in a plain net with a residual block F(x) + x (with identity shortcut, no extra parameters) makes the deeper variant achieve *lower* training and validation error than the shallower one for matched depths.
+## C02: Residual reformulation removes the degradation problem
+- **Statement**: Replacing each pair of stacked layers with a residual block — a parameter-free identity shortcut around the block — makes a deeper network reach lower training and validation error than its shallower plain counterpart, at matched depth.
+- **Conditions**: Demonstrated at 18-vs-34-layer depth on ImageNet with identity shortcuts; presented as depth-general.
+- **Sources**: [25.03 ← ResNet-34 top-1 ImageNet val, Table 2 [result]; 27.88 ← ResNet-18 top-1 ImageNet val, Table 2 [result]]
 - **Status**: supported
-- **Falsification criteria**: Under the same depth/width/training pipeline, ResNet-34 fails to improve over ResNet-18 on ImageNet validation, or ResNet-34 has higher training error than plain-34.
-- **Proof**: [E01, E02]
-- **Evidence basis**: Table 2 (ResNet-18 = 27.88, ResNet-34 = 25.03 top-1 ImageNet val; ResNet-34 better than ResNet-18 by 2.85 pts; ResNet-34 better than plain-34 by 3.51 pts); Fig. 4 right (training-error curves of ResNet-34 lie below ResNet-18 throughout training).
-- **Interpretation**: The result is consistent with the hypothesis that residual reformulation makes the optimization landscape easier to traverse, but does not by itself prove a representational advantage.
+- **Provenance**: ai-executed
+- **Falsification**: ResNet-34 fails to improve over ResNet-18, or has higher training error than plain-34, under the same pipeline.
+- **Proof**: [N07, N08]
 - **Dependencies**: C01
-- **Tags**: residual-learning, identity-shortcut, optimization
-- **Taste** (optional):
-  - [2026-07-27] `endorse` on `claim` — This is the paper's core result and the evidence basis is about as clean as this kind of comparison gets: matched depth, matched pipeline, both training and validation error move the same direction.
+- **Tags**: residual-learning, identity-shortcut
 
-## C03: Residual networks gain accuracy from increased depth up to 152 layers on ImageNet
-- **Statement**: Deeper ResNets (50, 101, 152) achieve monotonically lower top-1 and top-5 ImageNet validation error than shallower ResNets, with the 152-layer model still having lower complexity (11.3 GFLOPs) than VGG-16/19 (15.3/19.6 GFLOPs).
+## C03: Accuracy keeps improving with depth up to 152 layers on ImageNet, once bottleneck blocks are used
+- **Statement**: Within the depths studied, deeper bottleneck-block ResNets reach monotonically lower ImageNet validation error than shallower ones, at lower compute than a comparable non-residual network of similar accuracy.
+- **Conditions**: Depths 50/101/152, bottleneck design, ImageNet.
+- **Sources**: [22.85 ← ResNet-50 top-1, Table 3 [result]; 21.75 ← ResNet-101 top-1, Table 3 [result]; 21.43 ← ResNet-152 top-1, Table 3 [result]]
 - **Status**: supported
-- **Falsification criteria**: A ResNet-152 trained with the same recipe fails to improve top-1 over ResNet-101 (or ResNet-101 over ResNet-50) by a margin larger than the noise floor (~0.1%).
-- **Proof**: [E03]
-- **Evidence basis**: Table 3 (ResNet-50 = 22.85 / 6.71, ResNet-101 = 21.75 / 6.05, ResNet-152 = 21.43 / 5.71 top-1 / top-5 with 10-crop testing; FLOPs from Table 1).
-- **Interpretation**: Within the depths studied, depth alone (rather than added parameters) is the source of the gain because residual blocks add no extra parameters relative to plain counterparts.
+- **Provenance**: ai-executed
+- **Falsification**: ResNet-152 fails to beat ResNet-101 (or 101 fails to beat 50) by more than the ~0.1% noise floor.
+- **Proof**: [N11, N12]
 - **Dependencies**: C02
-- **Tags**: depth-scaling, imagenet, complexity
+- **Tags**: depth-scaling, imagenet
 
 ## C04: Identity shortcuts are sufficient; projection shortcuts give only marginal gains
-- **Statement**: Among shortcut options A (zero-padding identity), B (projection only when dimensions change), and C (projection on every shortcut), the differences in ImageNet top-1 error are small (≤0.65 pts on ResNet-34); identity shortcuts (A) suffice to fix degradation, and option C is rejected as not worth its parameter / memory cost.
+- **Statement**: Among a spectrum of shortcut designs from parameter-free identity to fully projected, the accuracy difference is small; the parameter-free option is not measurably disadvantaged relative to the more expensive alternatives.
+- **Conditions**: ResNet-34, ImageNet, 10-crop testing.
+- **Sources**: [25.03 ← option A top-1, Table 3 [result]; 24.52 ← option B top-1, Table 3 [result]; 24.19 ← option C top-1, Table 3 [result]]
 - **Status**: supported
-- **Falsification criteria**: A controlled comparison in which option C beats option A or B by more than ~1 top-1 point under identical training, indicating projection shortcuts are essential rather than convenience.
-- **Proof**: [E04]
-- **Evidence basis**: Table 3 (ResNet-34 A = 25.03, B = 24.52, C = 24.19 top-1 with 10-crop); §"Identity vs. Projection Shortcuts" attributes the small B>A gap to A's zero-padded dimensions having "no residual learning" and the small C>B gap to extra parameters from 13 projection shortcuts.
-- **Interpretation**: Identity shortcuts are the right default for parameter efficiency; B is used in deeper bottleneck nets where dimension changes are rarer.
+- **Provenance**: ai-executed
+- **Falsification**: A projection-shortcut option beats identity by more than ~1 top-1 point under identical training.
+- **Proof**: [N09]
 - **Dependencies**: C02
 - **Tags**: shortcut-design, ablation
 - **Taste** (optional):
-  - [2026-07-27] `uncertain` on `evidence` — The ≤0.65pt gap is doing a lot of work here ("sufficient", "marginal", "rejected") but it's a single ImageNet run per option with no repeated-trial variance reported — that gap could plausibly be run-to-run noise rather than a real ordering between A/B/C.
+  - [2026-07-27] `uncertain` on `evidence` — The ≤0.65pt gap is doing a lot of work here ("sufficient", "marginal") but it's a single ImageNet run per option with no repeated-trial variance reported — that gap could plausibly be run-to-run noise rather than a real ordering between A/B/C.
 
 ## C05: Bottleneck blocks make 50/101/152-layer ResNets practical
-- **Statement**: Replacing the 2-layer 3×3 building block with a 3-layer 1×1 → 3×3 → 1×1 *bottleneck* block of the same per-block time complexity allows construction of 50/101/152-layer ResNets that achieve lower error than the 34-layer ResNet without exploding compute.
+- **Statement**: A 3-layer bottleneck block (dimension-reducing, then expanding) matches the per-block cost of the 2-layer block used at shallower depths, letting depth scale into the 50-152 range without a proportional compute blowup.
+- **Conditions**: Applies at ≥50 layers.
+- **Sources**: [3.8 ← ResNet-50 GFLOPs, Table 1 [input]; 3.6 ← ResNet-34 GFLOPs, Table 1 [input]]
 - **Status**: supported
-- **Falsification criteria**: A 50- or 101-layer non-bottleneck ResNet matches the bottleneck ResNet at equal compute, eliminating the practical need for bottlenecks; or bottleneck ResNets fail to improve over ResNet-34.
-- **Proof**: [E03]
-- **Evidence basis**: Table 1 (3.8/7.6/11.3 GFLOPs for ResNet-{50,101,152}, comparable to ResNet-34 at 3.6 GFLOPs); Table 3 top-1 error drops from 24.19 (ResNet-34 C) to 22.85 / 21.75 / 21.43 for ResNet-50/101/152.
-- **Interpretation**: Identity shortcuts are particularly important for bottleneck designs because a projection shortcut on a bottleneck doubles its time complexity and model size (§"Deeper Bottleneck Architectures").
+- **Provenance**: ai-executed
+- **Falsification**: A non-bottleneck ResNet at equal compute matches or beats the bottleneck version at the same depth.
+- **Proof**: [N11, N12]
 - **Dependencies**: C02, C04
-- **Tags**: bottleneck, architecture, complexity
+- **Tags**: bottleneck, architecture
 
-## C06: Residual nets generalize to extreme CIFAR-10 depths (110 layers; 1202 layers without optimization difficulty)
-- **Statement**: On CIFAR-10, ResNets at depths {20, 32, 44, 56, 110} all train successfully, with the 110-layer model achieving 6.43% test error (best mean ± std 6.61 ± 0.16); a 1202-layer ResNet trains with no optimization difficulty (final training error <0.1%) although it overfits to 7.93% test error on this small dataset.
+## C06: Residual nets generalize to extreme CIFAR-10 depths
+- **Statement**: On a small-image benchmark, residual networks keep training successfully well beyond the depth a plain network tolerates; the deepest variant studied shows a train/test generalization gap, not a failure of training error to decrease.
+- **Conditions**: CIFAR-10, depths 20 through 1202.
+- **Sources**: [6.43 ← ResNet-110 CIFAR-10 test error, Table 6 [result]; 7.93 ← ResNet-1202 CIFAR-10 test error, Table 6 [result]]
 - **Status**: supported
-- **Falsification criteria**: A CIFAR ResNet at depth ≥110 trained with the same recipe fails to converge to <10% test error, or its training error fails to decrease below the 56-layer model's.
-- **Proof**: [E05]
-- **Evidence basis**: Table 6 (ResNet-{20=8.75, 32=7.51, 44=7.17, 56=6.97, 110=6.43, 1202=7.93}% test error); §"Exploring Over 1000 layers" notes 1202-layer training error <0.1% with no optimization difficulty.
-- **Interpretation**: The 1202-layer model worsens on test only because of overfitting on a 50k-image dataset, not because optimization breaks down.
+- **Provenance**: ai-executed
+- **Falsification**: A CIFAR ResNet at depth ≥110 under the same recipe fails to converge below 10% test error, or its training error fails to beat the 56-layer model's.
+- **Proof**: [N13]
 - **Dependencies**: C02, C03
-- **Tags**: cifar-10, extreme-depth, generalization, overfitting
+- **Tags**: cifar-10, extreme-depth
 - **Taste** (optional):
-  - [2026-07-27] `uncertain` on `framing` — "Just overfitting, not optimization breakdown" is stated as settled, but the claim doesn't separate the two cleanly — there's no matched-capacity smaller model shown as a control, so low training error plus high test error is consistent with overfitting but doesn't rule out a milder optimization issue that a stronger regularizer happens to paper over.
+  - [2026-07-27] `uncertain` on `framing` — "Just a generalization gap, not an optimization failure" is stated as settled, but there's no matched-capacity smaller-model control shown — low training error plus high test error is consistent with overfitting but doesn't rule out a milder optimization issue a stronger regularizer happens to paper over.
 
-## C07: Warming up the learning rate is necessary for the 110-layer CIFAR ResNet
-- **Statement**: A 110-layer ResNet on CIFAR-10 fails to start converging cleanly with the default initial LR of 0.1; warming up at LR 0.01 for ~400 iterations until training error drops below ~80%, then restoring LR 0.1, restores convergence.
+## C07: The 110-layer CIFAR ResNet needs a warmup phase to start converging at the target learning rate
+- **Statement**: At extreme CIFAR depth, starting training directly at the paper's standard learning rate stalls early progress; a short low-LR warmup phase before switching to the standard rate avoids the stall.
+- **Conditions**: 110-layer CIFAR-10 ResNet specifically; the paper notes the 1202-layer variant does not need this.
+- **Sources**: [0.01 ← warmup LR, §4.2 n=18 paragraph [input]; 400 ← warmup iteration count, §4.2 n=18 paragraph [input]]
 - **Status**: supported
-- **Falsification criteria**: Training a 110-layer ResNet on CIFAR-10 from scratch at LR 0.1 from iteration 0 reliably reaches the same final test error as the warmup recipe under the same total budget.
-- **Proof**: [E05]
-- **Evidence basis**: §4.2 paragraph on n=18 (110-layer): "0.1 is slightly too large to start converging" with footnote 5 noting LR 0.1 reaches similar accuracy after several epochs of >90% error but the warmup variant is the chosen recipe.
-- **Interpretation**: Warmup is a stability heuristic, not a fundamental requirement of residual learning — only a minor optimization aid for very deep CIFAR variants.
+- **Provenance**: ai-executed
+- **Falsification**: Training from the standard LR at iteration 0 reaches the same final error, within the same budget, as the warmup recipe.
+- **Proof**: [N13, N14]
 - **Dependencies**: C06
-- **Tags**: training-recipe, warmup, very-deep
+- **Tags**: training-recipe, warmup
 - **Taste** (optional):
-  - [2026-07-27] `uncertain` on `framing` — Statement reads as "warmup restores convergence" (existence), but the cited footnote says LR 0.1 without warmup reaches similar accuracy eventually, just slower — that's a convergence-speed effect, not a convergence-existence one. The claim as framed overstates what the footnote supports.
+  - [2026-07-27] `uncertain` on `framing` — Statement reads as "warmup restores convergence" (existence), but the paper's own follow-up note is that the standard LR without warmup reaches similar accuracy eventually, just slower — that's a convergence-speed effect, not a convergence-existence one. The claim as framed overstates what the source supports.
 
-## C08: ResNet representations transfer to detection, giving large COCO gains over VGG-16
-- **Statement**: Replacing the VGG-16 backbone with ResNet-101 in baseline Faster R-CNN improves COCO val mAP@[.5,.95] from 21.2 to 27.2, a 6.0-point absolute (28% relative) increase, attributed solely to the better learned representations.
+## C08: ResNet representations transfer to detection, improving over a VGG-16 backbone
+- **Statement**: Swapping a deeper residual backbone into an otherwise-unchanged detector improves localization-sensitive downstream accuracy substantially, indicating the representational gain is not classification-specific.
+- **Conditions**: Baseline Faster R-CNN, VGG-16 → ResNet-101 swap, COCO + PASCAL VOC.
+- **Sources**: [21.2 ← VGG-16 backbone COCO mAP@[.5,.95], Table 8 [result]; 27.2 ← ResNet-101 backbone COCO mAP@[.5,.95], Table 8 [result]]
 - **Status**: supported
-- **Falsification criteria**: A controlled VGG-16 → ResNet-101 swap in Faster R-CNN with the same hyperparameters fails to improve COCO mAP@[.5,.95] by ≥3 absolute points.
-- **Proof**: [E06]
-- **Evidence basis**: Table 8 (baseline Faster R-CNN: VGG-16 = 41.5 mAP@.5 / 21.2 mAP@[.5,.95]; ResNet-101 = 48.4 / 27.2 on COCO val); Table 7 (PASCAL VOC 07 mAP: 73.2 → 76.4; VOC 12: 70.4 → 73.8).
-- **Interpretation**: Depth of representations matters not only for classification but for downstream localization-sensitive tasks; mAP@[.5,.95] (which rewards tighter boxes) gains ≈ mAP@.5 gains, suggesting deeper features help both recognition and localization.
+- **Provenance**: ai-executed
+- **Falsification**: The same backbone swap fails to improve COCO mAP@[.5,.95] by ≥3 absolute points.
+- **Proof**: [N12, N15]
 - **Dependencies**: C03
-- **Tags**: transfer-learning, object-detection, coco, pascal-voc, faster-rcnn
+- **Tags**: transfer-learning, object-detection
