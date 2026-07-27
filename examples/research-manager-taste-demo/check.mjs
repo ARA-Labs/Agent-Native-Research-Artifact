@@ -208,10 +208,24 @@ function parseTasteLog(text) {
 
 function checkTasteLog(relPath, validNodeIds) {
   console.log('\ntrace/taste_log.yaml');
+  const beforeEntries = parseTasteLog(readAtRef(relPath));
   const entries = parseTasteLog(readCurrent(relPath));
   if (entries.length === 0) {
     pass('no entries (file absent or empty) — nothing to check');
     return;
+  }
+
+  const beforeById = new Map(beforeEntries.map((e) => [e.id, e]));
+  const afterById = new Map(entries.map((e) => [e.id, e]));
+  for (const [id, beforeEntry] of beforeById) {
+    const afterEntry = afterById.get(id);
+    if (!afterEntry) {
+      fail(`taste_log.yaml: entry ${id} present at ${gitRef} is missing now`);
+    } else if (JSON.stringify(afterEntry) !== JSON.stringify(beforeEntry)) {
+      fail(`taste_log.yaml: entry ${id} was mutated — taste_log entries must never be edited once written, only appended`);
+    } else {
+      pass(`${id}: unchanged since ${gitRef}`);
+    }
   }
 
   const seenNums = [];
