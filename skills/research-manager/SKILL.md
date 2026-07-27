@@ -17,7 +17,7 @@ argument-hint: "[optional: hint about what happened this turn]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 metadata:
   author: ara-commons
-  version: "2.6.0"
+  version: "2.7.0"
   tags: [research, process-recording, provenance, progressive-crystallization, knowledge-management, taste-comments]
 ---
 
@@ -432,7 +432,7 @@ tree:
 - **Tags**: {comma-separated}
 - **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
 - **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one
-  - [YYYY-MM-DD] `endorse | uncertain | reject` — {free-text comment}
+  - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}
 ```
 
 **The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,
@@ -468,7 +468,7 @@ marker, not a resting state — see Stage 4.
 - **Code ref**: [{file paths, or "pending"}]
 - **Last revised**: YYYY-MM-DD (turn-id)   # absent until first revision
 - **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one
-  - [YYYY-MM-DD] `endorse | uncertain | reject` — {free-text comment}
+  - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}
 ```
 
 Current-state snapshot only (same as claims); history lives in the trace.
@@ -589,6 +589,7 @@ entries:
     timestamp: "YYYY-MM-DDTHH:MM"
     target: N{XX}                         # trace node this comments on; never edited
     tag: endorse | uncertain | reject
+    object: claim | evidence | framing | priority
     comment: "{free-text comment}"
 ```
 
@@ -630,9 +631,15 @@ deliver the full briefing.
 
 Separate from the four-stage pipeline above. When the user reacts evaluatively to a specific
 claim, heuristic, or trace node this turn, record it as a taste comment: always
-`provenance: user`, never staged, never affects `Status` or crystallization. → Use
-`references/taste-comments.md` for trigger detection, target resolution, the
-confirm-before-write procedure, and the attitude-tag rules; schemas above.
+`provenance: user`, never staged, never affects `Status` or crystallization. Every taste
+comment carries both an attitude (`endorse | uncertain | reject`) and an object of judgment
+(`claim | evidence | framing | priority`) — the two are independent axes, not one label. →
+Use `references/taste-comments.md` for trigger detection, target resolution, the
+confirm-before-write procedure, and the tag rules; schemas above.
+
+Taste is additive, never a substitute for the normal pipeline: if the same utterance also
+introduces new research content, that content is routed through Stage 1–4 as its own event
+regardless of the taste comment (see `references/taste-comments.md`).
 
 Runs inline within the normal epilogue when triggered — not a separate interactive prompt, and
 not asked about on turns where it doesn't come up.

@@ -22,10 +22,16 @@ Does not fire for:
   element as its target
 - A reaction with no identifiable target — see Target Resolution below rather than
   guessing one
-- Anything that reads as new research content — a correction, a new claim, a redirect. Those
-  route through the normal Stage 1–4 pipeline instead (see SKILL.md and `event-taxonomy.md`).
 
-A single turn may contain both a taste comment and normal pipeline events — handle both.
+**Taste and new research content are not mutually exclusive — a single utterance is routed
+as both when it contains both.** An evaluative reaction to an existing entry always fires
+taste, regardless of whether the same utterance also introduces new research content (a
+correction, a new claim, a proposed next step, a redirect). That new content is never
+absorbed into the taste comment or left implicit in its free text — it independently goes
+through the normal Stage 1–4 pipeline as its own candidate event (see SKILL.md and
+`event-taxonomy.md`), exactly as it would if the taste reaction weren't there at all. Only an
+utterance that is *purely* new research content, with no evaluative reaction attached, skips
+taste entirely and goes through the pipeline alone.
 
 ## Target Resolution & Confirm-Before-Write
 
@@ -43,13 +49,30 @@ Never write a taste comment on a guess. Every write is confirmed first.
 
 ## Attitude Tag
 
-Every taste comment carries exactly one tag: `endorse | uncertain | reject`.
+Every taste comment carries exactly one attitude tag: `endorse | uncertain | reject`.
 
 - Derive it from the user's own phrasing when the sentiment is unambiguous.
 - If the sentiment is genuinely ambiguous, ask which of the three it is rather than
   guessing — a wrong tag is worse than a short clarifying question.
-- There is no fourth "suggestion" tag. If the comment carries a suggestion, it lives in the
-  free-text `comment` itself — do not invent structure for it.
+- There is no fourth "suggestion" tag, and none is needed: an actionable suggestion inside
+  the reaction is not something the attitude tag needs to carry — it is routed through the
+  normal pipeline per "When This Fires" above, on its own terms.
+
+## Object of Judgment
+
+Every taste comment also carries exactly one object tag, naming what the reaction is actually
+about — the attitude tag alone conflates these:
+
+- `claim` — whether the target's core assertion, choice, or conclusion is itself correct.
+- `evidence` — whether what supports the target is sufficient or reliable, independent of
+  whether the assertion itself is believed.
+- `framing` — whether the target's premise, scope, or the question it set out to answer was
+  posed correctly, independent of whether the conclusion reached within that framing holds.
+- `priority` — whether the target was worth pursuing at all, relative to other work,
+  independent of whether it is correct.
+
+Derive it from the user's own phrasing when unambiguous; ask rather than guess when it
+isn't — the same rule as the attitude tag.
 
 ## Write Procedure
 
