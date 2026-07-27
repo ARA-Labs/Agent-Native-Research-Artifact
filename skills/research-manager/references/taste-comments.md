@@ -4,24 +4,25 @@ Canonical reference for the **Taste Comment** capability. Loaded on demand when 
 contains one. SKILL.md owns the pipeline orchestration and schemas — this file covers
 trigger detection, target resolution, and the confirm-before-write procedure.
 
-A taste comment is the researcher's own evaluative reaction to a specific piece of AI-produced
-research — "this claim is shaky", "the baseline here felt weak", "good catch on that pivot".
-It is **not** part of the crystallization pipeline: it never gets staged, never crystallizes,
-never changes a `Status` or a `Provenance`, and it is always `provenance: user` (the whole
-point is that it's the researcher's own take — the AI does not write these on its own
-behalf). It is optional, additive, and can be skipped entirely without affecting anything
-else in the artifact.
+A taste comment is the researcher's own evaluative reaction to a specific piece of
+AI-produced research. It is **not** part of the crystallization pipeline: it never gets
+staged, never crystallizes, never changes a `Status` or a `Provenance`, and it is always
+`provenance: user` (the whole point is that it's the researcher's own take — the AI does
+not write these on its own behalf). It is optional, additive, and can be skipped entirely
+without affecting anything else in the artifact.
 
 ## When This Fires
 
 Only when the user's message this turn expresses an evaluative reaction to an **identifiable**
 element already in `logic/claims.md`, `logic/solution/heuristics.md`, or
-`trace/exploration_tree.yaml` — e.g. "我觉得C07的证据有点单薄", "这个heuristic站得住",
-"那个实验的baseline选得不太公平", "N12那个决策我觉得挺聪明的".
+`trace/exploration_tree.yaml` — the reaction must be traceable to one specific entry, in
+either language the researcher is working in.
 
 Does not fire for:
-- General feedback about the conversation, the AI's tone, or process ("你解释得不够清楚")
-- Vague reactions with no identifiable target ("这个不太行")
+- General feedback about the conversation, the AI's tone, or process, with no research
+  element as its target
+- A reaction with no identifiable target — see Target Resolution below rather than
+  guessing one
 - Anything that reads as new research content — a correction, a new claim, a redirect. Those
   route through the normal Stage 1–4 pipeline instead (see SKILL.md and `event-taxonomy.md`).
 
@@ -45,9 +46,8 @@ Never write a taste comment on a guess. Every write is confirmed first.
 
 Every taste comment carries exactly one tag: `endorse | uncertain | reject`.
 
-- Derive it from the user's own phrasing when it's unambiguous (explicit "认可"/"没问题"
-  → `endorse`; explicit "存疑"/"不确定" → `uncertain`; explicit "反对"/"不同意"/"站不住"
-  → `reject`; and clear equivalents in either language).
+- Derive it from the user's own phrasing when the sentiment is unambiguous, in whatever
+  language the researcher used.
 - If the sentiment is genuinely ambiguous, ask which of the three it is rather than
   guessing — a wrong tag is worse than a short clarifying question.
 - There is no fourth "suggestion" tag. If the comment carries a suggestion, it lives in the

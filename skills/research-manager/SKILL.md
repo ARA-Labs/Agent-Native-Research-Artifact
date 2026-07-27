@@ -629,10 +629,10 @@ deliver the full briefing.
 ## Taste Comments (optional, user-triggered)
 
 Separate from the four-stage pipeline above. When the user reacts evaluatively to a specific
-claim, heuristic, or trace node this turn ("我觉得C07的证据有点单薄", "那个baseline选得不太
-公平"), record it as a taste comment: always `provenance: user`, never staged, never affects
-`Status` or crystallization. → Use `references/taste-comments.md` for trigger detection, target
-resolution, the confirm-before-write procedure, and the attitude-tag rules; schemas above.
+claim, heuristic, or trace node this turn, record it as a taste comment: always
+`provenance: user`, never staged, never affects `Status` or crystallization. → Use
+`references/taste-comments.md` for trigger detection, target resolution, the
+confirm-before-write procedure, and the attitude-tag rules; schemas above.
 
 Runs inline within the normal epilogue when triggered — not a separate interactive prompt, and
 not asked about on turns where it doesn't come up.
