@@ -1,12 +1,19 @@
 #!/usr/bin/env node
-// Validates the structural invariants a taste-comment write must never break, by diffing
-// the current examples/research-manager-taste-demo/ara/ against its state at a git ref
-// (the living ARA evolves via commits, so "before" is git history, not a hand-maintained
-// second copy). No dependencies — the parsing below only needs to handle the specific
-// shapes taste-comments.md defines, not general YAML/Markdown.
+// Validates the structural invariants a research-manager taste-comment write must never
+// break, by diffing the shared skills-test-demo/ara/ against its state at a git ref (the
+// living ARA evolves via commits, so "before" is git history, not a hand-maintained second
+// copy). No dependencies — the parsing below only needs to handle the specific shapes
+// taste-comments.md defines, not general YAML/Markdown.
 //
-// Usage: node check.mjs [araDir] [gitRef]
-// Defaults to ./ara (this demo) and origin/main.
+// One of possibly several checks/*.mjs files sharing the same ara/ — each one validates a
+// different ARA-skill capability's effect on it. This one is research-manager's
+// taste-comments only; a skill that only reads ara/ (rigor-reviewer, research-visualizer,
+// research-foresight) would need a check shape that validates its output instead of diffing
+// ara/, and compiler doesn't fit this shared-ara/ pattern at all (it builds an ARA from a
+// paper/repo rather than editing an existing one) — see the repo's top-level README.
+//
+// Usage: node checks/research-manager-taste-comments.mjs [araDir] [gitRef]
+// Defaults to ../ara (this demo) and origin/main.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const araDir = path.resolve(process.argv[2] ?? path.join(HERE, 'ara'));
+const araDir = path.resolve(process.argv[2] ?? path.join(HERE, '..', 'ara'));
 const gitRef = process.argv[3] ?? 'origin/main';
 
 const ATTITUDE_TAGS = new Set(['endorse', 'uncertain', 'reject']);

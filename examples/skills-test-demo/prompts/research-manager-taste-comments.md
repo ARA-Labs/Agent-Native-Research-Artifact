@@ -15,7 +15,7 @@ Log schemas in `skills/research-manager/SKILL.md` — that is the current spec, 
 prompt; follow whatever it currently says even if it has changed since this prompt was
 written.
 
-The reference ARA is at `examples/research-manager-taste-demo/ara/`. Read its
+The reference ARA is at `examples/skills-test-demo/ara/`. Read its
 `logic/claims.md`, `logic/solution/heuristics.md`, and `trace/exploration_tree.yaml`.
 
 Simulate a researcher reviewing this ARA and reacting to it out loud. Invent 2–3 reactions
@@ -33,7 +33,7 @@ as written, then apply the write. Do not skip straight to writing — narrate wh
 you resolved each reaction to and why, the same way the live skill would confirm before
 writing.
 
-When done, show a diff of everything you changed under `examples/research-manager-taste-demo/ara/`
+When done, show a diff of everything you changed under `examples/skills-test-demo/ara/`
 and a one-line summary of each reaction (target, attitude, object, and whether it also
 triggered a pipeline event).
 
@@ -42,7 +42,7 @@ spec actually intends — commit the updated `ara/` as part of your PR, so the r
 in this repo reflects the current skill's behavior. If something looks wrong, that's a bug
 in the skill change you're testing, not in this prompt or the ARA.
 
-Then run `node examples/research-manager-taste-demo/check.mjs` from the repo root and
+Then run `node examples/skills-test-demo/checks/research-manager-taste-comments.mjs` from the repo root and
 paste its output — it diffs the current `ara/` against the version at `origin/main` and
 asserts the structural invariants a taste write must never break (tag/object enums,
 append-only-ness, trace nodes never mutated, targets resolving to real nodes, `T` ids

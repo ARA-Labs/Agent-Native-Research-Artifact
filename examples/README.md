@@ -30,15 +30,17 @@ Suggested order:
 2. Open `resnet-paper.pdf`
 3. Compare the paper against `resnet-ara-example/`
 
-## research-manager-taste-demo
+## skills-test-demo
 
-A living reference ARA for the `research-manager` taste-comment capability —
-not a frozen fixture, but the complete claims/heuristics/trace content of
-`resnet-ara-example` (not a hand-picked subset) that contributors re-run and
-update whenever they touch that capability. See
-`research-manager-taste-demo/README.md` for the workflow, `prompt.md` for the
-copy-pasteable test prompt, and run the invariant checker locally with:
+A living reference ARA shared across the ARA skills for local regression
+testing — not a frozen fixture, but the complete claims/heuristics/trace
+content of `resnet-ara-example` (not a hand-picked subset) that contributors
+re-run and update whenever they touch a tested capability. Currently covers
+`research-manager`'s taste-comment capability; see `skills-test-demo/README.md`
+for the workflow (including why this doesn't generalize to every skill
+unchanged), `prompts/` for the copy-pasteable test prompts, and run the
+invariant checker locally with:
 
 ```
-node examples/research-manager-taste-demo/check.mjs
+node examples/skills-test-demo/checks/research-manager-taste-comments.mjs
 ```
