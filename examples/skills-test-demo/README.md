@@ -1,31 +1,26 @@
 # ARA Skills Test Demo
 
 A living regression example, shared across the ARA skills. Contributors run this
-locally — no CI wiring, no install step, no API key.
+locally — no CI wiring, no install step, no API key, no automated pass/fail check.
 
 ## How this works
 
 One shared `ara/`, exercised by any number of skill-specific prompts. Each prompt
 demonstrates that skill's **entire** pipeline working end-to-end on a real research
-trajectory — not just one capability in isolation — because the primary judgment on
-whether a skill change is good is a human reading the resulting ARA, which is
-inherently subjective and can't be meaningfully asserted by a script.
+trajectory — not just one capability in isolation — because the judgment on whether
+a skill change is good is a human reading the resulting ARA, which is inherently
+subjective and can't be meaningfully asserted by a script.
 
 - `ara/` is the current reference state — built entirely by actually running a
   prompt below through the real skill, not hand-written.
 - `prompts/<skill>-trajectory.md` — a stable prompt that replays a real research
   trajectory through that skill's full pipeline, end to end, against `ara/`.
-- `checks/<skill>-<thing>.mjs` — a *supporting* mechanical check for the one part
-  of a run's output that IS assertable without a human reader (e.g. tag enums,
-  append-only-ness). It is not a pass/fail gate on the run as a whole.
 
-Right now there's one pair: `prompts/research-manager-trajectory.md` replays the
+Right now there's one prompt: `prompts/research-manager-trajectory.md` replays the
 ResNet paper's own research narrative through `research-manager`'s full four-stage
 pipeline (Context Harvester → Event Router → Maturity Tracker → Logic Layer
-Reconciliation), plus its taste-comment capability; `checks/research-manager-taste-comments.mjs`
-is the supporting check for the taste-comment portion of that run. When testing
-touches a different skill, add another `prompts/<skill>-trajectory.md` (and a
-`checks/*.mjs` only for whatever part of its output is actually assertable).
+Reconciliation), plus its taste-comment capability. When testing touches a
+different skill, add another `prompts/<skill>-trajectory.md`.
 
 **This doesn't generalize to every skill unchanged — read this before adding a
 second prompt:**
@@ -78,41 +73,21 @@ directly from `resnet-ara-example`'s content and only exercised the taste-commen
 capability against it; that undersold what "testing the skill" should mean — see
 the PR history for why this version replays the full pipeline from scratch instead.)
 
-## What `checks/research-manager-taste-comments.mjs` asserts
+## What to actually check when reviewing a run
 
-Diffing the current `ara/` against its state at `origin/main`:
+There's no automated checker here — read `ara/` and judge it directly. In
+particular:
 
-1. Every claim/heuristic entry present at `origin/main` still has all of its
-   non-Taste fields byte-identical now — a taste write touches nothing but the
-   `Taste` subsection.
-2. Any taste bullet already present at `origin/main` is still present,
-   unchanged, at the same position now — taste is append-only.
-3. Every taste bullet's attitude tag is one of `endorse | uncertain | reject`.
-4. Every taste bullet's object-of-judgment tag is one of
-   `claim | evidence | framing | priority`.
-5. Every trace node present at `origin/main` is byte-identical now — trace
-   nodes are pointed at, never edited. New nodes may be appended (e.g. by the
-   taste/pipeline co-firing rule) without failing this check.
-6. Every `trace/taste_log.yaml` entry's `target` resolves to a real node id in
-   the current `trace/exploration_tree.yaml`.
-7. `trace/taste_log.yaml` entry ids are unique and sequential from `T01`.
+- `trace/pm_reasoning_log.yaml` and `trace/sessions/2026-07-27_001.yaml` — the
+  routing/closure-signal judgment calls made turn by turn, including near-misses.
+  Do these decisions look right? Would you have routed/crystallized differently?
+- `logic/claims.md` / `logic/solution/heuristics.md` — do the crystallized
+  entries read as sound, falsifiable, correctly scoped?
+- `trace/taste_log.yaml` and the `Taste` subsections in `logic/` — do the tag
+  choices (attitude, object-of-judgment) match what the comment text actually says?
+- `trace/exploration_tree.yaml` — are dead ends, decisions, and the one pivot
+  classified as the right node type; do `also_depends_on` links make sense?
 
-Run it with:
-
-```
-node examples/skills-test-demo/checks/research-manager-taste-comments.mjs
-```
-
-It accepts optional `[araDir] [gitRef]` arguments if you want to point it
-somewhere other than `ara/`/`origin/main`.
-
-## Scope
-
-`checks/research-manager-taste-comments.mjs` validates structural invariants for
-the taste-comment portion of a run only — it says nothing about whether the
-routing/staging/crystallization decisions across the rest of the trajectory
-(which experiment triggered which claim's crystallization, whether a dead end
-was classified correctly, whether a closure signal actually fired) were the
-right calls. That's the part a human reading `ara/` and
-`trace/pm_reasoning_log.yaml` has to judge — it's inherently subjective and this
-repo doesn't pretend a script can substitute for that read.
+This is inherently subjective, and that's the point — a skill change that makes
+research-manager's outputs on this trajectory look worse to a human reader is a
+regression, whether or not it breaks anything a script could check.

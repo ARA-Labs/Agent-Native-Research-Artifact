@@ -97,11 +97,6 @@ which signal, and the taste reactions you added. If the result reads like someth
 actually intends, commit the updated `ara/` as part of your PR — the reference ARA in this
 repo is then whatever the most recent contributor's real run produced. If a routing or
 crystallization decision looks wrong on review, that's a bug (or an ambiguity worth
-resolving) in the skill you're testing, not in this prompt.
-
-Then run `node examples/skills-test-demo/checks/research-manager-taste-comments.mjs` from
-the repo root and paste its output. It's a supporting, mechanical check on the one part of
-the output that IS assertable without a human reader — taste-comment shape (tag/object
-enums, append-only-ness, trace nodes never mutated, targets resolving to real nodes, `T` ids
-sequential) — not a verdict on whether the routing/staging/crystallization decisions
-throughout the rest of the trajectory were correct. That's for whoever reviews your PR.
+resolving) in the skill you're testing, not in this prompt. That review — reading the
+resulting `ara/` and judging whether the routing/staging/crystallization decisions look
+right — is the actual test; nothing here scripts a pass/fail verdict on it.
