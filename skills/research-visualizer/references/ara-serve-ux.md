@@ -58,12 +58,19 @@ in the ARA's own order (pre-order, i.e. how the trace was written). Play auto-ad
 a search box is focused. This is the fastest way to "just replay the run" front-to-back without
 manually clicking through the graph.
 
+## Header disclosures
+
+When the ARA carries them, the toolbar surfaces **Context**, **Glossary** (term cards with
+notation/definition/boundary/related), **Dependencies**, and **Solution files** as modal
+disclosures, each with a count badge. An ARA without a layer simply has no button for it.
+
 ## Things it won't do (yet)
 
-- No quotes/figures/tables/diffs/glossary popovers/recipe rendering beyond what's structurally
-  present — the richer enrichment layers `research-visualizer` supports (concepts glossary,
-  related-work dependency graph, solution recipes) are not part of this viewer's schema yet. If
-  the user wants those, that's `research-visualizer`, not this skill.
+- No per-step plain-language narrative ("what this did / why it mattered") — the detail pane shows
+  the ARA's structured fields as written. No inline figure images or verbatim exhibit tables
+  (sources render as name chips), no in-text glossary popovers or per-node concept chips, no
+  per-node code/artifact pointers. These are tracked as `ara-cli` enhancement issues; until they
+  land, export mode is the view that has them.
 - No LLM calls, ever, at view time — everything above comes straight from the ARA's own files.
 - Selection/pan/zoom/filter state is in-memory only (resets on a full page reload, though it
   survives a live-reload triggered by an edit — see the main SKILL.md).

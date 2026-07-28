@@ -13,23 +13,65 @@ description: |
   solution recipes — reached from header disclosures without leaving the process map.
   Accepts either an existing ARA or raw research input (a paper, repo, run logs, or notes); when the
   input is not yet an ARA it is compiled into one first, then visualized.
+  Also fronts the official `ara` Rust CLI (github.com/ARA-Labs/ara-cli) as a second, live mode:
+  `ara check` validates/lints the artifact deterministically, and `ara serve` renders it as a
+  local live-reloading viewer with zero LLM calls at view time — for the edit loop and CI gating,
+  while the portable HTML export remains the shareable/publishable output.
 
   TRIGGERS: visualize, visualizer, trajectory view, render the ARA, see the steps, step-by-step view,
   process map, replay the trajectory, watch the agent work, drill into steps,
-  visualize a paper, visualize a repo, visualize a run
-argument-hint: "[ara-dir] [--output <path>]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *|base64 *|find *|ls *|open *)
+  visualize a paper, visualize a repo, visualize a run,
+  ara serve, live view, local viewer, watch the ara, live-reload, serve the artifact locally,
+  validate the ara, lint the ara, ara check, check my ara, is this a valid ara, does this ara pass ci,
+  view without an llm, deterministic view, browse ara examples, ara hub mode
+argument-hint: "[ara-dir] [--output <path>] | [--serve [--port <n>] [--hub --ara-root <dir>]] [--check [--fix] [--strict]]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(python3 *|base64 *|find *|ls *|open *|ara *|which *|curl *|lsof *|pkill *|brew *|cargo *|sleep *)
 metadata:
   author: ara-commons
   category: research-tooling
-  version: "1.0.1"
-  tags: [research, visualization, trajectory, exploration-tree, html]
+  version: "1.1.0"
+  tags: [research, visualization, trajectory, exploration-tree, html, ara-cli, validation, live-reload]
 ---
 
 # Research Visualizer
 
-You render an existing ARA into a single portable HTML view of the agent's step-by-step process.
-You are a **read-only consumer**: you read the artifact and emit a file; you never edit the ARA.
+You show an ARA. You are a **read-only consumer**: you read the artifact and emit a view; you never
+edit the ARA. There are two modes, and one routing decision:
+
+- **Export mode** (default) — you render the ARA into a single portable HTML file: narrated steps,
+  verbatim evidence, inline figures, and the enrichment overlays. This is the shareable/publishable
+  output (`submit-ara` publishes exactly this file). The rest of this document below "What you
+  produce" is this mode.
+- **Live mode** — you drive the official `ara` binary (github.com/ARA-Labs/ara-cli): `ara check`
+  to validate/lint, `ara serve` for a local live-reloading viewer with zero LLM calls at view
+  time. Reach for it when the user is mid-edit and wants the view to track saves, wants a
+  validation/CI answer ("does this still pass"), or asks for any of its triggers by name. It
+  renders the ARA's structured fields deterministically but does not (yet) author narrative,
+  inline figure exhibits, or per-node concept/code chips — when the user wants those, or a file
+  they can send to someone, that's export mode. If genuinely unsure which the user wants, ask.
+
+## Live mode
+
+1. Resolve `<ara-dir>` (or, for `--hub`, an `--ara-root` whose immediate subdirectories are each
+   an ARA, e.g. this repo's `examples/`).
+2. `which ara` → if missing, follow `references/ara-install.md` (Homebrew first, Cargo fallback;
+   never install without the user's confirmation). If present, check the version against the repo's
+   CI pin per the same file — flag an older binary, don't silently upgrade.
+3. `ara check <dir>` first (add `--strict` to fail on warnings; `--json` for machine-readable
+   output). Clean → continue. Fixable issues and the user wants them fixed → `ara check <dir> --fix`,
+   re-check, report what changed — never hand-edit the artifact to satisfy the linter. No
+   `trace/exploration_tree.yaml` at all → it's raw research input; route to the `compiler` skill
+   first, same as export mode's precondition.
+4. `ara serve <dir> --port <port>` (or `ara serve --hub --ara-root <dir> --port <port>`) in the
+   background; default port 8080, pick another if bound (`lsof -i :<port>`). Confirm with
+   `curl -s -o /dev/null -w '%{http_code}'` → 200, and read the bound URL from the process's own
+   stdout line rather than assuming.
+5. Report the URL and open it for the user. Edits under `<dir>` live-reload (add `--poll` only for
+   filesystems where the watcher misses changes). The server keeps running — tell the user how to
+   stop it (e.g. `pkill -f "ara serve"`) so it isn't silently orphaned. If they're new to the
+   viewer, surface the relevant bits of `references/ara-serve-ux.md`.
+
+## Export mode
 
 You operate as a first-class agent — use your native tools directly. The heavy rendering logic is
 **already written** in `references/trajectory-template.html`; you do NOT rewrite it. Your job is to
@@ -153,7 +195,16 @@ One self-contained file, default `<ara-dir>/trajectory.html` (override with `--o
 
 ## Verify
 
-Run on any ARA and confirm these properties — no named fixtures required:
+**Live mode** — run against whatever ARA(s) are on hand and confirm:
+- `which ara` missing → install instructions offered per `references/ara-install.md`, nothing
+  installed without asking.
+- `ara check` on a clean ARA → `0 error(s), 0 warning(s)`; on a non-ARA directory → clear
+  missing-`trace/exploration_tree.yaml` error and you route to `compiler` rather than serving it.
+- `ara serve <dir> --port <p>` comes up, `curl` returns 200 at the logged URL, and touching a file
+  under `<dir>` is reflected without restarting; `--hub` serves the index at `/` and each artifact
+  at `/a/<id>/`. The server is left running only with the user told how to stop it.
+
+**Export mode** — run on any ARA and confirm these properties — no named fixtures required:
 - Opens by double-click: no server, no network, no console errors.
 - Full process map: nesting, branches, dead ends marked, any `isolated` subtree boxed, `depends_on` chips.
 - Drill-down renders whichever blocks are present (what / why / result-with-inline-figure / how-verified /
