@@ -29,3 +29,15 @@ Suggested order:
 1. Read `resnet-walkthrough.md`
 2. Open `resnet-paper.pdf`
 3. Compare the paper against `resnet-ara-example/`
+
+## skills-test-demo
+
+A living reference ARA shared across the ARA skills for local regression
+testing — not a frozen fixture, but an artifact contributors regenerate by
+actually running a skill's own pipeline against a real research trajectory,
+then commit. Currently covers `research-manager`: `prompts/research-manager-trajectory.md`
+replays the ResNet paper's own research narrative through the skill's entire
+pipeline (not just one capability). There's no automated checker — reviewing
+a run means reading the resulting `ara/` directly; see `skills-test-demo/README.md`
+for the full workflow (including why this doesn't generalize to every skill
+unchanged, and what to look at when reviewing a run).

@@ -1,0 +1,22 @@
+entries:
+  - turn: "2026-07-27_001#6"
+    notes:
+      - "Held O02 (plain-net degradation) unpromoted through turns 4-6 — N04 and N05 are dead ends about WHY degradation happens, not further confirmations that it exists. Waited for a downstream node to actually depend on it."
+  - turn: "2026-07-27_001#7"
+    notes:
+      - "N06 routed as pivot, not as an 'insight' type — research-manager's real taxonomy has no insight node; pivot's from/to/trigger fields fit the residual-reformulation turn cleanly (from 'fix via training tricks' to 'reformulate the target'), and N06 explicitly builds on the two ruled-out dead ends, so O02 crystallizes here via artifact-commitment."
+  - turn: "2026-07-27_001#8"
+    notes:
+      - "Routed H05/H06 (downsampling + shortcut-stride conventions) as heuristics staged and crystallized alongside N07 rather than alongside N02 (first experiment) — they only become load-bearing once shortcuts and stage-boundary downsampling are both in play, which starts at the identity-shortcut decision, not before."
+  - turn: "2026-07-27_001#9"
+    notes:
+      - "C02 crystallized same-turn as N08 via empirical resolution — the result directly confirms the mechanism the prior turn's decision was designed to test, so no reason to hold it staged."
+  - turn: "2026-07-27_001#13"
+    notes:
+      - "C03 and C05 both crystallize off the same N12 result (accuracy AND compute-tractability read off the same table) — kept as two claims rather than merging, since falsifying one (bottleneck doesn't help compute) doesn't falsify the other (deeper still beats shallower)."
+  - turn: "2026-07-27_001#15"
+    notes:
+      - "Considered NOT crystallizing H03 at all, since it's near-duplicate content with C07 (same source, same recipe) — crystallized it anyway to match what the source artifact contained, then let a live taste reaction (T02) flag the redundancy explicitly rather than silently dropping it."
+  - turn: "2026-07-27_001#17 (live taste phase)"
+    notes:
+      - "T01's reaction on N05 contained both a judgment and an actionable suggestion ('has this ever been quantified') — per taste-comments.md, both fire: the taste bullet was appended AND the suggestion was routed through the normal pipeline as N16 (a new question node), not absorbed into the taste comment's free text."

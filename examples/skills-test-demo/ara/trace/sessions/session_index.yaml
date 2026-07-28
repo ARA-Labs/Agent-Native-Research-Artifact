@@ -1,0 +1,8 @@
+sessions:
+  - id: "2026-07-27_001"
+    date: "2026-07-27"
+    summary: "Full trajectory replay of the ResNet paper's own research narrative, turn by turn through research-manager, ending with a few live taste-comment reactions."
+    turn_count: 17
+    events_count: 30
+    claims_touched: [C01, C02, C03, C04, C05, C06, C07, C08]
+    open_threads: 1

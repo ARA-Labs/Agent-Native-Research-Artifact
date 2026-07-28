@@ -1,0 +1,180 @@
+# Journey-fact nodes only (question/decision/experiment/dead_end/pivot), in the order the
+# paper's own narrative presents them (§1, §3, §4). Every node's content is grounded in the
+# paper (short paraphrase + section/table pointer, not extended quotation); the only thing
+# not "from the paper" is the turn-by-turn framing itself, which follows research-manager's
+# own taxonomy (see skills/research-manager/references/event-taxonomy.md) rather than the
+# paper's prose structure. N16 is the one node not present in the paper at all — it's a
+# question that a live taste reaction on N05 raised during this test run (see taste_log.yaml).
+
+tree:
+  - id: N01
+    type: question
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:00"
+    description: >-
+      Is learning better networks as easy as stacking more layers? The paper opens
+      by showing CIFAR-10 plain-net curves at depths 20 and 56 where the deeper net
+      trains worse, not just tests worse — motivating the rest of the study (§1, Fig. 1).
+
+  - id: N02
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:10"
+    evidence: ["Fig. 1", "Fig. 6 left"]
+    result: >-
+      Plain-net depth scan on CIFAR-10, depths {20,32,44,56,110}: deeper plain nets
+      degrade; plain-110 fails badly, plain-56 worse than plain-20.
+
+  - id: N03
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:15"
+    evidence: ["Table 2", "Fig. 4 left"]
+    also_depends_on: [N02]
+    result: >-
+      Plain-net depth scan on ImageNet, 18 vs. 34 layers: plain-34 reaches 28.54%
+      top-1, plain-18 reaches 27.94% — degradation confirmed at scale, not CIFAR-specific.
+
+  - id: N04
+    type: dead_end
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:25"
+    hypothesis: "Vanishing gradients explain the degradation."
+    failure_mode: >-
+      With batch norm in place (H02), forward-signal variance stays non-zero and
+      backward gradient norms are healthy — plain-34 still reaches competitive
+      accuracy (24.19% top-1 10-crop, Table 3), so SGD is making progress, just slowly.
+    lesson: "The degradation is not a vanishing-signal problem."
+
+  - id: N05
+    type: dead_end
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:30"
+    hypothesis: "Training plain nets longer (3x iterations) closes the gap."
+    failure_mode: >-
+      A footnote reports the degradation persisted under 3x training — longer
+      training alone does not close the gap.
+    lesson: "The degradation is not just slow optimization."
+
+  - id: N06
+    type: pivot
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:40"
+    also_depends_on: [N04, N05]
+    from: "Treat degradation as an optimization pathology to fix via training tricks."
+    to: "Reformulate the target of each block to a residual mapping F(x) := H(x) - x, on the reasoning that identity should be cheap to express if that's what's actually needed."
+    trigger: >-
+      Both the vanishing-gradient and longer-training explanations for the
+      degradation were ruled out (N04, N05) — the fix has to be structural,
+      not a training-procedure tweak.
+
+  - id: N07
+    type: decision
+    provenance: ai-executed
+    timestamp: "2026-07-27T09:50"
+    also_depends_on: [N06]
+    choice: "Use parameter-free identity shortcuts (Eqn. 1) to realize the residual reformulation."
+    alternatives: ["a gated shortcut", "a projected shortcut on every block (contrasts with highway networks)"]
+    evidence: >-
+      No parameters or FLOPs added, so the deeper variant exactly matches the
+      shallower one's parameter budget for a clean ablation (§3.2, Fig. 2).
+
+  - id: N08
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:00"
+    also_depends_on: [N07]
+    evidence: ["Table 2", "Fig. 4 right"]
+    result: >-
+      ResNet-{18,34} (option A shortcuts) vs. plain-{18,34} on ImageNet:
+      ResNet-34 reaches 25.03% top-1 (3.51pts better than plain-34, 2.85pts
+      better than ResNet-18) — degradation removed.
+
+  - id: N09
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:10"
+    also_depends_on: [N07]
+    evidence: ["Table 3", "Identity vs. Projection Shortcuts section"]
+    result: >-
+      Shortcut option ablation on ResNet-34 (A=identity, B=projection on
+      dimension change, C=projection everywhere): A=25.03, B=24.52, C=24.19
+      top-1 — differences small; C rejected as not worth the parameter/memory cost.
+
+  - id: N10
+    type: dead_end
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:20"
+    hypothesis: "A single-layer residual function F could work."
+    failure_mode: >-
+      The paper notes a single-layer F with Eqn. (1) resembles a plain linear
+      layer, and reports no observed advantage from it — F needs ≥2 weighted layers.
+    lesson: "The residual function needs enough capacity to be non-trivial."
+
+  - id: N11
+    type: decision
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:30"
+    also_depends_on: [N09]
+    choice: "Adopt 1x1 -> 3x3 -> 1x1 bottleneck blocks for depths >=50 layers."
+    alternatives: ["keep the 2-layer 3x3 block and accept the compute increase at depth"]
+    evidence: >-
+      Lets depth scale to 50/101/152 layers at FLOPs comparable to ResNet-34
+      (3.8/7.6/11.3 GFLOPs vs. 3.6 GFLOPs, Table 1) — motivated by the small A-vs-C
+      gap in N09 (parameter-light identity remains the right default even at
+      bottleneck scale).
+
+  - id: N12
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T10:45"
+    also_depends_on: [N09, N11]
+    evidence: ["Table 3", "Table 4", "Table 5"]
+    result: >-
+      ResNet-50/101/152 with bottleneck blocks: top-1 error drops monotonically
+      (22.85 -> 21.75 -> 21.43); a 6-model ensemble reaches 3.57% top-5 on the
+      test set, winning ILSVRC 2015.
+
+  - id: N13
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T11:00"
+    also_depends_on: [N08]
+    evidence: ["Table 6", "Fig. 6", "Section 4.2"]
+    result: >-
+      ResNet-{20,32,44,56,110,1202} on CIFAR-10 (110-layer variant uses LR
+      warmup, see N14): test error decreases through depth 110 (6.43% mean);
+      ResNet-1202 trains successfully (training error <0.1%) but overfits to 7.93% test error.
+
+  - id: N14
+    type: decision
+    provenance: ai-executed
+    timestamp: "2026-07-27T11:05"
+    also_depends_on: [N13]
+    choice: "Warm up the LR (0.01 for ~400 iterations until train error <80%, then restore the standard rate) for the 110-layer CIFAR ResNet."
+    alternatives: ["train at the standard LR from iteration 0", "lower the standard LR permanently for this depth"]
+    evidence: >-
+      At depth 110, the standard LR is too large to start converging cleanly;
+      warmup gets the optimizer into a basin where the standard rate then trains
+      stably (§4.2 n=18 paragraph, footnote 5).
+
+  - id: N15
+    type: experiment
+    provenance: ai-executed
+    timestamp: "2026-07-27T11:20"
+    also_depends_on: [N12]
+    evidence: ["Table 7", "Table 8", "Appendix A"]
+    result: >-
+      Swap VGG-16 for ResNet-101 in baseline Faster R-CNN, fine-tune on PASCAL
+      VOC and COCO: PASCAL VOC07 mAP 73.2 -> 76.4; COCO mAP@.5 41.5 -> 48.4;
+      COCO mAP@[.5,.95] 21.2 -> 27.2 (28% relative improvement).
+
+  - id: N16
+    type: question
+    provenance: user
+    timestamp: "2026-07-27T15:10"
+    also_depends_on: [N05]
+    description: >-
+      Raised by a live taste reaction on N05 (see taste_log.yaml T01): has the
+      residual gap after 3x training on plain nets ever been quantified anywhere,
+      rather than only reported qualitatively in a footnote?
