@@ -1,4 +1,4 @@
-# 🔬 ARA (Agent-Native Research Artifact)
+# 🔬 Agent-Native Research Lab
 ### The Essential Toolkit to Supercharge Your Autoresearch
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
