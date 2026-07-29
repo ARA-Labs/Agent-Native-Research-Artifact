@@ -55,7 +55,7 @@ Then reach for a skill by what you need:
 | **Capture** research faithfully as you work — decisions, ablations, dead ends, configs | **research-manager** | `/research-manager` (or wire it to run automatically) |
 | **Compile** an existing paper, repo, or notes into a structured ARA | **compiler** | `/compiler <path>` |
 | **Verify** an artifact's epistemic rigor before you trust, publish, or submit it | **rigor-reviewer** | `/rigor-reviewer <dir>` |
-| **Observe** the full research trajectory in an interactive process map | **research-visualizer** | `/research-visualizer <ara-dir>` |
+| **Observe** the full research trajectory in an interactive process map — a portable narrated HTML export, or a live local viewer with validation/linting via the official [`ara` CLI](https://github.com/ARA-Labs/ara-cli) | **research-visualizer** | `/research-visualizer <ara-dir>` (add `--serve` or `--check` for the live/lint path) |
 | **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
 | **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
 
@@ -142,7 +142,8 @@ Route research work to the matching ARA skill:
 - When turning an existing paper, repo, or notes into a structured artifact →
   run `/compiler <path>`.
 - Before trusting, publishing, or submitting an artifact → run `/rigor-reviewer <dir>`.
-- To inspect the full research trajectory as a process map → run `/research-visualizer <ara-dir>`.
+- To inspect the full research trajectory as a process map → run `/research-visualizer <ara-dir>`
+  (add `--serve` for a live local viewer, or `--check` to validate/lint, via the `ara` CLI).
 - To answer "what should I try next / why did this work / what if I change X" →
   run `/research-foresight <ara-dir> "<question>"`.
 - When an artifact is ready to publish and list on the ARA Hub → run `/submit-ara <dir>`.
