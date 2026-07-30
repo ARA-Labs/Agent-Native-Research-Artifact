@@ -25,22 +25,46 @@ Instead of leading with layers, the bundle maps directly to how it solves the bo
   <img src="docs/figures/fig_three_principles.png" alt="The three core design principles: Guardrailing & Verification, Crystallizing Insights, and Total Observability" width="100%"/>
 </p>
 
-### 🛡️ Guardrailing & Verification
+<details>
+<summary><b>🛡️ Guardrailing & Verification</b> — every claim wired to ground-truth execution</summary>
+<br/>
 
 AI agents require precise constraint boundaries to prevent hallucinated conclusions. The system acts as a strict **epistemic anchor**, automatically applying formal verification principles to ensure every scientific claim is directly wired to ground-truth execution and falsifiable results.
 
-### 🧠 Crystallizing Insights
+</details>
+
+<details>
+<summary><b>🧠 Crystallizing Insights</b> — messy trajectories become structured knowledge</summary>
+<br/>
 
 Research is rarely a straight line; it is a messy graph of pivots and dead ends. The system forces AI scientists to systematically document their trajectory, crystallizing fleeting, unstructured logs into highly structured, reliable research knowledge that builds compounding value over time.
 
-### 👁️ Total Observability
+</details>
+
+<details>
+<summary><b>👁️ Total Observability</b> — high-level oversight without reading terminal output</summary>
+<br/>
 
 Supervising AI scientists shouldn't require reading endless terminal outputs. The system translates complex agent behaviors and exploration graphs into a clean, minimalist interface. It lets human researchers maintain high-level oversight, seamlessly stepping in to course-correct or guide the AI's behavior with zero friction.
 
+</details>
+
 <a id="quickstart"></a>
+## Wire ARA into your agent
+
+Paste one line into your coding agent, from your project root:
+
+```
+Read https://raw.githubusercontent.com/ARA-Labs/Agent-Native-Research-Artifact/main/wire-ara.md and follow its instructions.
+```
+
+The agent fetches the full wiring prompt, installs the six skills, and writes a task-routing map into its own context file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) — so every future session knows which skill handles which situation to assist your ai-native research. The prompt lives at [`wire-ara.md`](wire-ara.md).
+
+---
+
 ## 🛠️ The Toolkit: Six Core Skills
 
-To operationalize these design principles, ARA provides a suite of six specialized agent skills. You can install the toolkit via:
+To operationalize these design principles, ARA provides a suite of six specialized agent skills. The one-liner above installs all six automatically; to install manually or pick individual skills:
 
 ```bash
 npx @ara-commons/ara-skills
@@ -59,13 +83,7 @@ Then reach for a skill by what you need:
 | **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
 | **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
 
-**Make capture automatic.** Append this to your agent's system-prompt file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) so the record fills itself in every session:
-
-```markdown
-## ARA: end-of-session research capture
-At the END of every coding session, invoke the `/research-manager` skill to
-record decisions, experiments, dead ends, and claims into the `ara/` artifact.
-```
+**Make capture automatic.** [Wire ARA into your agent](#wire-ara-into-your-agent) with one line — the routing rules it installs make the agent trigger `/research-manager` itself at the end of every turn.
 
 See each skill's `SKILL.md` for the full specification:
 [research-manager](skills/research-manager/SKILL.md) ·
@@ -124,35 +142,6 @@ The supervision gap is not hand-waving — it shows up as measurable cost. Acros
 **→ [The Last Human-Written Paper: Agent-Native Research Artifacts](https://amberljc.github.io/blog/2026-04-24-the-last-human-written-paper.html)**
 
 This paper practices what it proposes — its own ARA lives at [`examples/the-ara-of-ara`](examples/the-ara-of-ara).
-
----
-
-## Wire ARA into your agent
-
-If you are working on a research project with an AI coding agent, teach the agent to reach for ARA on its own. Run the command below from your project root to append the routing rules to `CLAUDE.md`, so every session carries them in context. Each line maps a situation to the skill that handles it, so the agent invokes the right one without being told which command to run:
-
-```bash
-cat >> CLAUDE.md <<'EOF'
-
-## ARA: agent-native research artifacts
-This project uses ARA (https://github.com/ARA-Labs/Agent-Native-Research-Artifact).
-Route research work to the matching ARA skill:
-- At the END of every research or coding session → run `/research-manager` to
-  capture decisions, experiments, dead ends, and claims into the `ara/` artifact.
-- When turning an existing paper, repo, or notes into a structured artifact →
-  run `/compiler <path>`.
-- Before trusting, publishing, or submitting an artifact → run `/rigor-reviewer <dir>`.
-- To inspect the full research trajectory as a process map → run `/research-visualizer <ara-dir>`
-  (add `--serve` for a live local viewer, or `--check` to validate/lint, via the `ara` CLI).
-- To answer "what should I try next / why did this work / what if I change X" →
-  run `/research-foresight <ara-dir> "<question>"`.
-- When an artifact is ready to publish and list on the ARA Hub → run `/submit-ara <dir>`.
-EOF
-```
-
-Using a different agent? Swap `CLAUDE.md` for `AGENTS.md`, `.cursorrules`, or `GEMINI.md`.
-
-This extends the end-of-session capture snippet above into a full task-routing map across all six skills.
 
 ---
 
