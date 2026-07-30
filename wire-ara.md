@@ -45,11 +45,13 @@ This project records its research in an `ara/` artifact
 (https://github.com/ARA-Labs/Agent-Native-Research-Artifact).
 Route work to the matching ARA skill — invoke these yourself, without being asked:
 
-- `/research-manager` — run at the END of EVERY turn, after the user's request is
-  fully addressed and before yielding control back. It records what just happened
-  (decisions, experiments, dead ends, claims) into `ara/`. Trigger it yourself,
-  every turn — never mid-turn. Skip only empty turns (greetings, acknowledgments,
-  pure formatting).
+- `/research-manager` — trigger whenever a research milestone lands: an
+  experiment finishes, a decision is made, a hypothesis is confirmed or killed,
+  a dead end is hit, a direction pivots, user's input. This holds equally in autonomous runs
+  (loops, heartbeats, long experiments) where the user gives no input at all —
+  crystallize the insight at the milestone. It
+  records what just happened (decisions, experiments, dead ends, claims) into
+  `ara/`. Skip when nothing research-significant happened (greetings, pure formatting).
 - `/compiler <path>` — when turning an existing paper, repo, logs, or notes into
   a structured artifact.
 - `/rigor-reviewer <dir>` — before trusting, publishing, or submitting an artifact.
@@ -64,8 +66,9 @@ Route work to the matching ARA skill — invoke these yourself, without being as
 
 ## 4. Tell the user they are ready
 
-From this turn onward, honor the rules yourself — in particular, run the
-`/research-manager` epilogue at the end of every substantive turn without being asked.
+From this turn onward, honor the rules yourself — in particular, trigger
+`/research-manager` whenever a research milestone lands, user-prompted or
+autonomous, without being asked.
 
 Close by telling the user they can now start doing AI-native research, in roughly these
 words (adapt naturally, keep the substance):

@@ -83,8 +83,6 @@ Then reach for a skill by what you need:
 | **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
 | **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
 
-**Make capture automatic.** [Wire ARA into your agent](#wire-ara-into-your-agent) with one line — the routing rules it installs make the agent trigger `/research-manager` itself at the end of every turn.
-
 See each skill's `SKILL.md` for the full specification:
 [research-manager](skills/research-manager/SKILL.md) ·
 [compiler](skills/compiler/SKILL.md) ·
