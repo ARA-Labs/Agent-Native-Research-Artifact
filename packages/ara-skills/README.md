@@ -1,6 +1,6 @@
 # @ara-commons/ara-skills
 
-One-command installer for the six **Agent-Native Research Artifact (ARA)** skills:
+One-command installer for the seven **Agent-Native Research Artifact (ARA)** skills:
 
 | Skill | Invoke | What it does |
 |-------|--------|--------------|
@@ -10,6 +10,7 @@ One-command installer for the six **Agent-Native Research Artifact (ARA)** skill
 | `research-visualizer` | `/research-visualizer <dir>` | Render an ARA into one interactive, self-contained trajectory.html |
 | `research-foresight` | `/research-foresight <dir> "<query>"` | Ask the ARA anything and get a grounded, falsifiable answer — read-only, no API key |
 | `submit-ara`       | `/submit-ara <dir>`        | Validate/compile, visualize, publish to your GitHub, and list on the ARA Hub |
+| `context-drop`     | `/context-drop <path>`     | Hand a file or folder to someone else's agent as one URL |
 
 ## Quick start
 
