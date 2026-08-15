@@ -81,7 +81,6 @@ Then reach for a skill by what you need:
 | **Verify** an artifact's epistemic rigor before you trust, publish, or submit it | **rigor-reviewer** | `/rigor-reviewer <dir>` |
 | **Observe** the full research trajectory in an interactive process map — a portable narrated HTML export, or a live local viewer with validation/linting via the official [`ara` CLI](https://github.com/ARA-Labs/ara-cli) | **research-visualizer** | `/research-visualizer <ara-dir>` (add `--serve` or `--check` for the live/lint path) |
 | **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
-| **Submit** an ARA — validate/compile it, visualize it, publish it to your GitHub, and list it on the ARA Hub | **submit-ara** | `/submit-ara <dir>` |
 | **Share** a file or folder with someone else's agent — one URL they paste, no repo, no zip | **context-drop** | `/context-drop <path>` |
 
 See each skill's `SKILL.md` for the full specification:
@@ -90,7 +89,6 @@ See each skill's `SKILL.md` for the full specification:
 [rigor-reviewer](skills/rigor-reviewer/SKILL.md) ·
 [research-visualizer](skills/research-visualizer/SKILL.md) ·
 [research-foresight](skills/research-foresight/SKILL.md) ·
-[submit-ara](skills/submit-ara/SKILL.md) ·
 [context-drop](skills/context-drop/SKILL.md)
 
 ---
