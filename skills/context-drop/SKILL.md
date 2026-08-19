@@ -26,6 +26,42 @@ into context.
 
 ---
 
+## Fidelity — a drop is the material, not an account of it
+
+Never summarize, abridge, excerpt, or paraphrase what goes into a drop. The
+recipient's agent reasons from this and cannot ask what was left out, so a drop
+that lost something is worse than no drop: it reads as complete. Summarize only
+when the user asks for a summary in those words — "share this with X" is not
+that request, and neither is a long file.
+
+Two places where content leaks out without anyone noticing.
+
+**Container formats.** A `.docx`, `.pptx`, `.xlsx`, `.pdf`, `.ipynb`, or `.zip`
+is a bundle wearing one file's name. Regex-stripping the tags out of
+`word/document.xml` looks like it worked while silently flattening every table's
+column structure and dropping every embedded image. Unpack properly: convert to
+Markdown in document order with tables rendered as tables, write each embedded
+media file out beside it under a name that says what it is, and keep the
+original file in the drop so the recipient can return to the source. Then read
+the conversion against the original and confirm nothing vanished.
+
+**Figures that carry text.** A diagram is frequently where the real numbers
+live, and the surrounding prose may never repeat them. An image in a drop is
+fetchable, but only by a recipient who can see it. Transcribe every such figure
+verbatim into the Markdown at the point where it appears, preserving the panel
+layout, and mark it as a transcription so it is not mistaken for the sender's
+own prose. Ship the image as well.
+
+Whenever anything was converted, say so in `--note` and in a comment at the top
+of the converted file: what the source was, what the conversion preserved, and
+that nothing was summarized.
+
+The rule runs the same direction on the way back. Reading a drop, work from the
+whole document and quote rather than compress when reporting on it, unless the
+user asked for a summary.
+
+---
+
 ## Sending
 
 One command. It needs nothing installed but Python 3.
@@ -70,7 +106,10 @@ already refuses dotfiles, build and vendor directories (`.git`, `node_modules`,
 rather than burying them; a drop is something they are about to paste into a
 chat.
 
-If the path is large or mixed, run `--dry-run` first and confirm.
+If the path is large or mixed, run `--dry-run` first and confirm. If it holds
+container formats or figures, do the unpacking described under **Fidelity**
+before uploading, and upload the folder you prepared rather than the bare
+original.
 
 ---
 
@@ -85,7 +124,8 @@ curl -fsSL https://www.agenticresearch.sh/drop/kQ8x2f1a/md
 That is every text file in the drop as one Markdown document, headed by what it
 is and who sent it, with any binaries listed and addressed. Read it in full
 before answering — a drop is small by construction, and the sender chose its
-contents deliberately.
+contents deliberately. Fetch the binaries too when the text refers to them; a
+figure listed as a URL is usually carrying something the prose does not.
 
 Two narrower addresses when the whole document is more than you need:
 
@@ -115,7 +155,7 @@ curl -X DELETE -H "x-drop-token: <token>" https://www.agenticresearch.sh/api/dro
 ## Where this sits
 
 A drop is the throwaway version of sharing research — fast, unlisted, expiring.
-For work meant to last, compile it into an Agent-Native Research Artifact and
-publish it: `/compiler <path>` then `/submit-ara <dir>`. That gives a citable
-GitHub repo, an interactive trajectory, and a listing on the ARA Hub, none of
-which a drop tries to be.
+For work meant to last, compile it into an Agent-Native Research Artifact
+(`/compiler <path>`) and render its trajectory (`/research-visualizer <dir>`),
+then publish that to a repository of its own. A drop tries to be none of that;
+it is the link you paste into a chat you are already in.
