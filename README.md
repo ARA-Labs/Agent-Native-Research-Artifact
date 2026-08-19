@@ -2,7 +2,7 @@
 ### The Essential Toolkit to Supercharge Your Autoresearch
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-6%20skills-green)](skills/)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-7%20skills-green)](skills/)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.24658-b31b1b.svg)](https://arxiv.org/abs/2604.24658)
 [![Poster](https://img.shields.io/badge/Poster-PDF-orange.svg)](docs/poster.pdf)
 [![Demo](https://img.shields.io/badge/Demo-ARA--Demo-purple.svg)](https://github.com/ARA-Labs/ARA-Demo)
@@ -58,13 +58,13 @@ Paste one line into your coding agent, from your project root:
 Read https://raw.githubusercontent.com/ARA-Labs/Agent-Native-Research-Artifact/main/wire-ara.md and follow its instructions.
 ```
 
-The agent fetches the full wiring prompt, installs the six skills, and writes a task-routing map into its own context file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) — so every future session knows which skill handles which situation to assist your ai-native research. The prompt lives at [`wire-ara.md`](wire-ara.md).
+The agent fetches the full wiring prompt, installs the seven skills, and writes a task-routing map into its own context file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) — so every future session knows which skill handles which situation to assist your ai-native research. The prompt lives at [`wire-ara.md`](wire-ara.md).
 
 ---
 
-## 🛠️ The Toolkit: Six Core Skills
+## 🛠️ The Toolkit: Seven Core Skills
 
-To operationalize these design principles, ARA provides a suite of six specialized agent skills. The one-liner above installs all six automatically; to install manually or pick individual skills:
+To operationalize these design principles, ARA provides a suite of seven specialized agent skills. The one-liner above installs all seven automatically; to install manually or pick individual skills:
 
 ```bash
 npx @ara-commons/ara-skills
@@ -82,6 +82,7 @@ Then reach for a skill by what you need:
 | **Observe** the full research trajectory in an interactive process map — a portable narrated HTML export, or a live local viewer with validation/linting via the official [`ara` CLI](https://github.com/ARA-Labs/ara-cli) | **research-visualizer** | `/research-visualizer <ara-dir>` (add `--serve` or `--check` for the live/lint path) |
 | **Ask** an ARA anything — grounded, falsifiable answers to "what should I try next / why did this work / what if I change X" ([demo](https://www.agenticresearch.sh/blog/research-world-model)) | **research-foresight** | `/research-foresight <ara-dir> "<question>"` |
 | **Share** a file or folder with someone else's agent — one URL they paste, no repo, no zip | **context-drop** | `/context-drop <path>` |
+| **Steer** any open-ended investigation the way a fuzzer steers inputs — predict before every action, track untried leads and unexplained results, alarm on going-in-circles, gate every conclusion behind a self-refutation attempt ([repo](https://github.com/ARA-Labs/research-fuzzer)) | **research-fuzzer** | `/research-fuzzer` (fire at investigation start, after each batch of results, before any conclusion) |
 
 See each skill's `SKILL.md` for the full specification:
 [research-manager](skills/research-manager/SKILL.md) ·
@@ -89,7 +90,8 @@ See each skill's `SKILL.md` for the full specification:
 [rigor-reviewer](skills/rigor-reviewer/SKILL.md) ·
 [research-visualizer](skills/research-visualizer/SKILL.md) ·
 [research-foresight](skills/research-foresight/SKILL.md) ·
-[context-drop](skills/context-drop/SKILL.md)
+[context-drop](skills/context-drop/SKILL.md) ·
+[research-fuzzer](skills/research-fuzzer/SKILL.md)
 
 ---
 

@@ -10,6 +10,7 @@ One-command installer for the seven **Agent-Native Research Artifact (ARA)** ski
 | `research-visualizer` | `/research-visualizer <dir>` | Render an ARA into one interactive, self-contained trajectory.html |
 | `research-foresight` | `/research-foresight <dir> "<query>"` | Ask the ARA anything and get a grounded, falsifiable answer — read-only, no API key |
 | `context-drop`     | `/context-drop <path>`     | Hand a file or folder to someone else's agent as one URL |
+| `research-fuzzer`  | `/research-fuzzer`         | Fuzzer-style feedback loop for open-ended investigations: bet before acting, track untried leads and unexplained results, gate conclusions |
 
 ## Quick start
 
@@ -67,4 +68,4 @@ In dev mode the CLI reads skills from the sibling `../../skills/` directory. On 
 
 ## Upstream source of truth
 
-The six skill directories live at the repo root under `skills/`. Edit them there — never edit the copy inside this package, which is created on demand by `prepack`.
+The seven skill directories live at the repo root under `skills/`. Edit them there — never edit the copy inside this package, which is created on demand by `prepack`.

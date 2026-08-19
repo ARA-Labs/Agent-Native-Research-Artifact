@@ -14,6 +14,7 @@ test('listSkills discovers the bundled ARA skills', () => {
     'compiler',
     'context-drop',
     'research-foresight',
+    'research-fuzzer',
     'research-manager',
     'research-visualizer',
     'rigor-reviewer',
