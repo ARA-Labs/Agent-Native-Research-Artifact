@@ -60,8 +60,8 @@ Route work to the matching ARA skill — invoke these yourself, without being as
   validate/lint via the `ara` CLI).
 - `/research-foresight <ara-dir> "<question>"` — to answer "what should I try
   next / why did this work / what if I change X", grounded in the artifact.
-- `/submit-ara <dir>` — when an artifact is ready to publish to GitHub and list
-  on the ARA Hub.
+- `/context-drop <path>` — when a file, folder, or artifact needs to reach
+  somebody else's agent as one link.
 ```
 
 ## 4. Tell the user they are ready
@@ -84,4 +84,4 @@ words (adapt naturally, keep the substance):
 >   (`/research-visualizer ara/`).
 > - Stuck on what to try next? Ask the artifact (`/research-foresight ara/ "<question>"`).
 > - When results are ready to share: I'll review rigor (`/rigor-reviewer ara/`) and
->   publish to GitHub + the ARA Hub (`/submit-ara ara/`).
+>   hand the artifact to anyone's agent as one link (`/context-drop ara/`).

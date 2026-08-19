@@ -1,0 +1,3163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ARA Trajectory</title>
+<!--
+  ARA Trajectory Viewer — canonical self-contained scaffold for the `research-visualizer` skill.
+
+  HOW THE SKILL USES THIS FILE
+  ----------------------------
+  The rendering logic below is FIXED. The agent does NOT rewrite it. The agent only:
+    1. Parses the ARA into one ARA_DATA object (schema in references/binding.md).
+    2. base64-inlines every referenced figure .png into node.result.figures[].img.
+    3. Replaces ONLY the JSON between the BEGIN/END markers in the <script id="ara-data"> block.
+    4. Writes the result to <ara>/trajectory.html (or --output).
+  Everything is inline (no CDN, no fetch, no server) so the output is one portable file.
+
+  INJECTION CONTRACT
+  ------------------
+  - Replace exactly the lines between  __ARA_DATA_BEGIN__  and  __ARA_DATA_END__.
+  - The payload MUST be valid JSON (it is read with JSON.parse).
+  - JSON must not contain the literal substring "</script>"; escape any "<" in inlined
+    markdown/text as "<" to be safe.
+  - The demo payload shipped here renders a 3-node sample so the bare template opens and
+    shows every node state (experiment, dead_end, isolated). The skill overwrites it.
+-->
+<style>
+  /* Research Visualizer — "field notebook of a machine scientist".
+     Cool archival vellum + ink; monospace is the machine-readout voice for
+     structure / IDs / data, a humanist serif carries the reasoning prose. The
+     signature is a traced trajectory spine that forks at branches and is struck
+     through at dead ends. Type is read from glyph + label; colour is reserved
+     for true epistemic status (teal = chrome, green = supported, amber =
+     tentative, clay-red = dead end) — never decoration. */
+  :root{
+    /* paper & ink — deliberately cool vellum, NOT warm cream */
+    --bg:#e9ece4; --panel:#f4f6f0; --panel2:#e3e7dd; --line:#ccd3c7; --ink:#1b2420;
+    --muted:#67726a; --faint:#8a948b; --accent:#0e6b62; --accent-ink:#0a4f48; --chip:#e6eae0;
+    --ok:#3a6a39; --warn:#a6402c; --tentative:#8a6310; --glyph-bg:#e0e5da; --glyph-ink:#4a544c;
+    --sel-bg:#e3ede7; --code-bg:#eaeee6; --reason-bg:#f4f6f0;
+    --iso-line:#b7c0ae; --iso-bg:#e5eadf; --iso-ink:#5f6b58;
+    --scrim:rgba(20,28,24,.42); --shadow:rgba(20,28,24,.16);
+    --add-bg:#e0ebdb; --add-ink:#2f5a2e; --del-bg:#f1e0da; --del-ink:#8c3623; --hunk:#67726a;
+    --spine:#c3ccbd; --grid:rgba(27,36,32,.05);
+    /* legacy type vars retained so any leftover hooks resolve */
+    --q:var(--glyph-bg); --exp:var(--glyph-bg); --dec:var(--glyph-bg); --piv:var(--glyph-bg); --ins:var(--glyph-bg); --def:var(--glyph-bg); --dead:var(--warn);
+    /* type roles: a serif reads the prose, monospace reads the machine */
+    --serif:ui-serif,"New York","Iowan Old Style",Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font:14px/1.65 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  code,pre,.mono{font-family:var(--mono)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+
+  /* ---- masthead ---- */
+  header{padding:20px 24px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header .title{font-family:var(--serif);font-size:23px;font-weight:600;margin:0;letter-spacing:-.012em}
+  header .sub{font-family:var(--mono);color:var(--muted);font-size:11.5px;margin-top:5px;letter-spacing:.01em}
+  header details{margin-top:10px;color:var(--ink)}
+  header summary{cursor:pointer;color:var(--accent-ink);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+  .toolbar input[type=search],.toolbar select{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 10px;font-size:13px;font-family:var(--sans)}
+  .toolbar input[type=search]{min-width:230px}
+  .toolbar input[type=search]:focus,.toolbar select:focus{border-color:var(--accent);outline:none}
+  .toolbar label{color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:6px;align-items:center}
+  .btn{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 11px;font-size:12.5px;font-family:var(--mono);cursor:pointer;transition:border-color .12s,color .12s,background .12s}
+  .btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .btn.primary{border-color:var(--accent);color:#fff;background:var(--accent)}
+  .btn.primary:hover{background:var(--accent-ink)}
+  .spacer{flex:1}
+  .count{color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding-left:10px;border-left:1px solid var(--line)}
+
+  main{display:grid;grid-template-columns:minmax(300px,36%) 1fr;height:calc(100% - 0px);min-height:0}
+  #map{overflow:auto;border-right:1px solid var(--line);padding:18px 12px 56px;background:var(--bg);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:24px 24px;background-position:-1px -1px}
+  #detail{overflow:auto;padding:26px 32px 80px;background:var(--bg)}
+
+  /* ---- process map: the trajectory spine is the signature ---- */
+  .node{position:relative;display:flex;gap:10px;align-items:flex-start;padding:7px 9px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+  .node:hover{background:var(--panel2)}
+  .node.sel{background:var(--sel-bg);border-color:var(--accent)}
+  .node.deptarget{background:var(--sel-bg);outline:1px dashed var(--accent);outline-offset:-1px}
+  .node.dim{opacity:.32}
+  .node .glyph{flex:none;width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--glyph-ink);background:var(--glyph-bg);border:1px solid var(--line);margin-top:1px}
+  .node.sel .glyph{border-color:var(--accent);color:var(--accent-ink)}
+  .node .nid{color:var(--muted);font-size:10.5px;font-family:var(--mono);letter-spacing:.02em}
+  .node .ntitle{font-size:13px;line-height:1.45}
+  .node.dead .ntitle{color:var(--warn);text-decoration:line-through;text-decoration-color:rgba(166,64,44,.45)}
+  .node .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  /* the spine + branch connectors: nested steps trace back to their parent */
+  .kid{margin-left:19px;border-left:2px solid var(--spine);padding-left:14px}
+  .kid>.node::before{content:"";position:absolute;left:-14px;top:14px;width:10px;height:2px;background:var(--spine)}
+  .kid>.node.sel::before{background:var(--accent)}
+  .isobox{border:1px dashed var(--iso-line);border-radius:8px;margin:12px 2px;padding:6px 4px;background:var(--iso-bg)}
+  .isobox .isohdr{color:var(--iso-ink);font-family:var(--mono);font-size:10px;padding:3px 8px 7px;text-transform:uppercase;letter-spacing:.1em}
+  .dep{color:var(--muted);font-size:10px;font-family:var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+
+  .glyph.dead_end{background:var(--warn);color:#fff;border-color:var(--warn)}
+
+  /* ---- detail pane ---- */
+  .dhead{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:2px}
+  .badge{font-family:var(--mono);font-size:10px;font-weight:700;border-radius:4px;padding:3px 9px;color:var(--glyph-ink);background:var(--glyph-bg);border:1px solid var(--line);text-transform:uppercase;letter-spacing:.08em}
+  .badge.dead_end{background:var(--warn);color:#fff;border-color:var(--warn)}
+  .pill{font-family:var(--mono);font-size:10px;border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .pill.explicit{border-color:var(--ok);color:var(--ok)} .pill.inferred{border-color:var(--tentative);color:var(--tentative)}
+  .pill.iso{border-color:var(--iso-line);color:var(--iso-ink)}
+  .dtitle{font-family:var(--serif);font-size:25px;font-weight:600;margin:12px 0 6px;letter-spacing:-.012em;line-height:1.28}
+  .did{color:var(--muted);font-family:var(--mono);font-size:11.5px}
+
+  .block{border:1px solid var(--line);border-radius:7px;margin:15px 0;background:var(--panel)}
+  .block>summary{cursor:pointer;padding:11px 15px;font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px}
+  .block>summary::-webkit-details-marker{display:none}
+  .block>summary:hover{color:var(--accent-ink)}
+  .block>summary .tag{margin-left:auto;color:var(--faint);font-size:10.5px;font-weight:400;font-family:var(--mono);text-transform:none;letter-spacing:0}
+  .block .body{padding:4px 16px 16px}
+  /* the primary reasoning block: the agent's thinking, set as typeset prose */
+  .block.reason{border-left:3px solid var(--accent);background:var(--reason-bg)}
+  .block.reason>summary{color:var(--accent-ink)}
+  .block.reason .lead{font-family:var(--serif);font-size:17px;line-height:1.7;color:var(--ink)}
+  .didwhat{color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.09em;margin:16px 0 4px}
+  .lead{font-family:var(--serif);color:#2a322c;font-size:16px;line-height:1.7}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+  .chip{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:2px 8px;font-size:11px;color:#46504a;font-family:var(--mono)}
+  .chip.ext{color:var(--muted)}
+
+  .claim{border:1px solid var(--line);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;padding:11px 13px;margin:11px 0;background:var(--panel2)}
+  .claim h4{margin:0 0 6px;font-family:var(--mono);font-size:12px}
+  .claim .kv{font-size:13px;line-height:1.6;margin:4px 0;color:#3a423c}
+  .claim .kv b{color:var(--muted);font-weight:600;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+  .status{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;padding:1px 7px;border:1px solid var(--line)}
+  .status.supported{color:var(--ok);border-color:var(--ok)}
+  .status.refuted{color:var(--warn);border-color:var(--warn)}
+  .status.hypothesis{color:var(--tentative);border-color:var(--tentative)}
+  .prov{font-size:11px;color:var(--iso-ink);font-family:var(--mono)}
+
+  .quote{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 6px 6px 0;padding:9px 13px;margin:9px 0;font-size:13.5px;line-height:1.6;color:#2a322c}
+  .quote .ref{color:var(--muted);font-size:10.5px;font-family:var(--mono);margin-top:5px}
+  figure{margin:14px 0}
+  figure img{max-width:100%;border:1px solid var(--line);border-radius:5px;background:#fff;padding:6px}
+  figcaption{color:var(--muted);font-family:var(--mono);font-size:11px;margin-top:7px}
+
+  table.md{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12px;margin:10px 0}
+  table.md th,table.md td{border:1px solid var(--line);padding:5px 9px;text-align:left}
+  table.md th{background:var(--panel2);color:var(--ink);font-weight:700;text-transform:uppercase;font-size:10.5px;letter-spacing:.04em}
+  pre.snip{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow:auto;font-size:12px;color:var(--ink);white-space:pre-wrap}
+
+  .ptr{font-size:13px;margin:7px 0}
+  .ptr .path{font-family:var(--mono);color:#46504a}
+  .truncated{color:var(--muted);font-size:11.5px;font-style:italic}
+  .empty{color:var(--muted);font-size:13px}
+  .none{color:var(--muted);padding:40px 24px;text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:var(--mono);font-size:11px}
+
+  /* ---- enrichment layers (all inert unless the data is present) ---- */
+  .layerbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .lbtn .cnt{color:var(--muted);font-size:10.5px}
+  .chiplabel{color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin:12px 0 3px}
+  .chip.jump{cursor:pointer}
+  .chip.jump:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .chip.dangle{color:#9aa49b;text-decoration:line-through;cursor:not-allowed}
+  .chip.infer{border-style:dashed}
+  .chip-built{border-color:var(--ok);color:var(--ok)}
+  .chip-rej{border-color:var(--warn);color:var(--warn)}
+  .chip-recipe{border-color:var(--accent);color:var(--accent-ink)}
+  .nmark{color:var(--muted);font-size:10px;margin-left:5px;font-family:var(--mono)}
+  .rel{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;padding:2px 8px;color:var(--glyph-ink);background:var(--glyph-bg);font-weight:700}
+  .rel.bounds,.rel.refutes{background:var(--warn);color:#fff}
+  .rel.neutral{background:var(--chip);color:var(--ink);border:1px solid var(--line);font-weight:400}
+  .ribbon{border-left:3px solid var(--accent);background:var(--panel2);border-radius:0 6px 6px 0;padding:9px 13px;margin:9px 0;color:#3a423c;font-size:13px;line-height:1.6}
+  .warn{border-left:3px solid var(--warn);background:var(--del-bg);border-radius:0 6px 6px 0;padding:9px 13px;margin:9px 0;font-size:13px;line-height:1.6}
+  .muted{color:var(--muted);font-size:11.5px}
+  .math{font-family:var(--serif);font-style:italic}
+  .gterm{border-bottom:1px dashed var(--accent);cursor:help}
+  #gpop{position:fixed;max-width:360px;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:11px 13px;z-index:60;box-shadow:0 8px 28px var(--shadow);font-size:13px;line-height:1.55;display:none}
+  #gpop h5{margin:0 0 5px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  #gpop .gp-open{color:var(--accent);cursor:pointer;font-family:var(--mono);font-size:11px;margin-top:7px;display:inline-block}
+  .ov{position:fixed;inset:0;z-index:50}
+  .ov[hidden]{display:none}
+  .ov-scrim{position:absolute;inset:0;background:var(--scrim)}
+  .ov-sheet{position:relative;margin:5vh auto;max-width:920px;max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 16px 48px var(--shadow)}
+  .ov-head{position:sticky;top:0;display:flex;gap:10px;align-items:center;padding:13px 17px;border-bottom:1px solid var(--line);background:var(--panel);z-index:1}
+  .ov-head #ov-title{font-family:var(--mono);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--accent-ink)}
+  .ov-head input[type=search]{flex:1;max-width:260px;background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 10px;font-size:13px}
+  .ov-body{padding:10px 17px 26px}
+  .ov-body .spacer{flex:1}
+  .card{border:1px solid var(--line);border-radius:6px;padding:11px 13px;margin:11px 0;background:var(--panel2)}
+  .card h4{margin:0 0 6px;font-family:var(--mono);font-size:12px}
+  .card .sub{color:var(--muted);font-family:var(--mono);font-size:10.5px}
+  .grey{opacity:.5}
+
+  /* responsive: stack the two panes on a narrow screen */
+  @media (max-width:720px){
+    main{grid-template-columns:1fr;grid-template-rows:42vh 1fr}
+    #map{border-right:none;border-bottom:1px solid var(--line)}
+    #detail{padding:20px 18px 64px}
+    .dtitle{font-size:21px}
+  }
+  /* honour reduced-motion */
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1 class="title" id="h-title">ARA Trajectory</h1>
+  <div class="sub" id="h-sub"></div>
+  <details id="h-abstract-wrap"><summary>Abstract</summary><div class="lead" id="h-abstract"></div></details>
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="search steps…" autocomplete="off" />
+    <label>type
+      <select id="ftype"><option value="">all</option></select>
+    </label>
+    <label><input type="checkbox" id="fdead" /> dead ends only</label>
+    <span class="spacer"></span>
+    <button class="btn" id="rprev" title="previous (←)">‹</button>
+    <button class="btn primary" id="rplay">▶ Replay</button>
+    <button class="btn" id="rnext" title="next (→)">›</button>
+    <span class="count" id="rstat"></span>
+  </div>
+  <div class="layerbar" id="layerbar">
+    <button class="btn lbtn" data-panel="context" hidden>◧ Context</button>
+    <button class="btn lbtn" data-panel="glossary" hidden>▤ Glossary <span class="cnt"></span></button>
+    <button class="btn lbtn" data-panel="dependencies" hidden>⇄ Dependencies <span class="cnt"></span></button>
+    <button class="btn lbtn" data-panel="recipes" hidden>▦ Recipes <span class="cnt"></span></button>
+  </div>
+</header>
+
+<main>
+  <aside id="map"></aside>
+  <section id="detail"><div class="none">Select a step on the left, or press <kbd>▶ Replay</kbd>.</div></section>
+</main>
+
+<!-- v1.1: one shared modal overlay for the Context/Glossary/Dependencies/Recipes panels, + a glossary popover. Both inert unless their data is present. -->
+<div id="overlay" class="ov" hidden role="dialog" aria-modal="true">
+  <div class="ov-scrim" data-close></div>
+  <div class="ov-sheet">
+    <div class="ov-head"><span id="ov-title"></span>
+      <input type="search" id="ov-q" placeholder="filter…" hidden autocomplete="off" />
+      <span class="spacer"></span>
+      <button class="btn" id="ov-close" data-close>✕ <kbd>Esc</kbd></button>
+    </div>
+    <div class="ov-body" id="ov-body"></div>
+  </div>
+</div>
+<div id="gpop"></div>
+
+<!-- The skill replaces ONLY the JSON between the two markers below. -->
+<script id="ara-data" type="application/json">
+/* __ARA_DATA_BEGIN__ */
+{
+ "meta": {
+  "title": "Deep Residual Learning for Image Recognition",
+  "authors": [
+   "Kaiming He",
+   "Xiangyu Zhang",
+   "Shaoqing Ren",
+   "Jian Sun"
+  ],
+  "year": "2015",
+  "venue": "arXiv (later CVPR 2016)",
+  "ara_dir": "resnet-ara-example",
+  "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers — 8x deeper than VGG nets but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation."
+ },
+ "order": [
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08",
+  "N09",
+  "N10",
+  "N11",
+  "N12",
+  "N13",
+  "N14",
+  "N15"
+ ],
+ "nodes": [
+  {
+   "id": "N01",
+   "type": "question",
+   "parent": null,
+   "title": "Is learning better networks as easy as stacking more layers?",
+   "body": "Central research question that frames the entire paper. The introduction explicitly poses this question and uses CIFAR-10 plain-{20, 56} curves (Fig. 1) to motivate why the answer is \"no, not in the obvious way.\"",
+   "thinking": "The paper opens with a deceptively simple question: deeper networks are strictly more expressive, so is making a network better just a matter of stacking more layers? The authors already have a hint that the answer is no — a 56-layer network without shortcuts does worse than a 20-layer one on CIFAR-10, even on training error, where extra capacity should never hurt. Everything that follows is an attempt to explain and then fix that anomaly.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§1 introduction",
+    "Fig. 1"
+   ],
+   "why": [],
+   "result": {
+    "sources": [],
+    "figures": [],
+    "tables": [],
+    "data": []
+   },
+   "verified_by": [],
+   "artifact": [],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": []
+  },
+  {
+   "id": "N02",
+   "type": "experiment",
+   "parent": "N01",
+   "title": "Plain-net depth scan on CIFAR-10 (depths 20–110)",
+   "body": "Deeper plain nets degrade. Plain-110 fails badly (>60% error, not displayed in Fig. 6). Plain-56 is worse than plain-20.",
+   "thinking": "First, pin the phenomenon down on a small dataset. Train \"plain\" convolutional networks — ordinary stacks with no shortcut connections — at depths 20, 32, 44, 56 and 110 on CIFAR-10, with batch normalization and good initialization, and watch what depth does. The result is backwards from what capacity arguments predict: the deeper the plain network, the worse it gets. The 56-layer net is worse than the 20-layer one, and the 110-layer one fails outright with over 60% error.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "Fig. 1",
+    "Fig. 6 left"
+   ],
+   "why": [
+    {
+     "id": "C01",
+     "title": "Plain CNNs exhibit a depth-induced degradation problem",
+     "statement": "For sufficiently deep \"plain\" CNNs (no shortcuts), increasing depth strictly increases *training* error on both CIFAR-10 and ImageNet, even with BN and competent initialization.",
+     "status": "supported",
+     "falsification": "A controlled depth scan (e.g. plain-{18, 34, 56, 110}) trained with BN and standard SGD in which deeper models show monotonically lower or equal training error.",
+     "dependencies": []
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 2 (plain-18 = 27.94%, plain-34 = 28.54% top-1 ImageNet val); Fig. 4 left (training-error curves cross with deeper plain-34 above plain-18 throughout training); Fig. 6 left for plain-{20, 32, 44, 56, 110} on CIFAR-10.",
+      "ref": "logic/claims.md · C01 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "f1",
+      "caption": "Figure 1: CIFAR-10 training/test error for plain-{20, 56} — Training error (left) and test error (right) on CIFAR-10 with 20-layer and 56-layer 'plain' networks. The deeper network has higher training error, and thus test error. Similar phenomena on ImageNet is presented in Fig. 4.",
+      "markdown": "| iter range | plain-20 train err. | plain-56 train err. | plain-20 test err. | plain-56 test err. |\n|------------|---------------------|---------------------|--------------------|--------------------|\n| early (≤1×10⁴) | ≈ high (>40%) | ≈ high (>40%) | ≈ high (>40%) | ≈ high (>40%) |\n| mid  (~3×10⁴, after first LR drop) | drops sharply to ≈ 20% | drops to ≈ 25–30% | similar drop to ≈ 20–25% | drops to ≈ 25–30% |\n| late (~6×10⁴) | ≈ 5% | ≈ 10% | ≈ 8–10% | ≈ 13–15% |\n\nKey observation: throughout training, the 56-layer plain net's curves lie *above* the 20-layer plain net's, demonstrating the degradation problem (referenced as O1 in `/logic/problem.md`)."
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E01",
+     "title": "Plain vs. residual at matched depth on ImageNet (18 vs. 34 layers)",
+     "setup": "Model: 18-layer and 34-layer plain CNNs (VGG-style, 3.6 GFLOPs at 34 layers); residual counterparts adding identity shortcuts (Option A: zero-padding for dimension changes) — same parameter count. Dataset: ImageNet 2012 — 1.28M training images, 50k validation. System: BN after every conv, MSRA initialization, SGD momentum 0.9, weight decay 1e-4, LR start 0.1 with /10 step on plateau, up to 60×10⁴ iterations, no dropout; mini-batch 256.",
+     "metrics": "Top-1 error (%), top-5 error (%), and training-error trajectory."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "residual_block.py",
+     "pointer": "src/execution/residual_block.py",
+     "what": "Basic and bottleneck residual blocks with identity / projection shortcut options (transcribed paper code)"
+    }
+   ],
+   "built_on": [
+    {
+     "rw_id": "RW02",
+     "name": "VGG",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW03",
+     "name": "Batch Normalization",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW04",
+     "name": "MSRA initialization",
+     "relation_raw": "imports"
+    }
+   ],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Plain Network",
+    "Batch Normalization"
+   ]
+  },
+  {
+   "id": "N03",
+   "type": "experiment",
+   "parent": "N01",
+   "title": "Plain-net depth scan on ImageNet (18 vs. 34)",
+   "body": "plain-34 = 28.54% top-1, plain-18 = 27.94% top-1 → degradation confirmed on a large dataset, not specific to CIFAR.",
+   "thinking": "Then check the same thing at scale, so the effect can't be dismissed as a small-data quirk. On ImageNet, the 34-layer plain network lands at 28.54% top-1 error — worse than the 18-layer version's 27.94% — and its training-error curve sits above the shallower net's for the whole run. The degradation is real on a large dataset too.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "Table 2",
+    "Fig. 4 left"
+   ],
+   "why": [
+    {
+     "id": "C01",
+     "title": "Plain CNNs exhibit a depth-induced degradation problem",
+     "statement": "For sufficiently deep \"plain\" CNNs (no shortcuts), increasing depth strictly increases *training* error on both CIFAR-10 and ImageNet, even with BN and competent initialization.",
+     "status": "supported",
+     "falsification": "A controlled depth scan (e.g. plain-{18, 34, 56, 110}) trained with BN and standard SGD in which deeper models show monotonically lower or equal training error.",
+     "dependencies": []
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 2 (plain-18 = 27.94%, plain-34 = 28.54% top-1 ImageNet val); Fig. 4 left (training-error curves cross with deeper plain-34 above plain-18 throughout training); Fig. 6 left for plain-{20, 32, 44, 56, 110} on CIFAR-10.",
+      "ref": "logic/claims.md · C01 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t2",
+      "caption": "Table 2: Top-1 ImageNet validation error — plain vs. ResNet at 18 / 34 layers — Top-1 error (%, 10-crop testing) on ImageNet validation. Here the ResNets have no extra parameter compared to their plain counterparts. Fig. 4 shows the training procedures.",
+      "markdown": "|            | plain | ResNet |\n|------------|-------|--------|\n| 18 layers  | 27.94 | 27.88  |\n| 34 layers  | 28.54 | 25.03 |"
+     },
+     {
+      "id": "f4",
+      "caption": "Figure 4: ImageNet training and validation curves — plain vs. ResNet at 18/34 layers — Training on ImageNet. Thin curves denote training error, and bold curves denote validation error of the center crops. Left: plain networks of 18 and 34 layers. Right: ResNets of 18 and 34 layers. In this plot, the residual networks have no extra parameter compared to their plain counterparts.",
+      "markdown": "\n\nKey observation: The plain pair shows degradation; the residual pair removes it (cited under C01, C02)."
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E01",
+     "title": "Plain vs. residual at matched depth on ImageNet (18 vs. 34 layers)",
+     "setup": "Model: 18-layer and 34-layer plain CNNs (VGG-style, 3.6 GFLOPs at 34 layers); residual counterparts adding identity shortcuts (Option A: zero-padding for dimension changes) — same parameter count. Dataset: ImageNet 2012 — 1.28M training images, 50k validation. System: BN after every conv, MSRA initialization, SGD momentum 0.9, weight decay 1e-4, LR start 0.1 with /10 step on plateau, up to 60×10⁴ iterations, no dropout; mini-batch 256.",
+     "metrics": "Top-1 error (%), top-5 error (%), and training-error trajectory."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "residual_block.py",
+     "pointer": "src/execution/residual_block.py",
+     "what": "Basic and bottleneck residual blocks with identity / projection shortcut options (transcribed paper code)"
+    }
+   ],
+   "built_on": [
+    {
+     "rw_id": "RW02",
+     "name": "VGG",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW03",
+     "name": "Batch Normalization",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW04",
+     "name": "MSRA initialization",
+     "relation_raw": "imports"
+    }
+   ],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Plain Network"
+   ]
+  },
+  {
+   "id": "N04",
+   "type": "dead_end",
+   "parent": "N01",
+   "title": "Vanishing-gradient hypothesis",
+   "body": "With BN in place, signals do not vanish; the plain-34 net still reaches competitive accuracy (24.19% top-1 with 10-crop, Table 3), showing SGD is making progress — just slowly.",
+   "thinking": "The obvious suspect is vanishing gradients — signals dying away as they pass through many layers. The authors rule this out: batch normalization keeps the forward signals at healthy variance, the backward gradient norms look fine, and the deep plain net still reaches competitive accuracy, so the optimizer is making progress, just too slowly. The problem is optimization difficulty, not dying signals — which means a different kind of fix is needed.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§4.1 plain networks discussion"
+   ],
+   "why": [],
+   "result": {
+    "sources": [],
+    "figures": [],
+    "tables": [],
+    "data": []
+   },
+   "verified_by": [],
+   "artifact": [],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Plain Network",
+    "Batch Normalization"
+   ]
+  },
+  {
+   "id": "N05",
+   "type": "dead_end",
+   "parent": "N01",
+   "title": "More training iterations alone (3×) on plain nets",
+   "body": "The degradation is not just slow optimization; longer training does not close the gap.",
+   "thinking": "Maybe deep plain networks just need more time? The authors tried training them for three times as many iterations — and still observed the degradation. Whatever is wrong, it is not slow convergence in disguise; simply waiting longer does not close the gap.",
+   "support_level": "inferred",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§4.1 (footnote 3)"
+   ],
+   "why": [],
+   "result": {
+    "sources": [],
+    "figures": [],
+    "tables": [],
+    "data": []
+   },
+   "verified_by": [],
+   "artifact": [],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Plain Network"
+   ]
+  },
+  {
+   "id": "N06",
+   "type": "insight",
+   "parent": "N01",
+   "title": "Reformulate layers to fit a residual mapping F(x) := H(x) - x",
+   "body": "Key creative leap. Identity mapping should be expressible cheaply, so let stacked nonlinear layers learn the *residual* from identity.",
+   "thinking": "The creative leap. A deeper network should never be worse than a shallow one, because its extra layers could simply compute the identity function — yet the solver evidently cannot find that solution. So make identity the easy answer: instead of asking a stack of layers to learn a full mapping H(x), let it learn only the residual F(x) = H(x) − x, and add the input x back afterwards. If the best mapping is close to identity, the layers only have to push F toward zero — a much easier target.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§1",
+    "§3.1"
+   ],
+   "why": [],
+   "result": {
+    "sources": [],
+    "figures": [],
+    "tables": [],
+    "data": []
+   },
+   "verified_by": [],
+   "artifact": [],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Residual Mapping"
+   ]
+  },
+  {
+   "id": "N07",
+   "type": "decision",
+   "parent": "N06",
+   "title": "Use parameter-free identity shortcuts (Eqn. 1)",
+   "body": "Decision to add x via an unparameterized skip connection, rather than a gated or projected one (contrasts with highway networks, RW01). Rationale: no parameters, no FLOPs added, lets the deeper variant exactly match the shallower one's parameter budget for clean ablation.",
+   "thinking": "How should the input be added back? The choice is the simplest option on the table: a parameter-free identity shortcut that just adds x, rather than a gated shortcut (as in highway networks) or a learned projection. The rationale is experimental hygiene as much as elegance — it adds no parameters and no compute, so a residual network can be compared against its plain counterpart at exactly the same size, making the ablation clean.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§3.2",
+    "Fig. 2"
+   ],
+   "why": [],
+   "result": {
+    "sources": [],
+    "figures": [],
+    "tables": [],
+    "data": []
+   },
+   "verified_by": [],
+   "artifact": [],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Identity Shortcut"
+   ]
+  },
+  {
+   "id": "N08",
+   "type": "experiment",
+   "parent": "N06",
+   "title": "Plain vs. ResNet at 18/34 layers on ImageNet",
+   "body": "ResNet-34 = 25.03% top-1 (3.51 pts better than plain-34, 2.85 pts better than ResNet-18). Degradation is removed.",
+   "thinking": "The head-to-head test: the same 18- and 34-layer architectures, now with identity shortcuts added, trained with the exact same recipe. The ordering flips. ResNet-34 reaches 25.03% top-1 — better than ResNet-18 by 2.85 points and better than plain-34 by 3.51 points — and its training curve sits below the shallower net's throughout. Depth helps again; the degradation is gone, at zero extra parameters.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "Table 2",
+    "Fig. 4 right"
+   ],
+   "why": [
+    {
+     "id": "C02",
+     "title": "Residual learning eliminates the degradation problem",
+     "statement": "Replacing each pair of stacked 3×3 layers in a plain net with a residual block F(x) + x (with identity shortcut, no extra parameters) makes the deeper variant achieve *lower* training and validation error than the shallower one for matched depths.",
+     "status": "supported",
+     "falsification": "Under the same depth/width/training pipeline, ResNet-34 fails to improve over ResNet-18 on ImageNet validation, or ResNet-34 has higher training error than plain-34.",
+     "dependencies": [
+      "C01"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 2 (ResNet-18 = 27.88, ResNet-34 = 25.03 top-1 ImageNet val; ResNet-34 better than ResNet-18 by 2.85 pts; ResNet-34 better than plain-34 by 3.51 pts); Fig. 4 right (training-error curves of ResNet-34 lie below ResNet-18 throughout training).",
+      "ref": "logic/claims.md · C02 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t2",
+      "caption": "Table 2: Top-1 ImageNet validation error — plain vs. ResNet at 18 / 34 layers — Top-1 error (%, 10-crop testing) on ImageNet validation. Here the ResNets have no extra parameter compared to their plain counterparts. Fig. 4 shows the training procedures.",
+      "markdown": "|            | plain | ResNet |\n|------------|-------|--------|\n| 18 layers  | 27.94 | 27.88  |\n| 34 layers  | 28.54 | 25.03 |"
+     },
+     {
+      "id": "f4",
+      "caption": "Figure 4: ImageNet training and validation curves — plain vs. ResNet at 18/34 layers — Training on ImageNet. Thin curves denote training error, and bold curves denote validation error of the center crops. Left: plain networks of 18 and 34 layers. Right: ResNets of 18 and 34 layers. In this plot, the residual networks have no extra parameter compared to their plain counterparts.",
+      "markdown": "\n\nKey observation: The plain pair shows degradation; the residual pair removes it (cited under C01, C02)."
+     },
+     {
+      "id": "f7",
+      "caption": "Figure 7: CIFAR-10 layer-response std (after BN, before nonlinearity) — Standard deviations (std) of layer responses on CIFAR-10. The responses are the outputs of each 3×3 layer, after BN and before nonlinearity. Top: the layers are shown in their original order. Bottom: the responses are ranked in descending order.",
+      "markdown": "\n\nKey observation: Empirical support for the prior that optimal mappings sit near identity (used as motivation for the residual reformulation; cited under O5 and as supporting interpretation for C02)."
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E01",
+     "title": "Plain vs. residual at matched depth on ImageNet (18 vs. 34 layers)",
+     "setup": "Model: 18-layer and 34-layer plain CNNs (VGG-style, 3.6 GFLOPs at 34 layers); residual counterparts adding identity shortcuts (Option A: zero-padding for dimension changes) — same parameter count. Dataset: ImageNet 2012 — 1.28M training images, 50k validation. System: BN after every conv, MSRA initialization, SGD momentum 0.9, weight decay 1e-4, LR start 0.1 with /10 step on plateau, up to 60×10⁴ iterations, no dropout; mini-batch 256.",
+     "metrics": "Top-1 error (%), top-5 error (%), and training-error trajectory."
+    },
+    {
+     "id": "E02",
+     "title": "Training-trajectory comparison plain vs. residual on ImageNet",
+     "setup": "Same plain-{18, 34} and ResNet-{18, 34} as E01; thin curves for training error and bold curves for validation error (center-crop) logged during training (Fig. 4).",
+     "metrics": "Training error vs. iteration, validation (center-crop) error vs. iteration."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "residual_block.py",
+     "pointer": "src/execution/residual_block.py",
+     "what": "Basic and bottleneck residual blocks with identity / projection shortcut options (transcribed paper code)"
+    },
+    {
+     "name": "training_recipe.py",
+     "pointer": "src/execution/training_recipe.py",
+     "what": "SGD + step LR schedule + BN-after-conv recipe for ImageNet ResNets (transcribed paper code)"
+    },
+    {
+     "name": "configs/training.md",
+     "pointer": "src/configs/training.md",
+     "what": "ImageNet/CIFAR SGD hyperparameters with rationale"
+    },
+    {
+     "name": "imagenet_resnet34.yaml",
+     "pointer": "src/configs/imagenet_resnet34.yaml",
+     "what": "Concrete config for the 34-layer ImageNet ResNet"
+    },
+    {
+     "name": "environment.md",
+     "pointer": "src/environment.md",
+     "what": "Framework, hardware, augmentation, seed assumptions"
+    }
+   ],
+   "built_on": [
+    {
+     "rw_id": "RW03",
+     "name": "Batch Normalization",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW04",
+     "name": "MSRA initialization",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW08",
+     "name": "Residual representations — VLAD / Fisher Vector / Encoding residual vectors",
+     "relation_raw": "extends"
+    },
+    {
+     "rw_id": "RW09",
+     "name": "Multigrid / hierarchical basis preconditioning",
+     "relation_raw": "extends"
+    }
+   ],
+   "rejected_here": [
+    {
+     "rw_id": "RW01",
+     "name": "Highway Networks",
+     "relation_raw": "refutes (the gating choice)"
+    }
+   ],
+   "recipe_refs": [],
+   "concepts": [
+    "Identity Shortcut",
+    "Plain Network"
+   ]
+  },
+  {
+   "id": "N09",
+   "type": "experiment",
+   "parent": "N06",
+   "title": "Shortcut option ablation on ResNet-34 (A vs. B vs. C)",
+   "body": "A = 25.03, B = 24.52, C = 24.19 top-1. Differences are small; option C is rejected as not worth the parameter / memory cost.",
+   "thinking": "Does the shortcut itself need parameters? Compare three variants on ResNet-34: option A (parameter-free identity, zero-padding where dimensions grow), option B (a learned projection only where dimensions change), and option C (a projection on every shortcut). The scores — 25.03, 24.52, 24.19 top-1 — differ by well under a point. The residual gain comes from having a shortcut at all, not from making it learnable; option C is rejected as not worth its extra parameters and memory.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "Table 3",
+    "§\"Identity vs. Projection Shortcuts\""
+   ],
+   "why": [
+    {
+     "id": "C04",
+     "title": "Identity shortcuts are sufficient; projection shortcuts give only marginal gains",
+     "statement": "Among shortcut options A (zero-padding identity), B (projection only when dimensions change), and C (projection on every shortcut), the differences in ImageNet top-1 error are small (≤0.65 pts on ResNet-34); identity shortcuts (A) suffice to fix degradation, and option C is rejected as not worth its parameter / memory cost.",
+     "status": "supported",
+     "falsification": "A controlled comparison in which option C beats option A or B by more than ~1 top-1 point under identical training, indicating projection shortcuts are essential rather than convenience.",
+     "dependencies": [
+      "C02"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 3 (ResNet-34 A = 25.03, B = 24.52, C = 24.19 top-1 with 10-crop); §\"Identity vs. Projection Shortcuts\" attributes the small B>A gap to A's zero-padded dimensions having \"no residual learning\" and the small C>B gap to extra parameters from 13 projection shortcuts.",
+      "ref": "logic/claims.md · C04 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t3d",
+      "caption": "Derived subset — ResNet-34 shortcut option ablation — Subset preserving the rows directly relevant to C04 (shortcut option ablation): plain-34 baseline + ResNet-34 with options A / B / C. Other Table 3 rows are intentionally omitted.",
+      "markdown": "| model       | shortcut option | top-1 err. | top-5 err. | Δ vs. plain-34 (top-1) |\n|-------------|-----------------|------------|------------|------------------------|\n| plain-34    | none            | 28.54      | 10.02      | —                      |\n| ResNet-34 A | identity + zero-pad | 25.03  | 7.76       | −3.51                  |\n| ResNet-34 B | projection on dim change only | 24.52 | 7.46 | −4.02                  |\n| ResNet-34 C | projection on every shortcut | 24.19 | 7.40 | −4.35                  |"
+     },
+     {
+      "id": "t3",
+      "caption": "Table 3: Error rates on ImageNet validation (10-crop testing) — Error rates (%, 10-crop testing) on ImageNet validation. VGG-16 is based on our test. ResNet-50/101/152 are of option B that only uses projections for increasing dimensions.",
+      "markdown": "| model            | top-1 err. | top-5 err. |\n|------------------|------------|------------|\n| VGG-16 [41]      | 28.07      | 9.33       |\n| GoogLeNet [44]   | —          | 9.15       |\n| PReLU-net [13]   | 24.27      | 7.38       |\n| plain-34         | 28.54      | 10.02      |\n| ResNet-34 A      | 25.03      | 7.76       |\n| ResNet-34 B      | 24.52      | 7.46       |\n| ResNet-34 C      | 24.19      | 7.40       |\n| ResNet-50        | 22.85      | 6.71       |\n| ResNet-101       | 21.75      | 6.05       |\n| ResNet-152       | 21.43  | 5.71   |"
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E04",
+     "title": "Identity vs. projection shortcut ablation on ResNet-34",
+     "setup": "Model: ResNet-34 with three shortcut variants — A (identity + zero-pad, parameter-free), B (projections only when dimensions change), C (projections on every shortcut). Dataset: ImageNet 2012. System: same training recipe as E01, identical hyperparameters across variants.",
+     "metrics": "Top-1 / top-5 error (%); parameter count delta from extra projection shortcuts."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "residual_block.py",
+     "pointer": "src/execution/residual_block.py",
+     "what": "Basic and bottleneck residual blocks with identity / projection shortcut options (transcribed paper code)"
+    }
+   ],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Identity Shortcut",
+    "Projection Shortcut"
+   ]
+  },
+  {
+   "id": "N10",
+   "type": "dead_end",
+   "parent": "N06",
+   "title": "Single-layer residual function F",
+   "body": "\"We have not observed advantages.\" Authors require F to have ≥2 weighted layers.",
+   "thinking": "Could the residual function be a single layer? Tried — but with only one weighted layer the block y = W₁x + x behaves like a plain linear layer, and the authors report they \"have not observed advantages.\" From here on, residual functions get at least two weighted layers.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§3.2"
+   ],
+   "why": [],
+   "result": {
+    "sources": [],
+    "figures": [],
+    "tables": [],
+    "data": []
+   },
+   "verified_by": [],
+   "artifact": [],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": []
+  },
+  {
+   "id": "N11",
+   "type": "decision",
+   "parent": "N06",
+   "title": "Adopt 1×1 → 3×3 → 1×1 bottleneck blocks for ≥50 layers",
+   "body": "Replace the basic 2-layer block with a 3-layer bottleneck of comparable per-block time complexity. Rationale: lets us push depth to 50/101/152 layers at FLOPs comparable to ResNet-34 (3.8 / 7.6 / 11.3 GFLOPs vs. 3.6 GFLOPs).",
+   "thinking": "To push past roughly 50 layers without exploding compute, redesign the block itself. A 1×1 convolution first shrinks the channel count, the 3×3 convolution does its work in that cheaper space, and a second 1×1 restores the width — the \"bottleneck\" block, with about the same cost per block as the original 2-layer design. That is what makes 50-, 101- and 152-layer networks affordable: 3.8 to 11.3 GFLOPs, next to 3.6 for ResNet-34 and 19.6 for VGG-19.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§\"Deeper Bottleneck Architectures\"",
+    "Fig. 5 right"
+   ],
+   "why": [
+    {
+     "id": "C05",
+     "title": "Bottleneck blocks make 50/101/152-layer ResNets practical",
+     "statement": "Replacing the 2-layer 3×3 building block with a 3-layer 1×1 → 3×3 → 1×1 *bottleneck* block of the same per-block time complexity allows construction of 50/101/152-layer ResNets that achieve lower error than the 34-layer ResNet without exploding compute.",
+     "status": "supported",
+     "falsification": "A 50- or 101-layer non-bottleneck ResNet matches the bottleneck ResNet at equal compute, eliminating the practical need for bottlenecks; or bottleneck ResNets fail to improve over ResNet-34.",
+     "dependencies": [
+      "C02",
+      "C04"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 1 (3.8/7.6/11.3 GFLOPs for ResNet-{50,101,152}, comparable to ResNet-34 at 3.6 GFLOPs); Table 3 top-1 error drops from 24.19 (ResNet-34 C) to 22.85 / 21.75 / 21.43 for ResNet-50/101/152.",
+      "ref": "logic/claims.md · C05 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t1",
+      "caption": "Table 1: Architectures for ImageNet — Architectures for ImageNet. Building blocks are shown in brackets (see also Fig. 5), with the numbers of blocks stacked. Downsampling is performed by conv3_1, conv4_1, and conv5_1 with a stride of 2.",
+      "markdown": "| layer name | output size | 18-layer | 34-layer | 50-layer | 101-layer | 152-layer |\n|------------|-------------|----------|----------|----------|-----------|-----------|\n| conv1   | 112×112 | 7×7, 64, stride 2 | 7×7, 64, stride 2 | 7×7, 64, stride 2 | 7×7, 64, stride 2 | 7×7, 64, stride 2 |\n| conv2_x | 56×56   | 3×3 max-pool stride 2; [3×3, 64; 3×3, 64] ×2 | [3×3, 64; 3×3, 64] ×3 | [1×1, 64; 3×3, 64; 1×1, 256] ×3 | [1×1, 64; 3×3, 64; 1×1, 256] ×3 | [1×1, 64; 3×3, 64; 1×1, 256] ×3 |\n| conv3_x | 28×28   | [3×3, 128; 3×3, 128] ×2 | [3×3, 128; 3×3, 128] ×4 | [1×1, 128; 3×3, 128; 1×1, 512] ×4 | [1×1, 128; 3×3, 128; 1×1, 512] ×4 | [1×1, 128; 3×3, 128; 1×1, 512] ×8 |\n| conv4_x | 14×14   | [3×3, 256; 3×3, 256] ×2 | [3×3, 256; 3×3, 256] ×6 | [1×1, 256; 3×3, 256; 1×1, 1024] ×6 | [1×1, 256; 3×3, 256; 1×1, 1024] ×23 | [1×1, 256; 3×3, 256; 1×1, 1024] ×36 |\n| conv5_x | 7×7     | [3×3, 512; 3×3, 512] ×2 | [3×3, 512; 3×3, 512] ×3 | [1×1, 512; 3×3, 512; 1×1, 2048] ×3 | [1×1, 512; 3×3, 512; 1×1, 2048] ×3 | [1×1, 512; 3×3, 512; 1×1, 2048] ×3 |\n|         | 1×1     | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax |\n| FLOPs   |         | 1.8×10⁹ | 3.6×10⁹ | 3.8×10⁹ | 7.6×10⁹ | 11.3×10⁹ |"
+     },
+     {
+      "id": "t3",
+      "caption": "Table 3: Error rates on ImageNet validation (10-crop testing) — Error rates (%, 10-crop testing) on ImageNet validation. VGG-16 is based on our test. ResNet-50/101/152 are of option B that only uses projections for increasing dimensions.",
+      "markdown": "| model            | top-1 err. | top-5 err. |\n|------------------|------------|------------|\n| VGG-16 [41]      | 28.07      | 9.33       |\n| GoogLeNet [44]   | —          | 9.15       |\n| PReLU-net [13]   | 24.27      | 7.38       |\n| plain-34         | 28.54      | 10.02      |\n| ResNet-34 A      | 25.03      | 7.76       |\n| ResNet-34 B      | 24.52      | 7.46       |\n| ResNet-34 C      | 24.19      | 7.40       |\n| ResNet-50        | 22.85      | 6.71       |\n| ResNet-101       | 21.75      | 6.05       |\n| ResNet-152       | 21.43  | 5.71   |"
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E03",
+     "title": "Depth scan with bottleneck blocks on ImageNet (50 / 101 / 152 layers)",
+     "setup": "Model: ResNet-{50, 101, 152} built from 1×1 → 3×3 → 1×1 bottleneck blocks (Fig. 5 right) with option B shortcuts, per Table 1. Dataset: ImageNet 2012. System: same SGD recipe as E01; 10-crop testing for Table 3, multi-scale fully-convolutional testing for Table 4, 6-model ensemble on the test set for Table 5.",
+     "metrics": "Top-1 / top-5 error (%) at each depth; FLOPs (Table 1); test-set top-5 error for the ensemble."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "residual_block.py",
+     "pointer": "src/execution/residual_block.py",
+     "what": "Basic and bottleneck residual blocks with identity / projection shortcut options (transcribed paper code)"
+    },
+    {
+     "name": "configs/model.md",
+     "pointer": "src/configs/model.md",
+     "what": "Layer counts, channels, FLOPs for ResNet-{18,34,50,101,152} and CIFAR variants"
+    }
+   ],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": [
+    "Bottleneck Residual Block"
+   ]
+  },
+  {
+   "id": "N12",
+   "type": "experiment",
+   "parent": "N06",
+   "title": "Depth scan with bottleneck blocks (50 / 101 / 152 layers)",
+   "body": "Top-1 error drops monotonically (22.85 → 21.75 → 21.43); 6-model ensemble achieves 3.57% top-5 on the test set, winning ILSVRC 2015.",
+   "thinking": "Now scale up. With bottleneck blocks and the same training recipe, ResNet-50, 101 and 152 improve monotonically — 22.85, 21.75, 21.43% top-1 — with no sign of the degradation that killed plain networks at a third of this depth. A six-model ensemble reaches 3.57% top-5 error on the ImageNet test set, taking first place at ILSVRC 2015. Notably, the 152-layer model is still cheaper to run than VGG-16.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [
+    "N09",
+    "N11"
+   ],
+   "source_refs": [
+    "Table 3",
+    "Table 4",
+    "Table 5"
+   ],
+   "why": [
+    {
+     "id": "C03",
+     "title": "Residual networks gain accuracy from increased depth up to 152 layers on ImageNet",
+     "statement": "Deeper ResNets (50, 101, 152) achieve monotonically lower top-1 and top-5 ImageNet validation error than shallower ResNets, with the 152-layer model still having lower complexity (11.3 GFLOPs) than VGG-16/19 (15.3/19.6 GFLOPs).",
+     "status": "supported",
+     "falsification": "A ResNet-152 trained with the same recipe fails to improve top-1 over ResNet-101 (or ResNet-101 over ResNet-50) by a margin larger than the noise floor (~0.1%).",
+     "dependencies": [
+      "C02"
+     ]
+    },
+    {
+     "id": "C05",
+     "title": "Bottleneck blocks make 50/101/152-layer ResNets practical",
+     "statement": "Replacing the 2-layer 3×3 building block with a 3-layer 1×1 → 3×3 → 1×1 *bottleneck* block of the same per-block time complexity allows construction of 50/101/152-layer ResNets that achieve lower error than the 34-layer ResNet without exploding compute.",
+     "status": "supported",
+     "falsification": "A 50- or 101-layer non-bottleneck ResNet matches the bottleneck ResNet at equal compute, eliminating the practical need for bottlenecks; or bottleneck ResNets fail to improve over ResNet-34.",
+     "dependencies": [
+      "C02",
+      "C04"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 3 (ResNet-50 = 22.85 / 6.71, ResNet-101 = 21.75 / 6.05, ResNet-152 = 21.43 / 5.71 top-1 / top-5 with 10-crop testing; FLOPs from Table 1).",
+      "ref": "logic/claims.md · C03 — Evidence basis"
+     },
+     {
+      "quote": "Table 1 (3.8/7.6/11.3 GFLOPs for ResNet-{50,101,152}, comparable to ResNet-34 at 3.6 GFLOPs); Table 3 top-1 error drops from 24.19 (ResNet-34 C) to 22.85 / 21.75 / 21.43 for ResNet-50/101/152.",
+      "ref": "logic/claims.md · C05 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t3",
+      "caption": "Table 3: Error rates on ImageNet validation (10-crop testing) — Error rates (%, 10-crop testing) on ImageNet validation. VGG-16 is based on our test. ResNet-50/101/152 are of option B that only uses projections for increasing dimensions.",
+      "markdown": "| model            | top-1 err. | top-5 err. |\n|------------------|------------|------------|\n| VGG-16 [41]      | 28.07      | 9.33       |\n| GoogLeNet [44]   | —          | 9.15       |\n| PReLU-net [13]   | 24.27      | 7.38       |\n| plain-34         | 28.54      | 10.02      |\n| ResNet-34 A      | 25.03      | 7.76       |\n| ResNet-34 B      | 24.52      | 7.46       |\n| ResNet-34 C      | 24.19      | 7.40       |\n| ResNet-50        | 22.85      | 6.71       |\n| ResNet-101       | 21.75      | 6.05       |\n| ResNet-152       | 21.43  | 5.71   |"
+     },
+     {
+      "id": "t4",
+      "caption": "Table 4: Single-model results on ImageNet validation — Error rates (%) of single-model results on the ImageNet validation set (except † reported on the test set).",
+      "markdown": "| method            | top-1 err. | top-5 err. |\n|-------------------|------------|------------|\n| VGG [41] (ILSVRC'14) | —       | 8.43†      |\n| GoogLeNet [44] (ILSVRC'14) | — | 7.89    |\n| VGG [41] (v5)     | 24.4       | 7.1        |\n| PReLU-net [13]    | 21.59      | 5.71       |\n| BN-inception [16] | 21.99      | 5.81       |\n| ResNet-34 B       | 21.84      | 5.71       |\n| ResNet-34 C       | 21.53      | 5.60       |\n| ResNet-50         | 20.74      | 5.25       |\n| ResNet-101        | 19.87      | 4.60       |\n| ResNet-152        | 19.38  | 4.49   |"
+     },
+     {
+      "id": "t5",
+      "caption": "Table 5: ImageNet ensembles (top-5 error on the test set) — Error rates (%) of ensembles. The top-5 error is on the test set of ImageNet and reported by the test server.",
+      "markdown": "| method                       | top-5 err. (test) |\n|------------------------------|-------------------|\n| VGG [41] (ILSVRC'14)         | 7.32              |\n| GoogLeNet [44] (ILSVRC'14)   | 6.66              |\n| VGG [41] (v5)                | 6.8               |\n| PReLU-net [13]               | 4.94              |\n| BN-inception [16]            | 4.82              |\n| ResNet (ILSVRC'15)       | 3.57          |"
+     },
+     {
+      "id": "t1",
+      "caption": "Table 1: Architectures for ImageNet — Architectures for ImageNet. Building blocks are shown in brackets (see also Fig. 5), with the numbers of blocks stacked. Downsampling is performed by conv3_1, conv4_1, and conv5_1 with a stride of 2.",
+      "markdown": "| layer name | output size | 18-layer | 34-layer | 50-layer | 101-layer | 152-layer |\n|------------|-------------|----------|----------|----------|-----------|-----------|\n| conv1   | 112×112 | 7×7, 64, stride 2 | 7×7, 64, stride 2 | 7×7, 64, stride 2 | 7×7, 64, stride 2 | 7×7, 64, stride 2 |\n| conv2_x | 56×56   | 3×3 max-pool stride 2; [3×3, 64; 3×3, 64] ×2 | [3×3, 64; 3×3, 64] ×3 | [1×1, 64; 3×3, 64; 1×1, 256] ×3 | [1×1, 64; 3×3, 64; 1×1, 256] ×3 | [1×1, 64; 3×3, 64; 1×1, 256] ×3 |\n| conv3_x | 28×28   | [3×3, 128; 3×3, 128] ×2 | [3×3, 128; 3×3, 128] ×4 | [1×1, 128; 3×3, 128; 1×1, 512] ×4 | [1×1, 128; 3×3, 128; 1×1, 512] ×4 | [1×1, 128; 3×3, 128; 1×1, 512] ×8 |\n| conv4_x | 14×14   | [3×3, 256; 3×3, 256] ×2 | [3×3, 256; 3×3, 256] ×6 | [1×1, 256; 3×3, 256; 1×1, 1024] ×6 | [1×1, 256; 3×3, 256; 1×1, 1024] ×23 | [1×1, 256; 3×3, 256; 1×1, 1024] ×36 |\n| conv5_x | 7×7     | [3×3, 512; 3×3, 512] ×2 | [3×3, 512; 3×3, 512] ×3 | [1×1, 512; 3×3, 512; 1×1, 2048] ×3 | [1×1, 512; 3×3, 512; 1×1, 2048] ×3 | [1×1, 512; 3×3, 512; 1×1, 2048] ×3 |\n|         | 1×1     | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax | average pool, 1000-d fc, softmax |\n| FLOPs   |         | 1.8×10⁹ | 3.6×10⁹ | 3.8×10⁹ | 7.6×10⁹ | 11.3×10⁹ |"
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E03",
+     "title": "Depth scan with bottleneck blocks on ImageNet (50 / 101 / 152 layers)",
+     "setup": "Model: ResNet-{50, 101, 152} built from 1×1 → 3×3 → 1×1 bottleneck blocks (Fig. 5 right) with option B shortcuts, per Table 1. Dataset: ImageNet 2012. System: same SGD recipe as E01; 10-crop testing for Table 3, multi-scale fully-convolutional testing for Table 4, 6-model ensemble on the test set for Table 5.",
+     "metrics": "Top-1 / top-5 error (%) at each depth; FLOPs (Table 1); test-set top-5 error for the ensemble."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "residual_block.py",
+     "pointer": "src/execution/residual_block.py",
+     "what": "Basic and bottleneck residual blocks with identity / projection shortcut options (transcribed paper code)"
+    },
+    {
+     "name": "training_recipe.py",
+     "pointer": "src/execution/training_recipe.py",
+     "what": "SGD + step LR schedule + BN-after-conv recipe for ImageNet ResNets (transcribed paper code)"
+    },
+    {
+     "name": "configs/training.md",
+     "pointer": "src/configs/training.md",
+     "what": "ImageNet/CIFAR SGD hyperparameters with rationale"
+    },
+    {
+     "name": "configs/model.md",
+     "pointer": "src/configs/model.md",
+     "what": "Layer counts, channels, FLOPs for ResNet-{18,34,50,101,152} and CIFAR variants"
+    }
+   ],
+   "built_on": [
+    {
+     "rw_id": "RW02",
+     "name": "VGG",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW03",
+     "name": "Batch Normalization",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW05",
+     "name": "GoogLeNet / Inception",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW06",
+     "name": "PReLU-net / \"Surpassing human-level on ImageNet\"",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW07",
+     "name": "BN-Inception",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW12",
+     "name": "PASCAL VOC",
+     "relation_raw": "imports (datasets)"
+    }
+   ],
+   "rejected_here": [
+    {
+     "rw_id": "RW01",
+     "name": "Highway Networks",
+     "relation_raw": "refutes (the gating choice)"
+    }
+   ],
+   "recipe_refs": [],
+   "concepts": [
+    "Bottleneck Residual Block",
+    "Plain Network"
+   ]
+  },
+  {
+   "id": "N13",
+   "type": "experiment",
+   "parent": "N06",
+   "title": "CIFAR-10 depth scan (20 → 1202 layers)",
+   "body": "Test error decreases through depth 110 (6.43% mean, best 6.61 ± 0.16). ResNet-1202 trains successfully (training error \u003c0.1%) but overfits to 7.93% test error.",
+   "thinking": "Back on CIFAR-10, ask how far depth can now go. From 20 to 110 layers, test error keeps falling, down to 6.43%. Then the stress test: a 1202-layer network — ten times deeper — still trains without any optimization difficulty, driving training error below 0.1%. Its test error (7.93%) is worse than the 110-layer model's, but for a new reason: with 19.4M parameters on 50k images, the limit is now overfitting, not optimization. The original problem is genuinely solved.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "Table 6",
+    "Fig. 6",
+    "§4.2"
+   ],
+   "why": [
+    {
+     "id": "C06",
+     "title": "Residual nets generalize to extreme CIFAR-10 depths (110 layers; 1202 layers without optimization difficulty)",
+     "statement": "On CIFAR-10, ResNets at depths {20, 32, 44, 56, 110} all train successfully, with the 110-layer model achieving 6.43% test error (best mean ± std 6.61 ± 0.16); a 1202-layer ResNet trains with no optimization difficulty (final training error \u003c0.1%) although it overfits to 7.93% test error on this small dataset.",
+     "status": "supported",
+     "falsification": "A CIFAR ResNet at depth ≥110 trained with the same recipe fails to converge to \u003c10% test error, or its training error fails to decrease below the 56-layer model's.",
+     "dependencies": [
+      "C02",
+      "C03"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 6 (ResNet-{20=8.75, 32=7.51, 44=7.17, 56=6.97, 110=6.43, 1202=7.93}% test error); §\"Exploring Over 1000 layers\" notes 1202-layer training error \u003c0.1% with no optimization difficulty.",
+      "ref": "logic/claims.md · C06 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t6",
+      "caption": "Table 6: Classification error on the CIFAR-10 test set — Classification error on the CIFAR-10 test set. All methods are with data augmentation. For ResNet-110, we run it 5 times and show 'best (mean ± std)' as in [43].",
+      "markdown": "| method        | error (%)            |\n|---------------|----------------------|\n| Maxout [10]   | 9.38                 |\n| NIN [25]      | 8.81                 |\n| DSN [24]      | 8.22                 |\n\n| method        | # layers | # params | error (%)            |\n|---------------|---------:|---------:|----------------------|\n| FitNet [35]   | 19       | 2.5M     | 8.39                 |\n| Highway [42, 43] | 19    | 2.3M     | 7.54 (7.72 ± 0.16)   |\n| Highway [42, 43] | 32    | 1.25M    | 8.80                 |\n| ResNet        | 20       | 0.27M    | 8.75                 |\n| ResNet        | 32       | 0.46M    | 7.51                 |\n| ResNet        | 44       | 0.66M    | 7.17                 |\n| ResNet        | 56       | 0.85M    | 6.97                 |\n| ResNet        | 110      | 1.7M     | 6.43 (6.61 ± 0.16) |\n| ResNet        | 1202     | 19.4M    | 7.93                 |"
+     },
+     {
+      "id": "f6",
+      "caption": "Figure 6: CIFAR-10 training/test curves for plain and ResNet families — Training on CIFAR-10. Dashed lines denote training error, and bold lines denote testing error. Left: plain networks. The error of plain-110 is higher than 60% and not displayed. Middle: ResNets. Right: ResNets with 110 and 1202 layers.",
+      "markdown": "\n\nKey observation: ResNet families overcome the plain-net degradation, and even 1202 layers train cleanly — but extreme depth overfits without explicit regularization on this small dataset (cited under C06)."
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E05",
+     "title": "CIFAR-10 depth scan and 1202-layer stress test",
+     "setup": "Model: CIFAR ResNet family with 6n+2 layers — depths {20, 32, 44, 56, 110, 1202}; 16/32/64 filters; option A identity shortcuts; ~0.27M up to 19.4M params. Hardware: 2 GPUs. Dataset: CIFAR-10 (50k train / 10k test). System: SGD momentum 0.9, weight decay 1e-4, MSRA init, BN, no dropout, mini-batch 128, LR 0.1 with /10 at iter 32k and 48k, terminate at 64k; 110-layer net warms up at LR 0.01 for ~400 iters. ResNet-110 run 5 times (best, mean ± std).",
+     "metrics": "Test-set classification error (%); parameter count (#params); training-error trajectory."
+    }
+   ],
+   "artifact": [],
+   "built_on": [
+    {
+     "rw_id": "RW04",
+     "name": "MSRA initialization",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW12",
+     "name": "PASCAL VOC",
+     "relation_raw": "imports (datasets)"
+    }
+   ],
+   "rejected_here": [
+    {
+     "rw_id": "RW01",
+     "name": "Highway Networks",
+     "relation_raw": "refutes (the gating choice)"
+    }
+   ],
+   "recipe_refs": [],
+   "concepts": []
+  },
+  {
+   "id": "N14",
+   "type": "decision",
+   "parent": "N13",
+   "title": "Warm up LR for the 110-layer CIFAR ResNet",
+   "body": "At depth 110, LR 0.1 from iter 0 fails to start converging cleanly. Pre-warm at LR 0.01 for ~400 iters (until train error \u003c80%), then restore LR 0.1. Rationale: gets the optimizer into a basin where the standard LR schedule then trains stably.",
+   "thinking": "One practical wrinkle appears at depth 110: the usual starting learning rate of 0.1 is slightly too large for training to begin converging cleanly. The fix is a brief warmup — run at learning rate 0.01 for about 400 iterations until training error drops below 80%, then switch back to 0.1 and continue as normal. It is a stability aid, not a fundamental requirement: starting at 0.1 eventually gets there too, just after several wasted epochs.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [],
+   "source_refs": [
+    "§4.2 paragraph on n=18",
+    "footnote 5"
+   ],
+   "why": [
+    {
+     "id": "C07",
+     "title": "Warming up the learning rate is necessary for the 110-layer CIFAR ResNet",
+     "statement": "A 110-layer ResNet on CIFAR-10 fails to start converging cleanly with the default initial LR of 0.1; warming up at LR 0.01 for ~400 iterations until training error drops below ~80%, then restoring LR 0.1, restores convergence.",
+     "status": "supported",
+     "falsification": "Training a 110-layer ResNet on CIFAR-10 from scratch at LR 0.1 from iteration 0 reliably reaches the same final test error as the warmup recipe under the same total budget.",
+     "dependencies": [
+      "C06"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "§4.2 paragraph on n=18 (110-layer): \"0.1 is slightly too large to start converging\" with footnote 5 noting LR 0.1 reaches similar accuracy after several epochs of >90% error but the warmup variant is the chosen recipe.",
+      "ref": "logic/claims.md · C07 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t6",
+      "caption": "Table 6: Classification error on the CIFAR-10 test set — Classification error on the CIFAR-10 test set. All methods are with data augmentation. For ResNet-110, we run it 5 times and show 'best (mean ± std)' as in [43].",
+      "markdown": "| method        | error (%)            |\n|---------------|----------------------|\n| Maxout [10]   | 9.38                 |\n| NIN [25]      | 8.81                 |\n| DSN [24]      | 8.22                 |\n\n| method        | # layers | # params | error (%)            |\n|---------------|---------:|---------:|----------------------|\n| FitNet [35]   | 19       | 2.5M     | 8.39                 |\n| Highway [42, 43] | 19    | 2.3M     | 7.54 (7.72 ± 0.16)   |\n| Highway [42, 43] | 32    | 1.25M    | 8.80                 |\n| ResNet        | 20       | 0.27M    | 8.75                 |\n| ResNet        | 32       | 0.46M    | 7.51                 |\n| ResNet        | 44       | 0.66M    | 7.17                 |\n| ResNet        | 56       | 0.85M    | 6.97                 |\n| ResNet        | 110      | 1.7M     | 6.43 (6.61 ± 0.16) |\n| ResNet        | 1202     | 19.4M    | 7.93                 |"
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E05",
+     "title": "CIFAR-10 depth scan and 1202-layer stress test",
+     "setup": "Model: CIFAR ResNet family with 6n+2 layers — depths {20, 32, 44, 56, 110, 1202}; 16/32/64 filters; option A identity shortcuts; ~0.27M up to 19.4M params. Hardware: 2 GPUs. Dataset: CIFAR-10 (50k train / 10k test). System: SGD momentum 0.9, weight decay 1e-4, MSRA init, BN, no dropout, mini-batch 128, LR 0.1 with /10 at iter 32k and 48k, terminate at 64k; 110-layer net warms up at LR 0.01 for ~400 iters. ResNet-110 run 5 times (best, mean ± std).",
+     "metrics": "Test-set classification error (%); parameter count (#params); training-error trajectory."
+    }
+   ],
+   "artifact": [
+    {
+     "name": "configs/training.md",
+     "pointer": "src/configs/training.md",
+     "what": "ImageNet/CIFAR SGD hyperparameters with rationale"
+    },
+    {
+     "name": "environment.md",
+     "pointer": "src/environment.md",
+     "what": "Framework, hardware, augmentation, seed assumptions"
+    }
+   ],
+   "built_on": [],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": []
+  },
+  {
+   "id": "N15",
+   "type": "experiment",
+   "parent": "N01",
+   "title": "Detection transfer with ResNet-101 (PASCAL VOC, COCO)",
+   "body": "PASCAL VOC07 mAP: 73.2 → 76.4. COCO mAP@.5: 41.5 → 48.4. COCO mAP@[.5, .95]: 21.2 → 27.2 (28% relative improvement).",
+   "thinking": "Finally, do the learned features matter beyond classification? Swap VGG-16 for ResNet-101 inside an otherwise unchanged Faster R-CNN detector and fine-tune. PASCAL VOC07 mAP rises from 73.2 to 76.4, and COCO mAP@[.5,.95] — the strict metric that rewards tight boxes — jumps from 21.2 to 27.2, a 28% relative gain attributed purely to the better representation. Depth pays off downstream, not just on the leaderboard it was tuned for.",
+   "support_level": "explicit",
+   "isolated": false,
+   "depends_on": [
+    "N12"
+   ],
+   "source_refs": [
+    "Table 7",
+    "Table 8",
+    "Appendix A"
+   ],
+   "why": [
+    {
+     "id": "C08",
+     "title": "ResNet representations transfer to detection, giving large COCO gains over VGG-16",
+     "statement": "Replacing the VGG-16 backbone with ResNet-101 in baseline Faster R-CNN improves COCO val mAP@[.5,.95] from 21.2 to 27.2, a 6.0-point absolute (28% relative) increase, attributed solely to the better learned representations.",
+     "status": "supported",
+     "falsification": "A controlled VGG-16 → ResNet-101 swap in Faster R-CNN with the same hyperparameters fails to improve COCO mAP@[.5,.95] by ≥3 absolute points.",
+     "dependencies": [
+      "C03"
+     ]
+    }
+   ],
+   "result": {
+    "sources": [
+     {
+      "quote": "Table 8 (baseline Faster R-CNN: VGG-16 = 41.5 mAP@.5 / 21.2 mAP@[.5,.95]; ResNet-101 = 48.4 / 27.2 on COCO val); Table 7 (PASCAL VOC 07 mAP: 73.2 → 76.4; VOC 12: 70.4 → 73.8).",
+      "ref": "logic/claims.md · C08 — Evidence basis"
+     }
+    ],
+    "figures": [],
+    "tables": [
+     {
+      "id": "t7",
+      "caption": "Table 7: PASCAL VOC 2007 / 2012 detection (baseline Faster R-CNN) — Object detection mAP (%) on the PASCAL VOC 2007/2012 test sets using baseline Faster R-CNN. See also Table 10 and 11 for better results.",
+      "markdown": "| training data | 07+12 | 07++12 |\n|---------------|-------|--------|\n| test data     | VOC 07 test | VOC 12 test |\n| VGG-16        | 73.2  | 70.4   |\n| ResNet-101    | 76.4 | 73.8 |"
+     },
+     {
+      "id": "t8",
+      "caption": "Table 8: COCO detection (baseline Faster R-CNN) — Object detection mAP (%) on the COCO validation set using baseline Faster R-CNN. See also Table 9 for better results.",
+      "markdown": "| metric    | mAP@.5 | mAP@[.5, .95] |\n|-----------|--------|---------------|\n| VGG-16    | 41.5   | 21.2          |\n| ResNet-101 | 48.4 | 27.2   |"
+     }
+    ],
+    "data": []
+   },
+   "verified_by": [
+    {
+     "id": "E06",
+     "title": "COCO and PASCAL VOC detection transfer with ResNet-101",
+     "setup": "Model: Faster R-CNN with two backbones — VGG-16 and ResNet-101 (fine-tuned per Appendix A; BN statistics frozen). Hardware: 8 GPUs. Datasets: PASCAL VOC 07+12 / 07++12; COCO 80k train + 40k val. System: baseline Faster R-CNN hyperparameters from [32]; 4-step alternating training.",
+     "metrics": "PASCAL VOC mAP@.5 (%); COCO mAP@.5 (%); COCO mAP@[.5,.95] (%)."
+    }
+   ],
+   "artifact": [],
+   "built_on": [
+    {
+     "rw_id": "RW02",
+     "name": "VGG",
+     "relation_raw": "baseline"
+    },
+    {
+     "rw_id": "RW10",
+     "name": "Faster R-CNN",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW11",
+     "name": "Networks on Conv feature maps / NoC",
+     "relation_raw": "imports"
+    },
+    {
+     "rw_id": "RW12",
+     "name": "PASCAL VOC",
+     "relation_raw": "imports (datasets)"
+    }
+   ],
+   "rejected_here": [],
+   "recipe_refs": [],
+   "concepts": []
+  }
+ ],
+ "context": {
+  "title": "Problem",
+  "summary": "Reformulate each block to fit a *residual* mapping F(x) := H(x) − x, so the original mapping is recovered as F(x) + x via a parameter-free identity shortcut.",
+  "sections": [
+   {
+    "role": "setting",
+    "heading": "Setting",
+    "present": false,
+    "entries": []
+   },
+   {
+    "role": "observations",
+    "heading": "Observations",
+    "present": true,
+    "entries": [
+     {
+      "ent_id": "O1",
+      "inferred_id": false,
+      "ent_title": "Plain CNNs degrade with depth on CIFAR-10",
+      "text": "A 56-layer plain CNN reaches *higher* training error and *higher* test error than a 20-layer plain CNN on CIFAR-10 (Fig. 1, §1). Fig. 1 (training/test error curves vs. iterations) and Fig. 6 (left) for plain-{20,32,44,56,110}. Adding layers to a working network does not monotonically improve — and sometimes hurts — even training accuracy, contradicting the construction argument that a deeper net can at least match a shallower one by learning identity in the extra layers.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "A 56-layer plain CNN reaches *higher* training error and *higher* test error than a 20-layer plain CNN on CIFAR-10 (Fig. 1, §1)."
+       },
+       {
+        "label": "Evidence",
+        "value": "Fig. 1 (training/test error curves vs. iterations) and Fig. 6 (left) for plain-{20,32,44,56,110}."
+       },
+       {
+        "label": "Implication",
+        "value": "Adding layers to a working network does not monotonically improve — and sometimes hurts — even training accuracy, contradicting the construction argument that a deeper net can at least match a shallower one by learning identity in the extra layers."
+       }
+      ],
+      "refs": []
+     },
+     {
+      "ent_id": "O2",
+      "inferred_id": false,
+      "ent_title": "Same degradation appears on ImageNet",
+      "text": "34-layer plain net obtains 28.54% top-1 ImageNet validation error vs. 27.94% for the 18-layer plain net — the deeper plain net is worse despite having strictly more capacity (Table 2, Fig. 4 left). Table 2 (plain vs. ResNet, 18/34 layers); Fig. 4 left (plain training/validation curves). The degradation is not specific to CIFAR-scale data and is observed throughout the whole training trajectory, not just at the end.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "34-layer plain net obtains 28.54% top-1 ImageNet validation error vs. 27.94% for the 18-layer plain net — the deeper plain net is worse despite having strictly more capacity (Table 2, Fig. 4 left)."
+       },
+       {
+        "label": "Evidence",
+        "value": "Table 2 (plain vs. ResNet, 18/34 layers); Fig. 4 left (plain training/validation curves)."
+       },
+       {
+        "label": "Implication",
+        "value": "The degradation is not specific to CIFAR-scale data and is observed throughout the whole training trajectory, not just at the end."
+       }
+      ],
+      "refs": []
+     },
+     {
+      "ent_id": "O3",
+      "inferred_id": false,
+      "ent_title": "Degradation is not caused by vanishing gradients",
+      "text": "Plain networks here use Batch Normalization, which keeps forward signals at non-zero variance, and backward gradient norms are verified to be healthy. The 34-layer plain net is \"still able to achieve competitive accuracy\" (24.19% top-1 with 10-crop testing, Table 3), so SGD is making progress, just slowly. §4.1 \"Plain Networks\" discussion; Table 3 (plain-34 = 28.54% top-1 / 10.02% top-5). The bottleneck is *optimization difficulty* — exponentially low convergence rates conjectured — not signal collapse.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "Plain networks here use Batch Normalization, which keeps forward signals at non-zero variance, and backward gradient norms are verified to be healthy. The 34-layer plain net is \"still able to achieve competitive accuracy\" (24.19% top-1 with 10-crop testing, Table 3), so SGD is making progress, just slowly."
+       },
+       {
+        "label": "Evidence",
+        "value": "§4.1 \"Plain Networks\" discussion; Table 3 (plain-34 = 28.54% top-1 / 10.02% top-5)."
+       },
+       {
+        "label": "Implication",
+        "value": "The bottleneck is *optimization difficulty* — exponentially low convergence rates conjectured — not signal collapse."
+       }
+      ],
+      "refs": []
+     },
+     {
+      "ent_id": "O4",
+      "inferred_id": false,
+      "ent_title": "Identity-mapping construction proves a deeper net *should* be at least as good",
+      "text": "Given a shallow network, one can construct a deeper one by appending identity layers; this deeper construction has, by definition, training error ≤ the shallow net's. Yet SGD does not find it (§1, §3.1). §1 introduction argument. Solvers struggle to approximate identity mappings via stacks of nonlinear layers, motivating an architecture that makes identity easy to express.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "Given a shallow network, one can construct a deeper one by appending identity layers; this deeper construction has, by definition, training error ≤ the shallow net's. Yet SGD does not find it (§1, §3.1)."
+       },
+       {
+        "label": "Evidence",
+        "value": "§1 introduction argument."
+       },
+       {
+        "label": "Implication",
+        "value": "Solvers struggle to approximate identity mappings via stacks of nonlinear layers, motivating an architecture that makes identity easy to express."
+       }
+      ],
+      "refs": []
+     },
+     {
+      "ent_id": "O5",
+      "inferred_id": false,
+      "ent_title": "Layer responses in plain nets have larger magnitudes than in ResNets",
+      "text": "Std of 3×3 layer outputs (after BN, before ReLU) is consistently smaller for ResNets than for plain nets, and gets smaller as depth grows (Fig. 7). Fig. 7 (CIFAR-10 layer-response std for plain-{20,56,110} vs. ResNet-{20,56,110}). Empirical support for the prior that, in real tasks, optimal mappings are closer to identity than to zero — so a residual parameterization is a better-conditioned starting point.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "Std of 3×3 layer outputs (after BN, before ReLU) is consistently smaller for ResNets than for plain nets, and gets smaller as depth grows (Fig. 7)."
+       },
+       {
+        "label": "Evidence",
+        "value": "Fig. 7 (CIFAR-10 layer-response std for plain-{20,56,110} vs. ResNet-{20,56,110})."
+       },
+       {
+        "label": "Implication",
+        "value": "Empirical support for the prior that, in real tasks, optimal mappings are closer to identity than to zero — so a residual parameterization is a better-conditioned starting point."
+       }
+      ],
+      "refs": []
+     }
+    ]
+   },
+   {
+    "role": "gaps",
+    "heading": "Gaps",
+    "present": true,
+    "entries": [
+     {
+      "ent_id": "G1",
+      "inferred_id": false,
+      "ent_title": "No way to train networks much deeper than ~20–30 layers",
+      "text": "As of 2015, leading ImageNet models top out at depths in the teens (VGG-19, GoogLeNet); naive deeper variants degrade (O1, O2). O1, O2, O3, O4. Better initialization (Xavier/MSRA), Batch Normalization, intermediate auxiliary classifiers, highway networks with gated shortcuts. They allow tens-of-layer nets to converge but do not enable monotonic accuracy gains with extreme depth. Highway gates are data-dependent and have parameters; when a gate closes, the layer behaves non-residually, and highway networks have not shown gains beyond ~100 layers.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "As of 2015, leading ImageNet models top out at depths in the teens (VGG-19, GoogLeNet); naive deeper variants degrade (O1, O2)."
+       },
+       {
+        "label": "Caused by",
+        "value": "O1, O2, O3, O4."
+       },
+       {
+        "label": "Existing attempts",
+        "value": "Better initialization (Xavier/MSRA), Batch Normalization, intermediate auxiliary classifiers, highway networks with gated shortcuts."
+       },
+       {
+        "label": "Why they fail",
+        "value": "They allow tens-of-layer nets to converge but do not enable monotonic accuracy gains with extreme depth. Highway gates are data-dependent and have parameters; when a gate closes, the layer behaves non-residually, and highway networks have not shown gains beyond ~100 layers."
+       }
+      ],
+      "refs": []
+     },
+     {
+      "ent_id": "G2",
+      "inferred_id": false,
+      "ent_title": "No parameter-free, drop-in mechanism to bias optimization toward near-identity solutions",
+      "text": "Existing shortcut variants either add parameters (projection / gated) or change the function class (highway). O4, O5. Linear / projection shortcuts, gated skip connections. They couple the shortcut to additional learnable parameters or close the residual path entirely.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Statement",
+        "value": "Existing shortcut variants either add parameters (projection / gated) or change the function class (highway)."
+       },
+       {
+        "label": "Caused by",
+        "value": "O4, O5."
+       },
+       {
+        "label": "Existing attempts",
+        "value": "Linear / projection shortcuts, gated skip connections."
+       },
+       {
+        "label": "Why they fail",
+        "value": "They couple the shortcut to additional learnable parameters or close the residual path entirely."
+       }
+      ],
+      "refs": []
+     }
+    ]
+   },
+   {
+    "role": "insight",
+    "heading": "Key Insight",
+    "present": true,
+    "entries": [
+     {
+      "ent_id": "",
+      "inferred_id": false,
+      "ent_title": "Key Insight",
+      "text": "Reformulate each block to fit a *residual* mapping F(x) := H(x) − x, so the original mapping is recovered as F(x) + x via a parameter-free identity shortcut. If the optimal mapping is close to identity, the solver only needs to push F toward zero, which is empirically easier than fitting H from scratch (§3.1). O3, O4, O5. End-to-end training of networks with 50, 101, 152, and even 1202 layers without auxiliary losses, without changing the optimizer, and without adding parameters relative to the plain counterpart.",
+      "unstructured": false,
+      "fields": [
+       {
+        "label": "Insight",
+        "value": "Reformulate each block to fit a *residual* mapping F(x) := H(x) − x, so the original mapping is recovered as F(x) + x via a parameter-free identity shortcut. If the optimal mapping is close to identity, the solver only needs to push F toward zero, which is empirically easier than fitting H from scratch (§3.1)."
+       },
+       {
+        "label": "Derived from",
+        "value": "O3, O4, O5."
+       },
+       {
+        "label": "Enables",
+        "value": "End-to-end training of networks with 50, 101, 152, and even 1202 layers without auxiliary losses, without changing the optimizer, and without adding parameters relative to the plain counterpart."
+       }
+      ],
+      "refs": []
+     }
+    ]
+   },
+   {
+    "role": "assumptions",
+    "heading": "Assumptions",
+    "present": true,
+    "entries": [
+     {
+      "ent_id": "A1",
+      "inferred_id": false,
+      "ent_title": "",
+      "unstructured": true,
+      "fields": [],
+      "refs": [],
+      "text": "Multiple stacked nonlinear layers can asymptotically approximate complex functions (and, by the same hypothesis, residual functions). This is noted as still an open question (footnote 2)."
+     },
+     {
+      "ent_id": "A2",
+      "inferred_id": false,
+      "ent_title": "",
+      "unstructured": true,
+      "fields": [],
+      "refs": [],
+      "text": "Optimal mappings in real recognition tasks are closer to identity than to a generic random function — supported a posteriori by Fig. 7."
+     },
+     {
+      "ent_id": "A3",
+      "inferred_id": false,
+      "ent_title": "",
+      "unstructured": true,
+      "fields": [],
+      "refs": [],
+      "text": "Standard SGD with momentum and BN is sufficient as the optimizer; no second-order or specialized solver is required."
+     },
+     {
+      "ent_id": "A4",
+      "inferred_id": false,
+      "ent_title": "",
+      "unstructured": true,
+      "fields": [],
+      "refs": [],
+      "text": "Identity shortcuts can be applied wherever input and output dimensions agree; dimension-changing shortcuts use either zero-padding (option A) or 1×1 projections (option B/C)."
+     }
+    ]
+   }
+  ]
+ },
+ "glossary": {
+  "title": "Concepts",
+  "groups": [],
+  "terms": [
+   {
+    "term_id": "G01",
+    "name": "Residual Mapping",
+    "aliases": [],
+    "definition": "An auxiliary mapping fit by a few stacked nonlinear layers, expressing the *difference* between a desired underlying mapping $\\mathcal{H}$ and its input $\\mathbf{x}$. The block as a whole computes $\\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + \\mathbf{x}$.",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "$\\mathcal{F}(\\mathbf{x}) := \\mathcal{H}(\\mathbf{x}) - \\mathbf{x}$, with the original mapping recovered as $\\mathcal{H}(\\mathbf{x}) = \\mathcal{F}(\\mathbf{x}) + \\mathbf{x}$."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "Only well-defined for blocks whose input and output have matching dimensions; for dimension changes a linear projection $W_s$ is introduced (Eqn. 2). A single-layer $\\mathcal{F}$ degenerates to a linear layer with no observed advantage; $\\mathcal{F}$ should have ≥2 layers (§3.2)."
+     }
+    ],
+    "related": [
+     "G02",
+     "G03",
+     "G06"
+    ],
+    "refs": [],
+    "group": ""
+   },
+   {
+    "term_id": "G02",
+    "name": "Identity Shortcut",
+    "aliases": [
+     "Option A"
+    ],
+    "definition": "A parameter-free skip connection that adds the input of a residual block directly to its output. When dimensions increase across the shortcut, missing channels are filled with zero padding (no learnable parameters).",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "$\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + \\mathbf{x}$."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "Requires $\\dim(\\mathbf{x}) = \\dim(\\mathcal{F}(\\mathbf{x}))$, or zero-padding for the extra channels. Adds neither parameters nor computational cost beyond an element-wise add."
+     }
+    ],
+    "related": [
+     "G03",
+     "G01",
+     "G04"
+    ],
+    "refs": [],
+    "group": ""
+   },
+   {
+    "term_id": "G03",
+    "name": "Projection Shortcut",
+    "aliases": [
+     "Option B",
+     "Option C"
+    ],
+    "definition": "A 1×1 convolutional shortcut that linearly projects $\\mathbf{x}$ to match the output dimension. Option B uses projections only when dimensions change; option C uses projections on every shortcut.",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "$\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + W_s \\mathbf{x}$."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "$W_s$ adds parameters and FLOPs proportional to channel count. In bottleneck blocks, replacing identity with a projection roughly *doubles* the block's time complexity and model size, so it is reserved for dimension-changing shortcuts."
+     }
+    ],
+    "related": [
+     "G02",
+     "G04"
+    ],
+    "refs": [],
+    "group": ""
+   },
+   {
+    "term_id": "G04",
+    "name": "Bottleneck Residual Block",
+    "aliases": [
+     "bottleneck block"
+    ],
+    "definition": "A 3-layer residual building block whose first 1×1 reduces channels, the 3×3 operates on the bottleneck, and the second 1×1 restores the high-dimensional output. Used in ResNet-50/101/152 in place of the 2-layer 3×3 block.",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "1×1, $C_\\text{in} \\to C_\\text{mid}$ → 3×3, $C_\\text{mid} \\to C_\\text{mid}$ → 1×1, $C_\\text{mid} \\to C_\\text{out}$, with $C_\\text{out} = 4 C_\\text{mid}$ (Fig. 5 right)."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "Designed to keep per-block compute comparable to the 2-layer block while permitting much greater depth. Identity shortcuts are particularly important here because projection shortcuts on the high-dimensional ends are expensive."
+     }
+    ],
+    "related": [
+     "G01",
+     "G02",
+     "G06"
+    ],
+    "refs": [],
+    "group": ""
+   },
+   {
+    "term_id": "G05",
+    "name": "Degradation Problem",
+    "aliases": [],
+    "definition": "An empirical phenomenon where deeper plain CNNs reach *higher* training error than shallower counterparts that are nominally a subspace of the deeper architecture (§1).",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "For network depth $d$, training error $\\epsilon_\\text{train}(d)$ ceases to be monotonically non-increasing as $d$ grows."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "Observed in plain networks even when BN, MSRA initialization, and SGD with momentum are used. The paper attributes it to *optimization* difficulty, not vanishing/exploding gradients (§4.1)."
+     }
+    ],
+    "related": [
+     "G06",
+     "G01"
+    ],
+    "refs": [],
+    "group": ""
+   },
+   {
+    "term_id": "G06",
+    "name": "Plain Network",
+    "aliases": [
+     "plain net"
+    ],
+    "definition": "The non-residual baseline architecture used to isolate the effect of residual learning. The 34-layer plain net has 3.6 GFLOPs (≈18% of VGG-19's 19.6 GFLOPs).",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "Sequential composition of conv → BN → ReLU layers without skip connections, sharing the VGG-style design rules: same output map size ⇒ same #filters; halving spatial size ⇒ doubling #filters (§3.3)."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "Used purely as a control. Plain-{18,34} on ImageNet and plain-{20,32,44,56,110} on CIFAR-10 are the studied depths."
+     }
+    ],
+    "related": [
+     "G05"
+    ],
+    "refs": [],
+    "group": ""
+   },
+   {
+    "term_id": "G07",
+    "name": "Batch Normalization",
+    "aliases": [
+     "BN"
+    ],
+    "definition": "Per-channel normalization placed *right after each convolution and before activation* (§3.4). Used for all plain and residual nets in this paper, with no dropout.",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "$y = \\gamma \\cdot (x - \\mu_B) / \\sigma_B + \\beta$, normalization computed per channel over a mini-batch."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "At inference time, running statistics are used; for the COCO/PASCAL detection fine-tuning experiments, BN statistics are *frozen* after pre-training and BN behaves as an affine transform (Appendix A)."
+     }
+    ],
+    "related": [
+     "G06"
+    ],
+    "refs": [
+     {
+      "raw": "MSRA Initialization (RW04)",
+      "kind": "related_work",
+      "target": "RW04"
+     }
+    ],
+    "group": ""
+   },
+   {
+    "term_id": "G08",
+    "name": "10-Crop Testing",
+    "aliases": [],
+    "definition": "Standard test-time augmentation following Krizhevsky et al. used to report ImageNet validation error in Tables 2, 3.",
+    "fields": [
+     {
+      "label": "Notation",
+      "value": "Forward 10 fixed crops per image (4 corner crops + 1 center crop, each with horizontal flip) and average the predicted class probabilities."
+     },
+     {
+      "label": "Boundary conditions",
+      "value": "Distinct from \"single-model\" results in Table 4, which additionally use fully-convolutional multi-scale testing at scales {224, 256, 384, 480, 640}; and from the test-set ensemble result of 3.57% top-5 in Table 5."
+     }
+    ],
+    "related": [],
+    "refs": [],
+    "group": ""
+   }
+  ],
+  "lexicon": {
+   "residual mapping": "G01",
+   "identity shortcut": "G02",
+   "option a": "G02",
+   "projection shortcut": "G03",
+   "option b": "G03",
+   "option c": "G03",
+   "bottleneck residual block": "G04",
+   "bottleneck block": "G04",
+   "degradation problem": "G05",
+   "plain network": "G06",
+   "plain net": "G06",
+   "batch normalization": "G07",
+   "10-crop testing": "G08"
+  }
+ },
+ "dependencies": {
+  "title": "Related Work / Dependencies",
+  "preamble": "",
+  "legend": [],
+  "attribution": "",
+  "entries": [
+   {
+    "rw_id": "RW01",
+    "inferred_id": false,
+    "name": "Highway Networks (Srivastava, Greff & Schmidhuber, 2015)",
+    "relation_raw": "refutes (the gating choice)",
+    "relation_norm": "refutes",
+    "delta": "What changed: Replace highway's *data-dependent gated* shortcuts with parameter-free identity shortcuts. Why: When a highway gate \"closes\" (approaches zero) the layer becomes non-residual; highway networks have not demonstrated accuracy gains beyond ~100 layers.",
+    "adopted": "The general idea of skip connections, but the gating mechanism is rejected.",
+    "grounding": [
+     {
+      "raw": "arXiv:1505.00387",
+      "kind": "arxiv",
+      "target": null
+     },
+     {
+      "raw": "arXiv:1507.06228",
+      "kind": "arxiv",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C02",
+     "C03",
+     "C06"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW02",
+    "inferred_id": false,
+    "name": "VGG (Simonyan & Zisserman, 2015)",
+    "relation_raw": "baseline",
+    "relation_norm": "baseline",
+    "delta": "What changed: Adopt VGG's design philosophy of stacked 3×3 convs and the \"same map size ⇒ same #filters; halved size ⇒ doubled #filters\" rule, but at much greater depth and lower complexity (3.6 GFLOPs at 34 layers vs. VGG-19's 19.6 GFLOPs). Why: VGG provides the cleanest plain-net baseline against which residual learning can be measured.",
+    "adopted": "VGG-style design rules; reference numbers for FLOPs comparison.",
+    "grounding": [
+     {
+      "raw": "arXiv:1409.1556",
+      "kind": "arxiv",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C01",
+     "C03",
+     "C08"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW03",
+    "inferred_id": false,
+    "name": "Batch Normalization (Ioffe & Szegedy, 2015)",
+    "relation_raw": "imports",
+    "relation_norm": "imports",
+    "delta": "What changed: BN is applied after every conv and before activation in *both* plain and residual nets. The paper uses BN to verify that vanishing forward signals are *not* the cause of degradation. Why: BN is the standard tool for preventing signal collapse in deep nets and isolates the optimization-difficulty hypothesis.",
+    "adopted": "BN architecture; \"no dropout\" recipe combined with BN (also from this work).",
+    "grounding": [
+     {
+      "raw": "ref [16] in the paper",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C01",
+     "C02",
+     "C03"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW04",
+    "inferred_id": false,
+    "name": "MSRA initialization (He, Zhang, Ren & Sun, 2015 — \"Delving deep into rectifiers\")",
+    "relation_raw": "imports",
+    "relation_norm": "imports",
+    "delta": "What changed: Initialize all conv weights with the MSRA scheme. The exact same init is used for plain and residual variants. Why: Pairing PReLU-aware init with BN gives the cleanest starting point for the depth ablation.",
+    "adopted": "Weight initialization scheme.",
+    "grounding": [
+     {
+      "raw": "ref [13] in the paper",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C01",
+     "C02",
+     "C06"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW05",
+    "inferred_id": false,
+    "name": "GoogLeNet / Inception (Szegedy et al., 2015)",
+    "relation_raw": "baseline",
+    "relation_norm": "baseline",
+    "delta": "What changed: Compare against GoogLeNet on ILSVRC'14 (top-5 9.15) and Going Deeper (7.89) without adopting Inception's branching topology. Why: A second strong reference point alongside VGG; GoogLeNet uses an \"inception layer\" composed of a shortcut branch and a few deeper branches.",
+    "adopted": "None architecturally; only the comparison.",
+    "grounding": [
+     {
+      "raw": "ref [44] in the paper",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C03"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW06",
+    "inferred_id": false,
+    "name": "PReLU-net / \"Surpassing human-level on ImageNet\" (He et al., 2015)",
+    "relation_raw": "baseline",
+    "relation_norm": "baseline",
+    "delta": "What changed: Used as the prior single-model state of the art on ImageNet validation (24.27 top-1 / 7.38 top-5 in Table 4). ResNet-152 single-model surpasses it (19.38 / 4.49). Why: Direct comparison point at single-model level.",
+    "adopted": "None.",
+    "grounding": [
+     {
+      "raw": "ref [13] (same group)",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C03"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW07",
+    "inferred_id": false,
+    "name": "BN-Inception (Ioffe & Szegedy, 2015)",
+    "relation_raw": "baseline",
+    "relation_norm": "baseline",
+    "delta": "What changed: Used as the prior single-model SOTA on ImageNet (21.99 / 5.81 in Table 4) and as the prior best ensemble (4.82 in Table 5). Why: Most competitive single-model and ensemble baselines available at the time.",
+    "adopted": "None architecturally; ensemble/single-model comparison points.",
+    "grounding": [
+     {
+      "raw": "ref [16]",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C03"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW08",
+    "inferred_id": false,
+    "name": "Residual representations — VLAD / Fisher Vector / Encoding residual vectors",
+    "relation_raw": "extends",
+    "relation_norm": "extends",
+    "delta": "What changed: Generalize the *residual representation* idea (encoding residuals rather than originals, e.g., VLAD encoding by residual vectors w.r.t. a dictionary) to deep learning by reformulating each layer as a residual function. Why: Provides motivation that residual representations can be \"more effective\" for retrieval/classification (refs [4], [48]) and have a long history.",
+    "adopted": "Conceptual motivation only.",
+    "grounding": [
+     {
+      "raw": "refs [18], [17] (residual encoding)",
+      "kind": "source",
+      "target": null
+     },
+     {
+      "raw": "refs [4], [48] (VLAD/Fisher use)",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C02"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW09",
+    "inferred_id": false,
+    "name": "Multigrid / hierarchical basis preconditioning (Briggs et al., 2000; Szeliski 2006/2010)",
+    "relation_raw": "extends",
+    "relation_norm": "extends",
+    "delta": "What changed: Carry the low-level vision insight that solvers operating on residual variables converge much faster than solvers unaware of the residual nature into deep CNNs. Why: Provides a precedent that \"good reformulation or preconditioning can simplify the optimization.\"",
+    "adopted": "Conceptual motivation only.",
+    "grounding": [
+     {
+      "raw": "refs [3], [45], [46]",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C02"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW10",
+    "inferred_id": false,
+    "name": "Faster R-CNN (Ren, He, Girshick & Sun, 2015)",
+    "relation_raw": "imports",
+    "relation_norm": "imports",
+    "delta": "What changed: Use Faster R-CNN as the detection framework, swapping the VGG-16 backbone with ResNet-101 (Appendix A). Otherwise identical hyperparameters in the baseline rows. Why: Isolates the contribution of the backbone (i.e., the learned representation).",
+    "adopted": "4-step alternating training, RPN + Fast R-CNN, anchor design.",
+    "grounding": [
+     {
+      "raw": "ref [32]",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C08"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW11",
+    "inferred_id": false,
+    "name": "Networks on Conv feature maps / NoC (Ren, He, Girshick & Sun, 2015)",
+    "relation_raw": "imports",
+    "relation_norm": "imports",
+    "delta": "What changed: Use the NoC idea to share full-image conv features through layers with stride ≤16 and treat conv5_x as the per-RoI fc-equivalent in ResNet-101 Faster R-CNN. Why: Lets ResNet-101 (which lacks hidden fc layers) plug into the Faster R-CNN architecture cleanly.",
+    "adopted": "Conv-feature-sharing strategy.",
+    "grounding": [
+     {
+      "raw": "ref [33]",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C08"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   },
+   {
+    "rw_id": "RW12",
+    "inferred_id": false,
+    "name": "PASCAL VOC (Everingham et al., 2010); ImageNet (Russakovsky et al., 2015); COCO (Lin et al., 2014)",
+    "relation_raw": "imports (datasets)",
+    "relation_norm": "imports",
+    "delta": "Used as the evaluation datasets for ImageNet classification, ImageNet localization, COCO detection, and PASCAL VOC detection benchmarks.",
+    "adopted": "Standard splits and evaluation protocols.",
+    "grounding": [
+     {
+      "raw": "refs [5], [36], [26]",
+      "kind": "source",
+      "target": null
+     }
+    ],
+    "claims": [
+     "C03",
+     "C06",
+     "C08"
+    ],
+    "cross_agent": false,
+    "is_footprint": false
+   }
+  ],
+  "footprint": [
+   {
+    "ref_id": "1",
+    "citation": "Bengio, Simard & Frasconi, \"Learning long-term dependencies with gradient descent is difficult\" (1994) — historical reference for gradient-vanishing problem (§1)."
+   },
+   {
+    "ref_id": "2",
+    "citation": "Bishop, *Neural networks for pattern recognition* (1995) — historical reference on shortcut connections."
+   },
+   {
+    "ref_id": "6",
+    "citation": "Gidaris & Komodakis, \"Object detection via multi-region & semantic segmentation-aware CNN\" (2015) — context for VOC2012 SOTA discussion in Appendix B."
+   },
+   {
+    "ref_id": "7",
+    "citation": "Girshick, \"Fast R-CNN\" (2015) — Fast R-CNN ROI pooling, used inside Faster R-CNN."
+   },
+   {
+    "ref_id": "8",
+    "citation": "Girshick et al., \"Rich feature hierarchies (R-CNN)\" (2014) — R-CNN, referenced as the precursor pipeline used in ImageNet localization (Appendix C)."
+   },
+   {
+    "ref_id": "9",
+    "citation": "Glorot & Bengio, \"Understanding the difficulty of training deep feedforward NNs\" (AISTATS 2010) — Xavier init reference, baseline for initialization discussion."
+   },
+   {
+    "ref_id": "10",
+    "citation": "Goodfellow et al., \"Maxout networks\" (2013) — CIFAR-10 baseline in Table 6."
+   },
+   {
+    "ref_id": "11",
+    "citation": "He, Zhang, Ren & Sun, \"Convolutional networks at constrained time cost\" (2015) — corroborating prior report of degradation (§1)."
+   },
+   {
+    "ref_id": "12",
+    "citation": "He, Zhang, Ren & Sun, \"Spatial pyramid pooling in deep convs\" (2014) — SPP/RoI feature pyramid; used in COCO multi-scale testing."
+   },
+   {
+    "ref_id": "14",
+    "citation": "Hinton et al., \"Improving NNs by preventing co-adaptation (dropout)\" (2012) — explicitly *not* used here (no dropout)."
+   },
+   {
+    "ref_id": "15",
+    "citation": "Hochreiter & Schmidhuber, \"Long short-term memory\" (1997) — gating motivation referenced when contrasting with highway networks."
+   },
+   {
+    "ref_id": "17",
+    "citation": "Jegou, Douze & Schmid, \"Product quantization for nearest neighbor\" (TPAMI 2011) — residual-vector encoding precedent."
+   },
+   {
+    "ref_id": "19",
+    "citation": "Jia et al., \"Caffe\" (2014) — implementation library reference."
+   },
+   {
+    "ref_id": "20",
+    "citation": "Krizhevsky, \"Multiple layers of features from tiny images\" (2009) — CIFAR-10 dataset."
+   },
+   {
+    "ref_id": "21",
+    "citation": "Krizhevsky, Sutskever & Hinton, \"ImageNet classification with deep CNNs\" (NIPS 2012) — AlexNet, historical reference for color/scale augmentation and 10-crop testing."
+   },
+   {
+    "ref_id": "22",
+    "citation": "LeCun et al., \"Backpropagation applied to handwritten zip code recognition\" (1989) — historical reference for SGD with backprop."
+   },
+   {
+    "ref_id": "23",
+    "citation": "LeCun et al., \"Efficient backprop\" (1998) — historical reference for normalization."
+   },
+   {
+    "ref_id": "24",
+    "citation": "Lee et al., \"Deeply-supervised nets (DSN)\" (2014) — auxiliary classifier baseline; CIFAR-10 augmentation recipe (4-pixel pad + crop) borrowed."
+   },
+   {
+    "ref_id": "25",
+    "citation": "Lin, Chen & Yan, \"Network in network (NIN)\" (2013) — CIFAR-10 baseline in Table 6."
+   },
+   {
+    "ref_id": "27",
+    "citation": "Long, Shelhamer & Darrell, \"Fully convolutional networks for semantic segmentation\" (CVPR 2015) — referenced for fully-convolutional dense testing."
+   },
+   {
+    "ref_id": "28",
+    "citation": "Montufar, Pascanu, Cho & Bengio, \"On the number of linear regions of deep NNs\" (NIPS 2014) — cited at footnote 2 for the asymptotic-approximation hypothesis."
+   },
+   {
+    "ref_id": "29",
+    "citation": "Nair & Hinton, \"ReLU\" (ICML 2010) — activation function used throughout."
+   },
+   {
+    "ref_id": "30",
+    "citation": "Perronnin & Dance, \"Fisher kernels on visual vocabularies\" (CVPR 2007) — historical residual-encoding precedent."
+   },
+   {
+    "ref_id": "31",
+    "citation": "Raiko, Valpola & LeCun, \"Deep learning made easier by linear transformations in perceptrons\" (AISTATS 2012) — linear-shortcut precedent."
+   },
+   {
+    "ref_id": "33",
+    "citation": "Ren, He, Girshick & Sun, \"Object detection networks on conv feature maps (NoC)\" (arXiv:1504.06066) — see RW11."
+   },
+   {
+    "ref_id": "34",
+    "citation": "Ripley, *Pattern recognition and neural networks* (1996) — historical shortcut reference."
+   },
+   {
+    "ref_id": "35",
+    "citation": "Romero et al., \"FitNets: Hints for thin deep nets\" (ICLR 2015) — CIFAR-10 baseline in Table 6."
+   },
+   {
+    "ref_id": "37",
+    "citation": "Saxe, McClelland & Ganguli, \"Exact solutions to the nonlinear dynamics of learning in deep linear NNs\" (arXiv:1312.6120) — referenced for normalization discussion."
+   },
+   {
+    "ref_id": "38",
+    "citation": "Schraudolph, \"Accelerated gradient descent by factor-centering decomposition\" (1998) — precondition / centering precedent."
+   },
+   {
+    "ref_id": "39",
+    "citation": "Schraudolph, \"Centering NN gradient factors\" (1998) — see [38]."
+   },
+   {
+    "ref_id": "40",
+    "citation": "Sermanet et al., \"OverFeat\" (ICLR 2014) — ImageNet localization baseline in Table 14."
+   },
+   {
+    "ref_id": "42",
+    "citation": "Srivastava, Greff & Schmidhuber, \"Highway networks\" (arXiv:1505.00387) — see RW01."
+   },
+   {
+    "ref_id": "43",
+    "citation": "Srivastava, Greff & Schmidhuber, \"Training very deep networks\" (arXiv:1507.06228) — see RW01."
+   },
+   {
+    "ref_id": "45",
+    "citation": "Szeliski, \"Fast surface interpolation using hierarchical basis functions\" (TPAMI 1990) — see RW09."
+   },
+   {
+    "ref_id": "46",
+    "citation": "Szeliski, \"Locally adapted hierarchical basis preconditioning\" (SIGGRAPH 2006) — see RW09."
+   },
+   {
+    "ref_id": "47",
+    "citation": "Vatanen, Raiko, Valpola & LeCun, \"Pushing stochastic gradient towards second-order methods\" (NIPS 2013) — second-order/preconditioning context."
+   },
+   {
+    "ref_id": "48",
+    "citation": "Vedaldi & Fulkerson, \"VLFeat\" (2008) — VLFeat library / VLAD support."
+   },
+   {
+    "ref_id": "49",
+    "citation": "Venables & Ripley, *Modern applied statistics with s-plus* (1999) — historical shortcut reference."
+   },
+   {
+    "ref_id": "50",
+    "citation": "Zeiler & Fergus, \"Visualizing and understanding convolutional networks\" (ECCV 2014) — referenced for \"low/mid/high-level features\" framing in §1."
+   }
+  ]
+ },
+ "recipes": {
+  "title": "Solution",
+  "files": [
+   {
+    "file": "algorithm.md",
+    "role": "algorithm",
+    "file_title": "Algorithm: Residual Learning",
+    "sections": [
+     {
+      "sec_id": "",
+      "heading": "Mathematical formulation",
+      "kind": "math",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "Let $\\mathcal{H}(\\mathbf{x})$ denote the underlying mapping a stack of layers should fit, with $\\mathbf{x}$ the input to the first layer in the stack. Rather than fitting $\\mathcal{H}$ directly, residual learning hypothesizes a residual function\n\n$$\\mathcal{F}(\\mathbf{x}) := \\mathcal{H}(\\mathbf{x}) - \\mathbf{x}.$$\n\nThe original mapping is recovered as $\\mathcal{F}(\\mathbf{x}) + \\mathbf{x}$. A residual *building block* (Fig. 2) is\n\n$$\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + \\mathbf{x} \\qquad (\\text{Eqn. 1})$$\n\nWhen the input and output dimensions differ (e.g., on stride-2 down-sampling stages), a linear projection $W_s$ is introduced on the shortcut:\n\n$$\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + W_s \\mathbf{x} \\qquad (\\text{Eqn. 2})$$\n\nFor a 2-layer basic block, $\\mathcal{F} = W_2 \\, \\sigma(W_1 \\mathbf{x})$, where $\\sigma$ is ReLU and biases are omitted. The element-wise add is followed by a second ReLU: $\\sigma(\\mathbf{y})$. For a 3-layer bottleneck block, $\\mathcal{F} = W_3 \\, \\sigma(W_2 \\, \\sigma(W_1 \\mathbf{x}))$, where $W_1, W_3$ are 1×1 convolutions and $W_2$ is 3×3.",
+      "text": "Let $\\mathcal{H}(\\mathbf{x})$ denote the underlying mapping a stack of layers should fit, with $\\mathbf{x}$ the input to the first layer in the stack. Rather than fitting $\\mathcal{H}$ directly, residual learning hypothesizes a residual function\n\n$$\\mathcal{F}(\\mathbf{x}) := \\mathcal{H}(\\mathbf{x}) - \\mathbf{x}.$$\n\nThe original mapping is recovered as $\\mathcal{F}(\\mathbf{x}) + \\mathbf{x}$. A residual *building block* (Fig. 2) is\n\n$$\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + \\mathbf{x} \\qquad (\\text{Eqn. 1})$$\n\nWhen the input and output dimensions differ (e.g., on stride-2 down-sampling stages), a linear projection $W_s$ is introduced on the shortcut:\n\n$$\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + W_s \\mathbf{x} \\qquad (\\text{Eqn. 2})$$\n\nFor a 2-layer basic block, $\\mathcal{F} = W_2 \\, \\sigma(W_1 \\mathbf{x})$, where $\\sigma$ is ReLU and biases are omitted. The element-wise add is followed by a second ReLU: $\\sigma(\\mathbf{y})$. For a 3-layer bottleneck block, $\\mathcal{F} = W_3 \\, \\sigma(W_2 \\, \\sigma(W_1 \\mathbf{x}))$, where $W_1, W_3$ are 1×1 convolutions and $W_2$ is 3×3.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Pseudocode (forward pass of one residual block)",
+      "kind": "code",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "function ResidualBlock(x, F, shortcut_type, downsample):\n    # F is the residual function (basic or bottleneck)\n    out = F(x)                        # conv -> BN -> ReLU -> conv -> BN\n                                      # (or 1x1 -> 3x3 -> 1x1 for bottleneck)\n    if dim(out) == dim(x) and not downsample:\n        identity = x                  # parameter-free identity shortcut\n    else:\n        if shortcut_type == \"A\":\n            identity = zero_pad_channels(maybe_stride2(x))   # option A\n        else:\n            identity = projection(x)  # option B / C: 1x1 conv (+stride 2)\n    out = out + identity              # element-wise add\n    return ReLU(out)\n",
+      "text": "```\nfunction ResidualBlock(x, F, shortcut_type, downsample):\n    # F is the residual function (basic or bottleneck)\n    out = F(x)                        # conv -> BN -> ReLU -> conv -> BN\n                                      # (or 1x1 -> 3x3 -> 1x1 for bottleneck)\n    if dim(out) == dim(x) and not downsample:\n        identity = x                  # parameter-free identity shortcut\n    else:\n        if shortcut_type == \"A\":\n            identity = zero_pad_channels(maybe_stride2(x))   # option A\n        else:\n            identity = projection(x)  # option B / C: 1x1 conv (+stride 2)\n    out = out + identity              # element-wise add\n    return ReLU(out)\n```\n\n`maybe_stride2(x)` performs the 2× spatial down-sampling that matches the residual function's stride. For ImageNet ResNets, down-sampling occurs at the *first* block of stages `conv3_x`, `conv4_x`, `conv5_x`.\n\nThe full network is a stage-by-stage stack of `ResidualBlock` instances (architecture.md), preceded by the 7×7 stem and followed by global average pool + fc + softmax.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Step-by-step explanation",
+      "kind": "steps",
+      "markdown": "",
+      "steps": [
+       "**Pre-process**: subtract per-pixel mean; standard color/scale augmentation; 224×224 random crop on a shorter-side ∈ [256, 480] image.",
+       "**Stem**: 7×7 conv stride 2 → BN → ReLU → 3×3 max-pool stride 2.",
+       "**Residual stages**: for each residual block, compute $\\mathcal{F}(\\mathbf{x})$ by 2 (basic) or 3 (bottleneck) conv layers each followed by BN; the second/third has no ReLU before the addition.",
+       "**Shortcut add**: identity (option A) or projection (option B/C); element-wise sum.",
+       "**Block output**: ReLU after the add.",
+       "**Head**: global average pool over the 7×7 final map → 1000-way fc → softmax."
+      ],
+      "fields": [],
+      "code": "",
+      "text": "1. **Pre-process**: subtract per-pixel mean; standard color/scale augmentation; 224×224 random crop on a shorter-side ∈ [256, 480] image.\n2. **Stem**: 7×7 conv stride 2 → BN → ReLU → 3×3 max-pool stride 2.\n3. **Residual stages**: for each residual block, compute $\\mathcal{F}(\\mathbf{x})$ by 2 (basic) or 3 (bottleneck) conv layers each followed by BN; the second/third has no ReLU before the addition.\n4. **Shortcut add**: identity (option A) or projection (option B/C); element-wise sum.\n5. **Block output**: ReLU after the add.\n6. **Head**: global average pool over the 7×7 final map → 1000-way fc → softmax.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Complexity analysis",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- Identity shortcut adds **zero** parameters and only an element-wise addition (negligible vs. the conv FLOPs).\n- Projection shortcut adds parameters proportional to $C_{in} \\cdot C_{out}$ for a 1×1 conv, with FLOPs of $C_{in} \\cdot C_{out} \\cdot H_{out} \\cdot W_{out}$.\n- A bottleneck block with identity shortcut has the same time complexity as a basic 2-layer block (paper §\"Deeper Bottleneck Architectures\"); replacing its identity with a projection roughly *doubles* the block's time complexity and model size.\n- Whole-network FLOPs: ResNet-{18, 34, 50, 101, 152} = {1.8, 3.6, 3.8, 7.6, 11.3} × 10⁹ (Table 1). VGG-19 = 19.6 × 10⁹.\n- For comparison, the 34-layer plain net has 3.6 × 10⁹ FLOPs (≈18% of VGG-19) — adding identity shortcuts to make ResNet-34 leaves FLOPs unchanged.",
+      "warn": "",
+      "refs": []
+     }
+    ]
+   },
+   {
+    "file": "architecture.md",
+    "role": "architecture",
+    "file_title": "Architecture",
+    "sections": [
+     {
+      "sec_id": "",
+      "heading": "Stem (`conv1`)",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Inputs**: 224×224×3 image (per-pixel mean subtracted, ImageNet color/scale augmented).\n- **Operation**: 7×7 conv, 64 filters, stride 2 → BN → ReLU → 3×3 max-pool, stride 2.\n- **Outputs**: 56×56×64 feature map.\n- **Notes**: Identical for every ResNet-{18, 34, 50, 101, 152}.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Stage `conv2_x` (output 56×56)",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Inputs**: 56×56×64.\n- **Operation**: Stack of residual blocks. Basic block (ResNet-18/34): two 3×3 convs, 64 filters. Bottleneck (ResNet-50/101/152): 1×1, 64 → 3×3, 64 → 1×1, 256.\n- **Block counts**: ResNet-18 ×2, ResNet-34 ×3, ResNet-50/101/152 ×3.\n- **Outputs**: 56×56×64 (basic) or 56×56×256 (bottleneck).\n- **Notes**: First block of `conv2_x` does not down-sample.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Stages `conv3_x` (28×28), `conv4_x` (14×14), `conv5_x` (7×7)",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Inputs**: previous stage's feature map.\n- **Operation**: First block of each stage uses **stride 2** in the 3×3 conv to halve spatial size; channel count doubles. Subsequent blocks keep size and channels.\n- **Block counts (basic)**: ResNet-18 — {2, 2, 2}; ResNet-34 — {4, 6, 3}.\n- **Block counts (bottleneck)**: ResNet-50 — {4, 6, 3}; ResNet-101 — {4, 23, 3}; ResNet-152 — {8, 36, 3}.\n- **Channel widths (basic)**: 128 → 256 → 512.\n- **Channel widths (bottleneck)**: middle 128/256/512, output 512/1024/2048.\n- **Outputs**: 28×28×{128 | 512}, 14×14×{256 | 1024}, 7×7×{512 | 2048} respectively.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Residual block variants",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Basic block (ResNet-18/34)**: `[3×3 conv → BN → ReLU → 3×3 conv → BN] + shortcut → ReLU` (Fig. 2). Total 2 weighted layers.\n- **Bottleneck block (ResNet-50/101/152)**: `[1×1 conv → BN → ReLU → 3×3 conv → BN → ReLU → 1×1 conv → BN] + shortcut → ReLU` (Fig. 5 right). Total 3 weighted layers.\n- **Shortcut paths**:\n  - Identity (option A): direct add; for dimension-changing blocks, zero-pad extra channels and use stride-2 sampling.\n  - Projection (option B/C): 1×1 conv with stride 2 (when down-sampling) and matching output channels. Default in deeper bottleneck nets is option B (projection only on dimension changes).",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Head",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Inputs**: 7×7×{512 | 2048} feature map.\n- **Operation**: Global average pooling → 1000-d fully-connected softmax.\n- **Outputs**: 1000-class probability vector.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "CIFAR-10 architecture (separate variant)",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- 32×32×3 input → first 3×3 conv with 16 filters → three feature-map sizes {32, 16, 8} with widths {16, 32, 64} and 2n layers each (total 6n+2 weighted layers) → global average pool → 10-way fc + softmax.\n- Down-sampling done by stride-2 convolutions; **option A identity shortcuts everywhere**, so the residual nets have *exactly* the same parameter, depth, and width as the plain counterparts.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Per-depth complexity (from Table 1)",
+      "kind": "table",
+      "markdown": "| Depth | Block type | FLOPs | Block layout (conv2..conv5) |\n|-------|------------|-------|------------------------------|\n| 18  | basic       | 1.8×10⁹ | 2, 2, 2, 2 |\n| 34  | basic       | 3.6×10⁹ | 3, 4, 6, 3 |\n| 50  | bottleneck  | 3.8×10⁹ | 3, 4, 6, 3 |\n| 101 | bottleneck  | 7.6×10⁹ | 3, 4, 23, 3 |\n| 152 | bottleneck  | 11.3×10⁹ | 3, 8, 36, 3 |\n\nFor reference: VGG-19 = 19.6×10⁹ FLOPs (Table 1 caption), so ResNet-152 is roughly **8× deeper** at **~57% of the FLOPs**.",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "| Depth | Block type | FLOPs | Block layout (conv2..conv5) |\n|-------|------------|-------|------------------------------|\n| 18  | basic       | 1.8×10⁹ | 2, 2, 2, 2 |\n| 34  | basic       | 3.6×10⁹ | 3, 4, 6, 3 |\n| 50  | bottleneck  | 3.8×10⁹ | 3, 4, 6, 3 |\n| 101 | bottleneck  | 7.6×10⁹ | 3, 4, 23, 3 |\n| 152 | bottleneck  | 11.3×10⁹ | 3, 8, 36, 3 |\n\nFor reference: VGG-19 = 19.6×10⁹ FLOPs (Table 1 caption), so ResNet-152 is roughly **8× deeper** at **~57% of the FLOPs**.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Key design choices",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **VGG-style design rules** (§3.3): same output map size ⇒ same #filters; halving spatial size ⇒ doubling #filters.\n- **Down-sampling by stride-2 conv**, not by pooling, in `conv3_1`, `conv4_1`, `conv5_1`.\n- **Single 3×3 conv per layer** in basic blocks; bottleneck reduces the high-dim 1×1 ↔ 3×3 cost.\n- **No dropout** anywhere (§3.4).\n- **BN after every conv, before activation** (§3.4).",
+      "warn": "",
+      "refs": []
+     }
+    ]
+   },
+   {
+    "file": "constraints.md",
+    "role": "constraints",
+    "file_title": "Constraints and Limitations",
+    "sections": [
+     {
+      "sec_id": "",
+      "heading": "Dimension-matching constraints",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- Eqn. (1) (`y = F(x) + x`) is only well-defined when `dim(F(x)) == dim(x)`. When stages change spatial size or channel count, one of two strategies is required:\n  - **Option A (identity + zero-pad)**: down-sample by stride-2 sampling on the shortcut and zero-pad the extra channels — *no learnable parameters*.\n  - **Option B/C (projection)**: 1×1 conv with stride 2 (when down-sampling), introducing parameters `C_in × C_out`.\n- Within a stage (no spatial or channel change), identity shortcuts are always used.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Shortcut-design caveats",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Single-layer F is rejected.** When `F` has only one weighted layer, Eqn. (1) is similar to a linear layer; the paper \"did not observe advantages\" and uses ≥2 layers in `F` (§3.1).\n- **Option A has a residual-learning blind spot at dimension changes.** Zero-padded extra channels carry \"no residual learning\" — the paper attributes the small Option B>A gap on ImageNet to this fact.\n- **Option C is not worth its cost.** Although marginally better than B (24.19 vs. 24.52 ResNet-34 top-1), C adds 13 extra projection shortcuts and is \"not essential for addressing the degradation problem\"; the paper rejects C \"to reduce memory/time complexity and model sizes\" (§\"Identity vs. Projection Shortcuts\").\n- **Bottleneck blocks particularly require identity shortcuts.** Replacing the bottleneck identity with a projection \"doubles\" both time complexity and model size.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Training-recipe constraints",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **No dropout** anywhere (§3.4).\n- **BN must come right after each conv and before activation** (§3.4).\n- **MSRA initialization** for all conv weights.\n- **Mini-batch size**: 256 for ImageNet, 128 for CIFAR-10.\n- **LR schedule** depends on a *plateau* signal for ImageNet (LR /10 when error plateaus) but a *fixed* step schedule for CIFAR-10 (32k, 48k iters).",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Optimization caveats specific to extreme depth",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- **Warmup is required for the 110-layer CIFAR ResNet.** LR 0.1 from iter 0 is \"slightly too large to start converging\"; the recipe is LR 0.01 for ~400 iters until training error \u003c80%, then restore LR 0.1 (footnote 5). LR 0.1 from start *eventually* converges to similar accuracy after several epochs of >90% error, but warmup is the chosen recipe.\n- **No warmup is needed for ResNet-1202** at the same recipe — the paper notes \"no optimization difficulty\" for the 1202-layer model.\n- **Overfitting bites at extreme depth on small data.** ResNet-1202 (19.4M params on 50k CIFAR images) trains fine but tests at 7.93% vs. ResNet-110's 6.43%; the paper does not apply maxout/dropout/strong regularization in this work.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Generalization caveats",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- All ImageNet results use 10-crop testing for Tables 2/3 and an additional fully-convolutional multi-scale test for Table 4. Mixing these protocols across rows is not legitimate.\n- The 3.57% top-5 ensemble result (Table 5) is a 6-model ensemble on the test set — not reproducible from a single model.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Detection-transfer caveats (Appendix A)",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- BN layer statistics are *frozen* during Faster R-CNN fine-tuning to reduce memory consumption.\n- Per-class RPN with binary logistic classification is used for ImageNet localization; for COCO/PASCAL detection, the standard category-agnostic RPN is used.\n- The COCO+PASCAL \"baseline+++\" rows in Tables 9/10/11 combine box refinement, global context, multi-scale testing, and ensembling on top of ResNet-101; these gains are not solely attributable to the backbone.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Unverified hypothesis",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "",
+      "warn": "- **A1 (open question)**: The paper's residual-learning argument relies on the hypothesis that stacked nonlinear layers can asymptotically approximate any function (and thus also any residual function). Footnote 2 explicitly notes this remains open.",
+      "refs": []
+     },
+     {
+      "sec_id": "",
+      "heading": "Out-of-scope",
+      "kind": "prose",
+      "markdown": "",
+      "steps": [],
+      "fields": [],
+      "code": "",
+      "text": "- The paper does not formally prove that residual learning improves *optimization landscape* properties (it proposes this as a hypothesis supported empirically by Fig. 7).\n- The paper does not study extremely *wide* networks; only depth scaling.\n- No comparison with second-order optimizers; SGD is the only solver studied.",
+      "warn": "",
+      "refs": []
+     }
+    ]
+   },
+   {
+    "file": "heuristics.md",
+    "role": "heuristics",
+    "file_title": "Heuristics",
+    "sections": [
+     {
+      "sec_id": "H01",
+      "heading": "H01: Default to identity shortcuts (Option A) for parameter-free residual learning",
+      "kind": "kv",
+      "markdown": "",
+      "steps": [],
+      "fields": [
+       {
+        "label": "Rationale",
+        "value": "Identity shortcuts add zero parameters and zero FLOPs beyond an element-wise add, so they cleanly isolate the effect of residual learning from increases in capacity. Empirically, A is within ~0.65 top-1 of the more expensive C on ResNet-34 (Table 3)."
+       },
+       {
+        "label": "Sensitivity",
+        "value": "low — the residual learning gain is dominated by *having* a shortcut, not by which kind."
+       },
+       {
+        "label": "Bounds",
+        "value": "Use Option A only when input/output dimensions match (or fall back to zero-padding for new channels). For deeper bottleneck nets, default to Option B (projection only on dimension changes) to avoid the \"no residual learning at the dimension change\" blind spot of A."
+       },
+       {
+        "label": "Code ref",
+        "value": "[src/execution/residual_block.py](../../src/execution/residual_block.py)"
+       },
+       {
+        "label": "Source",
+        "value": "§3.2; §\"Identity vs. Projection Shortcuts\"; Table 3."
+       }
+      ],
+      "code": "",
+      "text": "- **Rationale**: Identity shortcuts add zero parameters and zero FLOPs beyond an element-wise add, so they cleanly isolate the effect of residual learning from increases in capacity. Empirically, A is within ~0.65 top-1 of the more expensive C on ResNet-34 (Table 3).\n- **Sensitivity**: low — the residual learning gain is dominated by *having* a shortcut, not by which kind.\n- **Bounds**: Use Option A only when input/output dimensions match (or fall back to zero-padding for new channels). For deeper bottleneck nets, default to Option B (projection only on dimension changes) to avoid the \"no residual learning at the dimension change\" blind spot of A.\n- **Code ref**: [src/execution/residual_block.py](../../src/execution/residual_block.py)\n- **Source**: §3.2; §\"Identity vs. Projection Shortcuts\"; Table 3.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "H02",
+      "heading": "H02: Place BN right after every conv and before the activation, no dropout",
+      "kind": "kv",
+      "markdown": "",
+      "steps": [],
+      "fields": [
+       {
+        "label": "Rationale",
+        "value": "BN keeps forward-signal variance non-zero in deep stacks (rules out vanishing-signal explanations for any residual dynamics). Combining BN with no dropout simplifies the picture and lets the depth ablation be clean."
+       },
+       {
+        "label": "Sensitivity",
+        "value": "medium — the paper consistently reports degraded plain-net results without BN. BN ↔ activation order is held fixed at \"BN before ReLU\" throughout."
+       },
+       {
+        "label": "Bounds",
+        "value": "Applies to ImageNet and CIFAR-10 training. For Faster R-CNN fine-tuning (Appendix A), BN statistics are *frozen* (BN behaves as an affine transform) to save memory."
+       },
+       {
+        "label": "Code ref",
+        "value": "[src/execution/residual_block.py](../../src/execution/residual_block.py)"
+       },
+       {
+        "label": "Source",
+        "value": "§3.4 \"Implementation\"; Appendix A."
+       }
+      ],
+      "code": "",
+      "text": "- **Rationale**: BN keeps forward-signal variance non-zero in deep stacks (rules out vanishing-signal explanations for any residual dynamics). Combining BN with no dropout simplifies the picture and lets the depth ablation be clean.\n- **Sensitivity**: medium — the paper consistently reports degraded plain-net results without BN. BN ↔ activation order is held fixed at \"BN before ReLU\" throughout.\n- **Bounds**: Applies to ImageNet and CIFAR-10 training. For Faster R-CNN fine-tuning (Appendix A), BN statistics are *frozen* (BN behaves as an affine transform) to save memory.\n- **Code ref**: [src/execution/residual_block.py](../../src/execution/residual_block.py)\n- **Source**: §3.4 \"Implementation\"; Appendix A.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "H03",
+      "heading": "H03: Warm up the LR for the 110-layer CIFAR ResNet",
+      "kind": "kv",
+      "markdown": "",
+      "steps": [],
+      "fields": [
+       {
+        "label": "Rationale",
+        "value": "At depth 110, LR 0.1 from iter 0 is \"slightly too large to start converging\" cleanly. Pre-warming at LR 0.01 for ~400 iterations until training error drops below ~80% lets the optimizer enter a basin where LR 0.1 then trains stably."
+       },
+       {
+        "label": "Sensitivity",
+        "value": "medium for the 110-layer CIFAR variant (controls whether early training stalls); low for ResNet-1202 (the paper notes no optimization difficulty there)."
+       },
+       {
+        "label": "Bounds",
+        "value": "Trigger only when very deep CIFAR ResNets fail to start converging at the default LR. The paper notes that LR 0.1 from start eventually reaches similar accuracy \"after several epochs (about 90% error)\" — warmup is a stability heuristic, not a fundamental requirement."
+       },
+       {
+        "label": "Code ref",
+        "value": "[src/execution/training_recipe.py](../../src/execution/training_recipe.py)"
+       },
+       {
+        "label": "Source",
+        "value": "§4.2 paragraph on n=18; footnote 5."
+       }
+      ],
+      "code": "",
+      "text": "- **Rationale**: At depth 110, LR 0.1 from iter 0 is \"slightly too large to start converging\" cleanly. Pre-warming at LR 0.01 for ~400 iterations until training error drops below ~80% lets the optimizer enter a basin where LR 0.1 then trains stably.\n- **Sensitivity**: medium for the 110-layer CIFAR variant (controls whether early training stalls); low for ResNet-1202 (the paper notes no optimization difficulty there).\n- **Bounds**: Trigger only when very deep CIFAR ResNets fail to start converging at the default LR. The paper notes that LR 0.1 from start eventually reaches similar accuracy \"after several epochs (about 90% error)\" — warmup is a stability heuristic, not a fundamental requirement.\n- **Code ref**: [src/execution/training_recipe.py](../../src/execution/training_recipe.py)\n- **Source**: §4.2 paragraph on n=18; footnote 5.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "H04",
+      "heading": "H04: Use bottleneck blocks (1×1 → 3×3 → 1×1) once depth exceeds ~50 layers",
+      "kind": "kv",
+      "markdown": "",
+      "steps": [],
+      "fields": [
+       {
+        "label": "Rationale",
+        "value": "A 3-layer bottleneck block has the same per-block time complexity as a 2-layer 3×3 block but lets the 3×3 operate on a low-dimensional bottleneck. This makes 50/101/152-layer ResNets tractable at FLOPs comparable to a 34-layer non-bottleneck (3.8 vs. 3.6 GFLOPs at 50 layers)."
+       },
+       {
+        "label": "Sensitivity",
+        "value": "high — at large depths, dropping bottlenecks would substantially raise compute and memory."
+       },
+       {
+        "label": "Bounds",
+        "value": "Use only with identity shortcuts on the high-dimensional ends; replacing those identities with projections doubles complexity and model size."
+       },
+       {
+        "label": "Code ref",
+        "value": "[src/execution/residual_block.py](../../src/execution/residual_block.py)"
+       },
+       {
+        "label": "Source",
+        "value": "§\"Deeper Bottleneck Architectures\"; Fig. 5; Table 1."
+       }
+      ],
+      "code": "",
+      "text": "- **Rationale**: A 3-layer bottleneck block has the same per-block time complexity as a 2-layer 3×3 block but lets the 3×3 operate on a low-dimensional bottleneck. This makes 50/101/152-layer ResNets tractable at FLOPs comparable to a 34-layer non-bottleneck (3.8 vs. 3.6 GFLOPs at 50 layers).\n- **Sensitivity**: high — at large depths, dropping bottlenecks would substantially raise compute and memory.\n- **Bounds**: Use only with identity shortcuts on the high-dimensional ends; replacing those identities with projections doubles complexity and model size.\n- **Code ref**: [src/execution/residual_block.py](../../src/execution/residual_block.py)\n- **Source**: §\"Deeper Bottleneck Architectures\"; Fig. 5; Table 1.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "H05",
+      "heading": "H05: Down-sample by stride-2 convolutions, not pooling",
+      "kind": "kv",
+      "markdown": "",
+      "steps": [],
+      "fields": [
+       {
+        "label": "Rationale",
+        "value": "Putting the stride on the first convolution of each stage (`conv3_1`, `conv4_1`, `conv5_1`) folds spatial reduction into a learnable layer and matches the VGG-style \"halve resolution ⇒ double channels\" rule, keeping per-layer time complexity roughly constant across stages."
+       },
+       {
+        "label": "Sensitivity",
+        "value": "low — a design convention rather than a tuned trick; ResNets are not reported to be sensitive to swapping pooling for strided conv at these stages."
+       },
+       {
+        "label": "Bounds",
+        "value": "Applies to the residual stages on ImageNet (and the analogous 32×32 → 16×16 → 8×8 progression on CIFAR-10). The 3×3 max-pool stride-2 in `conv1` is the only pooling used."
+       },
+       {
+        "label": "Code ref",
+        "value": "[src/execution/residual_block.py](../../src/execution/residual_block.py)"
+       },
+       {
+        "label": "Source",
+        "value": "§3.3 design rules; Table 1."
+       }
+      ],
+      "code": "",
+      "text": "- **Rationale**: Putting the stride on the first convolution of each stage (`conv3_1`, `conv4_1`, `conv5_1`) folds spatial reduction into a learnable layer and matches the VGG-style \"halve resolution ⇒ double channels\" rule, keeping per-layer time complexity roughly constant across stages.\n- **Sensitivity**: low — a design convention rather than a tuned trick; ResNets are not reported to be sensitive to swapping pooling for strided conv at these stages.\n- **Bounds**: Applies to the residual stages on ImageNet (and the analogous 32×32 → 16×16 → 8×8 progression on CIFAR-10). The 3×3 max-pool stride-2 in `conv1` is the only pooling used.\n- **Code ref**: [src/execution/residual_block.py](../../src/execution/residual_block.py)\n- **Source**: §3.3 design rules; Table 1.",
+      "warn": "",
+      "refs": []
+     },
+     {
+      "sec_id": "H06",
+      "heading": "H06: Match shortcut down-sampling to the residual function's stride",
+      "kind": "kv",
+      "markdown": "",
+      "steps": [],
+      "fields": [
+       {
+        "label": "Rationale",
+        "value": "When the residual function does stride-2 down-sampling, the shortcut must do the same — by stride-2 sampling (Option A) or stride-2 1×1 conv (Option B/C). Otherwise the element-wise add fails on shape, or worse, silently mis-aligns features."
+       },
+       {
+        "label": "Sensitivity",
+        "value": "high — wrong shortcut stride breaks the block."
+       },
+       {
+        "label": "Bounds",
+        "value": "Only triggers at stage boundaries (`conv3_1`, `conv4_1`, `conv5_1`)."
+       },
+       {
+        "label": "Code ref",
+        "value": "[src/execution/residual_block.py](../../src/execution/residual_block.py)"
+       },
+       {
+        "label": "Source",
+        "value": "§\"Residual Network\" paragraph in §3.3 (\"when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2\")."
+       }
+      ],
+      "code": "",
+      "text": "- **Rationale**: When the residual function does stride-2 down-sampling, the shortcut must do the same — by stride-2 sampling (Option A) or stride-2 1×1 conv (Option B/C). Otherwise the element-wise add fails on shape, or worse, silently mis-aligns features.\n- **Sensitivity**: high — wrong shortcut stride breaks the block.\n- **Bounds**: Only triggers at stage boundaries (`conv3_1`, `conv4_1`, `conv5_1`).\n- **Code ref**: [src/execution/residual_block.py](../../src/execution/residual_block.py)\n- **Source**: §\"Residual Network\" paragraph in §3.3 (\"when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2\").",
+      "warn": "",
+      "refs": []
+     }
+    ]
+   }
+  ]
+ }
+}
+/* __ARA_DATA_END__ */
+</script>
+
+<script>
+"use strict";
+(function () {
+  const GLYPH = { question:"Q", experiment:"✦", decision:"→", dead_end:"✗", pivot:"↻", insight:"!", default:"•" };
+  const TYPES = ["question","experiment","decision","dead_end","pivot","insight"];
+
+  let DATA;
+  try {
+    // The payload sits between the BEGIN/END marker comments (kept in-file so the
+    // skill can re-inject). Strip ONLY those two named markers before parsing; the
+    // rest of textContent is pure JSON. (Marker text is not written literally here,
+    // so it stays a single injection site.)
+    var raw = document.getElementById("ara-data").textContent
+                .replace(/\/\*\s*__ARA_DATA_(?:BEGIN|END)__\s*\*\//g, "");
+    DATA = JSON.parse(raw);
+  } catch (e) {
+    document.getElementById("detail").innerHTML =
+      '<div class="none">Could not parse embedded ARA data: ' + String(e) + '</div>';
+    return;
+  }
+
+  const nodes = DATA.nodes || [];
+  const byId = new Map(nodes.map(n => [n.id, n]));
+  const kids = new Map();
+  nodes.forEach(n => kids.set(n.id, []));
+  let roots = [];
+  nodes.forEach(n => {
+    if (n.parent && byId.has(n.parent)) kids.get(n.parent).push(n.id);
+    else roots.push(n.id);
+  });
+  // Traversal order: explicit DATA.order if given, else DFS from roots.
+  let order = Array.isArray(DATA.order) && DATA.order.length ? DATA.order.filter(id => byId.has(id)) : [];
+  if (!order.length) { const seen=new Set(); const dfs=id=>{if(seen.has(id))return;seen.add(id);order.push(id);(kids.get(id)||[]).forEach(dfs)}; roots.forEach(dfs); }
+
+  const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const glyph = t => GLYPH[t] || GLYPH.default;
+  const cls = t => TYPES.includes(t) ? t : "default";
+
+  // ---- header ----
+  const m = DATA.meta || {};
+  document.getElementById("h-title").textContent = m.title || "ARA Trajectory";
+  document.getElementById("h-sub").textContent =
+    [ (m.authors||[]).join(", "), m.venue, m.year ].filter(Boolean).join(" · ");
+  if (m.abstract) document.getElementById("h-abstract").textContent = m.abstract;
+  else document.getElementById("h-abstract-wrap").style.display = "none";
+
+  const ftype = document.getElementById("ftype");
+  const present = [...new Set(nodes.map(n => n.type))];
+  TYPES.concat(present.filter(t=>!TYPES.includes(t))).filter(t=>present.includes(t))
+    .forEach(t => { const o=document.createElement("option"); o.value=t; o.textContent=t; ftype.appendChild(o); });
+
+  // ---- minimal markdown-table renderer ----
+  function renderMd(md){
+    if(!md) return "";
+    const lines = String(md).split("\n");
+    let out=[], i=0;
+    while(i<lines.length){
+      if(/^\s*\|/.test(lines[i]) && i+1<lines.length && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i+1])){
+        const row = l => l.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|").map(c=>c.trim());
+        const head = row(lines[i]); i+=2; const body=[];
+        while(i<lines.length && /^\s*\|/.test(lines[i])){ body.push(row(lines[i])); i++; }
+        out.push('<table class="md"><thead><tr>'+head.map(h=>"<th>"+esc(h)+"</th>").join("")+
+          '</tr></thead><tbody>'+body.map(r=>"<tr>"+r.map(c=>"<td>"+esc(c)+"</td>").join("")+"</tr>").join("")+"</tbody></table>");
+      } else { if(lines[i].trim()) out.push("<div>"+esc(lines[i])+"</div>"); i++; }
+    }
+    return out.join("");
+  }
+
+  // ---- detail pane ----
+  function block(title, tag, inner, open, cls){
+    return '<details class="block'+(cls?" "+cls:"")+'"'+(open?" open":"")+'><summary>'+esc(title)+
+      (tag?'<span class="tag">'+esc(tag)+'</span>':'')+'</summary><div class="body">'+inner+'</div></details>';
+  }
+  function chips(arr, klass){ return arr&&arr.length ? '<div class="chips">'+arr.map(x=>'<span class="chip '+(klass||"")+'">'+esc(x)+'</span>').join("")+'</div>' : ""; }
+
+  function renderDetail(n){
+    const d = document.getElementById("detail");
+    let h = '<div class="dhead"><span class="badge '+cls(n.type)+'">'+esc(n.type)+'</span>'+
+      '<span class="did">'+esc(n.id)+'</span>'+
+      (n.support_level?'<span class="pill '+esc(n.support_level)+'">'+esc(n.support_level)+'</span>':'')+
+      (n.isolated?'<span class="pill iso">isolated</span>':'')+'</div>';
+    h += '<div class="dtitle">'+esc(n.title||"(untitled)")+'</div>';
+
+    // reasoning (primary, always open) — the agent's thinking IS the content of a step
+    let reason="";
+    if(n.thinking){
+      reason += '<div class="lead">'+esc(n.thinking)+'</div>';
+      if(n.body) reason += '<div class="didwhat">what it did</div><div>'+esc(n.body)+'</div>';
+    } else {
+      reason += n.body ? '<div class="lead">'+esc(n.body)+'</div>' : '<div class="empty">No description.</div>';
+    }
+    if(n.depends_on&&n.depends_on.length) reason += chips(n.depends_on.map(x=>"⇠ depends on "+x));
+    if(n.source_refs&&n.source_refs.length) reason += chips(n.source_refs, "ext");
+    if(n.built_on&&n.built_on.length) reason += chipRow("built on", n.built_on, "chip-built");
+    if(n.rejected_here&&n.rejected_here.length) reason += chipRow("rejected here", n.rejected_here, "chip-rej");
+    if(n.recipe_refs&&n.recipe_refs.length) reason += recipeChips(n.recipe_refs);
+    h += block(n.thinking?"reasoning":"what", n.type, reason, true, "reason");
+
+    // result (the grounded payload) — open
+    const r = n.result||{};
+    if((r.sources&&r.sources.length)||(r.figures&&r.figures.length)||(r.tables&&r.tables.length)||(r.data&&r.data.length)){
+      let s="";
+      (r.figures||[]).forEach(f=>{ s+='<figure><img src="'+esc(f.img)+'" alt="'+esc(f.caption||f.id)+'"/>'+
+        (f.caption?'<figcaption>'+esc(f.caption)+'</figcaption>':'')+'</figure>'; });
+      (r.tables||[]).forEach(t=>{ s+=(t.caption?'<div class="empty">'+esc(t.caption)+'</div>':'')+renderMd(t.markdown); });
+      (r.sources||[]).forEach(q=>{ s+='<div class="quote">'+esc(q.quote)+(q.ref?'<div class="ref">← '+esc(q.ref)+'</div>':'')+'</div>'; });
+      (r.data||[]).forEach(x=>{ s+='<div class="ptr">⛁ <span class="path">'+esc(x.path)+'</span>'+(x.note?' — '+esc(x.note):'')+'</div>'; });
+      h += block("result", "", s, true);
+    }
+
+    // why (claims) — supporting detail, collapsed
+    if(n.why&&n.why.length){
+      const w = n.why.map(c=>{
+        let s='<div class="claim"><h4>'+esc(c.id)+(c.title?' — '+esc(c.title):'')+'</h4>';
+        if(c.statement) s+='<div class="kv">'+esc(c.statement)+'</div>';
+        if(c.status) s+='<div class="kv"><b>status</b> <span class="status '+esc(String(c.status).toLowerCase())+'">'+esc(c.status)+'</span></div>';
+        if(c.conditions) s+='<div class="kv"><b>conditions</b> '+esc(c.conditions)+'</div>';
+        if(c.falsification) s+='<div class="kv"><b>falsified if</b> '+esc(c.falsification)+'</div>';
+        if(c.dependencies&&c.dependencies.length) s+='<div class="kv"><b>depends on</b> '+esc(c.dependencies.join(", "))+'</div>';
+        if(c.provenance) s+='<div class="kv"><span class="prov">provenance: '+esc(c.provenance)+'</span></div>';
+        return s+'</div>';
+      }).join("");
+      h += block("why", n.why.map(c=>c.id).join(" · "), w);
+    }
+
+    // how verified (experiments) — supporting detail, collapsed
+    if(n.verified_by&&n.verified_by.length){
+      const v = n.verified_by.map(e=>'<div class="claim"><h4>'+esc(e.id)+(e.title?' — '+esc(e.title):'')+'</h4>'+
+        (e.run?'<div class="kv"><b>run</b> <span class="path mono">'+esc(e.run)+'</span></div>':'')+
+        (e.setup?'<div class="kv"><b>setup</b> '+esc(e.setup)+'</div>':'')+
+        (e.metrics?'<div class="kv"><b>metrics</b> '+esc(e.metrics)+'</div>':'')+'</div>').join("");
+      h += block("how verified", n.verified_by.map(e=>e.id).join(" · "), v);
+    }
+
+    // artifact pointers (src/artifacts.md) — collapsed
+    if(n.artifact&&n.artifact.length){
+      const a = n.artifact.map(x=>'<div class="ptr">▸ <b>'+esc(x.name)+'</b> — <span class="path">'+esc(x.pointer)+'</span>'+
+        (x.what?'<div class="empty">'+esc(x.what)+'</div>':'')+'</div>').join("");
+      h += block("artifact", "pointer", a);
+    }
+
+    d.innerHTML = h;
+    if(typeof LEX!=="undefined" && LEX) linkifyConcepts(d);
+    d.scrollTop = 0;
+  }
+
+  // ---- map ----
+  let selected = null;
+  function selectNode(id){
+    if(!byId.has(id)) return;
+    selected = id;
+    document.querySelectorAll(".node").forEach(el=>el.classList.toggle("sel", el.dataset.id===id));
+    const el = document.querySelector('.node[data-id="'+CSS.escape(id)+'"]');
+    if(el) el.scrollIntoView({block:"nearest"});
+    renderDetail(byId.get(id));
+    rstat();
+  }
+
+  function nodeRow(n){
+    const row = document.createElement("div");
+    row.className = "node "+(n.type==="dead_end"?"dead":"");
+    row.dataset.id = n.id; row.dataset.type = n.type;
+    // calmer than before: one glyph + id + (quiet) cross-edge marker; the ⊕/⊘ count soup is gone.
+    row.innerHTML = '<span class="glyph '+cls(n.type)+'">'+glyph(n.type)+'</span>'+
+      '<span><span class="meta"><span class="nid">'+esc(n.id)+'</span>'+
+      (n.depends_on&&n.depends_on.length?'<span class="dep" title="depends on '+esc(n.depends_on.join(", "))+'">⇠ '+esc(n.depends_on.join(","))+'</span>':'')+
+      '</span><div class="ntitle">'+esc(n.title||n.body||"(untitled)")+'</div></span>';
+    row.addEventListener("click", ()=>selectNode(n.id));
+    // hover a node to highlight its cross-edge targets (gentler than always-on connectors)
+    if(n.depends_on&&n.depends_on.length){
+      row.addEventListener("mouseenter", ()=>n.depends_on.forEach(t=>{ const el=document.querySelector('.node[data-id="'+CSS.escape(t)+'"]'); if(el) el.classList.add("deptarget"); }));
+      row.addEventListener("mouseleave", ()=>document.querySelectorAll(".node.deptarget").forEach(el=>el.classList.remove("deptarget")));
+    }
+    return row;
+  }
+  function renderSubtree(id, container){
+    const n = byId.get(id); if(!n) return;
+    container.appendChild(nodeRow(n));
+    const cs = kids.get(id)||[];
+    if(cs.length){ const wrap=document.createElement("div"); wrap.className="kid"; cs.forEach(c=>renderSubtree(c,wrap)); container.appendChild(wrap); }
+  }
+  function renderMap(){
+    const map = document.getElementById("map"); map.innerHTML="";
+    const normalRoots = roots.filter(id=>!byId.get(id).isolated);
+    const isoRoots = roots.filter(id=>byId.get(id).isolated);
+    normalRoots.forEach(id=>renderSubtree(id, map));
+    if(isoRoots.length){
+      const box=document.createElement("div"); box.className="isobox";
+      const hdr=document.createElement("div"); hdr.className="isohdr"; hdr.textContent="isolated subtree"; box.appendChild(hdr);
+      isoRoots.forEach(id=>renderSubtree(id, box)); map.appendChild(box);
+    }
+  }
+
+  // ---- filter / search ----
+  function applyFilters(){
+    const q = document.getElementById("q").value.trim().toLowerCase();
+    const ty = document.getElementById("ftype").value;
+    const deadOnly = document.getElementById("fdead").checked;
+    let shown=0;
+    document.querySelectorAll(".node").forEach(el=>{
+      const n = byId.get(el.dataset.id);
+      const text = (n.id+" "+(n.title||"")+" "+(n.body||"")).toLowerCase();
+      const ok = (!q||text.includes(q)) && (!ty||n.type===ty) && (!deadOnly||n.type==="dead_end");
+      el.classList.toggle("dim", !ok);
+      if(ok) shown++;
+    });
+    document.getElementById("rstat").textContent = shown+" / "+nodes.length+" steps";
+  }
+  function rstat(){
+    const i = selected?order.indexOf(selected):-1;
+    document.getElementById("rstat").textContent = (i>=0?("step "+(i+1)+" / "+order.length):(nodes.length+" steps"));
+  }
+
+  // ---- replay ----
+  let timer=null;
+  function step(delta){
+    let i = selected?order.indexOf(selected):-1;
+    i = Math.max(0, Math.min(order.length-1, i+delta));
+    selectNode(order[i]);
+  }
+  function play(){
+    if(timer){ stop(); return; }
+    if(!selected) selectNode(order[0]);
+    document.getElementById("rplay").textContent="⏸ Pause";
+    timer = setInterval(()=>{
+      const i = selected?order.indexOf(selected):-1;
+      if(i>=order.length-1){ stop(); return; }
+      step(1);
+    }, 1300);
+  }
+  function stop(){ if(timer){clearInterval(timer);timer=null;} document.getElementById("rplay").textContent="▶ Replay"; }
+
+  // ======================= v1.1 enrichment layers (all inert unless present) =======================
+  const CTX = DATA.context, GLO = DATA.glossary, DEP = DATA.dependencies, REC = DATA.recipes;
+  const LAYERS = { context:CTX, glossary:GLO, dependencies:DEP, recipes:REC };
+
+  // ---- indexes (built once) ----
+  const claimToNodes = new Map();
+  nodes.forEach(n => (n.why||[]).forEach(c => { if(c&&c.id){ if(!claimToNodes.has(c.id)) claimToNodes.set(c.id,[]); claimToNodes.get(c.id).push(n.id); } }));
+  const firstNodeForClaim = id => (claimToNodes.get(id)||[])[0] || null;
+  const rwById   = new Map(((DEP&&DEP.entries)||[]).map(e => [e.rw_id, e]));
+  const termById = new Map(((GLO&&GLO.terms)||[]).map(t => [t.term_id, t]));
+  // concept "used by" (inferred) from each node's name-matched concepts[]
+  if(GLO){
+    const nameToTerm = new Map();
+    (GLO.terms||[]).forEach(t => { if(t.name) nameToTerm.set(String(t.name).toLowerCase(), t); (t.aliases||[]).forEach(a=>nameToTerm.set(String(a).toLowerCase(), t)); });
+    nodes.forEach(n => (n.concepts||[]).forEach(cn => { const t=nameToTerm.get(String(cn).toLowerCase()); if(t){ (t._used=t._used||[]).push(n.id); } }));
+  }
+
+  // ---- tiny inline-math fallback (no CDN; operates on already-escaped text, adds only safe tags) ----
+  const GK={alpha:"α",beta:"β",gamma:"γ",delta:"δ",epsilon:"ε",eta:"η",theta:"θ",kappa:"κ",lambda:"λ",mu:"μ",nu:"ν",pi:"π",rho:"ρ",sigma:"σ",tau:"τ",phi:"φ",chi:"χ",psi:"ψ",omega:"ω",Delta:"Δ",Sigma:"Σ",Omega:"Ω",Phi:"Φ",Theta:"Θ",Lambda:"Λ",Gamma:"Γ",nabla:"∇",partial:"∂",times:"×",cdot:"·",infty:"∞",approx:"≈",leq:"≤",geq:"≥",neq:"≠",to:"→",in:"∈",sum:"Σ",prod:"Π",sqrt:"√",mathbb:"",mathcal:"",mathbf:"",mathrm:"",left:"",right:""};
+  function texInner(s){
+    s=s.replace(/\\(?:mathbb|mathcal|mathbf|mathrm)\{([^{}]*)\}/g,"$1");
+    s=s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g,"($1)/($2)");
+    s=s.replace(/\\([A-Za-z]+)/g,(m,w)=>GK[w]!==undefined?GK[w]:m);
+    s=s.replace(/\^\{([^{}]*)\}/g,"<sup>$1</sup>").replace(/\^([\w()+\-])/g,"<sup>$1</sup>");
+    s=s.replace(/_\{([^{}]*)\}/g,"<sub>$1</sub>").replace(/_([\w()+\-])/g,"<sub>$1</sub>");
+    return s;
+  }
+  function mathPass(escaped){
+    if(escaped.indexOf("$")<0) return escaped;
+    return escaped.replace(/\$\$([^$]+)\$\$/g,(m,x)=>'<span class="math">'+texInner(x)+'</span>')
+                  .replace(/\$([^$]+)\$/g,(m,x)=>'<span class="math">'+texInner(x)+'</span>');
+  }
+  function mtext(v){ const e=esc(v); try{ return mathPass(e); }catch(_){ return e; } }
+
+  // ---- typed-ref rendering (off-ARA pointers stay inert; in-ARA targets become jump chips) ----
+  function refUrl(rf){
+    const raw=rf.raw||"";
+    if(rf.kind==="url"){ const m=raw.match(/https?:\/\/\S+/); return m?m[0]:""; }
+    if(rf.kind==="arxiv"){ const m=raw.match(/(\d{4}\.\d{4,5})/); return m?("https://arxiv.org/abs/"+m[1]):""; }
+    if(rf.kind==="doi"){ const m=raw.match(/(10\.\d{4,}\/\S+)/); return m?("https://doi.org/"+m[1]):""; }
+    return "";
+  }
+  function refChip(rf){
+    const raw=esc(rf.raw||""), url=refUrl(rf);
+    if(url) return '<a class="chip ext" href="'+esc(url)+'" target="_blank" rel="noopener">'+raw+'</a>';
+    if(rf.target){
+      if(rf.kind==="claim")        return '<span class="chip jump" data-jump-claim="'+esc(rf.target)+'">'+raw+'</span>';
+      if(rf.kind==="node")         return '<span class="chip jump" data-jump-node="'+esc(rf.target)+'">'+raw+'</span>';
+      if(rf.kind==="concept")      return '<span class="chip jump" data-open-term="'+esc(rf.target)+'">'+raw+'</span>';
+      if(rf.kind==="related_work") return '<span class="chip jump" data-open-panel="dependencies" data-anchor="ov-'+esc(rf.target)+'">'+raw+'</span>';
+      return '<span class="chip jump" data-scroll="ov-'+esc(rf.target)+'">'+raw+'</span>';
+    }
+    const dangle=(rf.kind==="claim"||rf.kind==="related_work"||rf.kind==="concept");
+    return '<span class="chip '+(dangle?'dangle" title="referenced but not found in this ARA':'ext')+'">'+raw+'</span>';
+  }
+  function refRow(refs){ return refs&&refs.length ? '<div class="chips">'+refs.map(refChip).join("")+'</div>' : ""; }
+
+  // ---- per-node provenance chips (consumed by renderDetail) ----
+  function chipRow(label, arr, klass){
+    const cs=arr.map(x=>{
+      const txt=[x.rw_id,x.name].filter(Boolean).join(" · ")||"?";
+      const tip=x.relation_raw?(' title="'+esc(x.relation_raw)+'"'):'';
+      const op =x.rw_id?(' data-open-panel="dependencies" data-anchor="ov-'+esc(x.rw_id)+'"'):'';
+      return '<span class="chip '+klass+(x.rw_id?' jump':'')+'"'+tip+op+'>'+esc(txt)+'</span>';
+    }).join("");
+    return '<div class="chiplabel">'+esc(label)+'</div><div class="chips">'+cs+'</div>';
+  }
+  function recipeChips(arr){
+    const cs=arr.map(x=>{
+      const anchor="ov-sec-"+(x.file||"")+"-"+(x.sec_id||"");
+      return '<span class="chip chip-recipe jump" data-open-panel="recipes" data-anchor="'+esc(anchor)+'" title="'+esc((x.file||"")+(x.role?(" · "+x.role):""))+'">▦ '+esc(x.heading||x.file||"recipe")+'</span>';
+    }).join("");
+    return '<div class="chiplabel">recipe</div><div class="chips">'+cs+'</div>';
+  }
+
+  // ---- the four overlay renderers (reuse block/chips/renderMd) ----
+  function renderContext(){
+    let h=""; if(CTX.summary) h+='<div class="ribbon">'+esc(CTX.summary)+'</div>';
+    (CTX.sections||[]).forEach(sec=>{
+      let inner="";
+      if(sec.present===false){ inner='<div class="muted grey">(not specified in this ARA)</div>'; }
+      else (sec.entries||[]).forEach(en=>{
+        let c='<div class="card" id="ov-'+esc(en.ent_id||"")+'"><h4>'+(en.ent_id?'<span class="did">'+esc(en.ent_id)+'</span> ':'')+esc(en.ent_title||"")+(en.inferred_id?' <span class="sub">(pos.)</span>':'')+'</h4>';
+        if(!en.unstructured && en.fields && en.fields.length) en.fields.forEach(f=>c+='<div class="kv"><b>'+esc(f.label)+'</b> '+mtext(f.value)+'</div>');
+        else if(en.text) c+='<div class="kv">'+mtext(en.text)+'</div>';
+        if(en.unstructured) c+='<div class="sub">unstructured</div>';
+        c+=refRow(en.refs)+'</div>'; inner+=c;
+      });
+      h+=block(sec.heading||sec.role||"section", sec.role||"", inner, sec.role==="insight");
+    });
+    return h || '<div class="muted">No problem context.</div>';
+  }
+  function renderGlossary(filter){
+    const f=(filter||"").trim().toLowerCase();
+    const match=t=>!f||((t.name||"")+" "+(t.aliases||[]).join(" ")+" "+(t.definition||"")).toLowerCase().includes(f);
+    function card(t){
+      let c='<div class="card" id="ov-'+esc(t.term_id)+'"><h4>'+esc(t.name)+(t.group?' <span class="sub">'+esc(t.group)+'</span>':'')+'</h4>';
+      if(t.aliases&&t.aliases.length) c+='<div class="chips">'+t.aliases.map(a=>'<span class="chip">'+esc(a)+'</span>').join("")+'</div>';
+      if(t.definition) c+='<div class="kv">'+mtext(t.definition)+'</div>';
+      (t.fields||[]).forEach(fl=>c+='<div class="kv"><b>'+esc(fl.label)+'</b> '+mtext(fl.value)+'</div>');
+      if(t.related&&t.related.length) c+='<div class="kv"><b>related</b> '+t.related.map(r=>{const rt=termById.get(r);return '<span class="chip jump" data-open-term="'+esc(r)+'">'+esc(rt?rt.name:r)+'</span>';}).join(" ")+'</div>';
+      if(t._used&&t._used.length) c+='<div class="kv"><b>mentions</b> '+[...new Set(t._used)].map(nid=>'<span class="chip jump" data-jump-node="'+esc(nid)+'">'+esc(nid)+'</span>').join(" ")+' <span class="sub">(inferred)</span></div>';
+      return c+refRow(t.refs)+'</div>';
+    }
+    const groups=GLO.groups&&GLO.groups.length?GLO.groups:null; let h="";
+    if(groups){
+      const grouped=new Set();
+      groups.forEach(g=>{ (g.term_ids||[]).forEach(id=>grouped.add(id)); const ts=(g.term_ids||[]).map(id=>termById.get(id)).filter(Boolean).filter(match); if(ts.length) h+=block(g.name||"group", String(ts.length), ts.map(card).join(""), true); });
+      const rest=(GLO.terms||[]).filter(t=>!grouped.has(t.term_id)).filter(match);
+      if(rest.length) h+=block("other", String(rest.length), rest.map(card).join(""), true);
+    } else { const ts=(GLO.terms||[]).filter(match); h=ts.map(card).join(""); }
+    return h || '<div class="muted">No matching terms.</div>';
+  }
+  function renderDeps(filter){
+    const f=(filter||"").trim().toLowerCase(); let h="";
+    if(DEP.preamble) h+='<div class="muted">'+esc(DEP.preamble)+'</div>';
+    if(DEP.attribution) h+='<div class="ribbon">'+esc(DEP.attribution)+'</div>';
+    const ents=(DEP.entries||[]).filter(e=>!e.is_footprint).filter(e=>!f||(((e.rw_id||"")+" "+(e.name||"")+" "+(e.relation_raw||"")+" "+(e.delta||"")).toLowerCase().includes(f)));
+    ents.forEach(e=>{
+      const rn=e.relation_norm, relc=["baseline","imports","extends","bounds","refutes"].includes(rn)?rn:"neutral";
+      let c='<div class="card" id="ov-'+esc(e.rw_id||"")+'"><h4>'+(e.rw_id?'<span class="did">'+esc(e.rw_id)+'</span> ':'')+esc(e.name||"")+'</h4>';
+      c+='<div class="chips"><span class="rel '+relc+'">'+esc(e.relation_raw||rn||"related")+'</span>'+(e.cross_agent?'<span class="chip" title="other-agent provenance">↔ other-agent</span>':'')+'</div>';
+      if(e.delta) c+='<div class="kv">'+mtext(e.delta)+'</div>';
+      if(e.adopted) c+='<div class="kv"><b>adopted</b> '+esc(e.adopted)+'</div>';
+      let prov=(e.grounding||[]).map(refChip).join("");
+      (e.claims||[]).filter(id=>claimToNodes.has(id)).forEach(id=>prov+='<span class="chip jump" data-jump-claim="'+esc(id)+'">'+esc(id)+'</span>');
+      c+= prov?('<div class="kv"><b>grounding</b> '+prov+'</div>'):'<div class="muted">ungrounded</div>';
+      h+=c+'</div>';
+    });
+    if(!ents.length) h+='<div class="muted">No matching dependencies.</div>';
+    const fp=DEP.footprint||[];
+    if(fp.length) h+=block("Citation footprint", String(fp.length), fp.map(x=>'<div class="ptr"><span class="muted">'+esc(x.ref_id||"")+'</span> '+esc(x.citation||"")+'</div>').join(""), false);
+    return h;
+  }
+  function renderRecipes(){
+    let h="";
+    (REC.files||[]).forEach(file=>{
+      let inner="";
+      (file.sections||[]).forEach(sec=>{
+        let c='<div class="card" id="ov-sec-'+esc((file.file||"")+"-"+(sec.sec_id||""))+'"><h4>'+(sec.sec_id?'<span class="did">'+esc(sec.sec_id)+'</span> ':'')+esc(sec.heading||"")+'</h4>';
+        if(sec.kind==="table"&&sec.markdown) c+=renderMd(sec.markdown);
+        else if(sec.kind==="steps"&&sec.steps&&sec.steps.length) c+='<ol>'+sec.steps.map(s=>'<li>'+mtext(String(s).replace(/^\s*\d+\.\s*/,""))+'</li>').join("")+'</ol>';
+        else if(sec.kind==="kv"&&sec.fields&&sec.fields.length) sec.fields.forEach(fl=>c+='<div class="kv"><b>'+esc(fl.label)+'</b> '+mtext(fl.value)+'</div>');
+        else if(sec.kind==="code"&&sec.code) c+='<pre class="snip">'+esc(sec.code)+'</pre>';
+        else if(sec.kind==="math"&&sec.code) c+='<div class="kv math">'+mtext(sec.code)+'</div>';
+        else if(sec.text) c+='<div class="kv">'+mtext(sec.text)+'</div>';
+        if(sec.warn) c+='<div class="warn">'+esc(sec.warn)+'</div>';
+        inner+=c+refRow(sec.refs)+'</div>';
+      });
+      h+=block((file.file_title||file.file||"recipe")+(file.role?("  ·  "+file.role):""), String((file.sections||[]).length), inner, true);
+    });
+    return h || '<div class="muted">No recipe content.</div>';
+  }
+
+  // ---- overlay open/close + layerbar wiring ----
+  const ov=document.getElementById("overlay");
+  let lastTrigger=null;
+  const PANEL_RENDER={ context:renderContext, glossary:()=>renderGlossary(""), dependencies:()=>renderDeps(""), recipes:renderRecipes };
+  function hasContent(name){ const L=LAYERS[name]; if(!L) return false;
+    if(name==="context") return (L.sections||[]).length>0;
+    if(name==="glossary") return (L.terms||[]).length>0;
+    if(name==="dependencies") return (L.entries||[]).length>0||(L.footprint||[]).length>0;
+    if(name==="recipes") return (L.files||[]).length>0; return false; }
+  function panelTitle(name){ const L=LAYERS[name]||{}; return L.title || ({context:"Context",glossary:"Concepts",dependencies:"Dependencies",recipes:"Solution"}[name]); }
+  function panelCount(name){ const L=LAYERS[name]||{};
+    if(name==="glossary") return (L.terms||[]).length;
+    if(name==="dependencies") return (L.entries||[]).length;
+    if(name==="recipes") return (L.files||[]).reduce((a,f)=>a+(f.sections||[]).length,0); return 0; }
+  function openPanel(name, anchor){
+    if(!hasContent(name)) return;
+    stop(); lastTrigger=document.activeElement;
+    document.getElementById("ov-title").textContent=panelTitle(name);
+    const body=document.getElementById("ov-body"); body.innerHTML=PANEL_RENDER[name]();
+    if(LEX) linkifyConcepts(body);
+    const q=document.getElementById("ov-q");
+    if(name==="glossary"||name==="dependencies"){ q.hidden=false; q.value=""; q.dataset.panel=name; } else { q.hidden=true; }
+    ov.hidden=false;
+    if(anchor){ const el=document.getElementById(anchor); if(el) el.scrollIntoView({block:"center"}); } else body.scrollTop=0;
+    (q.hidden?document.getElementById("ov-close"):q).focus();
+  }
+  function closePanel(){ ov.hidden=true; if(lastTrigger&&lastTrigger.focus) lastTrigger.focus(); }
+  document.querySelectorAll(".lbtn").forEach(b=>{ const name=b.dataset.panel;
+    if(hasContent(name)){ b.hidden=false; const c=b.querySelector(".cnt"); if(c){ const n=panelCount(name); if(n) c.textContent=n; } b.addEventListener("click",()=>openPanel(name)); } });
+  document.getElementById("ov-q").addEventListener("input", e=>{ const p=e.target.dataset.panel, body=document.getElementById("ov-body");
+    body.innerHTML = p==="glossary"?renderGlossary(e.target.value):renderDeps(e.target.value); if(LEX) linkifyConcepts(body); });
+
+  // ---- glossary lexicon + popover ----
+  const LEX=(GLO&&GLO.lexicon&&Object.keys(GLO.lexicon).length)?(function(){
+    const surf=Object.keys(GLO.lexicon).filter(s=>s.length>=3).sort((a,b)=>b.length-a.length);
+    if(!surf.length) return null;
+    const re=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    return { re:new RegExp("\\b("+surf.map(re).join("|")+")\\b","i"), map:GLO.lexicon };
+  })():null;
+  const SKIP_TAGS={A:1,CODE:1,PRE:1,BUTTON:1,SCRIPT:1,STYLE:1,H4:1,H5:1,SUMMARY:1};
+  function linkifyConcepts(root){
+    if(!LEX) return;
+    const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode(t){
+      if(!t.nodeValue||!t.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      let p=t.parentNode; while(p&&p!==root){ if(p.classList&&p.classList.contains("gterm")) return NodeFilter.FILTER_REJECT; if(SKIP_TAGS[p.tagName]) return NodeFilter.FILTER_REJECT; p=p.parentNode; }
+      return NodeFilter.FILTER_ACCEPT; } });
+    const seen=new Set(), hits=[]; let t;
+    while((t=walker.nextNode())){ const m=LEX.re.exec(t.nodeValue); if(!m) continue; const tid=LEX.map[m[1].toLowerCase()]; if(!tid||seen.has(tid)) continue; seen.add(tid); hits.push({node:t,index:m.index,len:m[1].length,tid}); }
+    hits.forEach(hp=>{ const tn=hp.node, txt=tn.nodeValue, par=tn.parentNode; if(!par) return;
+      const span=document.createElement("span"); span.className="gterm"; span.dataset.term=hp.tid; span.tabIndex=0; span.textContent=txt.slice(hp.index,hp.index+hp.len);
+      const after=document.createTextNode(txt.slice(hp.index+hp.len));
+      par.replaceChild(after,tn); par.insertBefore(span,after); par.insertBefore(document.createTextNode(txt.slice(0,hp.index)),span); });
+  }
+  const gpop=document.getElementById("gpop");
+  function gpopShow(span){ const t=termById.get(span.dataset.term); if(!t) return;
+    const def=t.definition||""; gpop.innerHTML='<h5>'+esc(t.name)+'</h5><div>'+mtext(def.slice(0,240))+(def.length>240?'…':'')+'</div><span class="gp-open" data-open-term="'+esc(t.term_id)+'">open in glossary →</span>';
+    gpop.style.display="block"; const r=span.getBoundingClientRect();
+    gpop.style.left=Math.max(6,Math.min(r.left, window.innerWidth-372))+"px"; gpop.style.top=(r.bottom+6)+"px"; }
+  function gpopHide(){ gpop.style.display="none"; }
+
+  // ---- delegated interactions for the new layers ----
+  document.addEventListener("click", e=>{
+    const el=e.target.closest&&e.target.closest("[data-close],[data-jump-node],[data-jump-claim],[data-open-panel],[data-open-term],[data-scroll]");
+    if(!el) return;
+    if(el.hasAttribute("data-close")){ closePanel(); return; }
+    if(el.dataset.jumpNode){ closePanel(); selectNode(el.dataset.jumpNode); return; }
+    if(el.dataset.jumpClaim){ const nid=firstNodeForClaim(el.dataset.jumpClaim); if(nid){ closePanel(); selectNode(nid); } return; }
+    if(el.dataset.openTerm){ openPanel("glossary","ov-"+el.dataset.openTerm); return; }
+    if(el.hasAttribute("data-open-panel")){ openPanel(el.dataset.openPanel, el.dataset.anchor||null); return; }
+    if(el.dataset.scroll){ const t=document.getElementById(el.dataset.scroll); if(t) t.scrollIntoView({block:"center"}); return; }
+  });
+  document.addEventListener("mouseover", e=>{ const g=e.target.closest&&e.target.closest(".gterm"); if(g) gpopShow(g); });
+  document.addEventListener("mouseout",  e=>{ const g=e.target.closest&&e.target.closest(".gterm"); if(g) gpopHide(); });
+  document.addEventListener("focusin",   e=>{ const g=e.target.closest&&e.target.closest(".gterm"); if(g) gpopShow(g); });
+  document.addEventListener("focusout",  e=>{ const g=e.target.closest&&e.target.closest(".gterm"); if(g) gpopHide(); });
+  window.addEventListener("scroll", gpopHide, true);
+
+  document.getElementById("q").addEventListener("input", applyFilters);
+  document.getElementById("ftype").addEventListener("change", applyFilters);
+  document.getElementById("fdead").addEventListener("change", applyFilters);
+  document.getElementById("rplay").addEventListener("click", play);
+  document.getElementById("rprev").addEventListener("click", ()=>{stop();step(-1);});
+  document.getElementById("rnext").addEventListener("click", ()=>{stop();step(1);});
+  document.addEventListener("keydown", e=>{
+    if(e.key==="Escape"){ if(!ov.hidden){ closePanel(); return; } gpopHide(); }
+    if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT") return;
+    if(e.key==="ArrowLeft"){stop();step(-1);} else if(e.key==="ArrowRight"){stop();step(1);}
+    else if(e.key==="c"||e.key==="g"||e.key==="d"||e.key==="r"){ const p={c:"context",g:"glossary",d:"dependencies",r:"recipes"}[e.key]; if(hasContent(p)) openPanel(p); }
+  });
+
+  renderMap();
+  rstat();
+})();
+</script>
+</body>
+</html>

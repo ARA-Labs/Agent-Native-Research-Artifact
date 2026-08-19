@@ -40,8 +40,7 @@ edit the ARA. There are two modes, and one routing decision:
 
 - **Export mode** (default) — you render the ARA into a single portable HTML file: narrated steps,
   verbatim evidence, inline figures, and the enrichment overlays. This is the shareable/publishable
-  output (`submit-ara` publishes exactly this file). The rest of this document below "What you
-  produce" is this mode.
+  output. The rest of this document below "What you produce" is this mode.
 - **Live mode** — you drive the official `ara` binary (github.com/ARA-Labs/ara-cli): `ara check`
   to validate/lint, `ara serve` for a local live-reloading viewer with zero LLM calls at view
   time. Reach for it when the user is mid-edit and wants the view to track saves, wants a
