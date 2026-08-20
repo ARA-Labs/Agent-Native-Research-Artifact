@@ -29,6 +29,10 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      # Trusted publishing (OIDC) needs npm >= 11.5.1; Node 20 ships npm 10.
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
       - name: Install
         run: npm install --no-package-lock
 
@@ -87,11 +91,14 @@ jobs:
           fi
           echo "local=$LOCAL published=$PUBLISHED skillsChanged=$SKILLS_CHANGED -> target=$TARGET skip=$SKIP"
 
+      # Authenticated by OIDC, not a token: npm verifies the workflow identity
+      # against the Trusted Publisher registered on the package
+      # (ARA-Labs/Agent-Native-Research-Artifact, publish-ara-skills.yml).
+      # Renaming this file means updating that registration. Provenance is
+      # attached automatically.
       - name: Publish
         if: steps.check.outputs.skip == 'false'
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Tag release
         if: steps.check.outputs.skip == 'false'
