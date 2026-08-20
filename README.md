@@ -1,6 +1,8 @@
 # 🔬 Agent-Native Research Lab
 ### The Essential Toolkit to Supercharge Your Autoresearch
 
+[![Start here](https://img.shields.io/badge/⚡_Start_here-one_line_setup-black?style=for-the-badge)](#quickstart)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-7%20skills-green)](skills/)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.24658-b31b1b.svg)](https://arxiv.org/abs/2604.24658)
@@ -14,6 +16,21 @@
 <p align="center">
   <img src="docs/ara-skills-demo.gif" alt="ARA Skills Demo" width="100%"/>
 </p>
+
+---
+
+<a id="quickstart"></a>
+## ⚡ Start here — the only setup step
+
+**Paste this one line into your coding agent, from your project root:**
+
+```
+Read https://raw.githubusercontent.com/ARA-Labs/Agent-Native-Research-Artifact/main/wire-ara.md and follow its instructions.
+```
+
+The agent fetches the full wiring prompt, installs the seven skills, and writes a task-routing map into its own context file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) — so every future session knows which skill handles which situation to assist your ai-native research. The prompt lives at [`wire-ara.md`](wire-ara.md).
+
+Using ARA as your **conference submission format**? Follow the short guide: **[Using ARA as a Conference Submission Format](docs/conference-guide.md)** — set up, record as you research, publish as one link.
 
 ---
 
@@ -48,19 +65,6 @@ Research is rarely a straight line; it is a messy graph of pivots and dead ends.
 Supervising AI scientists shouldn't require reading endless terminal outputs. The system translates complex agent behaviors and exploration graphs into a clean, minimalist interface. It lets human researchers maintain high-level oversight, seamlessly stepping in to course-correct or guide the AI's behavior with zero friction.
 
 </details>
-
-<a id="quickstart"></a>
-## Wire ARA into your agent
-
-Paste one line into your coding agent, from your project root:
-
-```
-Read https://raw.githubusercontent.com/ARA-Labs/Agent-Native-Research-Artifact/main/wire-ara.md and follow its instructions.
-```
-
-The agent fetches the full wiring prompt, installs the seven skills, and writes a task-routing map into its own context file (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, or `GEMINI.md`) — so every future session knows which skill handles which situation to assist your ai-native research. The prompt lives at [`wire-ara.md`](wire-ara.md).
-
----
 
 ## 🛠️ The Toolkit: Seven Core Skills
 
