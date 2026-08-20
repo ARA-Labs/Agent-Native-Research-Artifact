@@ -2,13 +2,13 @@
 
 You are an AI coding agent reading this file because your user wants this project wired up
 with **ARA** — Agent-Native Research Artifacts
-(https://github.com/ARA-Labs/Agent-Native-Research-Artifact), a toolkit of six skills that
+(https://github.com/ARA-Labs/Agent-Native-Research-Artifact), a toolkit of seven skills that
 makes AI-driven research structured, verifiable, and traceable.
 
 Complete all four steps autonomously, in order. Do not ask the user anything — every step
 has a default. Then end with the ready message in step 4.
 
-## 1. Install the six ARA skills
+## 1. Install the seven ARA skills
 
 Install all of them, non-interactively, targeting the agent you are:
 
@@ -62,6 +62,13 @@ Route work to the matching ARA skill — invoke these yourself, without being as
   next / why did this work / what if I change X", grounded in the artifact.
 - `/context-drop <path>` — when a file, folder, or artifact needs to reach
   somebody else's agent as one link.
+- `/research-fuzzer` — for any open-ended investigation without a known map
+  (experiments, debugging, data analysis, literature or market research). Fire
+  it when the investigation starts, after every action or batch that returned
+  results, and before stating any conclusion: predict before each action,
+  settle after, keep the queue of untried leads and unexplained results, and
+  gate conclusions behind a self-refutation attempt. Skip for trivial
+  single-step tasks.
 ```
 
 ## 4. Tell the user they are ready

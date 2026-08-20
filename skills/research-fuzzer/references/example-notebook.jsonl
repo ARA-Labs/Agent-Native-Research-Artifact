@@ -1,0 +1,9 @@
+{"type":"frame","v":1,"question":"why are users churning?","subq":["price?","UX?","competitors?"]}
+{"type":"bet","id":"b1","action":"interview 5 churned users","prediction":"most cite price","confidence":0.6,"target":"price?"}
+{"type":"settle","bet":"b1","outcome":"4/5 said need disappeared; price never mentioned","verdict":"surprised","update":"churn may not be dissatisfaction — add need-evaporated branch","doors":["interview RETAINED users","segment churn by tenure"]}
+{"type":"bet","id":"b2","action":"segment churn by tenure","prediction":"newer cohorts churn more","confidence":0.7,"target":"UX?"}
+{"type":"settle","bet":"b2","outcome":"oldest cohort churns most","verdict":"anomaly","doors":["check pricing changes for old cohorts"]}
+{"type":"bet","id":"b3","action":"pull competitor pricing pages","prediction":"cheaper rivals exist","confidence":0.8,"target":"competitors?"}
+{"type":"settle","bet":"b3","outcome":"rivals are pricier","verdict":"surprised","update":"competitor-driven churn unlikely","doors":[]}
+{"type":"bet","id":"b4","action":"re-run cohort split with cleaned data","prediction":"same result","confidence":0.9,"target":"UX?"}
+{"type":"settle","bet":"b4","outcome":"same result","verdict":"confirmed","doors":[]}

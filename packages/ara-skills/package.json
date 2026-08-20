@@ -1,7 +1,7 @@
 {
   "name": "@ara-commons/ara-skills",
-  "version": "0.7.0",
-  "description": "Install Agent-Native Research Artifact (ARA) skills — compiler, research-manager, rigor-reviewer, research-visualizer, research-foresight, context-drop — into Claude Code, Cursor, OpenCode, Gemini CLI, Codex, and more.",
+  "version": "0.8.0",
+  "description": "Install Agent-Native Research Artifact (ARA) skills — compiler, research-manager, rigor-reviewer, research-visualizer, research-foresight, context-drop, research-fuzzer — into Claude Code, Cursor, OpenCode, Gemini CLI, Codex, and more.",
   "type": "module",
   "bin": {
     "ara-skills": "./bin/cli.js"
@@ -37,6 +37,8 @@
     "research-foresight",
     "world-model",
     "context-drop",
+    "research-fuzzer",
+    "fuzzing",
     "llm",
     "cli"
   ],
