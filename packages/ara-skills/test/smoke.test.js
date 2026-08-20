@@ -18,6 +18,7 @@ test('listSkills discovers the bundled ARA skills', () => {
     'research-manager',
     'research-visualizer',
     'rigor-reviewer',
+    'submit-ara',
   ]);
 });
 

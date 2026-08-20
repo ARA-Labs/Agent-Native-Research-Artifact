@@ -52,23 +52,15 @@ Route work to the matching ARA skill — invoke these yourself, without being as
   crystallize the insight at the milestone. It
   records what just happened (decisions, experiments, dead ends, claims) into
   `ara/`. Skip when nothing research-significant happened (greetings, pure formatting).
-- `/compiler <path>` — when turning an existing paper, repo, logs, or notes into
-  a structured artifact.
-- `/rigor-reviewer <dir>` — before trusting, publishing, or submitting an artifact.
 - `/research-visualizer <ara-dir>` — to inspect the research trajectory as an
   interactive process map (add `--serve` for a live local viewer, `--check` to
   validate/lint via the `ara` CLI).
 - `/research-foresight <ara-dir> "<question>"` — to answer "what should I try
   next / why did this work / what if I change X", grounded in the artifact.
+- `/submit-ara <dir>` — when an artifact is ready to publish to the ARA Hub,
+  or a conference wants it as a submission.
 - `/context-drop <path>` — when a file, folder, or artifact needs to reach
-  somebody else's agent as one link.
-- `/research-fuzzer` — for any open-ended investigation without a known map
-  (experiments, debugging, data analysis, literature or market research). Fire
-  it when the investigation starts, after every action or batch that returned
-  results, and before stating any conclusion: predict before each action,
-  settle after, keep the queue of untried leads and unexplained results, and
-  gate conclusions behind a self-refutation attempt. Skip for trivial
-  single-step tasks.
+  somebody else's agent as one link. 
 ```
 
 ## 4. Tell the user they are ready
@@ -91,4 +83,5 @@ words (adapt naturally, keep the substance):
 >   (`/research-visualizer ara/`).
 > - Stuck on what to try next? Ask the artifact (`/research-foresight ara/ "<question>"`).
 > - When results are ready to share: I'll review rigor (`/rigor-reviewer ara/`) and
->   hand the artifact to anyone's agent as one link (`/context-drop ara/`).
+>   publish it to the ARA Hub (`/submit-ara ara/`) — one link, and re-running it
+>   updates the same artifact instead of making a second one.

@@ -9,6 +9,7 @@ One-command installer for the seven **Agent-Native Research Artifact (ARA)** ski
 | `rigor-reviewer`   | `/rigor-reviewer <dir>`    | ARA Seal Level 2 semantic epistemic review across six dimensions |
 | `research-visualizer` | `/research-visualizer <dir>` | Render an ARA into one interactive, self-contained trajectory.html |
 | `research-foresight` | `/research-foresight <dir> "<query>"` | Ask the ARA anything and get a grounded, falsifiable answer — read-only, no API key |
+| `submit-ara`       | `/submit-ara <dir>`        | Publish an ARA to the Hub and keep the token that updates it in place |
 | `context-drop`     | `/context-drop <path>`     | Hand a file or folder to someone else's agent as one URL |
 | `research-fuzzer`  | `/research-fuzzer`         | Fuzzer-style feedback loop for open-ended investigations: bet before acting, track untried leads and unexplained results, gate conclusions |
 
