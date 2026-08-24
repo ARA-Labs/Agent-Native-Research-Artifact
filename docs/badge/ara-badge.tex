@@ -1,0 +1,11 @@
+% ARA badge — paste into the preamble of any paper that ships with an ARA.
+% Requires: \usepackage{graphicx,eso-pic,hyperref}  (all standard in NeurIPS/ICML/ICLR templates)
+% Put ara-badge.png next to your .tex (download: https://raw.githubusercontent.com/ARA-Labs/Agent-Native-Research-Artifact/main/docs/badge/ara-badge.png)
+\newcommand{\ARAbadgeURL}{https://evolvinglab.ai}   % <- replace with this paper's ARA Hub link
+\AddToShipoutPictureFG*{%                            % * = first page only; drop the * for every page
+  \AtPageUpperLeft{%
+    \put(\LenToUnit{\dimexpr\paperwidth-0.55in-2.2cm\relax},\LenToUnit{\dimexpr-0.45in-1.2cm\relax}){%
+      \href{\ARAbadgeURL}{\includegraphics[width=2.2cm]{ara-badge.png}}%
+    }%
+  }%
+}
