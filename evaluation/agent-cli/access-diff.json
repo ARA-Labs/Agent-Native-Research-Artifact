@@ -4514,9 +4514,9 @@
     "evidence": "access-review-2026-10-02.json",
     "human_approvals": "F1–F7 unchanged; pending as recorded in protocol-decisions.json",
     "runtime_proof": "delivery-proof/runtime-smoke.json; three actual installed-agent packaging tasks observed, not experiments",
-    "cli_revision": "02f35b2adbdd2ea16dd23f6acb1d892f52c580c9",
+    "cli_revision": "4f70972cb68aaec122148cf98421dda29f3061e4",
     "cli_version": "0.1.23",
-    "final_binary_sha256": "4c41323565d0b616d039e9651d513260f40674bd7c033dee22448ec05e81b6ef"
+    "final_binary_sha256": "edb181c62e4a275bfaae4e464aea83d54cafb125739b0fb8fbd2385531912734"
   },
   "native_access_contract": {
     "reference": "command-reference.md",
