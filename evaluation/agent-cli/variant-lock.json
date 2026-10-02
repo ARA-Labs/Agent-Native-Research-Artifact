@@ -126,9 +126,9 @@
   ],
   "cli_pin": {
     "status": "pinned-verified-native-release",
-    "source_record_commit": "8e32a83d5fed9ec0ba7611d536b737165323dfa4",
+    "source_record_commit": "02f35b2adbdd2ea16dd23f6acb1d892f52c580c9",
     "version": "0.1.23",
-    "binary_sha256": "674f0229e76c13819a343e370211006e89d160d62773b6611c6775342928cd3b",
+    "binary_sha256": "4c41323565d0b616d039e9651d513260f40674bd7c033dee22448ec05e81b6ef",
     "proof": "https://github.com/ARA-Labs/ara-cli/blob/feat/agent-cli-interface/docs/verification/agent-cli-2026-10-02/final-release-installed-agent-replay.json",
     "scope": "Engineering implementation and final-release replay. Original installed model tasks retain their earlier 0.1.22 binary attribution; not scored research."
   },
@@ -145,7 +145,7 @@
   },
   "access_diff": {
     "path": "access-diff.json",
-    "sha256": "199292a7a0a99e18083e7397efe6e6de031ee633b36e257d70097eaf3671b3f1",
+    "sha256": "0f58a591596239c01b14e1cddf9d68cfea34176a884cadbb92ebbd456294fb31",
     "review_status": "passed-independent-static-access-review"
   },
   "command_reference": {

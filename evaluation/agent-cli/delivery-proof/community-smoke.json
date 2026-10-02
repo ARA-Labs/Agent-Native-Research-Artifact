@@ -7558,11 +7558,11 @@
   "final_reads": {
     "alice": {
       "actor_id": "alice",
-      "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+      "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
       "ok": true,
       "payload": {
         "actor_source_identity": "fixture-fork-alice",
-        "fork": "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+        "fork": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
         "frontier": [
           {
             "artifact_revision": "sha256:be63989135c005409f0d6f1f3976edf86d9571f09d2fdb604bfd392dd482a533",
@@ -10764,9 +10764,9 @@
         "invocations": {
           "open": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
               "open",
               "--json"
             ],
@@ -10776,9 +10776,9 @@
           },
           "show": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
               "show",
               "N12",
               "--full",
@@ -13797,15 +13797,15 @@
           }
         ]
       },
-      "pid": 47740
+      "pid": 7317
     },
     "bob": {
       "actor_id": "bob",
-      "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+      "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
       "ok": true,
       "payload": {
         "actor_source_identity": "fixture-fork-bob",
-        "fork": "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+        "fork": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
         "frontier": [
           {
             "artifact_revision": "sha256:be63989135c005409f0d6f1f3976edf86d9571f09d2fdb604bfd392dd482a533",
@@ -17007,9 +17007,9 @@
         "invocations": {
           "open": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
               "open",
               "--json"
             ],
@@ -17019,9 +17019,9 @@
           },
           "show": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
               "show",
               "N12",
               "--full",
@@ -20183,17 +20183,17 @@
           }
         ]
       },
-      "pid": 47741
+      "pid": 7318
     }
   },
   "initial_reads": {
     "alice": {
       "actor_id": "alice",
-      "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+      "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
       "ok": true,
       "payload": {
         "actor_source_identity": "fixture-fork-alice",
-        "fork": "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+        "fork": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
         "frontier": [
           {
             "artifact_revision": "sha256:be63989135c005409f0d6f1f3976edf86d9571f09d2fdb604bfd392dd482a533",
@@ -23395,9 +23395,9 @@
         "invocations": {
           "open": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
               "open",
               "--json"
             ],
@@ -23407,9 +23407,9 @@
           },
           "show": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
               "show",
               "N12",
               "--full",
@@ -25766,15 +25766,15 @@
         "remote_coverage_claimed": false,
         "remote_intention_context": []
       },
-      "pid": 47740
+      "pid": 7317
     },
     "bob": {
       "actor_id": "bob",
-      "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+      "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
       "ok": true,
       "payload": {
         "actor_source_identity": "fixture-fork-bob",
-        "fork": "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+        "fork": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
         "frontier": [
           {
             "artifact_revision": "sha256:be63989135c005409f0d6f1f3976edf86d9571f09d2fdb604bfd392dd482a533",
@@ -28976,9 +28976,9 @@
         "invocations": {
           "open": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
               "open",
               "--json"
             ],
@@ -28988,9 +28988,9 @@
           },
           "show": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
               "show",
               "N12",
               "--full",
@@ -31347,18 +31347,18 @@
         "remote_coverage_claimed": false,
         "remote_intention_context": []
       },
-      "pid": 47741
+      "pid": 7318
     }
   },
   "merge_proof": "not performed by this driver; parent combines the real merge scenario",
   "offline_reads": {
     "alice": {
       "actor_id": "alice",
-      "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+      "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
       "ok": true,
       "payload": {
         "actor_source_identity": "fixture-fork-alice",
-        "fork": "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+        "fork": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
         "frontier": [
           {
             "artifact_revision": "sha256:be63989135c005409f0d6f1f3976edf86d9571f09d2fdb604bfd392dd482a533",
@@ -34560,9 +34560,9 @@
         "invocations": {
           "open": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
               "open",
               "--json"
             ],
@@ -34572,9 +34572,9 @@
           },
           "show": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/alice/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/alice/ara",
               "show",
               "N12",
               "--full",
@@ -37165,15 +37165,15 @@
           }
         ]
       },
-      "pid": 47740
+      "pid": 7317
     },
     "bob": {
       "actor_id": "bob",
-      "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+      "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
       "ok": true,
       "payload": {
         "actor_source_identity": "fixture-fork-bob",
-        "fork": "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+        "fork": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
         "frontier": [
           {
             "artifact_revision": "sha256:be63989135c005409f0d6f1f3976edf86d9571f09d2fdb604bfd392dd482a533",
@@ -40375,9 +40375,9 @@
         "invocations": {
           "open": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
               "open",
               "--json"
             ],
@@ -40387,9 +40387,9 @@
           },
           "show": {
             "command": [
-              "/private/tmp/ara-integration-binary/ara-0.1.23-674f0229e76c1381",
+              "/private/tmp/ara-integration-binary/ara-0.1.23-4c41323565d0b616",
               "-C",
-              "/private/tmp/ara-community-final-0.1.23/forks/bob/ara",
+              "/private/tmp/ara-community-delivery-0.1.23-02f35b2/forks/bob/ara",
               "show",
               "N12",
               "--full",
@@ -42907,7 +42907,7 @@
           }
         ]
       },
-      "pid": 47741
+      "pid": 7318
     }
   },
   "schema": "ara.community-two-process-smoke/v1",
@@ -50597,7 +50597,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -50650,7 +50650,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -50661,7 +50661,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -50714,7 +50714,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -50747,7 +50747,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -50826,7 +50826,7 @@
           "sequence": 3,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -50837,7 +50837,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -50948,7 +50948,7 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -50985,7 +50985,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -51112,7 +51112,7 @@
           "sequence": 5,
           "status": "running"
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -51123,7 +51123,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -51339,7 +51339,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -51355,7 +51355,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -51503,7 +51503,7 @@
           "sequence": 7,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -51519,7 +51519,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -51696,7 +51696,7 @@
           "sequence": 8,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -51712,12 +51712,12 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "error": "channel_unavailable",
-        "message": "Cannot read committed journal: [Errno 2] No such file or directory: '/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions/events.jsonl'",
+        "message": "Cannot read committed journal: [Errno 2] No such file or directory: '/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions/events.jsonl'",
         "ok": false,
         "pause_budget_consuming_work": true,
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -51728,12 +51728,12 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "error": "channel_unavailable",
-        "message": "Cannot read committed journal: [Errno 2] No such file or directory: '/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions/events.jsonl'",
+        "message": "Cannot read committed journal: [Errno 2] No such file or directory: '/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions/events.jsonl'",
         "ok": false,
         "pause_budget_consuming_work": true,
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -51744,7 +51744,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -52018,7 +52018,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -52040,7 +52040,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -52216,7 +52216,7 @@
           "sequence": 10,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -52227,7 +52227,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -52500,7 +52500,7 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -52516,7 +52516,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -52636,7 +52636,7 @@
           "sequence": 12,
           "status": "running"
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -52652,7 +52652,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -52805,7 +52805,7 @@
           "sequence": 13,
           "status": "running"
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -52827,7 +52827,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -53023,7 +53023,7 @@
           "sequence": 14,
           "status": "running"
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -53031,7 +53031,7 @@
       "operation": "recover",
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -53207,7 +53207,7 @@
           "sequence": 10,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -53218,7 +53218,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -53600,7 +53600,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -53633,7 +53633,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -53712,7 +53712,7 @@
           "sequence": 16,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -53725,7 +53725,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -54171,7 +54171,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -54184,7 +54184,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -54634,7 +54634,7 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -54645,7 +54645,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -55095,7 +55095,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -55111,7 +55111,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -55219,7 +55219,7 @@
           "sequence": 20,
           "status": "running"
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -55230,7 +55230,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -55709,7 +55709,7 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -55722,7 +55722,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -56207,7 +56207,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -56220,7 +56220,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -56709,7 +56709,7 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -56722,7 +56722,7 @@
       },
       "response": {
         "actor_id": "alice",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -57217,7 +57217,7 @@
             "status": "running"
           }
         },
-        "pid": 47740
+        "pid": 7317
       }
     },
     {
@@ -57230,7 +57230,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -57758,7 +57758,7 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     },
     {
@@ -57769,7 +57769,7 @@
       },
       "response": {
         "actor_id": "bob",
-        "channel_directory": "/private/tmp/ara-community-final-0.1.23/shared/community/community-smoke/intentions",
+        "channel_directory": "/private/tmp/ara-community-delivery-0.1.23-02f35b2/shared/community/community-smoke/intentions",
         "ok": true,
         "payload": {
           "accounting": {
@@ -58297,14 +58297,14 @@
             "status": "running"
           }
         },
-        "pid": 47741
+        "pid": 7318
       }
     }
   ],
-  "evidence_attribution": {
+  "verification_metadata": {
     "version": "0.1.23",
-    "binary_sha256": "674f0229e76c13819a343e370211006e89d160d62773b6611c6775342928cd3b",
-    "source_record_commit": "8e32a83d5fed9ec0ba7611d536b737165323dfa4",
+    "binary_sha256": "4c41323565d0b616d039e9651d513260f40674bd7c033dee22448ec05e81b6ef",
+    "source_record_commit": "02f35b2adbdd2ea16dd23f6acb1d892f52c580c9",
     "merge_proof": "Final native acceptance runner measures merge separately; this driver did not perform a merge"
   }
 }
