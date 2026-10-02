@@ -1,15 +1,22 @@
 # Event Taxonomy & Routing Rules
 
+## CLI-only access boundary
+
+Every knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the
+words read, open, search, write, append and edit retain their original procedural meaning,
+but never authorize direct knowledge-file tools. For complete source use
+`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);
+`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.
+Source/evidence bodies and skill pages remain direct only within the baseline scope.
+No direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.
+The entrypoint loads `references/cli-access.md` directly for executable wire details.
+Pending protocol review and binary proof remain visible in the variant lock.
+
+
 Canonical reference for **Stage 2 (Event Router)** of the Live PM pipeline. Loaded on
 demand at epilogue time. SKILL.md owns the pipeline orchestration, closure signals,
 crystallization procedure, contradiction trigger, and schemas — this file does not
 duplicate those.
-
-The [CLI contract decision record](../../../docs/agent-cli-contracts.md) proposes bounded
-write permissions for every route below, including all promotion targets and complete
-session history. Its F1 through F7 decisions are pending upstream PR review, not merged
-approval. The [baseline inventory](../../../evaluation/agent-cli/operation-coverage.json)
-pins the original clauses; this note does not change routing, provenance, or closure rules.
 
 This document covers two axes:
 
@@ -24,7 +31,7 @@ true*. It is revisable, goes staged, and only crystallizes on a closure signal.
 
 ## Direct-Routed Events (Journey Layer)
 
-Write to `trace/exploration_tree.yaml` immediately at end of turn.
+Append through `node.add` in `ara apply` to `trace/exploration_tree.yaml` immediately at end of turn.
 
 | Type | Signals | Required payload |
 |------|---------|------------------|
@@ -42,7 +49,7 @@ list, **not** to the exploration tree.
 
 ## Staged-Routed Events (Interpretive — Buffered for Maturity)
 
-Write to `staging/observations.yaml` first, with `potential_type` indicating where they
+Append through `observation.stage` in `ara apply` to `staging/observations.yaml` first, with `potential_type` indicating where they
 would crystallize. They do **not** enter `logic/` until a closure signal fires (see
 SKILL.md Stage 3).
 
@@ -149,7 +156,7 @@ Reviewers and downstream tools (e.g., rigor-reviewer L2) inspect this distributi
 | Taste comment (trace-node) | T | T01, T02 | Global; `trace/taste_log.yaml` only — see `references/taste-comments.md` |
 | Session | date_seq | 2026-04-27_001 | Unique per calendar day |
 
-Always read the target file to find the highest existing ID before assigning a new one.
+Always read the target through ara full source show before adding (no duplicates); let the CLI assign the new ID and use its result/bindings instead of scanning to allocate it.
 
 ## Forensic Binding Checklist
 

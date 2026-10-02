@@ -1,0 +1,53 @@
+{
+  "format": "ara.packaging-smoke-tasks/v1",
+  "kind": "new-live-packaging-fixtures-not-benchmark",
+  "source_lock": "source-lock.json",
+  "task_map": "task-skill-map.json",
+  "execution_status": "passed-live-installed-agent-packaging-smoke",
+  "observed_proof": "delivery-proof/runtime-smoke.json",
+  "artifact_files": {
+    "PAPER.md": "---\ntitle: Packaging smoke artifact\nauthors: [Fixture author]\nyear: 2026\n---\n# Packaging smoke artifact\n\n## Layer Index\n- [Claims](logic/claims.md)\n- [Concepts](logic/concepts.md)\n- [Method](logic/solution/method.md)\n- [Session](trace/sessions/2026-10-01_001.yaml)\n",
+    "logic/claims.md": "# Claims\n\n## C01: State follows validated history\n- **Statement**: A current view can preserve previous wording through complete revision history.\n- **Conditions**: Each revision retains its full prior and new body in a session record.\n- **Status**: hypothesis\n- **Provenance**: ai-suggested\n- **Falsification**: A prior body cannot be recovered after a revision.\n- **Proof**: pending\n- **Sources**: []\n- **Dependencies**: []\n",
+    "logic/concepts.md": "# Concepts\n\n## revision-history\n- **Definition**: The complete prior and new body of an entry, linked to the session turn that changed it.\n- **Notation**: none\n- **Boundary conditions**: This fixture specifies a record contract, not an empirical research result.\n- **Related concepts**: current-view\n",
+    "logic/solution/method.md": "# Method\n\n## retain-before-and-after\nRead the original body before proposing a change. Keep equations and unknown fields unchanged unless the source-supported revision targets them. Record the complete prior and new value, not a summary.\n",
+    "trace/exploration_tree.yaml": "tree:\n  - id: N01\n    type: question\n    title: Can a prior statement be recovered?\n    description: Inspect the complete session revision contract.\n    provenance: user\n    timestamp: '2026-10-01T09:00'\n",
+    "staging/observations.yaml": "observations: []\n",
+    "trace/pm_reasoning_log.yaml": "entries: []\n",
+    "trace/sessions/session_index.yaml": "sessions:\n  - id: 2026-10-01_001\n    date: '2026-10-01'\n    summary: Packaging fixture initialized\n    turn_count: 0\n    events_count: 0\n    claims_touched: []\n    open_threads: 1\n",
+    "trace/sessions/2026-10-01_001.yaml": "session:\n  id: 2026-10-01_001\n  date: '2026-10-01'\n  started: '2026-10-01T09:00'\n  last_turn: '2026-10-01T09:00'\n  turn_count: 0\n  summary: Packaging fixture initialized\nevents_logged: []\nai_actions: []\nclaims_touched: []\nlogic_revisions: []\nkey_context: []\nopen_threads:\n  - Confirm the wording of C01\nai_suggestions_pending: []\n"
+  },
+  "tasks": [
+    {
+      "task_id": "live.reader-grounding",
+      "request": "Explain what revision-history means in this one artifact and which clause makes C01 conditional. Cite the exact native concept and claim refs, distinguish supported text from inference, and write nothing.",
+      "expected_shape": {
+        "Answer": ["answer", "grounded_inference", "speculative_leap", "basis", "reasoning", "confidence", "confidence_reason", "falsifiable"]
+      },
+      "role": "read-only reader",
+      "allowed_write_paths": [],
+      "not_a_reproduction": true
+    },
+    {
+      "task_id": "live.pm-continuity",
+      "request": "At the end of this fixture turn, the researcher explicitly says: Revise C01 Conditions to require a uniquely resolved session and keep the previous wording recoverable. Apply source reconciliation rules, record exact before/after with provenance and signal, append all applicable session lists and reasoning, and update current metadata/index without losing open-thread history.",
+      "expected_shape": {
+        "session_lists": ["events_logged", "ai_actions", "claims_touched", "logic_revisions", "key_context", "open_threads", "ai_suggestions_pending"],
+        "logic_revision_fields": ["turn", "entry", "field", "before", "after", "signal", "provenance"],
+        "current_metadata": ["last_turn", "turn_count", "summary"],
+        "index_fields": ["id", "date", "summary", "turn_count", "events_count", "claims_touched", "open_threads"]
+      },
+      "role": "single live project-manager writer",
+      "not_a_reproduction": true
+    },
+    {
+      "task_id": "live.compiler-core",
+      "request": "Load the compiler's complete schema and validation/extraction references. Given only the fixture method and claim text, report the source-supported mandatory-core and missing-input requirements before compilation. Preserve the actual prose and native concept identity; do not invent evidence, figures, experiments or code to satisfy counts.",
+      "expected_shape": {
+        "mandatory_knowledge_paths": ["PAPER.md", "logic/problem.md", "logic/claims.md", "logic/concepts.md", "logic/experiments.md", "logic/related_work.md", "logic/solution/constraints.md", "trace/exploration_tree.yaml"],
+        "source_requirements": ["source-bounded counts", "complete source-supported bodies", "input/evidence gaps stated without fabrication"]
+      },
+      "role": "source-grounded compiler",
+      "not_a_reproduction": true
+    }
+  ]
+}

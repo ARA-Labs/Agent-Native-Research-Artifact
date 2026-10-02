@@ -1,0 +1,824 @@
+{
+  "format": "ara.skill-source-lock/v1",
+  "created": "2026-10-01",
+  "protocol_contract": "../../docs/agent-cli-contracts.md",
+  "implementation_plan_status": "approved",
+  "upstream_review_status": "pending-review",
+  "remote_verification": {
+    "method": "git ls-remote origin refs/heads/main; git fetch origin main; git show FETCH_HEAD:path",
+    "remote_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact.git",
+    "advertised_main_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+    "fetched_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+    "source_bytes": "read from the fetched full commit, not installed skills or modified working tree"
+  },
+  "pins": [
+    {
+      "pin_id": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "kind": "live",
+      "selection_status": "selected-for-implementation-upstream-review-pending",
+      "paper_corresponding": false,
+      "skill": "research-foresight",
+      "remote_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact.git",
+      "full_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+      "source_path": "skills/research-foresight",
+      "entrypoint": "skills/research-foresight/SKILL.md",
+      "archive_root": "baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2",
+      "sha256": "90e6064ef9ea592276f16c0d3206dc329093910be7dd7581ced79af09ffb7b28",
+      "digest_algorithm": "sha256 over sorted source paths: u64-big-endian path byte length, path UTF-8 bytes, u64-big-endian content byte length, unchanged content bytes",
+      "files": [
+        "skills/research-foresight/SKILL.md",
+        "skills/research-foresight/references/CONTRACT.md",
+        "skills/research-foresight/references/PREDICT.md",
+        "skills/research-foresight/references/RETRIEVE.md",
+        "skills/research-manager/templates/reader-report.md"
+      ],
+      "transitive_references": [],
+      "license": {
+        "spdx": "MIT",
+        "copyright": "Copyright (c) 2026 Orchestra Research",
+        "source_path": "LICENSE",
+        "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/LICENSE",
+        "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a"
+      },
+      "experiment_provenance": {
+        "status": "new-live-pin-not-reproduction",
+        "reason": "Exact current remote source chosen for access-only interface development; historical skill-to-published-run mapping is not verified."
+      }
+    },
+    {
+      "pin_id": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "kind": "live",
+      "selection_status": "selected-for-implementation-upstream-review-pending",
+      "paper_corresponding": false,
+      "skill": "research-manager",
+      "remote_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact.git",
+      "full_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+      "source_path": "skills/research-manager",
+      "entrypoint": "skills/research-manager/SKILL.md",
+      "archive_root": "baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2",
+      "sha256": "1414dfd18b92327e80f40398382fe30ec966ae6d6942e6bc49a05210c86d23ce",
+      "digest_algorithm": "sha256 over sorted source paths: u64-big-endian path byte length, path UTF-8 bytes, u64-big-endian content byte length, unchanged content bytes",
+      "files": [
+        "skills/research-manager/SKILL.md",
+        "skills/research-manager/references/event-taxonomy.md",
+        "skills/research-manager/references/taste-comments.md",
+        "skills/research-manager/templates/reader-report.md"
+      ],
+      "transitive_references": [],
+      "license": {
+        "spdx": "MIT",
+        "copyright": "Copyright (c) 2026 Orchestra Research",
+        "source_path": "LICENSE",
+        "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/LICENSE",
+        "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a"
+      },
+      "experiment_provenance": {
+        "status": "new-live-pin-not-reproduction",
+        "reason": "Exact current remote source chosen for access-only interface development; historical skill-to-published-run mapping is not verified."
+      }
+    },
+    {
+      "pin_id": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "kind": "live",
+      "selection_status": "selected-for-implementation-upstream-review-pending",
+      "paper_corresponding": false,
+      "skill": "compiler",
+      "remote_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact.git",
+      "full_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+      "source_path": "skills/compiler",
+      "entrypoint": "skills/compiler/SKILL.md",
+      "archive_root": "baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2",
+      "sha256": "46082711c166a2207ba341122f9bf592b643c9de1c5d9ebb09cd394aa205a9a5",
+      "digest_algorithm": "sha256 over sorted source paths: u64-big-endian path byte length, path UTF-8 bytes, u64-big-endian content byte length, unchanged content bytes",
+      "files": [
+        "skills/compiler/SKILL.md",
+        "skills/compiler/references/ara-schema.md",
+        "skills/compiler/references/exploration-tree-spec.md",
+        "skills/compiler/references/figure-extraction-guide.md",
+        "skills/compiler/references/validation-checklist.md"
+      ],
+      "transitive_references": [],
+      "license": {
+        "spdx": "MIT",
+        "copyright": "Copyright (c) 2026 Orchestra Research",
+        "source_path": "LICENSE",
+        "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/LICENSE",
+        "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a"
+      },
+      "experiment_provenance": {
+        "status": "new-live-pin-not-reproduction",
+        "reason": "Exact current remote source chosen for access-only interface development; historical skill-to-published-run mapping is not verified."
+      }
+    }
+  ],
+  "files": [
+    {
+      "source_path": "LICENSE",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/LICENSE",
+      "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+      "bytes": 1075,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/LICENSE"
+    },
+    {
+      "source_path": "skills/compiler/SKILL.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/SKILL.md",
+      "sha256": "b7555bb021d8dd3d8caa3b093bdccf3a44557580805dfe5b45a5d23c79c979fb",
+      "bytes": 25754,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/SKILL.md"
+    },
+    {
+      "source_path": "skills/compiler/references/ara-schema.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/ara-schema.md",
+      "sha256": "bfd6725bbf05da932e2fe1d3be847fa48e53bf7bfd7bb4baa9f00101f8138b94",
+      "bytes": 27851,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/ara-schema.md"
+    },
+    {
+      "source_path": "skills/compiler/references/exploration-tree-spec.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/exploration-tree-spec.md",
+      "sha256": "c60540f54737b65fd254c0937da2a36a99a3adca67b8095ae6e05aa50f24cf17",
+      "bytes": 4765,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/exploration-tree-spec.md"
+    },
+    {
+      "source_path": "skills/compiler/references/figure-extraction-guide.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/figure-extraction-guide.md",
+      "sha256": "7e9529ab65afac1dbd00cd4dfdca835730485c78daf0568da37c22581d103723",
+      "bytes": 9352,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/figure-extraction-guide.md"
+    },
+    {
+      "source_path": "skills/compiler/references/validation-checklist.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/validation-checklist.md",
+      "sha256": "733437b090697a4e73efb2766ea13c512ec71dbb868ed5745d5ab0cc12ca25f2",
+      "bytes": 14496,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/validation-checklist.md"
+    },
+    {
+      "source_path": "skills/research-foresight/SKILL.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/SKILL.md",
+      "sha256": "393195faf08f9a2da8dfabda4e64129b8f166c263ac19433a55b8b16f187aeab",
+      "bytes": 2523,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/SKILL.md"
+    },
+    {
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/CONTRACT.md",
+      "sha256": "67bd4f925bd32374230ead9c56e0e3a4d1a1f348b0649a505ce6bee5642ef162",
+      "bytes": 6822,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/CONTRACT.md"
+    },
+    {
+      "source_path": "skills/research-foresight/references/PREDICT.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/PREDICT.md",
+      "sha256": "e1e0c8fc462815ed0ddb2245823505094def316c297db9039491b6a7a8617058",
+      "bytes": 18409,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/PREDICT.md"
+    },
+    {
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/RETRIEVE.md",
+      "sha256": "8329fb579992b22c8aad0369bcb263d4d8d4c4e01298797c42031f7662938d33",
+      "bytes": 16074,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/RETRIEVE.md"
+    },
+    {
+      "source_path": "skills/research-manager/SKILL.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/SKILL.md",
+      "sha256": "fc8fb52d57cbae4c754fd7bf9e6023dbf54fd4e796152d87786749e1f30d2c37",
+      "bytes": 36877,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/SKILL.md"
+    },
+    {
+      "source_path": "skills/research-manager/references/event-taxonomy.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/event-taxonomy.md",
+      "sha256": "49a273dca8d05cbe27ad80f4e78907dea23d710db6ced635082204b5c040527b",
+      "bytes": 7374,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/event-taxonomy.md"
+    },
+    {
+      "source_path": "skills/research-manager/references/taste-comments.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/taste-comments.md",
+      "sha256": "b6382632024d61ad57aff83d22caaef6858a8d511ffe141bc76ce34c5f73ca93",
+      "bytes": 5742,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/taste-comments.md"
+    },
+    {
+      "source_path": "skills/research-manager/templates/reader-report.md",
+      "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/templates/reader-report.md",
+      "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+      "bytes": 1423,
+      "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/templates/reader-report.md"
+    }
+  ],
+  "reference_closure": [
+    {
+      "from": "skills/research-foresight/SKILL.md",
+      "to": "skills/research-foresight/references/CONTRACT.md",
+      "requirement": "required foundation"
+    },
+    {
+      "from": "skills/research-foresight/SKILL.md",
+      "to": "skills/research-foresight/references/RETRIEVE.md",
+      "requirement": "required retrieve"
+    },
+    {
+      "from": "skills/research-foresight/SKILL.md",
+      "to": "skills/research-foresight/references/PREDICT.md",
+      "requirement": "required predict"
+    },
+    {
+      "from": "skills/research-foresight/references/RETRIEVE.md",
+      "to": "skills/research-foresight/references/CONTRACT.md",
+      "requirement": "foundation precedence"
+    },
+    {
+      "from": "skills/research-foresight/references/PREDICT.md",
+      "to": "skills/research-foresight/references/CONTRACT.md",
+      "requirement": "foundation precedence"
+    },
+    {
+      "from": "skills/research-foresight/references/PREDICT.md",
+      "to": "skills/research-manager/templates/reader-report.md",
+      "requirement": "transitive standalone report shape"
+    },
+    {
+      "from": "skills/research-manager/SKILL.md",
+      "to": "skills/research-manager/references/event-taxonomy.md",
+      "requirement": "routing and native IDs"
+    },
+    {
+      "from": "skills/research-manager/SKILL.md",
+      "to": "skills/research-manager/references/taste-comments.md",
+      "requirement": "conditional taste procedure"
+    },
+    {
+      "from": "skills/research-manager/SKILL.md",
+      "to": "skills/research-manager/templates/reader-report.md",
+      "requirement": "reader-report input shape"
+    },
+    {
+      "from": "skills/research-manager/references/event-taxonomy.md",
+      "to": "skills/research-manager/SKILL.md",
+      "requirement": "closure and mutability precedence"
+    },
+    {
+      "from": "skills/research-manager/references/event-taxonomy.md",
+      "to": "skills/research-manager/references/taste-comments.md",
+      "requirement": "taste ID shape"
+    },
+    {
+      "from": "skills/research-manager/references/taste-comments.md",
+      "to": "skills/research-manager/SKILL.md",
+      "requirement": "schema and layer mutability"
+    },
+    {
+      "from": "skills/research-manager/references/taste-comments.md",
+      "to": "skills/research-manager/references/event-taxonomy.md",
+      "requirement": "separate new-content routing"
+    },
+    {
+      "from": "skills/compiler/SKILL.md",
+      "to": "skills/compiler/references/ara-schema.md",
+      "requirement": "schema/validation/extraction source supplied to compiler"
+    },
+    {
+      "from": "skills/compiler/SKILL.md",
+      "to": "skills/compiler/references/exploration-tree-spec.md",
+      "requirement": "schema/validation/extraction source supplied to compiler"
+    },
+    {
+      "from": "skills/compiler/SKILL.md",
+      "to": "skills/compiler/references/validation-checklist.md",
+      "requirement": "schema/validation/extraction source supplied to compiler"
+    },
+    {
+      "from": "skills/compiler/SKILL.md",
+      "to": "skills/compiler/references/figure-extraction-guide.md",
+      "requirement": "schema/validation/extraction source supplied to compiler"
+    }
+  ],
+  "historical_configuration": {
+    "status": "available-current-snapshot-not-linked-to-published-run",
+    "remote_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact.git",
+    "full_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+    "files": [
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/adaptive-pruning_catA.json",
+        "sha256": "374086cfc628b62159199d0c1fe40eff52b27efde7f00910090016472eb95226",
+        "bytes": 7877,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/adaptive-pruning_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/adaptive-pruning_catB.json",
+        "sha256": "bdec059e7e1003b8cacdcb3e2b6ff8abd3c9147374b8abb8b814ea2681103976",
+        "bytes": 7957,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/adaptive-pruning_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/all-in-one_catA.json",
+        "sha256": "17e042ce7ee167ca40d0bc5bc246cd3b86691b93db05899f8f874de1d759821a",
+        "bytes": 6632,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/all-in-one_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/all-in-one_catB.json",
+        "sha256": "3ab8e091a2e0daeedae1fd055698f5544b9e03d021f19810d9dee491940e4f5e",
+        "bytes": 15313,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/all-in-one_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/bam_catA.json",
+        "sha256": "17a55312d8a8b7ee5d6a50e72869e5d9276cabb87d444c17014312a0049f67f5",
+        "bytes": 7120,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/bam_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/bam_catB.json",
+        "sha256": "6248ddb9e8012b6aad205d79e3674edb5c6ce6542350806fb377fd4f596809d7",
+        "bytes": 8688,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/bam_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/bbox_catA.json",
+        "sha256": "cfc26cea8f0806061175ca591e8c1e7181b3d8bb0eaf9f45c7288ff7312fa7a4",
+        "bytes": 6638,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/bbox_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/bbox_catB.json",
+        "sha256": "6062f6b863dba19a1f65dd73b92592c9f2d187baa905b52167dd99ddfff7a4a6",
+        "bytes": 14937,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/bbox_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/bridging-data-gaps_catA.json",
+        "sha256": "d22a18ca16b77eddf7db9136adf57a637473373e8d5113e4195f83df5bd6456f",
+        "bytes": 7058,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/bridging-data-gaps_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/bridging-data-gaps_catB.json",
+        "sha256": "f325b9824034851860b5fd179c3cfbf7d78cb4c6450b96f5cf4c176c731e937b",
+        "bytes": 15208,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/bridging-data-gaps_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/fre_catA.json",
+        "sha256": "7d50b4e11076cb47dcf3435ff1605ba75d84035b9b04ca1cbba0fcbaeb7b69ac",
+        "bytes": 7006,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/fre_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/fre_catB.json",
+        "sha256": "098d1dcddaeb58deb8fcb43507761ef975ba42d0172fe424e4eb436d8583440e",
+        "bytes": 17050,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/fre_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/ftrl_catA.json",
+        "sha256": "f31ca153b0cd463d36e88da26fd2ad5aa8561fef5f50549ce8047075a3566821",
+        "bytes": 6868,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/ftrl_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/ftrl_catB.json",
+        "sha256": "7c3bbafca6b5527fd5e0270f5eb9eb1aac4c1de675fa2f9e39a68cc90a0fc5ff",
+        "bytes": 14409,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/ftrl_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/lbcs_catA.json",
+        "sha256": "334d57cd6cf0a172d64f33ba5b27d2d945e7788e5c3c63bea694f7336e7a5d6e",
+        "bytes": 6156,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/lbcs_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/lbcs_catB.json",
+        "sha256": "7448d0563bab569d04c5798d7cc53d7e1530bbad28627224ccccfc8820a20fb8",
+        "bytes": 8760,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/lbcs_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/lca-on-the-line_catA.json",
+        "sha256": "5bed82803bf721107b76e0c9bbcef7969bee22b3f869e82176035b046c3e52c5",
+        "bytes": 7183,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/lca-on-the-line_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/lca-on-the-line_catB.json",
+        "sha256": "de4f6b1797d22c3d143239a8a037d7f45fd48a42548206da3e5139a023d3f650",
+        "bytes": 15802,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/lca-on-the-line_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/mechanistic-understanding_catA.json",
+        "sha256": "dce05833fc4bcc68af09c2dd7b2f179c811749458d6f8bd1e700301709175956",
+        "bytes": 7016,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/mechanistic-understanding_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/mechanistic-understanding_catB.json",
+        "sha256": "e6c745a29c65c1e32003161b6c17b5e9ba37189b807d5c9d69f21c9e066977f3",
+        "bytes": 14565,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/mechanistic-understanding_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/nanogpt-speedrun_catA.json",
+        "sha256": "a74f989beffc871102112feaccd155e768326524ae1d7dba2e46ee787c7ff0ce",
+        "bytes": 6140,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/nanogpt-speedrun_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/nanogpt-speedrun_catC.json",
+        "sha256": "1f41926984e35e9e913e7be63bf4474c99dbfb1159cc94eba73c33cc708a1e9e",
+        "bytes": 6740,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/nanogpt-speedrun_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/pinn_catA.json",
+        "sha256": "66eca58931ca46b6e0d7bef3844435bdfb58d2556d2021246039520dc3f65d10",
+        "bytes": 7339,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/pinn_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/pinn_catB.json",
+        "sha256": "774614d017c304b4b547f845eecec4a341412275e50d842f805e596e37ea3da0",
+        "bytes": 15006,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/pinn_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-fix_embedding_catA.json",
+        "sha256": "d72aa947d069f33a7440360b6185d6f9fc58633ce8813b37634d7c19f8b52c4a",
+        "bytes": 7157,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-fix_embedding_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-fix_embedding_catC.json",
+        "sha256": "d3ab28e57dcfe0802dc3ef1e88d2754470561e7eaef5686014150752ee57c0b4",
+        "bytes": 11706,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-fix_embedding_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-nanogpt_chat_rl_catA.json",
+        "sha256": "44738434b6cbab96acab2b434c9019e29f3c285b6709ad510890fc44a126291b",
+        "bytes": 5648,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-nanogpt_chat_rl_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-nanogpt_chat_rl_catC.json",
+        "sha256": "97686fb9ef472eba37f0514e592d4d7e384e74b7de981bb63d4f2175165be54c",
+        "bytes": 7632,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-nanogpt_chat_rl_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-optimize_llm_foundry_catA.json",
+        "sha256": "df306d03643822077dbe8b74d672a339be4a574f352316d68b2952e34f48e4b8",
+        "bytes": 6589,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-optimize_llm_foundry_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-optimize_llm_foundry_catC.json",
+        "sha256": "55e2c0690e6431423268b35a500d76f4ed3e34a3857c9970417c2508d47886da",
+        "bytes": 7532,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-optimize_llm_foundry_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-restricted_mlm_catA.json",
+        "sha256": "bce77334ae5c5188c999f96d0974c14825a87d6a17746be808248baf7840a673",
+        "bytes": 5626,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-restricted_mlm_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-restricted_mlm_catC.json",
+        "sha256": "65639a2481d64ab544f059b5f9a325567232664de75cbbffcd04c7d40780b02c",
+        "bytes": 9513,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-restricted_mlm_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-rust_codecontests_catA.json",
+        "sha256": "e2d52d28478a2777eecebb9a354f3737381b8a54884344e832e90e3535db2672",
+        "bytes": 5855,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-rust_codecontests_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-rust_codecontests_catC.json",
+        "sha256": "6267aaa4866af175f58ca97e66e6a09406c8e1499b5ee80fa023741b56607f2b",
+        "bytes": 8969,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-rust_codecontests_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-small_scaling_law_catA.json",
+        "sha256": "2f681a6c4df05d9d36285c304bc9aa34078b91b8f12ac33fa8921859657e7064",
+        "bytes": 6010,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-small_scaling_law_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-small_scaling_law_catC.json",
+        "sha256": "490e07b4658170f349ae6a7332b75dd899eb8bbd5dc456fbd54bd691ab8f0585",
+        "bytes": 9706,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-small_scaling_law_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-triton_cumsum_catA.json",
+        "sha256": "7e292ac2b400dff8a179cd00c54c012f0ac82bced510b6f2aeecbc4aa24b3fb6",
+        "bytes": 6218,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-triton_cumsum_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rebench-triton_cumsum_catC.json",
+        "sha256": "09b69e1b7c4da80530efe12f10de357236fffca5914b525baa23cb20b5e7146a",
+        "bytes": 10372,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rebench-triton_cumsum_catC.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rice_catA.json",
+        "sha256": "66f29dfde55dd2bc563b55a023eadf94174179aa948dbd8346ebbe554008ffae",
+        "bytes": 6565,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rice_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/rice_catB.json",
+        "sha256": "ba05c750d44254cc2179aae66f79363442307af22e9d1c8f5931fa691f646fd8",
+        "bytes": 13738,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/rice_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/robust-clip_catA.json",
+        "sha256": "ff78203d8c41af74997e482e9392b60b121754c01df4e7ebc5e6f0e4d250778d",
+        "bytes": 7236,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/robust-clip_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/robust-clip_catB.json",
+        "sha256": "fa3e5a35b0da8e44feae21e885e197c87360bce649e85b85e4787f8e70cde6b6",
+        "bytes": 15289,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/robust-clip_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/sample-specific-masks_catA.json",
+        "sha256": "19a1d4b2ad808b2623fdcd076522de1d30c5082819830ea0f3215a85a5e3fb3c",
+        "bytes": 6614,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/sample-specific-masks_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/sample-specific-masks_catB.json",
+        "sha256": "98651b2106be96cc23027d1e3fd75cb2a6deaaf2a122d4ddbe22d8d7c26fab1d",
+        "bytes": 14666,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/sample-specific-masks_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/sapg_catA.json",
+        "sha256": "18897097c57ca447dd341c617d5bf4f5319e0ce995329897bdfb87c4194899c7",
+        "bytes": 7238,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/sapg_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/sapg_catB.json",
+        "sha256": "794ae60a36a0ef7bc8848051383aa13452c7d78a237f582468d779fc31678b61",
+        "bytes": 17182,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/sapg_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/self-composing-policies_catA.json",
+        "sha256": "e00f7a1b5259fa4cad585ab5ec85034c9e54defd38a6013134da0c746eb57ce0",
+        "bytes": 6953,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/self-composing-policies_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/self-composing-policies_catB.json",
+        "sha256": "63f1656f936a955b861c58b5d5c0e750cf019cf9b87f0ec182d0807d0782ee93",
+        "bytes": 14504,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/self-composing-policies_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/self-expansion_catA.json",
+        "sha256": "297fea92875d6d567b3d4d225035d52f319625d50ea2115bdba20821eff3de0c",
+        "bytes": 7466,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/self-expansion_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/self-expansion_catB.json",
+        "sha256": "f4da1d534a2b773942629850890ee906f63ab54a7a168cbb2554eb4d6254c3de",
+        "bytes": 14426,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/self-expansion_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/semantic-self-consistency_catA.json",
+        "sha256": "96c5644f413b28a755a0933bc6ce53fb86193464cd38667f9e44bc810b2c3355",
+        "bytes": 7628,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/semantic-self-consistency_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/semantic-self-consistency_catB.json",
+        "sha256": "6f44516ec99856b7f7c983c569078943172581d97a769cd9307bfefb4b5f7162",
+        "bytes": 15576,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/semantic-self-consistency_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/sequential-neural-score-estimation_catA.json",
+        "sha256": "e847a674897f0734b094e345af7192ed5249666ae0aba8460e0667a694a80132",
+        "bytes": 7240,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/sequential-neural-score-estimation_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/sequential-neural-score-estimation_catB.json",
+        "sha256": "751d093ee17e22188a1887b752707ced62d80c757f239c83dbbf0003bd7b5845",
+        "bytes": 16073,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/sequential-neural-score-estimation_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/stay-on-topic-with-classifier-free-guidance_catA.json",
+        "sha256": "452ae79b501897d1bb6dc653e2269c4b01caf4eae33f1eda303eef987df1c9b0",
+        "bytes": 7429,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/stay-on-topic-with-classifier-free-guidance_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/stay-on-topic-with-classifier-free-guidance_catB.json",
+        "sha256": "125055c9437c16ec48269530e8174f7e0ca303504ff099fa74739e4e21d22bbb",
+        "bytes": 16670,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/stay-on-topic-with-classifier-free-guidance_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/stochastic-interpolants_catA.json",
+        "sha256": "27e896640c67b748760e376e6995d74fad64f48caf0fe1c3a6d3136993cc8d09",
+        "bytes": 7435,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/stochastic-interpolants_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/stochastic-interpolants_catB.json",
+        "sha256": "6c5962a2fb51b4c5cb7d7a65f29c2d67cb09f7221faef974d247f468ab0accf7",
+        "bytes": 17351,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/stochastic-interpolants_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/test-time-model-adaptation_catA.json",
+        "sha256": "09337d5cdcee3620edbfef09878c5408eb3d96c830e195107598daa894094d42",
+        "bytes": 7979,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/test-time-model-adaptation_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/test-time-model-adaptation_catB.json",
+        "sha256": "7a4a14add50ab7723d6dfb33334bca05098fde171264feb3d6340758403c0abb",
+        "bytes": 16721,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/test-time-model-adaptation_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/what-will-my-model-forget_catA.json",
+        "sha256": "c70a322cbf612fcb7817036a10f4c67554aec71d79cfa9666078207e8c3a88ad",
+        "bytes": 7148,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/what-will-my-model-forget_catA.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/questions/what-will-my-model-forget_catB.json",
+        "sha256": "3c52893f5b453b90492ca915c729b01d03b25771fa3a98b8106f2454e30ff4c5",
+        "bytes": 14163,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/questions/what-will-my-model-forget_catB.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/paper_registry.json",
+        "sha256": "c8bde80baadfd7986c0ad1b291b1629253fb146c972a12ffaca433ad2485ce78",
+        "bytes": 11138,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/paper_registry.json"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/run_understanding_eval.py",
+        "sha256": "21f41a4909af4fc04f86a02bdfdd21040afe8d3623a4d2583b38848faf61adb2",
+        "bytes": 34558,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/run_understanding_eval.py"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/run_understanding_token_eff.py",
+        "sha256": "78e7848c12ca0e2a4693118313bc2d82714c4c171577d80d0bbcd1eddb501264",
+        "bytes": 25564,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/run_understanding_token_eff.py"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/prompts/ara_agent.md",
+        "sha256": "d66e39aa1ec9c56ef59c82ddb484c144ff0187a276ed43ecd82ef426f33a5084",
+        "bytes": 3635,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/prompts/ara_agent.md"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/prompts/pdf_agent.md",
+        "sha256": "18d30acc1d7ebde73fbb8ac4364428cc5a74e699d74c0be519a18cbcbacb06d0",
+        "bytes": 1666,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/prompts/pdf_agent.md"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/prompts/judge_agent.md",
+        "sha256": "2d20f244f98da4abc346bc0153d42a1e8075f5a106568a47ef8ebc25e674dd0d",
+        "bytes": 1106,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/prompts/judge_agent.md"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/src/eval/prompts/judge.md",
+        "sha256": "384ba4abde9cc6663b4a851d9ed0b364f6ab0ae76e4ae16fef5130f6995d957a",
+        "bytes": 1470,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/src/eval/prompts/judge.md"
+      },
+      {
+        "source_path": "examples/the-ara-of-ara/evidence/README.md",
+        "sha256": "d8b75fba0a01e715b8b0df3a93a89e567b8239213426b49df10ce84bfeff48a4",
+        "bytes": 7018,
+        "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/examples/the-ara-of-ara/evidence/README.md"
+      }
+    ],
+    "question_paths": [
+      "examples/the-ara-of-ara/src/eval/questions/adaptive-pruning_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/adaptive-pruning_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/all-in-one_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/all-in-one_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/bam_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/bam_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/bbox_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/bbox_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/bridging-data-gaps_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/bridging-data-gaps_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/fre_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/fre_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/ftrl_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/ftrl_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/lbcs_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/lbcs_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/lca-on-the-line_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/lca-on-the-line_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/mechanistic-understanding_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/mechanistic-understanding_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/nanogpt-speedrun_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/nanogpt-speedrun_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/pinn_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/pinn_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-fix_embedding_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-fix_embedding_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-nanogpt_chat_rl_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-nanogpt_chat_rl_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-optimize_llm_foundry_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-optimize_llm_foundry_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-restricted_mlm_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-restricted_mlm_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-rust_codecontests_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-rust_codecontests_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-small_scaling_law_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-small_scaling_law_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-triton_cumsum_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rebench-triton_cumsum_catC.json",
+      "examples/the-ara-of-ara/src/eval/questions/rice_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/rice_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/robust-clip_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/robust-clip_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/sample-specific-masks_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/sample-specific-masks_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/sapg_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/sapg_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/self-composing-policies_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/self-composing-policies_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/self-expansion_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/self-expansion_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/semantic-self-consistency_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/semantic-self-consistency_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/sequential-neural-score-estimation_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/sequential-neural-score-estimation_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/stay-on-topic-with-classifier-free-guidance_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/stay-on-topic-with-classifier-free-guidance_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/stochastic-interpolants_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/stochastic-interpolants_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/test-time-model-adaptation_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/test-time-model-adaptation_catB.json",
+      "examples/the-ara-of-ara/src/eval/questions/what-will-my-model-forget_catA.json",
+      "examples/the-ara-of-ara/src/eval/questions/what-will-my-model-forget_catB.json"
+    ],
+    "available_native_question_count": 465,
+    "reported_published_question_count": 450,
+    "reported_count_source": {
+      "path": "examples/the-ara-of-ara/evidence/README.md",
+      "lines": [
+        7,
+        16
+      ]
+    },
+    "historical_skill_revision": null,
+    "published_question_subset": null,
+    "published_run_configuration_revision": null,
+    "unresolved": [
+      "Which 450 of the 465 available native questions belonged to the reported run",
+      "Exact historical skill revision or evidence that no skill was supplied",
+      "Exact published-run prompt/runner/grading version and source artifact snapshot"
+    ],
+    "observed_entrypoint": "examples/the-ara-of-ara/src/eval/prompts/ara_agent.md",
+    "observed_entrypoint_is_research_foresight": false,
+    "raw_result_source_not_in_checkout": "code/eval/results/understanding/understanding_eval_report.json"
+  },
+  "benchmark_collection": {
+    "remote_url": "https://github.com/ARA-Labs/ara-paperbench.git",
+    "advertised_main_revision": "62e9b54b2d4efe45b97f25676a16784530dd552a",
+    "local_revision": "62e9b54b2d4efe45b97f25676a16784530dd552a",
+    "source": "README.md",
+    "finding": "32-artifact collection with additional extra question files, not a verified 450-question skill mapping"
+  },
+  "experiments": {
+    "status": "deferred",
+    "paper_reproduction": "blocked-unverified-historical-mapping",
+    "live_reader": "permitted as a declared new live task, not a reproduction; no run performed"
+  }
+}

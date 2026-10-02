@@ -1,0 +1,3377 @@
+{
+  "format": "ara.skill-operations/v1",
+  "source_lock": "source-lock.json",
+  "protocol_decisions": "protocol-decisions.json",
+  "contract_status": "implementation-plan-approved-upstream-review-pending",
+  "coverage_rule": "covered requires pinned CLI revision and observed end-to-end proof; direct-access-allowed and output-only rows do not assert CLI coverage",
+  "operations": [
+    {
+      "operation_id": "reader.discover",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 90,
+        "line_end": 113,
+        "quoted_clause": "### Step 2 — Search the ARA's native files directly"
+      },
+      "layer": "knowledge",
+      "native_selector": "PAPER.md; logic/**; trace/**",
+      "access": "enumerate",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Discover every native knowledge file and anchor; include all node types and arbitrary solution prose",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara list --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.search",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 90,
+        "line_end": 129,
+        "quoted_clause": "### Step 2 — Search the ARA's native files directly"
+      },
+      "layer": "knowledge",
+      "native_selector": "PAPER.md; logic/**; trace/**",
+      "access": "search",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Search complete native text and surrounding sections; keyword snippets alone are insufficient",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara search QUERY --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_manifest",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 109,
+        "line_end": 110,
+        "quoted_clause": "- **`related_work.md`, `PAPER.md`, `src/`** — context and the literal code/configs when the frame"
+      },
+      "layer": "manifest",
+      "native_selector": "PAPER.md",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_problem",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 95,
+        "line_end": 96,
+        "quoted_clause": "- **`logic/problem.md`** — the framing and objective. A hit here tells the caller what the work was"
+      },
+      "layer": "logic",
+      "native_selector": "logic/problem.md#section",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_solution",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 97,
+        "line_end": 98,
+        "quoted_clause": "- **`logic/solution/*`** — the actual method/mechanism. Often the strongest precedent for a"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/*#section",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_claim",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 99,
+        "line_end": 101,
+        "quoted_clause": "- **`logic/claims.md`** — distilled, grounded assertions; ref as `logic/claims.md#<Cxx>`. Note each"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md#Cxx",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_concept",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 102,
+        "line_end": 103,
+        "quoted_clause": "- **`logic/concepts.md`** — definitions/boundaries; ref as `logic/concepts.md#<name>`. Rarely the"
+      },
+      "layer": "logic",
+      "native_selector": "logic/concepts.md#name",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_plan",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 104,
+        "line_end": 107,
+        "quoted_clause": "- **`logic/experiments.md`** and **`trace/exploration_tree.yaml`** — the research DAG. Read **all**"
+      },
+      "layer": "logic",
+      "native_selector": "logic/experiments.md#Exx",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_trace",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 104,
+        "line_end": 107,
+        "quoted_clause": "- **`logic/experiments.md`** and **`trace/exploration_tree.yaml`** — the research DAG. Read **all**"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.read_related_work",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 109,
+        "line_end": 110,
+        "quoted_clause": "- **`related_work.md`, `PAPER.md`, `src/`** — context and the literal code/configs when the frame"
+      },
+      "layer": "logic",
+      "native_selector": "logic/related_work.md#native-heading",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact whole body or uniquely selected section, all fields/prose/equations/uncertainty; native selector unchanged",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.graph",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/CONTRACT.md",
+        "line_start": 55,
+        "line_end": 60,
+        "quoted_clause": "  logic/                             # claims.md, concepts.md, problem.md, experiments.md,"
+      },
+      "layer": "trace",
+      "native_selector": "trace/exploration_tree.yaml",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Full DAG with nested parent, explicit parent, also_depends_on and all five node payloads, dead ends and rejected choices",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara graph --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.negatives",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 131,
+        "line_end": 142,
+        "quoted_clause": "### Step 4 — Surface relevant negatives (dedicated channel)"
+      },
+      "layer": "knowledge",
+      "native_selector": "trace:Nxx; logic/claims.md#Cxx",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Relevant dead_end/pivot/decision and refuted/weakened complete claim bodies; never silently bury negatives",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara list --status refuted --json; ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.grounding",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/PREDICT.md",
+        "line_start": 96,
+        "line_end": 107,
+        "quoted_clause": "### Step 2 — Read the FULL ARA via RETRIEVE"
+      },
+      "layer": "knowledge",
+      "native_selector": "every ranked/negative/basis native ref",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Reopen complete body for every cited ref; rationale/caution is not evidence; no external-scope widening",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.source_evidence",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 108,
+        "line_end": 110,
+        "quoted_clause": "- **`evidence/`** — figures, tables, grounded measurements; ref as `evidence/.../<file>.md`."
+      },
+      "layer": "src/evidence",
+      "native_selector": "src/**; evidence/**",
+      "access": "read",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Code/config bodies, figures/table transcriptions and original screenshots inside selected artifact; no code execution or external fetch",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.answer_report",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/PREDICT.md",
+        "line_start": 155,
+        "line_end": 196,
+        "quoted_clause": "## 3. Output schema"
+      },
+      "layer": "output",
+      "native_selector": "Answer and optional contradiction_report",
+      "access": "output",
+      "access_policy": "output-only",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "All honesty-envelope fields, verbatim disputed clause, positive evidence refs, repro; caller owns transport, reader writes nothing",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "reader.standalone_report_template",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "source_clause": {
+        "path": "skills/research-foresight/references/PREDICT.md",
+        "line_start": 281,
+        "line_end": 296,
+        "quoted_clause": "## 7. Contradiction reports (reader-side feedback — still read-only)"
+      },
+      "layer": "skill reference",
+      "native_selector": "skills/research-manager/templates/reader-report.md",
+      "access": "read",
+      "access_policy": "skill-reference-access",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Transitive shared report shape is packaged; no transport side effect by reader",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Native refs used verbatim; cited body must actually contain the attached assertion",
+      "role": "read-only reader",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.initialize",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 596,
+        "line_end": 616,
+        "quoted_clause": "## Initialization (if `ara/` does not exist)"
+      },
+      "layer": "root/core",
+      "native_selector": "PAPER.md; trace/sessions/session_index.yaml; trace/exploration_tree.yaml; trace/pm_reasoning_log.yaml; staging/observations.yaml; logic/claims.md; logic/problem.md; logic/solution/heuristics.md; evidence/README.md",
+      "access": "create",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "profile": "research-manager",
+        "missing_only": "Optional boolean, default false: strict new-or-empty root. Explicit true creates only absent seeds, preserves existing generated defaults, and requires caller-supplied PAPER/documents to byte-identically match existing files or reject the full batch.",
+        "seed_keys": {
+          "trace/sessions/session_index.yaml": "sessions",
+          "trace/exploration_tree.yaml": "tree",
+          "trace/pm_reasoning_log.yaml": "entries",
+          "staging/observations.yaml": "observations"
+        },
+        "root_boundary": "PAPER.md only; evidence README seed is bootstrap direct-body exception"
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara apply FILE (artifact.init JSONL)",
+      "proposed_batch_tag": "artifact.init",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.read_state_ids",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 343,
+        "line_end": 351,
+        "quoted_clause": "## Per-Turn Procedure"
+      },
+      "layer": "knowledge",
+      "native_selector": "PAPER.md; logic/**; trace/**; staging/**",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete current state, highest existing typed IDs and all history before allocating/writing; no hidden truncation",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara list --json; ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.read_briefing",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 618,
+        "line_end": 628,
+        "quoted_clause": "## Briefing (fresh conversation only)"
+      },
+      "layer": "knowledge",
+      "native_selector": "latest session; claims; active observations; pm_reasoning_log",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "summary/open_threads/ai_suggestions_pending/key_context, status counts, near-closure nonstale/unpromoted entries, latest complete reasoning notes",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session latest --full --json; ara list --json; ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.read_full_sessions",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 493,
+        "line_end": 563,
+        "quoted_clause": "### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/YYYY-MM-DD_NNN.yaml; trace/sessions/session_index.yaml",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete session mapping, all seven arrays, exact logic_revisions before/after, index native rows and references",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session SESSION --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.read_observations",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 103,
+        "line_end": 145,
+        "quoted_clause": "Walk `staging/observations.yaml` and decide which staged observations are mature. **Maturity"
+      },
+      "layer": "staging",
+      "native_selector": "staging/observations.yaml#Oxx",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Full content/context/potential_type/provenance/bound_to/promoted/promoted_to/crystallized_via/stale, not a summary",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara show Oxx --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.read_reasoning",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 565,
+        "line_end": 577,
+        "quoted_clause": "### Reasoning Log (`trace/pm_reasoning_log.yaml`) — self-continuity"
+      },
+      "layer": "trace",
+      "native_selector": "trace/pm_reasoning_log.yaml",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete per-turn notes including rejected closure/reconciliation signals and near-misses",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara show trace/pm_reasoning_log.yaml --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.add_question",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "question",
+        "required_payload": [
+          "description"
+        ],
+        "common": [
+          "id",
+          "title",
+          "timestamp",
+          "provenance"
+        ],
+        "relations": [
+          "parent",
+          "also_depends_on",
+          "children"
+        ],
+        "evidence_dialects": [
+          "sequence",
+          "scalar source prose"
+        ],
+        "dead_end_leaf": false
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara add node --type question --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.add_decision",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "decision",
+        "required_payload": [
+          "choice",
+          "alternatives",
+          "evidence"
+        ],
+        "common": [
+          "id",
+          "title",
+          "timestamp",
+          "provenance"
+        ],
+        "relations": [
+          "parent",
+          "also_depends_on",
+          "children"
+        ],
+        "evidence_dialects": [
+          "sequence",
+          "scalar source prose"
+        ],
+        "dead_end_leaf": false
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara add node --type decision --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.add_experiment",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "experiment",
+        "required_payload": [
+          "result",
+          "evidence"
+        ],
+        "common": [
+          "id",
+          "title",
+          "timestamp",
+          "provenance"
+        ],
+        "relations": [
+          "parent",
+          "also_depends_on",
+          "children"
+        ],
+        "evidence_dialects": [
+          "sequence",
+          "scalar source prose"
+        ],
+        "dead_end_leaf": false
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara add node --type experiment --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.add_dead_end",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "dead_end",
+        "required_payload": [
+          "hypothesis",
+          "failure_mode",
+          "lesson"
+        ],
+        "common": [
+          "id",
+          "title",
+          "timestamp",
+          "provenance"
+        ],
+        "relations": [
+          "parent",
+          "also_depends_on",
+          "children"
+        ],
+        "evidence_dialects": [
+          "sequence",
+          "scalar source prose"
+        ],
+        "dead_end_leaf": true
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara add node --type dead_end --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.add_pivot",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "pivot",
+        "required_payload": [
+          "from",
+          "to",
+          "trigger"
+        ],
+        "common": [
+          "id",
+          "title",
+          "timestamp",
+          "provenance"
+        ],
+        "relations": [
+          "parent",
+          "also_depends_on",
+          "children"
+        ],
+        "evidence_dialects": [
+          "sequence",
+          "scalar source prose"
+        ],
+        "dead_end_leaf": false
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara add node --type pivot --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_cross_edge",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 384,
+        "line_end": 417,
+        "quoted_clause": "### Exploration Tree Node (`trace/exploration_tree.yaml`)"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx.also_depends_on",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Append existing distinct node refs; no cycle across nesting/parent/cross edges; never rewrite existing relations",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara add edge FROM TO",
+      "proposed_batch_tag": "add_edge",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.stage_observation",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 476,
+        "line_end": 490,
+        "quoted_clause": "### Observation (`staging/observations.yaml`) — staged"
+      },
+      "layer": "staging",
+      "native_selector": "staging/observations.yaml#Oxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "fields": [
+          "id",
+          "timestamp",
+          "provenance",
+          "content",
+          "context",
+          "potential_type",
+          "bound_to",
+          "promoted",
+          "promoted_to",
+          "crystallized_via",
+          "stale"
+        ],
+        "potential_types": [
+          "claim",
+          "heuristic",
+          "concept",
+          "constraint",
+          "architecture",
+          "unknown"
+        ],
+        "content": "complete factually distilled original",
+        "bindings": "existing node refs"
+      },
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara stage --data-file PAYLOAD",
+      "proposed_batch_tag": "stage",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.promote_claim",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "layer": "staging + target",
+      "native_selector": "Oxx -> logic/claims.md:Cxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "target_kind": "claim",
+        "target": "logic/claims.md:Cxx",
+        "closure_signals": [
+          "topic-abandonment",
+          "verbal-affirmation",
+          "empirical-resolution",
+          "artifact-commitment"
+        ],
+        "atomic_fields": [
+          "promoted",
+          "promoted_to",
+          "crystallized_via"
+        ],
+        "required": "full typed target, source observation ref, closure/evidence, forensic bindings and session record",
+        "dead_end_condition": null
+      },
+      "history_contract": "Retain raw observation, original provenance and bindings; exact creation before/after and signal in session; promoted tuple cannot discard differing target/closure",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara promote Oxx --target logic/claims.md:Cxx --signal SIGNAL --data-file PAYLOAD",
+      "proposed_batch_tag": "promote",
+      "required_decisions": [
+        "F3",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.promote_heuristic",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "layer": "staging + target",
+      "native_selector": "Oxx -> logic/solution/heuristics.md:Hxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "target_kind": "heuristic",
+        "target": "logic/solution/heuristics.md:Hxx",
+        "closure_signals": [
+          "topic-abandonment",
+          "verbal-affirmation",
+          "empirical-resolution",
+          "artifact-commitment"
+        ],
+        "atomic_fields": [
+          "promoted",
+          "promoted_to",
+          "crystallized_via"
+        ],
+        "required": "full typed target, source observation ref, closure/evidence, forensic bindings and session record",
+        "dead_end_condition": null
+      },
+      "history_contract": "Retain raw observation, original provenance and bindings; exact creation before/after and signal in session; promoted tuple cannot discard differing target/closure",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara promote Oxx --target logic/solution/heuristics.md:Hxx --signal SIGNAL --data-file PAYLOAD",
+      "proposed_batch_tag": "promote",
+      "required_decisions": [
+        "F3",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.promote_concept",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "layer": "staging + target",
+      "native_selector": "Oxx -> logic/concepts.md#name",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "target_kind": "concept",
+        "target": "logic/concepts.md#name",
+        "closure_signals": [
+          "topic-abandonment",
+          "verbal-affirmation",
+          "empirical-resolution",
+          "artifact-commitment"
+        ],
+        "atomic_fields": [
+          "promoted",
+          "promoted_to",
+          "crystallized_via"
+        ],
+        "required": "full typed target, source observation ref, closure/evidence, forensic bindings and session record",
+        "dead_end_condition": null
+      },
+      "history_contract": "Retain raw observation, original provenance and bindings; exact creation before/after and signal in session; promoted tuple cannot discard differing target/closure",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara promote Oxx --target logic/concepts.md#name --signal SIGNAL --data-file PAYLOAD",
+      "proposed_batch_tag": "promote",
+      "required_decisions": [
+        "F3",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.promote_constraint",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "layer": "staging + target",
+      "native_selector": "Oxx -> logic/solution/constraints.md#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "target_kind": "constraint",
+        "target": "logic/solution/constraints.md#section",
+        "closure_signals": [
+          "topic-abandonment",
+          "verbal-affirmation",
+          "empirical-resolution",
+          "artifact-commitment"
+        ],
+        "atomic_fields": [
+          "promoted",
+          "promoted_to",
+          "crystallized_via"
+        ],
+        "required": "full typed target, source observation ref, closure/evidence, forensic bindings and session record",
+        "dead_end_condition": null
+      },
+      "history_contract": "Retain raw observation, original provenance and bindings; exact creation before/after and signal in session; promoted tuple cannot discard differing target/closure",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara promote Oxx --target logic/solution/constraints.md#section --signal SIGNAL --data-file PAYLOAD",
+      "proposed_batch_tag": "promote",
+      "required_decisions": [
+        "F3",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.promote_architecture",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "layer": "staging + target",
+      "native_selector": "Oxx -> logic/solution/architecture.md#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "target_kind": "architecture",
+        "target": "logic/solution/architecture.md#section",
+        "closure_signals": [
+          "topic-abandonment",
+          "verbal-affirmation",
+          "empirical-resolution",
+          "artifact-commitment"
+        ],
+        "atomic_fields": [
+          "promoted",
+          "promoted_to",
+          "crystallized_via"
+        ],
+        "required": "full typed target, source observation ref, closure/evidence, forensic bindings and session record",
+        "dead_end_condition": null
+      },
+      "history_contract": "Retain raw observation, original provenance and bindings; exact creation before/after and signal in session; promoted tuple cannot discard differing target/closure",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara promote Oxx --target logic/solution/architecture.md#section --signal SIGNAL --data-file PAYLOAD",
+      "proposed_batch_tag": "promote",
+      "required_decisions": [
+        "F3",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.promote_dead_end",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "layer": "staging + target",
+      "native_selector": "Oxx -> trace:Nxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "target_kind": "dead_end",
+        "target": "trace:Nxx",
+        "closure_signals": [
+          "topic-abandonment",
+          "verbal-affirmation",
+          "empirical-resolution",
+          "artifact-commitment"
+        ],
+        "atomic_fields": [
+          "promoted",
+          "promoted_to",
+          "crystallized_via"
+        ],
+        "required": "full typed target, source observation ref, closure/evidence, forensic bindings and session record",
+        "dead_end_condition": "empirical resolution refutes observation"
+      },
+      "history_contract": "Retain raw observation, original provenance and bindings; exact creation before/after and signal in session; promoted tuple cannot discard differing target/closure",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara promote Oxx --target trace:Nxx --signal SIGNAL --data-file PAYLOAD",
+      "proposed_batch_tag": "promote",
+      "required_decisions": [
+        "F3",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.mark_stale",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 211,
+        "line_end": 215,
+        "quoted_clause": "#### Stale-flagging"
+      },
+      "layer": "staging",
+      "native_selector": "staging/observations.yaml#Oxx.stale",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "false/absent to true only after 3+ session-days without promotion or reference; preserve all content; no auto-discard",
+      "history_contract": "Append reasoning with session-days/reference evidence; never rewrite observation or infer terminal status",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara stage stale Oxx --session SESSION --reason TEXT",
+      "proposed_batch_tag": "mark_stale",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.annotate_contradiction",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 166,
+        "line_end": 174,
+        "quoted_clause": "#### Contradiction trigger"
+      },
+      "layer": "logic/trace/staging",
+      "native_selector": "both conflicting native refs",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Append source-native HTML/YAML CONFLICT annotations, retain both bodies; unresolved decision refs both; defer adjudication",
+      "history_contract": "Original entries and earlier annotations unchanged; complete positive conflicting evidence retained",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara annotate conflict SELECTOR --other REF",
+      "proposed_batch_tag": "annotate_conflict",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.adjudicate_reader_report",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 176,
+        "line_end": 209,
+        "quoted_clause": "#### Reader reports (cross-agent feedback)"
+      },
+      "layer": "logic/trace/staging",
+      "native_selector": "reported target and basis refs",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Upheld: full logic correction/history + resolved decision; rejected: no target edit + resolved reason; unverifiable: CONFLICT + unresolved decision/repro; uncrystallized target: ordinary ai-suggested observation",
+      "history_contract": "Every verdict and grounds in session/summary; report is input, manager sole writer, no external unresolved evidence counts as upholding",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara apply --file OPERATIONS",
+      "proposed_batch_tag": "apply",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.revise_claim",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 223,
+        "line_end": 240,
+        "quoted_clause": "#### What Stage 4 may do"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md#Cxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete field/body revision triggered by source signal; re-ground numbers; retain unmodified fields and falsifiability",
+      "history_contract": "Exact complete affected before/after, signal, provenance, Last revised pointer; append reasoning including rejected signals",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara edit SELECTOR --data-file PAYLOAD",
+      "proposed_batch_tag": "edit_entry",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.revise_heuristic",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 223,
+        "line_end": 240,
+        "quoted_clause": "#### What Stage 4 may do"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/heuristics.md#Hxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete field/body revision triggered by source signal; re-ground numbers; retain unmodified fields and falsifiability",
+      "history_contract": "Exact complete affected before/after, signal, provenance, Last revised pointer; append reasoning including rejected signals",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara edit SELECTOR --data-file PAYLOAD",
+      "proposed_batch_tag": "edit_entry",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.revise_concept",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 223,
+        "line_end": 240,
+        "quoted_clause": "#### What Stage 4 may do"
+      },
+      "layer": "logic",
+      "native_selector": "logic/concepts.md#name",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete field/body revision triggered by source signal; re-ground numbers; retain unmodified fields and falsifiability",
+      "history_contract": "Exact complete affected before/after, signal, provenance, Last revised pointer; append reasoning including rejected signals",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara edit SELECTOR --data-file PAYLOAD",
+      "proposed_batch_tag": "edit_entry",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.status_transition",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 242,
+        "line_end": 265,
+        "quoted_clause": "#### Allowed status transitions"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md#Cxx.Status",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Source status transitions; revised is transitional; terminal refuted/withdrawn explicit user revival only; supported weakening is contradiction",
+      "history_contract": "Status before/after and explicit signal; refutation creates dead_end reference",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara edit Cxx --data-file PAYLOAD",
+      "proposed_batch_tag": "edit_entry",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.split",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 303,
+        "line_end": 305,
+        "quoted_clause": "5. For structural changes:"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md#Cxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Keep original narrower/primary ID; new spin-off ID; update all mutable refs; both endpoints in exact history",
+      "history_contract": "Complete source-signal before/after for every affected entry, Last revised pointers and reasoning; 3+ entry refactor requires explicit user request",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara apply --file OPERATIONS",
+      "proposed_batch_tag": "split",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.merge",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 306,
+        "line_end": 307,
+        "quoted_clause": "   - **Merge**: keep the lower id, mark the higher id as `withdrawn` with"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md#Cxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Keep lower ID; higher retained withdrawn with Merged into; redirect refs; no deletion of history",
+      "history_contract": "Complete source-signal before/after for every affected entry, Last revised pointers and reasoning; 3+ entry refactor requires explicit user request",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara apply --file OPERATIONS",
+      "proposed_batch_tag": "merge",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.generalize",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 308,
+        "line_end": 309,
+        "quoted_clause": "   - **Generalize**: allocate a new id for the more general claim, set its `Dependencies`"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md#Cxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "New generalized claim Dependencies narrower claims and Proof their evidence; keep narrower claims",
+      "history_contract": "Complete source-signal before/after for every affected entry, Last revised pointers and reasoning; 3+ entry refactor requires explicit user request",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara apply --file OPERATIONS",
+      "proposed_batch_tag": "generalize",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.rename_identity",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 232,
+        "line_end": 240,
+        "quoted_clause": "3. **Structural changes** — split a claim into two, merge duplicates, repair"
+      },
+      "layer": "logic",
+      "native_selector": "concept/claim/heuristic native selector",
+      "access": "rename",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Typed identity change, update modeled mutable refs; append old->new native redirect; do not rewrite historical refs",
+      "history_contract": "Exact full before/after for every mutable endpoint; retained historical refs resolve through redirect, cycles/unknown inbound refs reject",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara rename SELECTOR NEW_SELECTOR",
+      "proposed_batch_tag": "rename_entry",
+      "required_decisions": [
+        "F1",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.remove_current_entry",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 303,
+        "line_end": 312,
+        "quoted_clause": "5. For structural changes:"
+      },
+      "layer": "logic",
+      "native_selector": "existing current-state selector",
+      "access": "remove",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Claim withdrawal retains entry. Other removal with remaining typed/historical refs requires an existing replacement redirect. Null target allowed only if complete final candidate and reference inventory prove no remaining typed or historical reference. Never delete trace/staging history.",
+      "history_contract": "Exact removed full body and signal preserved in session regardless; every remaining historical native ref resolves through the explicit redirect; no dangling referenced locator",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara remove SELECTOR --redirect-to REPLACEMENT",
+      "proposed_batch_tag": "remove_entry",
+      "required_decisions": [
+        "F1",
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.repair_dependencies",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 232,
+        "line_end": 240,
+        "quoted_clause": "3. **Structural changes** — split a claim into two, merge duplicates, repair"
+      },
+      "layer": "logic",
+      "native_selector": "claim/heuristic/concept refs",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Repair broken mutable refs, dependencies, terminology mismatch and loops only on explicit source signal",
+      "history_contract": "Full before/after for changed fields and every affected entry; no history rewrite",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara apply --file OPERATIONS",
+      "proposed_batch_tag": "edit_entry",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.write_constraint_body",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 43,
+        "line_end": 50,
+        "quoted_clause": "| Candidate Event | Signals | Crystallizes To | `potential_type` |"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/constraints.md#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete arbitrary source-grounded Markdown/LaTeX section body; not restricted to C/H fields",
+      "history_contract": "Observation closure/source pointer and exact complete prior/new body in session",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara document put PATH --section HEADING --body-file FILE",
+      "proposed_batch_tag": "put_section",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.write_architecture_body",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 43,
+        "line_end": 50,
+        "quoted_clause": "| Candidate Event | Signals | Crystallizes To | `potential_type` |"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/architecture.md#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete arbitrary source-grounded Markdown/LaTeX section body; not restricted to C/H fields",
+      "history_contract": "Observation closure/source pointer and exact complete prior/new body in session",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara document put PATH --section HEADING --body-file FILE",
+      "proposed_batch_tag": "put_section",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_session_events_logged",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 504,
+        "line_end": 510,
+        "quoted_clause": "events_logged:"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.events_logged",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "sequence_field": "events_logged",
+        "record_fields": [
+          "turn",
+          "type",
+          "id",
+          "routing",
+          "provenance",
+          "summary"
+        ],
+        "preservation": "complete native record incl exact strings and unknown fields"
+      },
+      "history_contract": "Prior records immutable, same-date active session only; complete turn identity, no truncated before/after",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session append SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "append_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_session_ai_actions",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 512,
+        "line_end": 516,
+        "quoted_clause": "ai_actions:"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.ai_actions",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "sequence_field": "ai_actions",
+        "record_fields": [
+          "turn",
+          "action",
+          "provenance",
+          "files_changed"
+        ],
+        "preservation": "complete native record incl exact strings and unknown fields"
+      },
+      "history_contract": "Prior records immutable, same-date active session only; complete turn identity, no truncated before/after",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session append SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "append_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_session_claims_touched",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 518,
+        "line_end": 521,
+        "quoted_clause": "claims_touched:"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.claims_touched",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "sequence_field": "claims_touched",
+        "record_fields": [
+          "id",
+          "action",
+          "turn"
+        ],
+        "preservation": "complete native record incl exact strings and unknown fields"
+      },
+      "history_contract": "Prior records immutable, same-date active session only; complete turn identity, no truncated before/after",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session append SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "append_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_session_logic_revisions",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 523,
+        "line_end": 539,
+        "quoted_clause": "logic_revisions:                  # full before/after for every edit Stage 4 makes"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.logic_revisions",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "sequence_field": "logic_revisions",
+        "record_fields": [
+          "turn",
+          "entry",
+          "field",
+          "before",
+          "after",
+          "signal",
+          "provenance",
+          "note"
+        ],
+        "preservation": "complete native record incl exact strings and unknown fields"
+      },
+      "history_contract": "Prior records immutable, same-date active session only; complete turn identity, no truncated before/after",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session append SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "append_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_session_key_context",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 541,
+        "line_end": 544,
+        "quoted_clause": "key_context:"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.key_context",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "sequence_field": "key_context",
+        "record_fields": [
+          "turn",
+          "excerpt"
+        ],
+        "preservation": "complete native record incl exact strings and unknown fields"
+      },
+      "history_contract": "Prior records immutable, same-date active session only; complete turn identity, no truncated before/after",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session append SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "append_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.update_session_open_threads",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 545,
+        "line_end": 547,
+        "quoted_clause": "open_threads:"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.open_threads",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete rolling string list; remove completed current item only with archived prior/new list and reason",
+      "history_contract": "Exact before/after lists archived in append-only reasoning with session/turn, no loss of completed/pending history",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session update SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "update_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.update_session_ai_suggestions_pending",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 548,
+        "line_end": 550,
+        "quoted_clause": "ai_suggestions_pending:"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.ai_suggestions_pending",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete rolling string list; remove completed current item only with archived prior/new list and reason",
+      "history_contract": "Exact before/after lists archived in append-only reasoning with session/turn, no loss of completed/pending history",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session update SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "update_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.create_session",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 493,
+        "line_end": 502,
+        "quoted_clause": "### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/YYYY-MM-DD_NNN.yaml",
+      "access": "create",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "session id/date/started stable; last_turn/turn_count/summary; all historical and rolling lists; date grouping and next available sequence",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session create --data-file PAYLOAD",
+      "proposed_batch_tag": "create_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.update_session_metadata",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 493,
+        "line_end": 502,
+        "quoted_clause": "### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/SESSION.yaml.session",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "last_turn, turn_count, summary only; preserve id/date/started; coherent monotonic current-date turn progression",
+      "history_contract": "Archive complete prior/new metadata in reasoning, same-date active session only",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session update SESSION --data-file PAYLOAD",
+      "proposed_batch_tag": "update_session",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.update_session_index",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 552,
+        "line_end": 563,
+        "quoted_clause": "### Session Index (`trace/sessions/session_index.yaml`)"
+      },
+      "layer": "trace",
+      "native_selector": "trace/sessions/session_index.yaml#SESSION",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "summary/turn_count/events_count/claims_touched/open_threads recomputed from full session; other rows unchanged",
+      "history_contract": "Stable id/date and exact previous/new row retained in reasoning",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara session index --data-file PAYLOAD",
+      "proposed_batch_tag": "update_session_index",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_reasoning",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 565,
+        "line_end": 577,
+        "quoted_clause": "### Reasoning Log (`trace/pm_reasoning_log.yaml`) — self-continuity"
+      },
+      "layer": "trace",
+      "native_selector": "trace/pm_reasoning_log.yaml.entries",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Full turn identity and notes, chosen/rejected signals, near misses, continuity and permitted rolling view history",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara reasoning append --data-file PAYLOAD",
+      "proposed_batch_tag": "append_reasoning",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.taste_target_read",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/taste-comments.md",
+        "line_start": 36,
+        "line_end": 48,
+        "quoted_clause": "## Target Resolution & Confirm-Before-Write"
+      },
+      "layer": "logic/trace",
+      "native_selector": "claim/heuristic/non-question trace selector",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Read exact target title and Statement/Rationale clause; no guessing, require user target confirmation",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_logic_taste",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/taste-comments.md",
+        "line_start": 77,
+        "line_end": 95,
+        "quoted_clause": "## Write Procedure"
+      },
+      "layer": "logic",
+      "native_selector": "claim or heuristic Taste subsection",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Confirmed user taste on claim/heuristic",
+      "payload_contract": "Verbatim confirmed user comment/date, attitude endorse|uncertain|reject and object claim|evidence|framing|priority; never concepts/experiments",
+      "history_contract": "Existing taste bullets immutable, no Status/Provenance change; new content routes separately",
+      "provenance_contract": "Always user, never agent-authored taste",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara taste SELECTOR --data-file PAYLOAD",
+      "proposed_batch_tag": "add_taste",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_trace_taste",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/taste-comments.md",
+        "line_start": 77,
+        "line_end": 101,
+        "quoted_clause": "## Write Procedure"
+      },
+      "layer": "trace",
+      "native_selector": "trace/taste_log.yaml#Txx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Confirmed user taste on non-question trace node",
+      "payload_contract": "id/timestamp/target/tag/object/comment; existing experiment/decision/dead_end/pivot target only",
+      "history_contract": "Never edit the trace node; append a separate complete record",
+      "provenance_contract": "Always user, confirmed verbatim comment",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara taste Nxx --data-file PAYLOAD",
+      "proposed_batch_tag": "add_taste",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.source_grounding",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 148,
+        "line_end": 164,
+        "quoted_clause": "#### Number grounding (claims & heuristics)"
+      },
+      "layer": "knowledge",
+      "native_selector": "trace:Nxx#field; logic path#section; session native ref",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Reopen each cited knowledge body through ara, copy exact matched line, distinguish input/result; no inherited source guess",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": "ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.append_evidence",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 52,
+        "line_end": 53,
+        "quoted_clause": "Evidence artifacts (tables, figures, metrics) referenced by a direct-routed `experiment`"
+      },
+      "layer": "evidence",
+      "native_selector": "evidence/**",
+      "access": "append",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Raw tables/figures/metrics for direct experiment; faithful body and source provenance",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.acquire_inputs",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 29,
+        "line_end": 74,
+        "quoted_clause": "## Input Philosophy"
+      },
+      "layer": "input",
+      "native_selector": "paper/repo/logs/configs/notes/figures",
+      "access": "read",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Read all inputs and every PDF page including appendices; repository README/core/config/environment; visual evidence; acquire real sources",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.initialize",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 213,
+        "line_end": 233,
+        "quoted_clause": "### Step 3: Generate Files"
+      },
+      "layer": "root/core",
+      "native_selector": "PAPER.md; logic/problem.md; logic/claims.md; logic/concepts.md; logic/experiments.md; logic/related_work.md; logic/solution/constraints.md; src/environment.md; trace/exploration_tree.yaml; evidence/README.md",
+      "access": "create",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Compiler mandatory core/directories; default strict new-or-empty root. Explicit artifact.init missing_only:true creates absent seeds only, preserves existing generated defaults, and rejects nonidentical caller-supplied PAPER/documents atomically. Raw source/evidence untouched; final validation; full source-supported nontrivial content supplied later, initialization not completion.",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara apply FILE (artifact.init JSONL)",
+      "proposed_batch_tag": "artifact.init",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_paper",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 54,
+        "line_end": 105,
+        "quoted_clause": "## PAPER.md"
+      },
+      "layer": "root",
+      "native_selector": "PAPER.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete required frontmatter title/authors/year/venue/doi/ara_version/domain/keywords/claims_summary/abstract and full Layer Index/Overview",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_problem",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 129,
+        "line_end": 157,
+        "quoted_clause": "## logic/problem.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/problem.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Full Observations O/Gaps G/Key Insight/Assumptions A sections with native document-scoped identities, evidence and causal links",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_claims",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 161,
+        "line_end": 175,
+        "quoted_clause": "## logic/claims.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/claims.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete Cxx Markdown block: Statement/Conditions/Sources/Status/Falsification criteria/Proof/Evidence basis/Dependencies/Tags, unknown fields and equations",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_concepts",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 214,
+        "line_end": 224,
+        "quoted_clause": "## logic/concepts.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/concepts.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "One native term-name section with notation/definition/boundary conditions/related concepts, no invented numeric concept IDs",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_experiments",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 228,
+        "line_end": 253,
+        "quoted_clause": "## logic/experiments.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/experiments.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete Exx Verifies/Evidence/Run/Setup/Procedure/Metrics/Expected outcome/Baselines/Dependencies; directional only, failed/ablated run refs retained",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_architecture",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 257,
+        "line_end": 259,
+        "quoted_clause": "## logic/solution/architecture.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/architecture.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete arbitrary component graph: name/purpose/inputs/outputs/interactions/choices",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_algorithm",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 261,
+        "line_end": 266,
+        "quoted_clause": "## logic/solution/algorithm.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/algorithm.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "All equations, paper-stated pseudocode, step explanation and source-supported complexity",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_constraints",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 268,
+        "line_end": 272,
+        "quoted_clause": "## logic/solution/constraints.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/constraints.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete boundary conditions/assumptions/known limitations",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_heuristics",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 274,
+        "line_end": 286,
+        "quoted_clause": "## logic/solution/heuristics.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/heuristics.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete Hxx Rationale/Sensitivity/Bounds/Code ref/Source with source-bounded presence",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_related_work",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 290,
+        "line_end": 306,
+        "quoted_clause": "## logic/related_work.md"
+      },
+      "layer": "logic",
+      "native_selector": "logic/related_work.md",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Full existing RWxx blocks DOI/Type/Delta/Claims affected/Adopted elements; retain all briefer citations and native headings",
+      "history_contract": "Initial create retains all supplied bytes; subsequent current-state changes archive full before/after/session/reason, untouched spans unchanged",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.arbitrary_solution",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 157,
+        "line_end": 166,
+        "quoted_clause": "- **solution/**: the method layer — `constraints.md` (limitations/assumptions) is always present;"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/ANY.md#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Any source-warranted method/study-design/formalization/proofs/results/taxonomy/appendix body, full equations/prose at original granularity; no fixed template",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --section SECTION --body-file FILE",
+      "proposed_batch_tag": "put_section",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.additional_knowledge",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 612,
+        "line_end": 619,
+        "quoted_clause": "## Appendix-sourced content"
+      },
+      "layer": "registered knowledge",
+      "native_selector": "explicit registered additional knowledge path#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Appendix worked examples/taxonomies/annotation schema/extended analyses preserve every source field. Outside logic/fixed rubric path, caller registers normalized relative Markdown in PAPER frontmatter knowledge_paths through paper edit/init; no inference. Reject src/evidence/trace/staging/.git/.ara namespaces, escape, duplicates, symlink and special files. Same guarded whole-body/heading operation and exact digest.",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put PATH --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4",
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.rubric",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 623,
+        "line_end": 640,
+        "quoted_clause": "## rubric/requirements.md (Only if rubric provided)"
+      },
+      "layer": "registered knowledge",
+      "native_selector": "rubric/requirements.md#Rxx",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "A rubric is supplied",
+      "payload_contract": "Verbatim rubric UUID/category/weight/requirement/most-specific ARA coverage/key detail, native Rxx scoped to rubric",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put rubric/requirements.md --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4",
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.add_question",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "question",
+        "fields": [
+          "description"
+        ],
+        "common": [
+          "id",
+          "type",
+          "title",
+          "support_level",
+          "source_refs"
+        ],
+        "support_level": [
+          "explicit",
+          "inferred"
+        ],
+        "relations": [
+          "children",
+          "also_depends_on"
+        ],
+        "thinking": "only verbatim journal rationale if actually provided"
+      },
+      "history_contract": "Source-bounded initial creation; never fabricate synthetic trace history or revise previously recorded immutable payload without conflict resolution",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara add node --type question --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.add_decision",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "decision",
+        "fields": [
+          "choice",
+          "alternatives",
+          "evidence"
+        ],
+        "common": [
+          "id",
+          "type",
+          "title",
+          "support_level",
+          "source_refs"
+        ],
+        "support_level": [
+          "explicit",
+          "inferred"
+        ],
+        "relations": [
+          "children",
+          "also_depends_on"
+        ],
+        "thinking": "only verbatim journal rationale if actually provided"
+      },
+      "history_contract": "Source-bounded initial creation; never fabricate synthetic trace history or revise previously recorded immutable payload without conflict resolution",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara add node --type decision --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.add_experiment",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "experiment",
+        "fields": [
+          "result",
+          "evidence"
+        ],
+        "common": [
+          "id",
+          "type",
+          "title",
+          "support_level",
+          "source_refs"
+        ],
+        "support_level": [
+          "explicit",
+          "inferred"
+        ],
+        "relations": [
+          "children",
+          "also_depends_on"
+        ],
+        "thinking": "only verbatim journal rationale if actually provided"
+      },
+      "history_contract": "Source-bounded initial creation; never fabricate synthetic trace history or revise previously recorded immutable payload without conflict resolution",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara add node --type experiment --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.add_dead_end",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "dead_end",
+        "fields": [
+          "hypothesis",
+          "failure_mode",
+          "lesson"
+        ],
+        "common": [
+          "id",
+          "type",
+          "title",
+          "support_level",
+          "source_refs"
+        ],
+        "support_level": [
+          "explicit",
+          "inferred"
+        ],
+        "relations": [
+          "children",
+          "also_depends_on"
+        ],
+        "thinking": "only verbatim journal rationale if actually provided"
+      },
+      "history_contract": "Source-bounded initial creation; never fabricate synthetic trace history or revise previously recorded immutable payload without conflict resolution",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara add node --type dead_end --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.add_pivot",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": {
+        "type": "pivot",
+        "fields": [
+          "from",
+          "to",
+          "trigger"
+        ],
+        "common": [
+          "id",
+          "type",
+          "title",
+          "support_level",
+          "source_refs"
+        ],
+        "support_level": [
+          "explicit",
+          "inferred"
+        ],
+        "relations": [
+          "children",
+          "also_depends_on"
+        ],
+        "thinking": "only verbatim journal rationale if actually provided"
+      },
+      "history_contract": "Source-bounded initial creation; never fabricate synthetic trace history or revise previously recorded immutable payload without conflict resolution",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara add node --type pivot --data-file PAYLOAD",
+      "proposed_batch_tag": "add_node",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.append_cross_edge",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 93,
+        "line_end": 102,
+        "quoted_clause": "## Rules"
+      },
+      "layer": "trace",
+      "native_selector": "trace:Nxx.also_depends_on",
+      "access": "append",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Convergence edge to an existing node, valid DAG across all edge kinds, preserve original topology",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara add edge FROM TO",
+      "proposed_batch_tag": "add_edge",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.read_coverage_state",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 239,
+        "line_end": 245,
+        "quoted_clause": "### Step 4: Coverage Check Loop (max 3 rounds)"
+      },
+      "layer": "knowledge",
+      "native_selector": "PAPER.md; logic/**; trace/**; rubric/requirements.md",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Re-read every captured contribution/citation/appendix/figure/argument and compare complete source bodies; no lossy indexed substitute",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara list --json; ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.coverage_repair",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 239,
+        "line_end": 288,
+        "quoted_clause": "### Step 4: Coverage Check Loop (max 3 rounds)"
+      },
+      "layer": "knowledge",
+      "native_selector": "every mutable body and initial source-supported trace gap",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Targeted full-fidelity coverage repair max three coverage rounds; immutable existing trace repair only audited protected resolution",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara apply --file OPERATIONS",
+      "proposed_batch_tag": "apply",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.validate_structure",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/validation-checklist.md",
+        "line_start": 5,
+        "line_end": 150,
+        "quoted_clause": "## 1. Directory Existence"
+      },
+      "layer": "knowledge",
+      "native_selector": "root/core and graph",
+      "access": "validate",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Mandatory dirs/nontrivial files/frontmatter/native fields/source-bounded counts/all node types/typed payloads/valid DAG; report complete failures",
+      "history_contract": "Read-only validation; do not normalize source or invent quota filler",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara check DIR --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.validate_bindings",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/validation-checklist.md",
+        "line_start": 152,
+        "line_end": 221,
+        "quoted_clause": "## 9. Cross-Layer Binding"
+      },
+      "layer": "knowledge + evidence/src",
+      "native_selector": "claim/plan/code/trace native refs",
+      "access": "validate",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Read/validate all knowledge-side Proof->E, Verifies->C, Dependencies, Evidence/Run/native selector links, trace payloads and PAPER counts through ara; semantic and direct-source checks are separate",
+      "history_contract": "Source full files remain authoritative; structural CLI does not claim automatic semantic Seal proof",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara check DIR --json; ara show SELECTOR --full --json",
+      "proposed_batch_tag": null,
+      "required_decisions": [
+        "F6"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_environment",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 403,
+        "line_end": 416,
+        "quoted_clause": "## src/environment.md  (mandatory core)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "src/environment.md",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Language/runtime/framework/hardware/data/dependencies/protocols/seeds; actual source values",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_code_index",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 370,
+        "line_end": 396,
+        "quoted_clause": "## src/artifacts.md  (the CODEBASE pointer index — code only, any language)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "src/artifacts.md",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Every persisted code/script/config/module pointer, no aggregation; do not index run outputs here under proposed disposition",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_code_capture",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 326,
+        "line_end": 368,
+        "quoted_clause": "## src/execution/{module}.py  (when the work warrants it — grounded or absent)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "src/execution/*",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Full native-form real code only when otherwise lost, source grounding; prompts/templates verbatim, no invented APIs",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_data",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 398,
+        "line_end": 401,
+        "quoted_clause": "## data/  (when the work is data-driven)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "data/dataset.md; data/preprocessing.md",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Complete provenance/source/size/license/consent/ethics/variables and preprocessing/QC",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_config",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 310,
+        "line_end": 324,
+        "quoted_clause": "## src/configs/{config}.md  (when the work warrants it)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "src/configs/*",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact value/rationale/search range/sensitivity/source per parameter",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_proof",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 418,
+        "line_end": 428,
+        "quoted_clause": "## evidence/proofs/{name}.md  (for theory/derivation work)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "evidence/proofs/*",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Theorem/source/formal statement/assumptions/full proof derivation",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_run_records",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 432,
+        "line_end": 445,
+        "quoted_clause": "## evidence/results/{node-or-name}.md  (run records — the outputs of running the code)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "evidence/results/*",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Each run_id/parameters/metric/export_id, trace and claim refs, failed and ablated runs",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_log_pointers",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 447,
+        "line_end": 456,
+        "quoted_clause": "## evidence/logs/log_pointers.md  (direct per-run log pointers)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "evidence/logs/log_pointers.md",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Direct per-run log pointers by export_id, no log transcription",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_evidence_index",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 524,
+        "line_end": 538,
+        "quoted_clause": "## evidence/README.md"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "evidence/README.md",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Every raw/derived table/figure/file index, source and claims; omission reasons",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_table",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 460,
+        "line_end": 496,
+        "quoted_clause": "## evidence/tables/{file}.md (+ screenshot)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "evidence/tables/*.md + *.png",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Exact complete source rows/caption/identifier and sibling original screenshot; derived subset labeled separately with parent",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.write_figure",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 553,
+        "line_end": 608,
+        "quoted_clause": "## evidence/figures/{name}.md (+ screenshot)"
+      },
+      "layer": "src/data/evidence",
+      "native_selector": "evidence/figures/*.md + *.png",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "All panels, exact source/caption/screenshot/type/extraction method/confidence/axes/table/trend or visual description; estimates marked approximate",
+      "history_contract": "Ground original source and preserve full evidence ledger; raw evidence append-only, derived subset separate",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.render_evidence",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/figure-extraction-guide.md",
+        "line_start": 40,
+        "line_end": 94,
+        "quoted_clause": "## 2. Rendering and cropping a figure (when needed)"
+      },
+      "layer": "evidence",
+      "native_selector": "all numbered table/figure screenshots",
+      "access": "create",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Render/crop source PDF or standalone images as real PNG beside transcription; direct visual read and iteration, no invented data",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.mirror_diagram",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/figure-extraction-guide.md",
+        "line_start": 149,
+        "line_end": 168,
+        "quoted_clause": "## 4. Reading a diagram"
+      },
+      "layer": "logic",
+      "native_selector": "logic/solution/architecture.md#section",
+      "access": "update",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Mirror source diagram component/connection/annotation structure into complete method body without fabricating numeric table",
+      "history_contract": "Complete supplied payload and untouched source spans retained; no historical record is rewritten",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara document put logic/solution/architecture.md --body-file FILE",
+      "proposed_batch_tag": "put_document",
+      "required_decisions": [
+        "F4"
+      ],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "pm.source_body_grounding",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 148,
+        "line_end": 164,
+        "quoted_clause": "#### Number grounding (claims & heuristics)"
+      },
+      "layer": "src/evidence",
+      "native_selector": "src/**; evidence/**; original supplied source file:line",
+      "access": "read",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Open each actual source/evidence body, copy exact matched line, distinguish input/result; direct access never includes knowledge files",
+      "history_contract": "Exact cited body retained; no writes",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "single live project-manager writer",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.source_verification",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/references/validation-checklist.md",
+        "line_start": 182,
+        "line_end": 221,
+        "quoted_clause": "## 10. Citation Verification (Rule 15)"
+      },
+      "layer": "src/evidence/input",
+      "native_selector": "all original source paths/quotes/cells/table-figure ledger",
+      "access": "validate",
+      "access_policy": "direct-access-allowed",
+      "required": true,
+      "applicability": "Whenever the source clause applies",
+      "payload_contract": "Reopen actual input/src/evidence cited location; verify quotes/denominators/derived values/screenshots/evidence completeness; direct access excludes knowledge bodies (those use CLI)",
+      "history_contract": "Read-only source checks; cannot claim automatic semantic verification from command success",
+      "provenance_contract": "Preserve source attribution and user/ai-suggested/ai-executed/user-revised tags; never infer user approval",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": null,
+      "proposed_batch_tag": null,
+      "required_decisions": [],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    },
+    {
+      "operation_id": "compiler.report_stats",
+      "skill_pin": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 290,
+        "line_end": 293,
+        "quoted_clause": "### Step 7: Report"
+      },
+      "layer": "artifact metadata",
+      "native_selector": "artifact root and complete file/native entry inventory",
+      "access": "read",
+      "access_policy": "cli-required",
+      "required": true,
+      "applicability": "After compiler generation and actually observed validation",
+      "payload_contract": "Artifact location, every file and exact byte size, total count/size, native claims/plans/concepts/tree nodes/evidence tables/figures counts, and actually observed validation result with failures. Do not infer Seal pass from listing or a structural-only command.",
+      "history_contract": "Read-only report; no file or procedure change",
+      "provenance_contract": "All reported counts and validation evidence come from the artifact and observed checks, never memory or invented success",
+      "role": "source-grounded compiler",
+      "proposed_cli_operation": "ara manifest --json; ara ls --json; ara check DIR --json",
+      "proposed_batch_tag": null,
+      "required_decisions": ["F6"],
+      "coverage_status": "proposed",
+      "proof_reference": null,
+      "blocked_reason": null
+    }
+  ]
+}

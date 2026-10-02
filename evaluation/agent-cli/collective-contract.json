@@ -1,0 +1,331 @@
+{
+  "schema": "ara.collective-contract/v1",
+  "revision": "1.0.0",
+  "status": "proposed-upstream-review-pending",
+  "implementation_plan_status": "approved",
+  "role_approval_status": "pending-upstream-review",
+  "transport_approval_status": "pending-upstream-review",
+  "observed_runtime_proof_status": "exercised-two-process-engineering-smoke-not-scored-research",
+  "observed_runtime_proof": "delivery-proof/community-smoke.json",
+  "external_harness15_status": "deferred",
+  "scored_experiments_status": "deferred",
+  "multi_host_status": "out-of-scope",
+  "interface_only_variants_unchanged": true,
+  "variant_lock": "variant-lock.json",
+  "transport_consumer": {
+    "schema": "ara.community-transport/v1",
+    "channel_path": "shared/community/{community_id}/intentions",
+    "writer": "coordinator-only",
+    "durability": "event-fsync-before-atomic-snapshot",
+    "states": [
+      "planned",
+      "active",
+      "completed",
+      "abandoned",
+      "expired"
+    ],
+    "roles": [
+      "reader",
+      "contributor",
+      "fork-pm",
+      "integration-pm"
+    ],
+    "failure_policy": {
+      "channel_unavailable": "pause-budget-consuming-work",
+      "round_closure": "all-admitted-actors-finished-or-registered-failure",
+      "registered_failures": [
+        "actor-unavailable",
+        "channel-unavailable",
+        "budget-exhausted"
+      ]
+    },
+    "accounting": {
+      "allocation": "equal-total-per-actor",
+      "includes": [
+        "coordination",
+        "research"
+      ],
+      "coordination_units": 1,
+      "unit": "protocol-allocation-unit",
+      "request_lifecycle_includes": [
+        "submission",
+        "deduplication",
+        "receipt-recovery"
+      ]
+    }
+  },
+  "components": {
+    "common": {
+      "install_surface": "skills/collective-research-cli",
+      "load": [
+        "references/roles.md",
+        "references/failure-policy.md"
+      ],
+      "every_collective_condition": true
+    },
+    "frontier": {
+      "install_surface": "skills/collective-frontier-cli",
+      "independent": true,
+      "load": [
+        "references/roles.md",
+        "references/failure-policy.md",
+        "references/frontier.md"
+      ]
+    },
+    "intentions": {
+      "install_surface": "skills/collective-intentions-cli",
+      "independent": true,
+      "load": [
+        "references/roles.md",
+        "references/failure-policy.md",
+        "references/intentions.md"
+      ]
+    }
+  },
+  "conditions": [
+    {
+      "id": "Files",
+      "access": "files",
+      "components": [],
+      "common_roles_and_failure": true
+    },
+    {
+      "id": "C+S",
+      "access": "cli",
+      "components": [],
+      "common_roles_and_failure": true
+    },
+    {
+      "id": "C+S+frontier",
+      "access": "cli",
+      "components": [
+        "frontier"
+      ],
+      "common_roles_and_failure": true
+    },
+    {
+      "id": "C+S+intentions",
+      "access": "cli",
+      "components": [
+        "intentions"
+      ],
+      "common_roles_and_failure": true
+    },
+    {
+      "id": "C+S+frontier+intentions",
+      "access": "cli",
+      "components": [
+        "frontier",
+        "intentions"
+      ],
+      "common_roles_and_failure": true
+    }
+  ],
+  "run_config": {
+    "schema": "ara.community-run/v1",
+    "required": [
+      "run_id",
+      "community_id",
+      "coordinator_id",
+      "actors",
+      "allocation_per_actor",
+      "refresh_cadence_rounds",
+      "expiry_rounds",
+      "max_rounds",
+      "failure_policy"
+    ],
+    "actors": {
+      "fields": [
+        "actor_id",
+        "source_identity",
+        "role"
+      ],
+      "admitted_before_run": true,
+      "immutable_actor_process_identity": true
+    },
+    "parameters": {
+      "allocation_per_actor": "positive integer, equal total including coordination+research",
+      "refresh_cadence_rounds": "positive whole logical rounds, design parameter not empirical threshold",
+      "expiry_rounds": "positive whole logical rounds >= cadence",
+      "max_rounds": "positive integer bounded run"
+    },
+    "changes_within_run": "reject"
+  },
+  "intention_schema": {
+    "identity": [
+      "community_id",
+      "actor_id",
+      "intention_id",
+      "revision"
+    ],
+    "source": [
+      "source_identity",
+      "artifact_revision",
+      "native_refs"
+    ],
+    "planned_content": [
+      "action",
+      "question",
+      "experiment_signature",
+      "verification_of",
+      "verification_rationale"
+    ],
+    "state": [
+      "state"
+    ],
+    "coordinator_owned": [
+      "published_sequence",
+      "refresh_round",
+      "expires_after_round",
+      "budget_used",
+      "history"
+    ],
+    "accounting": [
+      "budget_reserved",
+      "budget_used",
+      "result_refs"
+    ],
+    "native_refs_shape": {
+      "source_identity": "registered fork identity",
+      "native_ref": "verbatim native selector"
+    },
+    "verification_of_shape": {
+      "source_identity": "source-qualified owner",
+      "intention_id": "run-scoped intention identity",
+      "revision": "positive integer"
+    },
+    "new_publish_state": "planned",
+    "new_publish_expected_revision": 0,
+    "terminal_states": [
+      "completed",
+      "abandoned",
+      "expired"
+    ]
+  },
+  "channel_invariants": {
+    "outside_forks": true,
+    "single_committed_shared_source": true,
+    "coordinator_only_sequence_and_round": true,
+    "cas": [
+      "observed_sequence",
+      "observed_round",
+      "expected_revision"
+    ],
+    "actor_owned_revisions": true,
+    "stable_request_id_and_digest_recovery": true,
+    "durable_ack_sequence": true,
+    "expiry": "coordinator round > expires_after_round without owner refresh",
+    "round_end": "all admitted actors finished allotted turn/action or registered failure closure",
+    "history": "retain all state events including expiry and recovery; no old active work copied into new community",
+    "overlap": "return fresh owners/signatures for explicit judgment; verification allowed",
+    "reader_channel_access": "runner supplies snapshot input/publishes output request, never reader outside-scope IO",
+    "scientific_authority": "none"
+  },
+  "required_smoke_scenarios": [
+    "two-independent-fork-processes-shared-publish-refresh",
+    "owner-refresh-and-logical-expiry",
+    "concurrent-publication-cas",
+    "stale-revision-and-actor-ownership",
+    "lost-ack-and-duplicate-request-recovery",
+    "interrupted-append-snapshot-window",
+    "corrupt-or-unavailable-channel-pauses-execution",
+    "offline-ara-reads-still-work-during-channel-outage",
+    "deliberate-verification-and-overlap-context",
+    "same-allocation-budget-exhaustion",
+    "merge-preserves-source-qualified-frontier-full-history-visible-conflicts"
+  ],
+  "extra_prompt_clauses": [
+    {
+      "clause": "common-roles",
+      "source": "skills/collective-research-cli/references/roles.md",
+      "conditions": "every collective condition",
+      "intervention": "explicit proposed per-fork contributor/PM and integration authority, unchanged source evidence/history rules"
+    },
+    {
+      "clause": "common-failure-budget",
+      "source": "skills/collective-research-cli/references/failure-policy.md",
+      "conditions": "every collective condition",
+      "intervention": "same total allocation, registered closure, paused installed-channel execution, no extra agent"
+    },
+    {
+      "clause": "frontier-context",
+      "source": "skills/collective-research-cli/references/frontier.md",
+      "conditions": "frontier selected only",
+      "intervention": "source-qualified unresolved local/imported/remote context without automated priority or conclusions"
+    },
+    {
+      "clause": "intentions-context",
+      "source": "skills/collective-research-cli/references/intentions.md",
+      "conditions": "intentions selected only",
+      "intervention": "one committed shared channel, refresh/publication/CAS/recovery/freshness boundary"
+    }
+  ],
+  "files": [
+    {
+      "path": "skills/collective-research-cli/SKILL.md",
+      "sha256": "cdb61269a7d01442e3aa6db8d4f1ccd50326232855810d7ba4030754575b3a42",
+      "bytes": 2441
+    },
+    {
+      "path": "skills/collective-research-cli/references/failure-policy.md",
+      "sha256": "59e3ec8eef7c0ecefcb8684757b2ed4f601bb286862c6b0c466b7c45fe283507",
+      "bytes": 4341
+    },
+    {
+      "path": "skills/collective-research-cli/references/frontier.md",
+      "sha256": "fa0af699857e74868452dbb388177a3f171e84adf6659f092b8ce76ef9c39ddd",
+      "bytes": 3559
+    },
+    {
+      "path": "skills/collective-research-cli/references/intentions.md",
+      "sha256": "2f582ac9570b2effa67591574ce6c829cf47284c24978906e40a984858c36e12",
+      "bytes": 7766
+    },
+    {
+      "path": "skills/collective-research-cli/references/roles.md",
+      "sha256": "b8b4dcba27f6233d6fdb6c238f8867ad2def57429ab64630522f628ecb1dea81",
+      "bytes": 3803
+    },
+    {
+      "path": "skills/collective-frontier-cli/SKILL.md",
+      "sha256": "80eb82bbe0f528a9fcc58288f686f589c4bb6fe8cebb04540dc469e38b09b2b7",
+      "bytes": 1677
+    },
+    {
+      "path": "skills/collective-frontier-cli/references/failure-policy.md",
+      "sha256": "59e3ec8eef7c0ecefcb8684757b2ed4f601bb286862c6b0c466b7c45fe283507",
+      "bytes": 4341
+    },
+    {
+      "path": "skills/collective-frontier-cli/references/frontier.md",
+      "sha256": "fa0af699857e74868452dbb388177a3f171e84adf6659f092b8ce76ef9c39ddd",
+      "bytes": 3559
+    },
+    {
+      "path": "skills/collective-frontier-cli/references/roles.md",
+      "sha256": "b8b4dcba27f6233d6fdb6c238f8867ad2def57429ab64630522f628ecb1dea81",
+      "bytes": 3803
+    },
+    {
+      "path": "skills/collective-intentions-cli/SKILL.md",
+      "sha256": "71e4293b1a999615c3d6318798005157e876bf8c63cee075a8cd3bea2500d96e",
+      "bytes": 1689
+    },
+    {
+      "path": "skills/collective-intentions-cli/references/failure-policy.md",
+      "sha256": "59e3ec8eef7c0ecefcb8684757b2ed4f601bb286862c6b0c466b7c45fe283507",
+      "bytes": 4341
+    },
+    {
+      "path": "skills/collective-intentions-cli/references/intentions.md",
+      "sha256": "2f582ac9570b2effa67591574ce6c829cf47284c24978906e40a984858c36e12",
+      "bytes": 7766
+    },
+    {
+      "path": "skills/collective-intentions-cli/references/roles.md",
+      "sha256": "b8b4dcba27f6233d6fdb6c238f8867ad2def57429ab64630522f628ecb1dea81",
+      "bytes": 3803
+    }
+  ],
+  "token_accounting": "count every actually supplied entrypoint/reference/command page; same real allocation must be bound by future external runtime; utility units are not empirical resource proof"
+}

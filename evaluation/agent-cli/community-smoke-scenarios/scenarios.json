@@ -1,0 +1,92 @@
+{
+  "schema": "ara.community-scenario-catalog/v1",
+  "implementation_scope": "Standalone one-host bounded protocol consumer; Python standard library; no network, model calls, additional scientific agent, automatic judgment or scored experimental harness",
+  "verification_status": "Not run during implementation; parent runs after all sibling changes land",
+  "approval_claimed": false,
+  "external_harness_and_scored_experiments": "deferred",
+  "commands_from_protocol_repository_root": {
+    "generated_transition_scenarios": "python3 -m unittest discover -s evaluation/agent-cli/community-smoke-scenarios -p 'test_community_channel.py' -v",
+    "actual_two_fork_surface": "python3 evaluation/agent-cli/community-smoke-scenarios/two_process_smoke.py --ara ../ara-cli/target/release/ara --artifact-dir ../ara-cli/crates/ara-core/tests/fixtures/agent-cli --run-root /tmp/ara-community-two-process-smoke --selector N12",
+    "utility_help": "python3 evaluation/agent-cli/community-smoke-scenarios/community_channel.py --help",
+    "driver_help": "python3 evaluation/agent-cli/community-smoke-scenarios/two_process_smoke.py --help"
+  },
+  "command_prerequisites": [
+    "Sibling-owned evaluation/agent-cli/collective-contract.json with matching transport_consumer and common roles/failure policy",
+    "Real already-built ara for the two-process driver, with ara.open/v1 and ara.show/v1 support",
+    "Real existing fixture and actual native selector; override --selector when using another fixture",
+    "A new --run-root outside the fixture; existing output is rejected rather than overwritten",
+    "Parent runs project-wide gates only after siblings complete; this directory contains no build step"
+  ],
+  "utility_api": {
+    "argv": ["python3", "community_channel.py", "--run-root", "RUN_ROOT", "--community-id", "COMMUNITY_ID", "--actor", "REGISTERED_ACTOR", "--contract", "PINNED_CONTRACT", "OPERATION", "--request", "REQUEST_JSON"],
+    "input": "JSON request file or bounded JSON on stdin; operation selects request.schema.json $defs",
+    "identity": "--actor is immutable exact run-scoped identity supplied by a trusted local runner; this is not hostile-process authentication",
+    "channel": "RUN_ROOT/shared/community/COMMUNITY_ID/intentions",
+    "operations": {
+      "initialize": "Coordinator only; freeze finite run configuration and complete contract digest; durable initial event costs its admitted actor one coordination unit",
+      "snapshot": "Alias for billed durable refresh; no free coordination view",
+      "refresh": "Latest committed full view with coordinator sequence/round; actor read is itself one durable coordination event",
+      "publish": "Actor-owned intention ID, expected_revision=0 and exact observed_sequence/observed_round; planned state with empty result refs",
+      "refresh-intention": "Owner-only revision CAS; planned/active refresh or completed/abandoned transition; source fields/signatures/verification persist in every history revision",
+      "execute": "Account explicit research_units plus one coordination unit against the same allocation; active acknowledged intention and registered refresh cadence required; does not execute or judge science",
+      "finish-round": "Close the actor's allotted action/turn; round advances only after every admitted actor finishes or has registered failure closure",
+      "close-failure": "Coordinator records a registered reason for the target actor and optionally closes the run; it requires a valid channel and consumes the coordinator's existing allocation",
+      "recover": "Return original durable acknowledgement for an actor-owned request ID; optional original request_digest must match; --repair-interrupted explicitly completes only a matching durable write-ahead append"
+    },
+    "ack_schema": "ara.community-ack/v1",
+    "error_schema": "ara.community-error/v1",
+    "exit_codes": {"0": "Accepted operation or original durable receipt retransmission", "1": "Rejected request/config/contract/CAS/ownership/budget operation without partial mutation", "2": "Unavailable/corrupt channel or command setup failure; pause budget-consuming collective work"},
+    "config_schema": "run-config.schema.json",
+    "request_schema": "request.schema.json",
+    "snapshot_schema": "ara.community-snapshot/v1",
+    "event_schema": "ara.community-event/v1",
+    "limits": {"admitted_actors": 64, "per_actor_allocation": 1000000, "whole_rounds": 10000, "request_bytes": 1048576, "journal_bytes": 67108864},
+    "durability": [
+      "flock on coordinator.lock serializes the single host coordinator",
+      "pending-append.json is atomically written and file+directory fsynced before append",
+      "complete events are hash chained, request digests checked, and fsynced before atomic snapshot replacement",
+      "snapshot temporary file is fsynced before replace; channel directory is fsynced after replace/removal",
+      "normal operations pause on pending/interrupted append; explicit recovery appends missing matching suffix only, never truncates or discards committed bytes",
+      "replay verifies every produced acknowledgement and state transition before reconstructing a missing or valid stale-prefix snapshot",
+      "malformed/corrupt/truncated committed log without a matching write-ahead record is unavailable, not silently repaired"
+    ],
+    "accounting": {
+      "unit": "protocol-allocation-unit",
+      "allocation": "equal-total-per-actor",
+      "coordination_units_per_accepted_request_lifecycle": 1,
+      "request_lifecycle_includes": ["submission", "deduplication", "receipt-recovery"],
+      "research_units": "Explicit positive integer on execute; same remaining total as coordination",
+      "reservations": "Visible remaining reserved research cannot exceed remaining total after coordination; not extra allocation",
+      "outage": "No accepted event or research debit while corrupt/unavailable; collective work pauses",
+      "measurement_limit": "Not measured token/CPU accounting or a scored experiment budget implementation; external harness must separately account real model and transport overhead"
+    }
+  },
+  "generated_scenarios": [
+    {"id": "completed-history", "test": "test_generated_completion_preserves_source_history_and_joint_budget", "asserts": ["actual planned/active/accounted/completed revisions", "full history and source-qualified refs", "produced snapshot/log/receipt agreement", "coordination+research conservation"]},
+    {"id": "ownership-cas", "test": "test_actor_ownership_cas_and_registered_fork_are_enforced", "asserts": ["cross-owner change/recovery rejected", "stale sequence/round/revision rejected without mutation", "unregistered actor and wrong fork identity rejected"]},
+    {"id": "stable-request", "test": "test_request_identity_returns_original_ack_and_rejects_changed_digest", "asserts": ["original durable receipt returned after later coordination", "changed request content/digest rejected", "unknown request never reported accepted"]},
+    {"id": "concurrent-real-processes", "test": "test_two_real_processes_publish_cas_then_explicitly_refresh_and_reconsider", "asserts": ["two subprocesses compete on one observed sequence", "one succeeds and one receives actual CAS conflict", "explicit loser refresh sees winner before new publication", "overlap remains advisory"]},
+    {"id": "logical-retention", "test": "test_refresh_extends_logical_expiry_and_preserves_planned_active_history", "asserts": ["all actor closures before round advance", "fresh at round equal to expiry", "expired only at strictly greater round", "refreshed owner extends whole-round lifetime", "planned and active history retained"]},
+    {"id": "lost-ack", "test": "test_lost_ack_after_commit_is_recovered_without_duplicate_event", "asserts": ["real process exits after durable commit before receipt delivery", "original ack recovered", "no duplicate accepted event or budget debit"]},
+    {"id": "crash-windows", "test": "test_crash_append_snapshot_windows_recover_all_accepted_history", "asserts": ["real process exits before/mid/after append and after snapshot", "normal work pauses until explicit recovery", "complete accepted prefix preserved byte-for-byte", "matching pending append completed once"]},
+    {"id": "snapshot-reconstruction", "test": "test_snapshot_reconstruction_requires_valid_committed_prefix", "asserts": ["valid older snapshot and absent snapshot reconstructed from log during explicit recovery", "corrupt accounting snapshot rejected"]},
+    {"id": "channel-unavailable", "test": "test_malformed_corrupt_and_truncated_committed_journal_pause_without_budget", "asserts": ["actual malformed/hash-corrupt/truncated journal is unavailable", "unmatched repair never discards corruption", "missing channel refuses accounting", "snapshot budgets unchanged during outage"]},
+    {"id": "intentional-verification", "test": "test_intentional_verification_is_advisory_and_retains_source_revision", "asserts": ["retained original source-qualified revision required", "explicit rationale required", "matching signatures both returned without exclusion or scientific outcome"]},
+    {"id": "budget-exhaustion", "test": "test_exhaustion_and_registered_failure_use_no_extra_actor_allocation", "asserts": ["coordination consumes research's same finite allocation", "exhausted actor cannot refresh/execute", "coordinator closes only registered failure using its own budget", "expired history retained"]},
+    {"id": "failure-closure", "test": "test_registered_failure_closes_run_without_role_or_policy_override", "asserts": ["only coordinator registers failure", "unregistered failure policy rejected", "failure closure retains round and recovery receipt", "closed run cannot consume further allocation"]},
+    {"id": "execution-cadence", "test": "test_execution_requires_current_context_and_intention_cadence", "asserts": ["shared snapshot refresh required in current round", "owned intention refresh required at registered cadence", "renewed active revision permits visible research accounting"]},
+    {"id": "abandonment", "test": "test_abandonment_releases_advisory_reservation_but_retains_terminal_history", "asserts": ["abandoned source/signature/verification history retained", "terminal revival rejected", "new intention may use released reservation without extra allocation"]},
+    {"id": "corrupt-interruption", "test": "test_corrupt_interrupted_append_never_discards_complete_accepted_prefix", "asserts": ["corrupt partial append cannot be silently repaired", "complete previously accepted prefix and snapshot remain intact", "unavailable state preserves other owner's publication"]},
+    {"id": "finite-config", "test": "test_whole_round_limit_and_immutable_preregistered_config", "asserts": ["run closes at whole-round limit", "original receipt remains recoverable", "boolean/fractional/invalid cadence, duplicate actor and changed failure policy rejected"]}
+  ],
+  "two_process_generated_surface": {
+    "driver": "two_process_smoke.py",
+    "output": ["scenario-result.json", "alice-frames.jsonl", "bob-frames.jsonl", "shared/community/COMMUNITY_ID/intentions/events.jsonl", "shared/community/COMMUNITY_ID/intentions/snapshot.json"],
+    "transitions": ["A publishes planned read", "B refreshes A's durable sequence before choosing explicit verification", "both signatures reported for judgment", "A/B active, research-accounted and completed read actions", "disabled shared log pauses actual collective execution", "actual ara open/show in both forks remains usable offline", "restoration refresh preserves budget/history", "original durable receipt recovery", "intention refresh observed by other fork", "all actors finish whole rounds", "unrefreshed planned intention expires with full retained history"],
+    "frontier": "Actual ara open native objects annotated with runner-registered source identity, exact knowledge inventory revision and observed intention snapshot sequence; separate active/stale/retained remote intention context records its actual observed sequence/round, complete publisher-declared record and unverified scientific coverage; no covered status invented",
+    "revision_authority": "Administrative sorted exact-byte inventory includes PAPER.md, logic/, trace/, staging/, rubric/ and --knowledge-path files; excludes .ara/.git/src/evidence; encoding recorded in evidence",
+    "private_knowledge_mutation": "None; fixture copy only and before/after inventory equality",
+    "merge_proof": "Parent combines actual PR08 merge smoke separately; driver does not claim a performed merge",
+    "scientific_result": "Not evaluated"
+  }
+}

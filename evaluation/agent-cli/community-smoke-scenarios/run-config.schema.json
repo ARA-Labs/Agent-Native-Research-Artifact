@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.community-run/v1",
+  "title": "Immutable one-host community run configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "community_id", "coordinator_id", "actors", "allocation_per_actor", "refresh_cadence_rounds", "expiry_rounds", "max_rounds", "failure_policy"],
+  "properties": {
+    "schema": {"const": "ara.community-run/v1"},
+    "run_id": {"$ref": "#/$defs/identity"},
+    "community_id": {"$ref": "#/$defs/identity"},
+    "coordinator_id": {"$ref": "#/$defs/identity"},
+    "actors": {
+      "type": "array", "minItems": 2, "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["actor_id", "source_identity", "role"],
+        "properties": {
+          "actor_id": {"$ref": "#/$defs/identity"},
+          "source_identity": {"type": "string", "minLength": 1, "maxLength": 16384},
+          "role": {"enum": ["reader", "contributor", "fork-pm", "integration-pm"]}
+        }
+      }
+    },
+    "allocation_per_actor": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "refresh_cadence_rounds": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "expiry_rounds": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "max_rounds": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "failure_policy": {
+      "const": {
+        "channel_unavailable": "pause-budget-consuming-work",
+        "round_closure": "all-admitted-actors-finished-or-registered-failure",
+        "registered_failures": ["actor-unavailable", "channel-unavailable", "budget-exhausted"]
+      }
+    }
+  },
+  "$defs": {
+    "identity": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$"}
+  },
+  "x-consumer-invariants": [
+    "actor_id values are unique and coordinator_id names an admitted actor",
+    "every admitted actor receives exactly allocation_per_actor, including the coordinator",
+    "expiry_rounds >= refresh_cadence_rounds",
+    "initialization freezes the complete collective contract SHA256 and run configuration",
+    "protocol-allocation units are explicit deterministic accounting, not token/CPU measurements or scored-harness proof",
+    "all accepted coordination request lifecycles cost one unit; research_units consume the same total allocation",
+    "request retries, deduplication and original-receipt recovery are part of the original billed lifecycle",
+    "source_identity is registered administrative identity, not inferred from a native node label"
+  ]
+}

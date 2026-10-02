@@ -1,0 +1,35 @@
+SYNTHETIC INTEGRATION INPUT — not a published paper or empirical research result.
+Title: Queue conservation under two-stage admission
+Authors: Protocol fixture authors
+Year: 2026
+Venue: Deterministic protocol-consumer fixture
+
+1. Problem and central question
+The research question is whether a bounded queue can preserve admitted work while a downstream stage pauses. An observation is that upstream arrivals continue during a pause. The gap is loss of provenance when queued records are summarized. The objective is exact record preservation, not a throughput claim.
+
+2. Method: a source-warranted formalization, not a model-training recipe
+Let Q be the ordered sequence of admitted records and C the ordered sequence of completed records. Admission appends one source record to Q. Completion moves the first eligible record to C without changing its payload. The conservation invariant is that each admitted record is present exactly once in Q or C. Conditions: one serialized owner and no unrecorded deletion. A concrete falsification is an admitted identity missing from both sequences or appearing in both.
+The work has no released code, printed pseudocode, API implementation or training configuration. Do not invent a runnable stub. It does warrant a method file describing the ordered transition and a separate formal-invariant file containing this invariant and its short inductive argument. Empty initialization is not a compiled artifact.
+
+3. Source-bounded trajectory
+We asked the central question above. We considered replacing old payloads with summary text, but chose exact retained payloads because the conservation proof needs original identities and provenance. This explicitly stated decision has alternative "replace with summary" and evidence "the conservation invariant requires original identity". No experiment run, measured throughput, dead end or pivot is reported here; never invent these to reach a quota. A declarative verification plan may inspect the invariant under admission/completion; no exact outcome numbers belong in its expected outcome.
+
+Table 1: Declared input capacities (not measured outcomes)
+Condition | Capacity | Units | Provenance
+single-owner | 2 | records | input parameter declared here
+serialized-boundary | 3 | records | input parameter declared here
+These are input values, not empirical results. A derived sum would be an ARA-authored calculation, not a new source row.
+
+Figure 1: Ordered queue and retained completion record
+The standalone figure1.svg is the original visual: Admission → Pending queue → Completion record; a Pause edge feeds the pending queue. This is a structural diagram, not a quantitative plot. Capture the visual plus a description of all labels and connections, preserve the caption, and reflect the structure into the method layer; never fabricate numeric data points or a plot table.
+
+4. Related work
+Queue Conservation, Fixture Authors (2025), is an explicitly named conceptual baseline here; its technical delta is a one-stage ledger, extended here by distinct pending/completed states. This reference is synthetic fixture content, not a claim that an external publication exists. The compiler should preserve this qualification and full citation footprint.
+
+Appendix A: complete taxonomy and omitted-content repair target
+entry alpha: "pending-held" — a source record awaiting downstream completion; keep its original payload and rationale "pause is not deletion".
+entry beta: "completion-retained" — a finished record whose original identity/provenance remains; rationale "completion is not erasure".
+Both per-entry descriptive fields must survive; collapsing to two names or frequencies loses source granularity. The appendix sentence "original payload remains recoverable after completion" is the deliberate initial coverage-gap repair target. Route it to its natural knowledge layer, with an additional safe registered Markdown path only if no existing file is a natural home.
+
+Reproducibility environment
+Analytical fixture — no runtime hardware, dataset or software framework is required for the research method. The fixture transport/CLI smoke commands are integration tooling, not an implementation supplied by this research input.

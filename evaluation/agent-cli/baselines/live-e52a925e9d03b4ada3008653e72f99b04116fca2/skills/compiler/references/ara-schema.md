@@ -1,12 +1,5 @@
 # ARA Directory Schema — Complete Field-Level Reference
 
-The proposed CLI access, additive fields, and bounded-write contracts are recorded in
-[`docs/agent-cli-contracts.md`](../../../docs/agent-cli-contracts.md).
-F1 through F7 are pending upstream PR review; no approval revision is recorded.
-The implementation plan is approved, but this link does not amend the research
-procedures below. The unchanged source/reference baseline and its operation inventory
-are locked under [`evaluation/agent-cli/`](../../../evaluation/agent-cli/baseline-contracts.md).
-
 ## Directory Structure
 
 `✓` = mandatory core (always present). Everything else is created **only when the paper's content
