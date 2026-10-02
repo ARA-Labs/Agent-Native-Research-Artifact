@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.community-request/v1",
+  "title": "Requests selected by the CLI operation argument",
+  "$defs": {
+    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}:[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$"},
+    "sequence": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "round": {"type": "integer", "minimum": 1, "maximum": 10001},
+    "revision": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "text": {"type": "string", "minLength": 1, "maxLength": 16384},
+    "refs": {
+      "type": "array", "maxItems": 1024,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["source_identity", "native_ref"],
+        "properties": {"source_identity": {"$ref": "#/$defs/text"}, "native_ref": {"$ref": "#/$defs/text"}}
+      }
+    },
+    "intention": {
+      "type": "object", "additionalProperties": false,
+      "required": ["intention_id", "source_identity", "artifact_revision", "native_refs", "action", "question", "experiment_signature", "verification_of", "verification_rationale", "state", "budget_reserved", "result_refs"],
+      "properties": {
+        "intention_id": {"$ref": "#/$defs/request_id"},
+        "source_identity": {"$ref": "#/$defs/text"}, "artifact_revision": {"$ref": "#/$defs/text"},
+        "native_refs": {"$ref": "#/$defs/refs"}, "action": {"$ref": "#/$defs/text"},
+        "question": {"$ref": "#/$defs/text"}, "experiment_signature": {"$ref": "#/$defs/text"},
+        "verification_of": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "additionalProperties": false, "required": ["source_identity", "intention_id", "revision"],
+             "properties": {"source_identity": {"$ref": "#/$defs/text"}, "intention_id": {"$ref": "#/$defs/request_id"}, "revision": {"$ref": "#/$defs/revision"}}}
+          ]
+        },
+        "verification_rationale": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/text"}]},
+        "state": {"const": "planned"},
+        "budget_reserved": {"type": "integer", "minimum": 0, "maximum": 1000000},
+        "result_refs": {"type": "array", "maxItems": 0}
+      }
+    },
+    "initialize": {
+      "type": "object", "additionalProperties": false, "required": ["request_id", "config"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "config": {"$ref": "run-config.schema.json"}}
+    },
+    "refresh": {
+      "type": "object", "additionalProperties": false, "required": ["request_id"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}}
+    },
+    "recover": {
+      "type": "object", "additionalProperties": false, "required": ["request_id"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "request_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}
+    },
+    "publish": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "observed_sequence", "observed_round", "expected_revision", "intention"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "observed_sequence": {"$ref": "#/$defs/sequence"},
+        "observed_round": {"$ref": "#/$defs/round"}, "expected_revision": {"const": 0}, "intention": {"$ref": "#/$defs/intention"}}
+    },
+    "refresh-intention": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "observed_sequence", "observed_round", "intention_id", "expected_revision", "state"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "observed_sequence": {"$ref": "#/$defs/sequence"},
+        "observed_round": {"$ref": "#/$defs/round"}, "intention_id": {"$ref": "#/$defs/request_id"},
+        "expected_revision": {"$ref": "#/$defs/revision"}, "state": {"enum": ["planned", "active", "completed", "abandoned"]},
+        "budget_reserved": {"type": "integer", "minimum": 0, "maximum": 1000000}, "result_refs": {"$ref": "#/$defs/refs"}}
+    },
+    "execute": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "observed_sequence", "observed_round", "intention_id", "expected_revision", "research_units"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "observed_sequence": {"$ref": "#/$defs/sequence"},
+        "observed_round": {"$ref": "#/$defs/round"}, "intention_id": {"$ref": "#/$defs/request_id"},
+        "expected_revision": {"$ref": "#/$defs/revision"}, "research_units": {"type": "integer", "minimum": 1, "maximum": 1000000}}
+    },
+    "finish-round": {
+      "type": "object", "additionalProperties": false, "required": ["request_id", "observed_sequence", "observed_round"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "observed_sequence": {"$ref": "#/$defs/sequence"}, "observed_round": {"$ref": "#/$defs/round"}}
+    },
+    "close-failure": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_id", "observed_sequence", "observed_round", "target_actor", "reason", "close_run"],
+      "properties": {"request_id": {"$ref": "#/$defs/request_id"}, "observed_sequence": {"$ref": "#/$defs/sequence"},
+        "observed_round": {"$ref": "#/$defs/round"}, "target_actor": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$"},
+        "reason": {"enum": ["actor-unavailable", "channel-unavailable", "budget-exhausted"]}, "close_run": {"type": "boolean"}}
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/initialize"}, {"$ref": "#/$defs/recover"}, {"$ref": "#/$defs/publish"},
+    {"$ref": "#/$defs/refresh-intention"}, {"$ref": "#/$defs/execute"}, {"$ref": "#/$defs/finish-round"}, {"$ref": "#/$defs/close-failure"}
+  ],
+  "x-operation-selection": "Use the operation-specific $defs schema. refresh/snapshot share $defs.refresh; recover accepts its subset plus optional digest. CLI operation, not JSON shape, selects semantics.",
+  "x-consumer-invariants": [
+    "request and intention identity prefix equals immutable registered process --actor",
+    "observed sequence and round equal coordinator authority before every publication, accounting or closure",
+    "all publications and execution require shared refresh this round; execution also requires owned intention age below registered cadence",
+    "source-qualified refs and complete intention state history survive every revision",
+    "verification_of resolves a retained source-qualified revision and requires nonempty rationale",
+    "completed and expired histories are terminal; completed does not certify a scientific result",
+    "only coordinator registers failure closures; unavailable/corrupt channel pauses until a valid refresh or recovery succeeds"
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "format": "ara.protocol-decisions/v1",
+  "implementation_plan": {
+    "status": "approved",
+    "date": "2026-10-01",
+    "scope": "Draft/implement/submit contracts and packaging; not upstream approval"
+  },
+  "source_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+  "decision_record": "../../docs/agent-cli-contracts.md",
+  "wire_contracts": {
+    "upstream_status": "pending-review",
+    "aliases": {
+      "path": "trace/aliases.yaml",
+      "format": "ara.aliases/v1",
+      "record_fields": ["source_key", "label", "original", "target", "revision"],
+      "identity": ["source_key", "original"],
+      "all_imported_identities_required": true,
+      "unchanged_id_mapping_required": true,
+      "historical_targets_reserve_slots": true,
+      "retired_inactive_targets_are_live_terminals": false,
+      "source_only_retired_numeric_identities": "reserve fresh destination mappings including null removals; never fabricate replacements of protected historical references",
+      "rejected_source_scopes": ["native trace selector namespace", "registered root Markdown document namespaces"],
+      "reject": ["cycles", "dangling targets", "ambiguous label-only lookup"]
+    },
+    "local_redirects": {
+      "path": "trace/logic_mutations.yaml",
+      "root_key": "mutations",
+      "record_fields": ["action", "from", "to", "from_selector", "to_selector", "before", "after", "session", "turn", "signal", "provenance", "historical_references"],
+      "locator": "normalized native string: full ancestor-qualified heading path for named/title-only change; canonical numeric native ID for true ID change",
+      "generated_selector": {"type": "strict EntrySelector", "shape": {"document": "relative Markdown path", "heading": ["literal ancestor title", "literal final title"]}, "slash_inside_title": "one array element, never an inferred hierarchy separator"},
+      "to_selector_on_unreferenced_remove": null,
+      "legacy_without_selectors": "only unambiguous archive-suffix resolution; reject ambiguous slash-containing title/hierarchy",
+      "chain_resolution": true,
+      "reject": ["cycles", "dangling targets", "reused live origins", "ambiguous short headings", "C/H/E numeric namespace changes"],
+      "forbidden_origin_namespaces": ["trace", "staging", "src", "evidence"],
+      "historical_text_rewritten": false,
+      "target_must_resolve": "always for rename; for remove when any typed or historical reference remains",
+      "null_target_preserves_reference": false,
+      "null_remove_allowed": "only if the complete final candidate and reference inventory prove no remaining typed or historical reference; exact before-body still archived"
+    },
+    "merge_log": {
+      "path": "trace/merge_log.yaml",
+      "format": "ara.merge-log/v1",
+      "root_key": "records",
+      "encoding": "append-only YAML sequence of inline tagged JSON records",
+      "record_kinds": ["enrollment", "label", "revision", "conflict", "resolution", "imported_resolution", "transport", "protected_decision"],
+      "revision_identity": ["source_key", "fingerprint"],
+      "mapping_fields": ["source_key", "original", "target", "layer", "path"],
+      "source_bytes": "relative path -> canonical padded RFC 4648 standard base64 string of exact bytes; malformed/noncanonical text and legacy numeric arrays rejected",
+      "conflict_candidates": ["base", "ours", "theirs"],
+      "candidate_fields": ["present", "bytes", "fingerprint"],
+      "ordinary_resolution_choices": ["ours", "theirs", "base"],
+      "resolution_fields": ["conflict_id", "take", "time", "session", "turn", "signal", "provenance", "prior_fingerprint", "selected_fingerprint", "applied_fingerprint"],
+      "resolution_fingerprints": "selected captures original chosen source evidence; applied captures actual relocated destination",
+      "imported_resolution_fields": ["source_key", "revision", "conflict_id", "evidence"],
+      "imported_resolution_evidence": "canonical padded standard base64 of the exact JSON bytes of the source's valid audited resolution record",
+      "unsafe_foreign_resolution": "destination local selection prohibited; later valid source resolution may clear imported_unresolved",
+      "foreign_identity_union": "union/remap native enrollment, revisions and mappings without replacing source keys by transport labels",
+      "foreign_immutable_conflict": "reject publication retaining full conflicting ledger evidence",
+      "protected_resolution_choices": ["reject_incoming", "restore_base"],
+      "protected_requires": ["complete captured conflict", "exact expected-current fingerprint", "session", "turn", "signal", "provenance", "reason", "exact before/after"],
+      "repeat_conflict": "retain unresolved candidate state without new identity allocation",
+      "protected_restore": "only exact previously captured base bytes; no arbitrary immutable replacement",
+      "ordinary_transport": {"transport": "cli", "command": ["merge", "resolve"], "take": ["ours", "theirs", "base"], "reply_format": "ara.merge/v1"},
+      "protected_transport": {"transport": "cli", "command": ["merge", "repair"], "flags": ["--conflict-file", "--decision", "--expected-current", "--session", "--turn", "--signal", "--provenance", "--reason"], "reply_format": "ara.merge/v1", "jsonl_write_operation": false, "session_turn": "next turn_count + 1 only, never a past turn"}
+    },
+    "knowledge_registration": {
+      "root_document": "PAPER.md",
+      "fixed_additional_path": "rubric/requirements.md",
+      "field": "knowledge_paths",
+      "field_kind": "sequence of safe normalized relative Markdown paths",
+      "caller_supplied_only": true,
+      "reserved_namespaces": ["src", "evidence", "trace", "staging", ".git", ".ara"],
+      "reject": ["absolute paths", "path escape", "duplicates", "symlinks", "special files"],
+      "registered_document_mutability": "same guarded full-body/heading operations and source digest as logic"
+    },
+    "initialization": {
+      "operation": "artifact.init",
+      "transport": "apply JSONL",
+      "missing_only": {"kind": "optional boolean", "default": false},
+      "default_mode": "strict new-or-empty root",
+      "missing_only_mode": "create absent seeds; preserve existing generated defaults; reject caller-supplied PAPER/documents unless existing bytes match exactly",
+      "raw_source_and_evidence": "untouched",
+      "final_artifact_validation": true
+    },
+    "authored_scalar_vocabulary": {
+      "claim_resting_status": ["hypothesis", "untested", "testing", "supported", "weakened", "refuted", "withdrawn"],
+      "claim_transition_only": ["revised"],
+      "heuristic_status": ["active", "weakened", "retired"],
+      "sensitivity": ["low", "medium", "high", "unknown", "Not specified in paper"],
+      "global_provenance": ["user", "ai-suggested", "ai-executed", "user-revised"],
+      "unsupported_historical_values": "preserve exact source when not targeted; do not accept unsupported spellings as newly authored statuses",
+      "epistemic_judgment_or_upgrade_inferred": false
+    },
+    "source_revision_workflow": {
+      "existing_pm_compiler_knowledge": "logic.revise complete Body/fields plus owning session.log in one atomic batch",
+      "caller_supplies": ["actual signal", "provenance", "exact full before/after", "session", "turn"],
+      "document_replace_infers_history": false,
+      "paper_edit_audit": {"field": "audit", "kind": "optional strict RevisionContext", "required_fields": ["session", "turn", "signal", "provenance"], "optional_fields": ["note"], "before_after": "complete actual PAPER bytes", "session_turn": "owning next turn in same atomic batch", "without_audit": "do not invent historical metadata"},
+      "initial_creation_invents_prior_revision": false
+    }
+  },
+  "decisions": [
+    {
+      "decision_id": "F1",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR03",
+        "PR06",
+        "PR08"
+      ],
+      "choices": [
+        "Every imported identity including unchanged local IDs appears in append-only portable import ledger and alias map",
+        "Explicit local redirects keep structural old native refs resolvable; reject cycles/dangling targets",
+        "Complete unresolved candidate identity is retained without claiming installed destination"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    },
+    {
+      "decision_id": "F2",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR08"
+      ],
+      "choices": [
+        "Stable explicit source_key is separate from --as label and content/VCS revision",
+        "Untracked first import needs source_key; copied checkout/label is not lineage proof",
+        "Verified shared-base content recognizes ancestry; ordinary local entry IDs remain"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    },
+    {
+      "decision_id": "F3",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR05",
+        "PR06",
+        "PR08"
+      ],
+      "choices": [
+        "Atomic promoted/promoted_to/crystallized_via tuple and validated target/history",
+        "Differing target/closure/evidence remain unresolved; true does not win",
+        "All claim/heuristic/concept/constraint/architecture/dead_end targets remain available"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    },
+    {
+      "decision_id": "F4",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR03",
+        "PR04",
+        "PR05",
+        "PR06",
+        "PR08",
+        "PR13"
+      ],
+      "choices": [
+        "Named whitelist in docs mutability table; no wildcard trace/staging edit",
+        "Current logic/PAPER bodies mutable with exact full before/after and reasoning",
+        "Session five historical arrays append; two rolling arrays plus metadata/index update with archived before/after",
+        "Stale explicit >=3 session-days, additive conflict annotations and validated cross-edges",
+        "Protected conflict repair explicitly audits reject_incoming or exact restore_base with current fingerprint, reason, full captured candidates and before/after; arbitrary immutable replacement forbidden",
+        "Typed referenced removal requires retained replacement/redirect; unreferenced mutable delete permits null target only after complete final reference proof; exact before-body archived and no historical deletion"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    },
+    {
+      "decision_id": "F5",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR07",
+        "PR08"
+      ],
+      "choices": [
+        "Later node same_as earlier distinct existing node; append only",
+        "Reject self-links/cycles/duplicate relation; keep both source records"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    },
+    {
+      "decision_id": "F6",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR01",
+        "PR02",
+        "PR03",
+        "PR04",
+        "PR06",
+        "PR13"
+      ],
+      "choices": [
+        "Full claim fields and both falsification spellings/Proof dialects retained",
+        "Native concept/section/related-work identities, arbitrary body reads and unknown fields preserved",
+        "Optional node artifacts [{name,pointer,what}] with retained extra fields and concepts [existing exact name or native-ref] are additive, absent if unused",
+        "Node parent and pivot from/to/trigger source dialect preserved, no normalization",
+        "Fixed rubric/requirements.md plus caller-registered PAPER knowledge_paths safe normalized relative Markdown; reject reserved src/evidence/trace/staging/.git/.ara namespaces, duplicate registrations, symlinks and special files"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    },
+    {
+      "decision_id": "F7",
+      "disposition": "selected-for-implementation-pending-review",
+      "upstream_status": "pending-review",
+      "approved_revision": null,
+      "approval_evidence": null,
+      "consumers": [
+        "PR13",
+        "PR15"
+      ],
+      "choices": [
+        "Access-only CLI copies after pinned command proof for every required row",
+        "Read-only reader, PM single-writer, compiler ownership/procedures unchanged",
+        "Direct source/evidence bodies remain permitted where source permits; PAPER is not direct knowledge exception",
+        "Collective coordination separate; scored experiments deferred"
+      ],
+      "review_required": true,
+      "unresolved_choices": [],
+      "integration_gate": "Reviewer disposition and actual approval revision required; a proposed command name is not proof"
+    }
+  ],
+  "source_contradictions": [
+    {
+      "id": "promotion-snapshot",
+      "source_clauses": [
+        "skills/research-manager/SKILL.md:142",
+        "skills/research-manager/SKILL.md:453-457"
+      ],
+      "proposed_disposition": "Later snapshot rule: closure/source in observation+trace creation history, not logic snapshot",
+      "upstream_status": "pending-review"
+    },
+    {
+      "id": "rolling-session-history",
+      "source_clauses": [
+        "skills/research-manager/SKILL.md:41-46",
+        "skills/research-manager/SKILL.md:493-563"
+      ],
+      "proposed_disposition": "Explicit append arrays and audited replacement of rolling views/metadata/index",
+      "upstream_status": "pending-review"
+    },
+    {
+      "id": "stale-immutability",
+      "source_clauses": [
+        "skills/research-manager/SKILL.md:41-46",
+        "skills/research-manager/SKILL.md:211-215"
+      ],
+      "proposed_disposition": "Narrow stale false->true exception with 3+ session-day reasoning",
+      "upstream_status": "pending-review"
+    },
+    {
+      "id": "proof-dialects",
+      "source_clauses": [
+        "skills/compiler/references/ara-schema.md:177",
+        "skills/research-manager/SKILL.md:430"
+      ],
+      "proposed_disposition": "Preserve both native dialects and exact body, not coercion",
+      "upstream_status": "pending-review"
+    },
+    {
+      "id": "run-code-index",
+      "source_clauses": [
+        "skills/compiler/SKILL.md:173-184",
+        "skills/compiler/references/ara-schema.md:336-340",
+        "skills/compiler/references/validation-checklist.md:95-98"
+      ],
+      "proposed_disposition": "Main/current codebase rule: code pointers in src/artifacts, runs/logs in evidence; baseline contradiction retained",
+      "upstream_status": "pending-review"
+    }
+  ]
+}

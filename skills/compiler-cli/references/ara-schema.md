@@ -1,11 +1,17 @@
 # ARA Directory Schema — Complete Field-Level Reference
 
-The proposed CLI access, additive fields, and bounded-write contracts are recorded in
-[`docs/agent-cli-contracts.md`](../../../docs/agent-cli-contracts.md).
-F1 through F7 are pending upstream PR review; no approval revision is recorded.
-The implementation plan is approved, but this link does not amend the research
-procedures below. The unchanged source/reference baseline and its operation inventory
-are locked under [`evaluation/agent-cli/`](../../../evaluation/agent-cli/baseline-contracts.md).
+## CLI-only access boundary
+
+Every knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the
+words read, open, search, write, append and edit retain their original procedural meaning,
+but never authorize direct knowledge-file tools. For complete source use
+`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);
+`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.
+Source/evidence bodies and skill pages remain direct only within the baseline scope.
+No direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.
+The entrypoint loads `references/cli-access.md` directly for executable wire details.
+Pending protocol review and binary proof remain visible in the variant lock.
+
 
 ## Directory Structure
 
@@ -52,7 +58,7 @@ taxonomies) — place such content where it best belongs.
 
 ## Progressive Disclosure (3 Levels)
 
-- **Level 1 — PAPER.md** (~200 tokens): Frontmatter + layer index. Agent reads ONLY this to decide relevance.
+- **Level 1 — PAPER.md** (~200 tokens): Frontmatter + layer index. Agent reads ONLY this through `ara show --document PAPER.md --source --full --json` to decide relevance.
 - **Level 2 — Layer files** (problem.md, claims.md, experiments.md, evidence/README.md): Loaded on demand.
 - **Level 3 — Detail files** (algorithm.md, code stubs, individual evidence tables): Loaded when drilling in.
 
@@ -623,7 +629,11 @@ annotation schemas, extended analyses, and prescriptive content. Route each into
 layer where it best fits, preserving the granularity the source uses (for example, keep
 per-entry descriptive fields for taxonomies rather than collapsing to names + frequencies).
 The existing layer conventions above apply; create additional files only when no existing
-file is a natural home.
+file is a natural home. Knowledge creation uses ara document operations. An additional
+knowledge path outside logic must first be explicitly registered as a safe relative `.md`
+path in PAPER frontmatter `knowledge_paths` through `paper.edit`/initialization;
+`rubric/requirements.md` is the fixed allowlisted case. This does not authorize direct
+knowledge writes or limit source-supported content/granularity.
 
 ---
 

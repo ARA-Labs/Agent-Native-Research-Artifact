@@ -1,0 +1,512 @@
+{
+  "format": "ara.skill-variant-lock/v1",
+  "created": "2026-10-01",
+  "source_lock": {
+    "path": "source-lock.json",
+    "sha256": "4b293d8f043761926ef90111009060793176fabcc7308b685d6dadff84eb46c2"
+  },
+  "baseline_revision": "e52a925e9d03b4ada3008653e72f99b04116fca2",
+  "baseline_pins": [
+    {
+      "pin_id": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight",
+      "sha256": "90e6064ef9ea592276f16c0d3206dc329093910be7dd7581ced79af09ffb7b28",
+      "files": [
+        {
+          "source_path": "skills/research-foresight/SKILL.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/SKILL.md",
+          "sha256": "393195faf08f9a2da8dfabda4e64129b8f166c263ac19433a55b8b16f187aeab",
+          "bytes": 2523,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/SKILL.md"
+        },
+        {
+          "source_path": "skills/research-foresight/references/CONTRACT.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/CONTRACT.md",
+          "sha256": "67bd4f925bd32374230ead9c56e0e3a4d1a1f348b0649a505ce6bee5642ef162",
+          "bytes": 6822,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/CONTRACT.md"
+        },
+        {
+          "source_path": "skills/research-foresight/references/PREDICT.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/PREDICT.md",
+          "sha256": "e1e0c8fc462815ed0ddb2245823505094def316c297db9039491b6a7a8617058",
+          "bytes": 18409,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/PREDICT.md"
+        },
+        {
+          "source_path": "skills/research-foresight/references/RETRIEVE.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/RETRIEVE.md",
+          "sha256": "8329fb579992b22c8aad0369bcb263d4d8d4c4e01298797c42031f7662938d33",
+          "bytes": 16074,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-foresight/references/RETRIEVE.md"
+        },
+        {
+          "source_path": "skills/research-manager/templates/reader-report.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/templates/reader-report.md",
+          "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+          "bytes": 1423,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/templates/reader-report.md"
+        }
+      ]
+    },
+    {
+      "pin_id": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+      "sha256": "1414dfd18b92327e80f40398382fe30ec966ae6d6942e6bc49a05210c86d23ce",
+      "files": [
+        {
+          "source_path": "skills/research-manager/SKILL.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/SKILL.md",
+          "sha256": "fc8fb52d57cbae4c754fd7bf9e6023dbf54fd4e796152d87786749e1f30d2c37",
+          "bytes": 36877,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/SKILL.md"
+        },
+        {
+          "source_path": "skills/research-manager/references/event-taxonomy.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/event-taxonomy.md",
+          "sha256": "49a273dca8d05cbe27ad80f4e78907dea23d710db6ced635082204b5c040527b",
+          "bytes": 7374,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/event-taxonomy.md"
+        },
+        {
+          "source_path": "skills/research-manager/references/taste-comments.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/taste-comments.md",
+          "sha256": "b6382632024d61ad57aff83d22caaef6858a8d511ffe141bc76ce34c5f73ca93",
+          "bytes": 5742,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/references/taste-comments.md"
+        },
+        {
+          "source_path": "skills/research-manager/templates/reader-report.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/templates/reader-report.md",
+          "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+          "bytes": 1423,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/research-manager/templates/reader-report.md"
+        }
+      ]
+    },
+    {
+      "pin_id": "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler",
+      "sha256": "46082711c166a2207ba341122f9bf592b643c9de1c5d9ebb09cd394aa205a9a5",
+      "files": [
+        {
+          "source_path": "skills/compiler/SKILL.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/SKILL.md",
+          "sha256": "b7555bb021d8dd3d8caa3b093bdccf3a44557580805dfe5b45a5d23c79c979fb",
+          "bytes": 25754,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/SKILL.md"
+        },
+        {
+          "source_path": "skills/compiler/references/ara-schema.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/ara-schema.md",
+          "sha256": "bfd6725bbf05da932e2fe1d3be847fa48e53bf7bfd7bb4baa9f00101f8138b94",
+          "bytes": 27851,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/ara-schema.md"
+        },
+        {
+          "source_path": "skills/compiler/references/exploration-tree-spec.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/exploration-tree-spec.md",
+          "sha256": "c60540f54737b65fd254c0937da2a36a99a3adca67b8095ae6e05aa50f24cf17",
+          "bytes": 4765,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/exploration-tree-spec.md"
+        },
+        {
+          "source_path": "skills/compiler/references/figure-extraction-guide.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/figure-extraction-guide.md",
+          "sha256": "7e9529ab65afac1dbd00cd4dfdca835730485c78daf0568da37c22581d103723",
+          "bytes": 9352,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/figure-extraction-guide.md"
+        },
+        {
+          "source_path": "skills/compiler/references/validation-checklist.md",
+          "archive_path": "evaluation/agent-cli/baselines/live-e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/validation-checklist.md",
+          "sha256": "733437b090697a4e73efb2766ea13c512ec71dbb868ed5745d5ab0cc12ca25f2",
+          "bytes": 14496,
+          "source_url": "https://github.com/ARA-Labs/Agent-Native-Research-Artifact/blob/e52a925e9d03b4ada3008653e72f99b04116fca2/skills/compiler/references/validation-checklist.md"
+        }
+      ]
+    }
+  ],
+  "cli_pin": {
+    "status": "pinned-verified-native-release",
+    "source_record_commit": "8e32a83d5fed9ec0ba7611d536b737165323dfa4",
+    "version": "0.1.23",
+    "binary_sha256": "674f0229e76c13819a343e370211006e89d160d62773b6611c6775342928cd3b",
+    "proof": "https://github.com/ARA-Labs/ara-cli/blob/feat/agent-cli-interface/docs/verification/agent-cli-2026-10-02/final-release-installed-agent-replay.json",
+    "scope": "Engineering implementation and final-release replay. Original installed model tasks retain their earlier 0.1.22 binary attribution; not scored research."
+  },
+  "protocol_decisions": {
+    "path": "protocol-decisions.json",
+    "status": "pending-upstream-review",
+    "approval_revision_status": "not-approved",
+    "sha256": "1e3914de21ac080bb82ad832d40390c62f35dbcc602a558447cb98efefff6780"
+  },
+  "operation_inventory": {
+    "path": "operation-coverage.json",
+    "sha256": "a3a88afa7c2c84237c76a326a43b626407ac1b01aa4057606061637b8ba04c8e",
+    "operation_count": 107
+  },
+  "access_diff": {
+    "path": "access-diff.json",
+    "sha256": "199292a7a0a99e18083e7397efe6e6de031ee633b36e257d70097eaf3671b3f1",
+    "review_status": "passed-independent-static-access-review"
+  },
+  "command_reference": {
+    "path": "command-reference.md",
+    "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a"
+  },
+  "deliverables": [
+    {
+      "deliverable": "13a",
+      "skills": [
+        "research-foresight-cli"
+      ],
+      "baseline_pins": [
+        "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-foresight"
+      ],
+      "variant_files": [
+        {
+          "path": "skills/research-foresight-cli/LICENSE",
+          "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+          "bytes": 1075
+        },
+        {
+          "path": "skills/research-foresight-cli/SKILL.md",
+          "sha256": "620e7a128de382ccdab9b298d355bc618ec3eb932682fea2f3106adb317753ba",
+          "bytes": 3526
+        },
+        {
+          "path": "skills/research-foresight-cli/references/CONTRACT.md",
+          "sha256": "badf74c1fe64201673936f5adfda93dbfe1f08bd6407105978a2696c0aba2271",
+          "bytes": 7916
+        },
+        {
+          "path": "skills/research-foresight-cli/references/PREDICT.md",
+          "sha256": "9baf341799accff874111aa710a4e359c21f14e207acddb379b753575a78fb16",
+          "bytes": 19443
+        },
+        {
+          "path": "skills/research-foresight-cli/references/RETRIEVE.md",
+          "sha256": "e5c77ca5abf96579236760b609d5305280660a7fd512a877f486fdddf3fdaf9d",
+          "bytes": 17666
+        },
+        {
+          "path": "skills/research-foresight-cli/references/cli-access.md",
+          "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a",
+          "bytes": 21007
+        },
+        {
+          "path": "skills/research-foresight-cli/templates/reader-report.md",
+          "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+          "bytes": 1423
+        }
+      ],
+      "required_operation_ids": [
+        "reader.discover",
+        "reader.search",
+        "reader.read_manifest",
+        "reader.read_problem",
+        "reader.read_solution",
+        "reader.read_claim",
+        "reader.read_concept",
+        "reader.read_plan",
+        "reader.read_trace",
+        "reader.read_related_work",
+        "reader.graph",
+        "reader.negatives",
+        "reader.grounding",
+        "reader.source_evidence",
+        "reader.answer_report",
+        "reader.standalone_report_template"
+      ],
+      "integration_status": "implemented-independent-static-access-review-passed",
+      "proof_status": "observed-installed-reader-packaging-smoke",
+      "proof_path": "delivery-proof/runtime-smoke.json"
+    },
+    {
+      "deliverable": "13b",
+      "skills": [
+        "research-manager-cli",
+        "compiler-cli"
+      ],
+      "baseline_pins": [
+        "live-e52a925e9d03b4ada3008653e72f99b04116fca2/research-manager",
+        "live-e52a925e9d03b4ada3008653e72f99b04116fca2/compiler"
+      ],
+      "variant_files": [
+        {
+          "path": "skills/compiler-cli/LICENSE",
+          "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+          "bytes": 1075
+        },
+        {
+          "path": "skills/compiler-cli/SKILL.md",
+          "sha256": "4c386eb225cc20215484e2926b6d58625d583dd8caf2865bf39b8dcba094a7c3",
+          "bytes": 27377
+        },
+        {
+          "path": "skills/compiler-cli/references/ara-schema.md",
+          "sha256": "d2b5f3074c11320361d919b3ac807d0398b16b4ea1ca083e0a00cdab25537a31",
+          "bytes": 29111
+        },
+        {
+          "path": "skills/compiler-cli/references/cli-access.md",
+          "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a",
+          "bytes": 21007
+        },
+        {
+          "path": "skills/compiler-cli/references/exploration-tree-spec.md",
+          "sha256": "a3dd417dc24ff855473b495157c5d5c0d065fb8997412feba3ca40588fbe7e0e",
+          "bytes": 5578
+        },
+        {
+          "path": "skills/compiler-cli/references/figure-extraction-guide.md",
+          "sha256": "df47905a45ad5099c26de9d259ff6834848d6fefe4cf52aba9032caf4a1c21da",
+          "bytes": 10165
+        },
+        {
+          "path": "skills/compiler-cli/references/validation-checklist.md",
+          "sha256": "bfbdeff270893972573e430f0f97842403142d1614ee28ea83e3f81f35635f79",
+          "bytes": 15309
+        },
+        {
+          "path": "skills/research-manager-cli/LICENSE",
+          "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+          "bytes": 1075
+        },
+        {
+          "path": "skills/research-manager-cli/SKILL.md",
+          "sha256": "cd15be868dd2d5c867ec01a3d48cadc32f48506494cb372f582671decac3c7d7",
+          "bytes": 26901
+        },
+        {
+          "path": "skills/research-manager-cli/references/cli-access.md",
+          "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a",
+          "bytes": 21007
+        },
+        {
+          "path": "skills/research-manager-cli/references/event-taxonomy.md",
+          "sha256": "253a6911708287d9bd31334475e93dd709fa37a777a5bdb10c872f0371a57e10",
+          "bytes": 8355
+        },
+        {
+          "path": "skills/research-manager-cli/references/schema-and-initialization.md",
+          "sha256": "fc951625f85a2c91fbb8533610e28a52a2998fac6d17436dd5f857b189dcae7b",
+          "bytes": 13130
+        },
+        {
+          "path": "skills/research-manager-cli/references/taste-comments.md",
+          "sha256": "079a73f889eaaaeb7dbb58633189fd12bbbb2ecd2a51a256e617369494df24dd",
+          "bytes": 6758
+        },
+        {
+          "path": "skills/research-manager-cli/templates/reader-report.md",
+          "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+          "bytes": 1423
+        }
+      ],
+      "required_operation_ids": [
+        "pm.initialize",
+        "pm.read_state_ids",
+        "pm.read_briefing",
+        "pm.read_full_sessions",
+        "pm.read_observations",
+        "pm.read_reasoning",
+        "pm.add_question",
+        "pm.add_decision",
+        "pm.add_experiment",
+        "pm.add_dead_end",
+        "pm.add_pivot",
+        "pm.append_cross_edge",
+        "pm.stage_observation",
+        "pm.promote_claim",
+        "pm.promote_heuristic",
+        "pm.promote_concept",
+        "pm.promote_constraint",
+        "pm.promote_architecture",
+        "pm.promote_dead_end",
+        "pm.mark_stale",
+        "pm.annotate_contradiction",
+        "pm.adjudicate_reader_report",
+        "pm.revise_claim",
+        "pm.revise_heuristic",
+        "pm.revise_concept",
+        "pm.status_transition",
+        "pm.split",
+        "pm.merge",
+        "pm.generalize",
+        "pm.rename_identity",
+        "pm.remove_current_entry",
+        "pm.repair_dependencies",
+        "pm.write_constraint_body",
+        "pm.write_architecture_body",
+        "pm.append_session_events_logged",
+        "pm.append_session_ai_actions",
+        "pm.append_session_claims_touched",
+        "pm.append_session_logic_revisions",
+        "pm.append_session_key_context",
+        "pm.update_session_open_threads",
+        "pm.update_session_ai_suggestions_pending",
+        "pm.create_session",
+        "pm.update_session_metadata",
+        "pm.update_session_index",
+        "pm.append_reasoning",
+        "pm.taste_target_read",
+        "pm.append_logic_taste",
+        "pm.append_trace_taste",
+        "pm.source_grounding",
+        "pm.append_evidence",
+        "compiler.acquire_inputs",
+        "compiler.initialize",
+        "compiler.write_paper",
+        "compiler.write_problem",
+        "compiler.write_claims",
+        "compiler.write_concepts",
+        "compiler.write_experiments",
+        "compiler.write_architecture",
+        "compiler.write_algorithm",
+        "compiler.write_constraints",
+        "compiler.write_heuristics",
+        "compiler.write_related_work",
+        "compiler.arbitrary_solution",
+        "compiler.additional_knowledge",
+        "compiler.rubric",
+        "compiler.add_question",
+        "compiler.add_decision",
+        "compiler.add_experiment",
+        "compiler.add_dead_end",
+        "compiler.add_pivot",
+        "compiler.append_cross_edge",
+        "compiler.read_coverage_state",
+        "compiler.coverage_repair",
+        "compiler.validate_structure",
+        "compiler.validate_bindings",
+        "compiler.write_environment",
+        "compiler.write_code_index",
+        "compiler.write_code_capture",
+        "compiler.write_data",
+        "compiler.write_config",
+        "compiler.write_proof",
+        "compiler.write_run_records",
+        "compiler.write_log_pointers",
+        "compiler.write_evidence_index",
+        "compiler.write_table",
+        "compiler.write_figure",
+        "compiler.render_evidence",
+        "compiler.mirror_diagram",
+        "pm.source_body_grounding",
+        "compiler.source_verification",
+        "compiler.report_stats"
+      ],
+      "integration_status": "implemented-independent-static-access-review-passed",
+      "proof_status": "observed-installed-pm-revision-and-source-bounded-compiler-packaging-smokes",
+      "proof_path": "delivery-proof/runtime-smoke.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "skills/compiler-cli/LICENSE",
+      "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+      "bytes": 1075
+    },
+    {
+      "path": "skills/compiler-cli/SKILL.md",
+      "sha256": "4c386eb225cc20215484e2926b6d58625d583dd8caf2865bf39b8dcba094a7c3",
+      "bytes": 27377
+    },
+    {
+      "path": "skills/compiler-cli/references/ara-schema.md",
+      "sha256": "d2b5f3074c11320361d919b3ac807d0398b16b4ea1ca083e0a00cdab25537a31",
+      "bytes": 29111
+    },
+    {
+      "path": "skills/compiler-cli/references/cli-access.md",
+      "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a",
+      "bytes": 21007
+    },
+    {
+      "path": "skills/compiler-cli/references/exploration-tree-spec.md",
+      "sha256": "a3dd417dc24ff855473b495157c5d5c0d065fb8997412feba3ca40588fbe7e0e",
+      "bytes": 5578
+    },
+    {
+      "path": "skills/compiler-cli/references/figure-extraction-guide.md",
+      "sha256": "df47905a45ad5099c26de9d259ff6834848d6fefe4cf52aba9032caf4a1c21da",
+      "bytes": 10165
+    },
+    {
+      "path": "skills/compiler-cli/references/validation-checklist.md",
+      "sha256": "bfbdeff270893972573e430f0f97842403142d1614ee28ea83e3f81f35635f79",
+      "bytes": 15309
+    },
+    {
+      "path": "skills/research-foresight-cli/LICENSE",
+      "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+      "bytes": 1075
+    },
+    {
+      "path": "skills/research-foresight-cli/SKILL.md",
+      "sha256": "620e7a128de382ccdab9b298d355bc618ec3eb932682fea2f3106adb317753ba",
+      "bytes": 3526
+    },
+    {
+      "path": "skills/research-foresight-cli/references/CONTRACT.md",
+      "sha256": "badf74c1fe64201673936f5adfda93dbfe1f08bd6407105978a2696c0aba2271",
+      "bytes": 7916
+    },
+    {
+      "path": "skills/research-foresight-cli/references/PREDICT.md",
+      "sha256": "9baf341799accff874111aa710a4e359c21f14e207acddb379b753575a78fb16",
+      "bytes": 19443
+    },
+    {
+      "path": "skills/research-foresight-cli/references/RETRIEVE.md",
+      "sha256": "e5c77ca5abf96579236760b609d5305280660a7fd512a877f486fdddf3fdaf9d",
+      "bytes": 17666
+    },
+    {
+      "path": "skills/research-foresight-cli/references/cli-access.md",
+      "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a",
+      "bytes": 21007
+    },
+    {
+      "path": "skills/research-foresight-cli/templates/reader-report.md",
+      "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+      "bytes": 1423
+    },
+    {
+      "path": "skills/research-manager-cli/LICENSE",
+      "sha256": "25ba8a25365fdc8475b0f7b4818d8ea629cb69d24e30632b0e1a95c759d7368a",
+      "bytes": 1075
+    },
+    {
+      "path": "skills/research-manager-cli/SKILL.md",
+      "sha256": "cd15be868dd2d5c867ec01a3d48cadc32f48506494cb372f582671decac3c7d7",
+      "bytes": 26901
+    },
+    {
+      "path": "skills/research-manager-cli/references/cli-access.md",
+      "sha256": "3c49553285b86f8c62d38470c9af7d8c59cc33d9add1d975a5dc1639060e499a",
+      "bytes": 21007
+    },
+    {
+      "path": "skills/research-manager-cli/references/event-taxonomy.md",
+      "sha256": "253a6911708287d9bd31334475e93dd709fa37a777a5bdb10c872f0371a57e10",
+      "bytes": 8355
+    },
+    {
+      "path": "skills/research-manager-cli/references/schema-and-initialization.md",
+      "sha256": "fc951625f85a2c91fbb8533610e28a52a2998fac6d17436dd5f857b189dcae7b",
+      "bytes": 13130
+    },
+    {
+      "path": "skills/research-manager-cli/references/taste-comments.md",
+      "sha256": "079a73f889eaaaeb7dbb58633189fd12bbbb2ecd2a51a256e617369494df24dd",
+      "bytes": 6758
+    },
+    {
+      "path": "skills/research-manager-cli/templates/reader-report.md",
+      "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+      "bytes": 1423
+    }
+  ],
+  "collective_extension_included": false,
+  "experiment_status": "deferred; no quality/performance/reproduction claim"
+}

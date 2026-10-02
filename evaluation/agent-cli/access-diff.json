@@ -1,0 +1,4589 @@
+{
+  "format": "ara.skill-access-diff/v1",
+  "source_lock": "source-lock.json",
+  "operation_inventory": "operation-coverage.json",
+  "operation_inventory_sha256": "a3a88afa7c2c84237c76a326a43b626407ac1b01aa4057606061637b8ba04c8e",
+  "scope": "interface-only access changes; no collective instructions in variants",
+  "review_status": "passed-independent-static-access-review",
+  "source_contradictions": "baseline-contracts.md; no unilateral procedure resolution",
+  "clause_changes": [
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 2,
+      "before": "name: compiler\n",
+      "after": "name: compiler-cli\n"
+    },
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 15,
+      "before": "allowed-tools: Read, Write, Edit, Bash(python *|git clone *|ls *|mkdir *), Glob, Grep, Task",
+      "after": "allowed-tools: Read, Write, Edit, Bash(ara *|python *|git clone *|ls *|mkdir *), Glob, Grep, Task"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 27,
+      "before": "(Read, Write, Edit, Bash, Glob, Grep) directly. No API wrapper needed.",
+      "after": "(Read, Write, Edit, Bash, Glob, Grep) directly for inputs/source/evidence; use `ara` for\nall knowledge-layer/root access. No API wrapper needed."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 215,
+      "before": "Write the mandatory core, then the additional files the paper warrants. See",
+      "after": "Use `artifact.init` (compiler profile) and source-preserving document/node operations\nthrough `ara apply` for the mandatory knowledge core and additional knowledge files the\npaper warrants; write permitted source/evidence bodies directly. See"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 249,
+      "before": "Run ARA Seal Level 1. Check:",
+      "after": "Run `ara check <artifact> --json` and ARA Seal Level 1 in full. Check:"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 287,
+      "before": "For each failure: read the file, apply targeted edits (prefer Edit over rewrite), re-validate.",
+      "after": "For each failure: read knowledge with ara full source show and apply guarded targeted\nknowledge edits through ara (prefer section/field repair over whole-body replacement);\nread/edit source/evidence directly where permitted, then re-validate. Immutable conflict\nrepair uses only the dedicated audited `merge repair` path with complete captured conflict\ncandidates, exact current fingerprint, `reject_incoming`/`restore_base`, actual reason/signal/\nprovenance and the session's next turn; never ordinary `merge resolve`, a direct or generic edit."
+    },
+    {
+      "change_kind": "reference-closure",
+      "source_path": "skills/compiler/SKILL.md",
+      "source_line_start": 316,
+      "before": "Load on demand:",
+      "after": "Load `references/cli-access.md` directly before knowledge access. Load on demand:"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/compiler/references/ara-schema.md",
+      "source_line_start": 48,
+      "before": "Agent reads ONLY this to decide relevance.",
+      "after": "Agent reads ONLY this through `ara show --document PAPER.md --source --full --json` to decide relevance."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/compiler/references/ara-schema.md",
+      "source_line_start": 618,
+      "before": "The existing layer conventions above apply; create additional files only when no existing\nfile is a natural home.",
+      "after": "The existing layer conventions above apply; create additional files only when no existing\nfile is a natural home. Knowledge creation uses ara document operations. An additional\nknowledge path outside logic must first be explicitly registered as a safe relative `.md`\npath in PAPER frontmatter `knowledge_paths` through `paper.edit`/initialization;\n`rubric/requirements.md` is the fixed allowlisted case. This does not authorize direct\nknowledge writes or limit source-supported content/granularity."
+    },
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/research-foresight/SKILL.md",
+      "source_line_start": 2,
+      "before": "name: research-foresight\n",
+      "after": "name: research-foresight-cli\n"
+    },
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/research-foresight/SKILL.md",
+      "source_line_start": 14,
+      "before": "allowed-tools: Read, Grep, Glob",
+      "after": "allowed-tools: Read, Grep, Glob, Bash(ara *)"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/SKILL.md",
+      "source_line_start": 8,
+      "before": "by retrieving precedent from the ARA's native files (references/RETRIEVE.md)",
+      "after": "by retrieving precedent through ara from the ARA's native files (references/RETRIEVE.md)"
+    },
+    {
+      "change_kind": "reference-closure",
+      "source_path": "skills/research-foresight/SKILL.md",
+      "source_line_start": 30,
+      "before": "- `references/PREDICT.md` — the Predictor: grounded, honest answering of the question asked.",
+      "after": "- `references/PREDICT.md` — the Predictor: grounded, honest answering of the question asked.\n- `references/cli-access.md` — load directly before knowledge access.\n- `templates/reader-report.md` — load directly if a standalone report shape is needed."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 7,
+      "before": "the engine reads **one ARA directory** directly.",
+      "after": "the engine reads **one ARA directory** through ara for knowledge and directly for permitted source/evidence bodies."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 15,
+      "before": "The engine reads an ARA's native files **directly** — there is",
+      "after": "The engine reads an ARA's native knowledge files **through ara** (full native source bodies) — there is"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 28,
+      "before": "There is **no deterministic projection, distance, or index\n   layer**; relevance and inference are semantic, over the ARA's real prose.",
+      "after": "There is **no deterministic projection or distance layer**; `ara find` may aid retrieval\n   but never rank semantic relevance or replace grounding. Relevance and inference are semantic, over the ARA's real prose."
+    },
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 46,
+      "before": "research-foresight/                  # ENGINE",
+      "after": "research-foresight-cli/              # ENGINE"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 53,
+      "before": "# THE SUBSTRATE — read directly, never copied or projected",
+      "after": "# THE SUBSTRATE — knowledge via ara full source reads, never copied or projected"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 64,
+      "before": "intermediate database or index, and has no write path (§4b).",
+      "after": "intermediate distilled database, and has no write path (§4b). Keyword retrieval is only an access aid."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "source_line_start": 95,
+      "before": "the ARA's native files directly (`logic/`, `trace/`, `evidence/`, `src/`, `PAPER.md`)",
+      "after": "the ARA's native knowledge via ara (`logic/`, `trace/`, `PAPER.md`); permitted `evidence/` and `src/` bodies directly"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/PREDICT.md",
+      "source_line_start": 29,
+      "before": "there is no projected number, no distance, and no index to lean on",
+      "after": "there is no projected number or distance, and no keyword index to lean on for semantic judgment"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/PREDICT.md",
+      "source_line_start": 30,
+      "before": "your own targeted reads of the refs RETRIEVE returns",
+      "after": "your own targeted ara full source reads of the knowledge refs RETRIEVE returns (permitted source/evidence bodies remain direct)"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/PREDICT.md",
+      "source_line_start": 103,
+      "before": "real body** of every ref you intend to cite",
+      "after": "real body** of every ref you intend to cite (knowledge: `ara show --document <path> --source --full --json`; permitted source/evidence bodies: direct)"
+    },
+    {
+      "change_kind": "reference-closure",
+      "source_path": "skills/research-foresight/references/PREDICT.md",
+      "source_line_start": 291,
+      "before": "Use the shared shape in `research-manager`'s `templates/reader-report.md`",
+      "after": "Use the unchanged shared shape bundled in this skill's `templates/reader-report.md`"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 5,
+      "before": "search the ARA's native files directly (Glob/Grep/Read across\n  logic/, trace/, evidence/, src/, PAPER.md)",
+      "after": "search the ARA's native knowledge through ara (ls/find/show across\n  logic/, trace/, PAPER.md; permitted evidence/ and src/ bodies remain direct)"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 19,
+      "before": "search that ARA's native\nfiles directly",
+      "after": "search that ARA's native\nknowledge through ara and permitted source/evidence bodies directly"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 28,
+      "before": "there is no projected number, no distance, and no index to gate on",
+      "after": "there is no projected number or distance; ara find is only a retrieval aid, never an index to gate semantic relevance on"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 30,
+      "before": "You do **not** execute code, fetch URLs, write\nanything",
+      "after": "You do **not** execute source code, fetch URLs, write\nanything (read-only ara access commands are permitted)"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 47,
+      "before": "You read the ARA's real files directly. There is no projection, no\n  distilled candidate list, no derived index handed to you — you do the searching",
+      "after": "You read the ARA's real knowledge files through ara full source shows. There is no projection, no\n  distilled candidate list; ara find assists keywords only — you do the semantic searching"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 59,
+      "before": "reading the ARA directly instead of a lossy projection",
+      "after": "reading the ARA's full native bodies through ara instead of a lossy projection"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 90,
+      "before": "### Step 2 — Search the ARA's native files directly\nUse Glob/Grep/Read over the ARA in scope to find every location whose prose bears on the frame. Cast",
+      "after": "### Step 2 — Search the ARA's native files through ara\nUse `ara -C <ara_dir> status --json`, `ls --json`, and `find <query> --json` to locate\nknowledge; use `show --document <path> --source --full --json` for complete bodies and\nunique repeated `--heading` components for sections. Use `path`/`refs` for structured\nrelations and possible prose mentions. Permitted source/evidence bodies remain direct.\nFind every location whose prose bears on the frame. Cast"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "source_line_start": 112,
+      "before": "When a Grep hit is too terse to judge, Read the surrounding section so your rank is based on the real\nprose, not a keyword coincidence.",
+      "after": "A find excerpt is never grounding proof. Retrieve and verify the complete knowledge\nsource/section with `show --document ... --source --full --json`, including its content\ndigest; read permitted source/evidence bodies directly. Rank on the real prose, not a\nkeyword coincidence, and verify every cited body even when an excerpt seems sufficient."
+    },
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 2,
+      "before": "name: research-manager\n",
+      "after": "name: research-manager-cli\n"
+    },
+    {
+      "change_kind": "packaging",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 17,
+      "before": "allowed-tools: Read, Write, Edit, Glob, Grep",
+      "after": "allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ara *)"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 136,
+      "before": "2. Allocate the next ID for the target layer (read the target file first).",
+      "after": "2. Read the target layer through ara first; let the corresponding add/promote operation allocate the next ID and consume its result/bindings."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 297,
+      "before": "1. Edit the affected fields in the logic file directly. **Overwrite the prior value** —",
+      "after": "1. Use `logic.revise` through `ara apply` for the affected fields in the logic file. **Overwrite the prior value** —"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 346,
+      "before": "1. Read existing ara/ files (current state, next IDs).",
+      "after": "1. Read existing ara/ knowledge with ara full source shows (current state); use CLI allocation/results for new IDs."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 351,
+      "before": "6. Append turn events to today's session record; update session_index.yaml; append a line to pm_reasoning_log.yaml.",
+      "after": "6. Use one ara apply batch: session.log appends complete turn arrays and audited rolling metadata/index; record.append appends the complete PM reasoning notes."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 601,
+      "before": "```\nmkdir -p ara/{logic/solution,src,trace/sessions,evidence/{tables,figures},staging}\n```",
+      "after": "Submit an external JSONL request through `ara -C ara apply <request.jsonl> --json` with\n`{\"op\":\"artifact.init\",\"profile\":\"research-manager\",\"paper\":\"<complete inferred root manifest>\",\"missing_only\":true}`.\nThe bounded operation creates the same source structure and seed set below, preserving\nexisting default-seed contents; explicitly supplied existing bytes must match exactly.\nFor an existing root read PAPER through ara first and supply its exact complete bytes,\nnot a regenerated manifest. Conflicting supplied seeds reject without mutation."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 656,
+      "before": "8. **Read target files first** (correct IDs, no dupes);",
+      "after": "8. **Read target files first through ara** (no dupes; CLI assigns new IDs);"
+    },
+    {
+      "change_kind": "movement",
+      "source_path": "skills/research-manager/SKILL.md",
+      "source_line_start": 358,
+      "source_line_end": 617,
+      "destination_path": "skills/research-manager-cli/references/schema-and-initialization.md",
+      "reason": "Keep main skill under500 lines; move complete contiguous directory/schemas/initialization block, no procedure deletion or summarization.",
+      "unchanged_source_slice_sha256": "9dc5ba012aacd503ef618278d0fd6c7222a442893968c7c5ccc4fd409e7686ba",
+      "destination_sha256": "fc951625f85a2c91fbb8533610e28a52a2998fac6d17436dd5f857b189dcae7b",
+      "access_changes_inside_movement": [
+        "pm.initialize"
+      ],
+      "source_content_preservation": "Full contiguous source slice in order, with only explicit access substitutions and access preamble."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/event-taxonomy.md",
+      "source_line_start": 21,
+      "before": "Write to `trace/exploration_tree.yaml` immediately at end of turn.",
+      "after": "Append through `node.add` in `ara apply` to `trace/exploration_tree.yaml` immediately at end of turn."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/event-taxonomy.md",
+      "source_line_start": 39,
+      "before": "Write to `staging/observations.yaml` first, with `potential_type` indicating where they",
+      "after": "Append through `observation.stage` in `ara apply` to `staging/observations.yaml` first, with `potential_type` indicating where they"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/event-taxonomy.md",
+      "source_line_start": 146,
+      "before": "Always read the target file to find the highest existing ID before assigning a new one.",
+      "after": "Always read the target through ara full source show before adding (no duplicates); let the CLI assign the new ID and use its result/bindings instead of scanning to allocate it."
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/taste-comments.md",
+      "source_line_start": 40,
+      "before": "1. Search `claims.md`, `heuristics.md` (by title/content match), and",
+      "after": "1. Search through `ara find` and verify complete bodies with `ara show --document ... --source --full --json`: `claims.md`, `heuristics.md` (by title/content match), and"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/taste-comments.md",
+      "source_line_start": 82,
+      "before": "append one bullet under that",
+      "after": "use `entry.taste_append` through ara to append one bullet under that"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/taste-comments.md",
+      "source_line_start": 87,
+      "before": "Append a new entry to `trace/taste_log.yaml`",
+      "after": "Use `record.append` through ara to append a new entry to `trace/taste_log.yaml`"
+    },
+    {
+      "change_kind": "access",
+      "source_path": "skills/research-manager/references/taste-comments.md",
+      "source_line_start": 101,
+      "before": "Read `trace/taste_log.yaml` first to find the highest existing `T` id.",
+      "after": "Read `trace/taste_log.yaml` first through ara full source show; the CLI allocates the new `T` id."
+    }
+  ],
+  "page_diffs": [
+    {
+      "source_path": "skills/compiler/SKILL.md",
+      "variant_path": "skills/compiler-cli/SKILL.md",
+      "source_sha256": "b7555bb021d8dd3d8caa3b093bdccf3a44557580805dfe5b45a5d23c79c979fb",
+      "variant_sha256": "4c386eb225cc20215484e2926b6d58625d583dd8caf2865bf39b8dcba094a7c3",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 3
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 3
+          },
+          "before": "name: compiler\n",
+          "after": "name: compiler-cli\n",
+          "operation_ids": [
+            "compiler.acquire_inputs",
+            "compiler.initialize",
+            "compiler.arbitrary_solution",
+            "compiler.read_coverage_state",
+            "compiler.coverage_repair",
+            "compiler.report_stats"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 15,
+            "end_exclusive": 16
+          },
+          "variant_lines": {
+            "start": 15,
+            "end_exclusive": 16
+          },
+          "before": "allowed-tools: Read, Write, Edit, Bash(python *|git clone *|ls *|mkdir *), Glob, Grep, Task\n",
+          "after": "allowed-tools: Read, Write, Edit, Bash(ara *|python *|git clone *|ls *|mkdir *), Glob, Grep, Task\n",
+          "operation_ids": [
+            "compiler.acquire_inputs",
+            "compiler.initialize",
+            "compiler.arbitrary_solution",
+            "compiler.read_coverage_state",
+            "compiler.coverage_repair",
+            "compiler.report_stats"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 25,
+            "end_exclusive": 25
+          },
+          "variant_lines": {
+            "start": 25,
+            "end_exclusive": 38
+          },
+          "before": "",
+          "after": "## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n\n",
+          "operation_ids": [
+            "compiler.acquire_inputs",
+            "compiler.initialize",
+            "compiler.arbitrary_solution",
+            "compiler.read_coverage_state",
+            "compiler.coverage_repair",
+            "compiler.report_stats"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 27,
+            "end_exclusive": 28
+          },
+          "variant_lines": {
+            "start": 40,
+            "end_exclusive": 42
+          },
+          "before": "(Read, Write, Edit, Bash, Glob, Grep) directly. No API wrapper needed.\n",
+          "after": "(Read, Write, Edit, Bash, Glob, Grep) directly for inputs/source/evidence; use `ara` for\nall knowledge-layer/root access. No API wrapper needed.\n",
+          "operation_ids": [
+            "compiler.acquire_inputs",
+            "compiler.initialize",
+            "compiler.arbitrary_solution",
+            "compiler.read_coverage_state",
+            "compiler.coverage_repair",
+            "compiler.report_stats"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 215,
+            "end_exclusive": 216
+          },
+          "variant_lines": {
+            "start": 229,
+            "end_exclusive": 232
+          },
+          "before": "Write the mandatory core, then the additional files the paper warrants. See\n",
+          "after": "Use `artifact.init` (compiler profile) and source-preserving document/node operations\nthrough `ara apply` for the mandatory knowledge core and additional knowledge files the\npaper warrants; write permitted source/evidence bodies directly. See\n",
+          "operation_ids": [
+            "compiler.initialize"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 249,
+            "end_exclusive": 250
+          },
+          "variant_lines": {
+            "start": 265,
+            "end_exclusive": 266
+          },
+          "before": "Run ARA Seal Level 1. Check:\n",
+          "after": "Run `ara check <artifact> --json` and ARA Seal Level 1 in full. Check:\n",
+          "operation_ids": [
+            "compiler.coverage_repair"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 287,
+            "end_exclusive": 288
+          },
+          "variant_lines": {
+            "start": 303,
+            "end_exclusive": 309
+          },
+          "before": "For each failure: read the file, apply targeted edits (prefer Edit over rewrite), re-validate.\n",
+          "after": "For each failure: read knowledge with ara full source show and apply guarded targeted\nknowledge edits through ara (prefer section/field repair over whole-body replacement);\nread/edit source/evidence directly where permitted, then re-validate. Immutable conflict\nrepair uses only the dedicated audited `merge repair` path with complete captured conflict\ncandidates, exact current fingerprint, `reject_incoming`/`restore_base`, actual reason/signal/\nprovenance and the session's next turn; never ordinary `merge resolve`, a direct or generic edit.\n",
+          "operation_ids": [
+            "compiler.coverage_repair"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 316,
+            "end_exclusive": 317
+          },
+          "variant_lines": {
+            "start": 337,
+            "end_exclusive": 338
+          },
+          "before": "Load on demand:\n",
+          "after": "Load `references/cli-access.md` directly before knowledge access. Load on demand:\n",
+          "operation_ids": [
+            "compiler.acquire_inputs",
+            "compiler.initialize",
+            "compiler.arbitrary_solution",
+            "compiler.read_coverage_state",
+            "compiler.coverage_repair",
+            "compiler.report_stats"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/compiler/references/ara-schema.md",
+      "variant_path": "skills/compiler-cli/references/ara-schema.md",
+      "source_sha256": "bfd6725bbf05da932e2fe1d3be847fa48e53bf7bfd7bb4baa9f00101f8138b94",
+      "variant_sha256": "d2b5f3074c11320361d919b3ac807d0398b16b4ea1ca083e0a00cdab25537a31",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "compiler.write_paper",
+            "compiler.write_problem",
+            "compiler.write_claims",
+            "compiler.write_concepts",
+            "compiler.write_experiments",
+            "compiler.write_architecture",
+            "compiler.write_algorithm",
+            "compiler.write_constraints",
+            "compiler.write_heuristics",
+            "compiler.write_related_work",
+            "compiler.additional_knowledge",
+            "compiler.rubric",
+            "compiler.write_environment",
+            "compiler.write_code_index",
+            "compiler.write_code_capture",
+            "compiler.write_data",
+            "compiler.write_config",
+            "compiler.write_proof",
+            "compiler.write_run_records",
+            "compiler.write_log_pointers",
+            "compiler.write_evidence_index",
+            "compiler.write_table",
+            "compiler.write_figure"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 48,
+            "end_exclusive": 49
+          },
+          "variant_lines": {
+            "start": 61,
+            "end_exclusive": 62
+          },
+          "before": "- **Level 1 — PAPER.md** (~200 tokens): Frontmatter + layer index. Agent reads ONLY this to decide relevance.\n",
+          "after": "- **Level 1 — PAPER.md** (~200 tokens): Frontmatter + layer index. Agent reads ONLY this through `ara show --document PAPER.md --source --full --json` to decide relevance.\n",
+          "operation_ids": [
+            "compiler.write_paper",
+            "compiler.write_problem",
+            "compiler.write_claims",
+            "compiler.write_concepts",
+            "compiler.write_experiments",
+            "compiler.write_architecture",
+            "compiler.write_algorithm",
+            "compiler.write_constraints",
+            "compiler.write_heuristics",
+            "compiler.write_related_work",
+            "compiler.additional_knowledge",
+            "compiler.rubric",
+            "compiler.write_environment",
+            "compiler.write_code_index",
+            "compiler.write_code_capture",
+            "compiler.write_data",
+            "compiler.write_config",
+            "compiler.write_proof",
+            "compiler.write_run_records",
+            "compiler.write_log_pointers",
+            "compiler.write_evidence_index",
+            "compiler.write_table",
+            "compiler.write_figure"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 619,
+            "end_exclusive": 620
+          },
+          "variant_lines": {
+            "start": 632,
+            "end_exclusive": 637
+          },
+          "before": "file is a natural home.\n",
+          "after": "file is a natural home. Knowledge creation uses ara document operations. An additional\nknowledge path outside logic must first be explicitly registered as a safe relative `.md`\npath in PAPER frontmatter `knowledge_paths` through `paper.edit`/initialization;\n`rubric/requirements.md` is the fixed allowlisted case. This does not authorize direct\nknowledge writes or limit source-supported content/granularity.\n",
+          "operation_ids": [
+            "compiler.additional_knowledge"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/compiler/references/exploration-tree-spec.md",
+      "variant_path": "skills/compiler-cli/references/exploration-tree-spec.md",
+      "source_sha256": "c60540f54737b65fd254c0937da2a36a99a3adca67b8095ae6e05aa50f24cf17",
+      "variant_sha256": "a3dd417dc24ff855473b495157c5d5c0d065fb8997412feba3ca40588fbe7e0e",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "compiler.add_question",
+            "compiler.add_decision",
+            "compiler.add_experiment",
+            "compiler.add_dead_end",
+            "compiler.add_pivot",
+            "compiler.append_cross_edge"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/compiler/references/figure-extraction-guide.md",
+      "variant_path": "skills/compiler-cli/references/figure-extraction-guide.md",
+      "source_sha256": "7e9529ab65afac1dbd00cd4dfdca835730485c78daf0568da37c22581d103723",
+      "variant_sha256": "df47905a45ad5099c26de9d259ff6834848d6fefe4cf52aba9032caf4a1c21da",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "compiler.render_evidence",
+            "compiler.mirror_diagram"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/compiler/references/validation-checklist.md",
+      "variant_path": "skills/compiler-cli/references/validation-checklist.md",
+      "source_sha256": "733437b090697a4e73efb2766ea13c512ec71dbb868ed5745d5ab0cc12ca25f2",
+      "variant_sha256": "bfbdeff270893972573e430f0f97842403142d1614ee28ea83e3f81f35635f79",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "compiler.validate_structure",
+            "compiler.validate_bindings",
+            "compiler.source_verification"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-foresight/SKILL.md",
+      "variant_path": "skills/research-foresight-cli/SKILL.md",
+      "source_sha256": "393195faf08f9a2da8dfabda4e64129b8f166c263ac19433a55b8b16f187aeab",
+      "variant_sha256": "620e7a128de382ccdab9b298d355bc618ec3eb932682fea2f3106adb317753ba",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 3
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 3
+          },
+          "before": "name: research-foresight\n",
+          "after": "name: research-foresight-cli\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.graph",
+            "reader.negatives",
+            "reader.grounding",
+            "reader.source_evidence",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 8,
+            "end_exclusive": 9
+          },
+          "variant_lines": {
+            "start": 8,
+            "end_exclusive": 9
+          },
+          "before": "  else — by retrieving precedent from the ARA's native files (references/RETRIEVE.md) and answering\n",
+          "after": "  else — by retrieving precedent through ara from the ARA's native files (references/RETRIEVE.md) and answering\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.graph",
+            "reader.negatives",
+            "reader.grounding",
+            "reader.source_evidence",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 14,
+            "end_exclusive": 15
+          },
+          "variant_lines": {
+            "start": 14,
+            "end_exclusive": 15
+          },
+          "before": "allowed-tools: Read, Grep, Glob\n",
+          "after": "allowed-tools: Read, Grep, Glob, Bash(ara *)\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.graph",
+            "reader.negatives",
+            "reader.grounding",
+            "reader.source_evidence",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 24,
+            "end_exclusive": 24
+          },
+          "variant_lines": {
+            "start": 24,
+            "end_exclusive": 37
+          },
+          "before": "",
+          "after": "## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.graph",
+            "reader.negatives",
+            "reader.grounding",
+            "reader.source_evidence",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 31,
+            "end_exclusive": 31
+          },
+          "variant_lines": {
+            "start": 44,
+            "end_exclusive": 46
+          },
+          "before": "",
+          "after": "- `references/cli-access.md` — load directly before knowledge access.\n- `templates/reader-report.md` — load directly if a standalone report shape is needed.\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.graph",
+            "reader.negatives",
+            "reader.grounding",
+            "reader.source_evidence",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-foresight/references/CONTRACT.md",
+      "variant_path": "skills/research-foresight-cli/references/CONTRACT.md",
+      "source_sha256": "67bd4f925bd32374230ead9c56e0e3a4d1a1f348b0649a505ce6bee5642ef162",
+      "variant_sha256": "badf74c1fe64201673936f5adfda93dbfe1f08bd6407105978a2696c0aba2271",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 7,
+            "end_exclusive": 8
+          },
+          "variant_lines": {
+            "start": 20,
+            "end_exclusive": 21
+          },
+          "before": "> Scope = **single-ARA** operation: the engine reads **one ARA directory** directly. Multi-ARA\n",
+          "after": "> Scope = **single-ARA** operation: the engine reads **one ARA directory** through ara for knowledge and directly for permitted source/evidence bodies. Multi-ARA\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 15,
+            "end_exclusive": 16
+          },
+          "variant_lines": {
+            "start": 28,
+            "end_exclusive": 29
+          },
+          "before": "1. **The ARA is the substrate.** The engine reads an ARA's native files **directly** — there is\n",
+          "after": "1. **The ARA is the substrate.** The engine reads an ARA's native knowledge files **through ara** (full native source bodies) — there is\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 28,
+            "end_exclusive": 30
+          },
+          "variant_lines": {
+            "start": 41,
+            "end_exclusive": 43
+          },
+          "before": "   the ARA's prose and reasons over it. There is **no deterministic projection, distance, or index\n   layer**; relevance and inference are semantic, over the ARA's real prose.\n",
+          "after": "   the ARA's prose and reasons over it. There is **no deterministic projection or distance layer**; `ara find` may aid retrieval\n   but never rank semantic relevance or replace grounding. Relevance and inference are semantic, over the ARA's real prose.\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 46,
+            "end_exclusive": 47
+          },
+          "variant_lines": {
+            "start": 59,
+            "end_exclusive": 60
+          },
+          "before": "research-foresight/                  # ENGINE — the skill, all-English contracts, no per-ARA data\n",
+          "after": "research-foresight-cli/              # ENGINE — the skill, all-English contracts, no per-ARA data\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 53,
+            "end_exclusive": 54
+          },
+          "variant_lines": {
+            "start": 66,
+            "end_exclusive": 67
+          },
+          "before": "<ara_dir>/                           # THE SUBSTRATE — read directly, never copied or projected\n",
+          "after": "<ara_dir>/                           # THE SUBSTRATE — knowledge via ara full source reads, never copied or projected\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 64,
+            "end_exclusive": 65
+          },
+          "variant_lines": {
+            "start": 77,
+            "end_exclusive": 78
+          },
+          "before": "intermediate database or index, and has no write path (§4b).\n",
+          "after": "intermediate distilled database, and has no write path (§4b). Keyword retrieval is only an access aid.\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 95,
+            "end_exclusive": 96
+          },
+          "variant_lines": {
+            "start": 108,
+            "end_exclusive": 109
+          },
+          "before": "| `RETRIEVE.md` | the ARA's native files directly (`logic/`, `trace/`, `evidence/`, `src/`, `PAPER.md`) | **nothing** |\n",
+          "after": "| `RETRIEVE.md` | the ARA's native knowledge via ara (`logic/`, `trace/`, `PAPER.md`); permitted `evidence/` and `src/` bodies directly | **nothing** |\n",
+          "operation_ids": [
+            "reader.graph"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-foresight/references/PREDICT.md",
+      "variant_path": "skills/research-foresight-cli/references/PREDICT.md",
+      "source_sha256": "e1e0c8fc462815ed0ddb2245823505094def316c297db9039491b6a7a8617058",
+      "variant_sha256": "9baf341799accff874111aa710a4e359c21f14e207acddb379b753575a78fb16",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 20,
+            "end_exclusive": 20
+          },
+          "variant_lines": {
+            "start": 20,
+            "end_exclusive": 33
+          },
+          "before": "",
+          "after": "## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n\n",
+          "operation_ids": [
+            "reader.grounding",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 29,
+            "end_exclusive": 31
+          },
+          "variant_lines": {
+            "start": 42,
+            "end_exclusive": 44
+          },
+          "before": "floor; there is no projected number, no distance, and no index to lean on (CONTRACT.md §0.3). You\nreach the ARA only through RETRIEVE and your own targeted reads of the refs RETRIEVE returns; you\n",
+          "after": "floor; there is no projected number or distance, and no keyword index to lean on for semantic judgment (CONTRACT.md §0.3). You\nreach the ARA only through RETRIEVE and your own targeted ara full source reads of the knowledge refs RETRIEVE returns (permitted source/evidence bodies remain direct); you\n",
+          "operation_ids": [
+            "reader.grounding",
+            "reader.answer_report",
+            "reader.standalone_report_template"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 103,
+            "end_exclusive": 104
+          },
+          "variant_lines": {
+            "start": 116,
+            "end_exclusive": 117
+          },
+          "before": "real body** of every ref you intend to cite (CONTRACT.md §2 ref-honesty — a ref promises the cited\n",
+          "after": "real body** of every ref you intend to cite (knowledge: `ara show --document <path> --source --full --json`; permitted source/evidence bodies: direct) (CONTRACT.md §2 ref-honesty — a ref promises the cited\n",
+          "operation_ids": [
+            "reader.grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 291,
+            "end_exclusive": 292
+          },
+          "variant_lines": {
+            "start": 304,
+            "end_exclusive": 305
+          },
+          "before": "- Use the shared shape in `research-manager`'s `templates/reader-report.md` when the report leaves\n",
+          "after": "- Use the unchanged shared shape bundled in this skill's `templates/reader-report.md` when the report leaves\n",
+          "operation_ids": [
+            "reader.standalone_report_template"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-foresight/references/RETRIEVE.md",
+      "variant_path": "skills/research-foresight-cli/references/RETRIEVE.md",
+      "source_sha256": "8329fb579992b22c8aad0369bcb263d4d8d4c4e01298797c42031f7662938d33",
+      "variant_sha256": "e5c77ca5abf96579236760b609d5305280660a7fd512a877f486fdddf3fdaf9d",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 5,
+            "end_exclusive": 7
+          },
+          "variant_lines": {
+            "start": 5,
+            "end_exclusive": 7
+          },
+          "before": "  and the path to the ARA in scope, search the ARA's native files directly (Glob/Grep/Read across\n  logic/, trace/, evidence/, src/, PAPER.md), rank hits by semantic match to the query frame,\n",
+          "after": "  and the path to the ARA in scope, search the ARA's native knowledge through ara (ls/find/show across\n  logic/, trace/, PAPER.md; permitted evidence/ and src/ bodies remain direct), rank hits by semantic match to the query frame,\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 19,
+            "end_exclusive": 19
+          },
+          "variant_lines": {
+            "start": 19,
+            "end_exclusive": 32
+          },
+          "before": "",
+          "after": "## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 20,
+            "end_exclusive": 21
+          },
+          "variant_lines": {
+            "start": 33,
+            "end_exclusive": 34
+          },
+          "before": "files directly and return the relevant precedent as **native refs** (CONTRACT.md §2): a ranked set\n",
+          "after": "knowledge through ara and permitted source/evidence bodies directly and return the relevant precedent as **native refs** (CONTRACT.md §2): a ranked set\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 28,
+            "end_exclusive": 29
+          },
+          "variant_lines": {
+            "start": 41,
+            "end_exclusive": 42
+          },
+          "before": "floor: there is no projected number, no distance, and no index to gate on (CONTRACT.md §0.3).\n",
+          "after": "floor: there is no projected number or distance; ara find is only a retrieval aid, never an index to gate semantic relevance on (CONTRACT.md §0.3).\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 30,
+            "end_exclusive": 32
+          },
+          "variant_lines": {
+            "start": 43,
+            "end_exclusive": 45
+          },
+          "before": "You operate purely by reading the ARA in scope. You do **not** execute code, fetch URLs, write\nanything, or read outside the ARA directory you were pointed at.\n",
+          "after": "You operate purely by reading the ARA in scope. You do **not** execute source code, fetch URLs, write\nanything (read-only ara access commands are permitted), or read outside the ARA directory you were pointed at.\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 47,
+            "end_exclusive": 49
+          },
+          "variant_lines": {
+            "start": 60,
+            "end_exclusive": 62
+          },
+          "before": "- **The ARA is the substrate.** You read the ARA's real files directly. There is no projection, no\n  distilled candidate list, no derived index handed to you — you do the searching (CONTRACT.md §0.1).\n",
+          "after": "- **The ARA is the substrate.** You read the ARA's real knowledge files through ara full source shows. There is no projection, no\n  distilled candidate list; ara find assists keywords only — you do the semantic searching (CONTRACT.md §0.1).\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 59,
+            "end_exclusive": 60
+          },
+          "variant_lines": {
+            "start": 72,
+            "end_exclusive": 73
+          },
+          "before": "  whole point of reading the ARA directly instead of a lossy projection (CONTRACT.md §3).\n",
+          "after": "  whole point of reading the ARA's full native bodies through ara instead of a lossy projection (CONTRACT.md §3).\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search",
+            "reader.read_manifest",
+            "reader.read_problem",
+            "reader.read_solution",
+            "reader.read_claim",
+            "reader.read_concept",
+            "reader.read_plan",
+            "reader.read_trace",
+            "reader.read_related_work",
+            "reader.negatives",
+            "reader.source_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 90,
+            "end_exclusive": 92
+          },
+          "variant_lines": {
+            "start": 103,
+            "end_exclusive": 109
+          },
+          "before": "### Step 2 — Search the ARA's native files directly\nUse Glob/Grep/Read over the ARA in scope to find every location whose prose bears on the frame. Cast\n",
+          "after": "### Step 2 — Search the ARA's native files through ara\nUse `ara -C <ara_dir> status --json`, `ls --json`, and `find <query> --json` to locate\nknowledge; use `show --document <path> --source --full --json` for complete bodies and\nunique repeated `--heading` components for sections. Use `path`/`refs` for structured\nrelations and possible prose mentions. Permitted source/evidence bodies remain direct.\nFind every location whose prose bears on the frame. Cast\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 112,
+            "end_exclusive": 114
+          },
+          "variant_lines": {
+            "start": 129,
+            "end_exclusive": 133
+          },
+          "before": "When a Grep hit is too terse to judge, Read the surrounding section so your rank is based on the real\nprose, not a keyword coincidence.\n",
+          "after": "A find excerpt is never grounding proof. Retrieve and verify the complete knowledge\nsource/section with `show --document ... --source --full --json`, including its content\ndigest; read permitted source/evidence bodies directly. Rank on the real prose, not a\nkeyword coincidence, and verify every cited body even when an excerpt seems sufficient.\n",
+          "operation_ids": [
+            "reader.discover",
+            "reader.search"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-manager/SKILL.md",
+      "variant_path": "skills/research-manager-cli/SKILL.md",
+      "source_sha256": "fc8fb52d57cbae4c754fd7bf9e6023dbf54fd4e796152d87786749e1f30d2c37",
+      "variant_sha256": "cd15be868dd2d5c867ec01a3d48cadc32f48506494cb372f582671decac3c7d7",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 3
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 3
+          },
+          "before": "name: research-manager\n",
+          "after": "name: research-manager-cli\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 17,
+            "end_exclusive": 18
+          },
+          "variant_lines": {
+            "start": 17,
+            "end_exclusive": 18
+          },
+          "before": "allowed-tools: Read, Write, Edit, Glob, Grep\n",
+          "after": "allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ara *)\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 26,
+            "end_exclusive": 26
+          },
+          "variant_lines": {
+            "start": 26,
+            "end_exclusive": 39
+          },
+          "before": "",
+          "after": "## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 31,
+            "end_exclusive": 31
+          },
+          "variant_lines": {
+            "start": 44,
+            "end_exclusive": 51
+          },
+          "before": "",
+          "after": "\nLoad `references/cli-access.md` directly before knowledge access; and load every\nsupplied reference directly from this entrypoint when applicable:\n- `references/schema-and-initialization.md` — full directory/schema/initialization source.\n- `references/event-taxonomy.md` — original classification, provenance and forensic binding.\n- `references/taste-comments.md` — original taste trigger/target/confirmation.\n- `templates/reader-report.md` — unchanged reader-report input shape.\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 136,
+            "end_exclusive": 137
+          },
+          "variant_lines": {
+            "start": 156,
+            "end_exclusive": 157
+          },
+          "before": "2. Allocate the next ID for the target layer (read the target file first).\n",
+          "after": "2. Read the target layer through ara first; let the corresponding add/promote operation allocate the next ID and consume its result/bindings.\n",
+          "operation_ids": [
+            "pm.read_observations",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 297,
+            "end_exclusive": 298
+          },
+          "variant_lines": {
+            "start": 317,
+            "end_exclusive": 318
+          },
+          "before": "1. Edit the affected fields in the logic file directly. **Overwrite the prior value** —\n",
+          "after": "1. Use `logic.revise` through `ara apply` for the affected fields in the logic file. **Overwrite the prior value** —\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 346,
+            "end_exclusive": 347
+          },
+          "variant_lines": {
+            "start": 366,
+            "end_exclusive": 367
+          },
+          "before": "1. Read existing ara/ files (current state, next IDs).\n",
+          "after": "1. Read existing ara/ knowledge with ara full source shows (current state); use CLI allocation/results for new IDs.\n",
+          "operation_ids": [
+            "pm.read_state_ids"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 351,
+            "end_exclusive": 352
+          },
+          "variant_lines": {
+            "start": 371,
+            "end_exclusive": 372
+          },
+          "before": "6. Append turn events to today's session record; update session_index.yaml; append a line to pm_reasoning_log.yaml.\n",
+          "after": "6. Use one ara apply batch: session.log appends complete turn arrays and audited rolling metadata/index; record.append appends the complete PM reasoning notes.\n",
+          "operation_ids": [
+            "pm.read_state_ids"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 358,
+            "end_exclusive": 359
+          },
+          "variant_lines": {
+            "start": 378,
+            "end_exclusive": 379
+          },
+          "before": "## ARA Directory Structure\n",
+          "after": "## Schemas and Initialization\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 360,
+            "end_exclusive": 617
+          },
+          "variant_lines": {
+            "start": 380,
+            "end_exclusive": 383
+          },
+          "before": "```\nara/\n  PAPER.md                          # Root manifest + layer index\n  logic/                            # MUTABLE — current best understanding (Stage 4 reconciles)\n    claims.md  problem.md  concepts.md  experiments.md  related_work.md\n    solution/                       #   constraints.md + method files per the compiler's domain profile\n  src/                              # How (artifacts) — configs/code/data per domain profile; always environment.md\n  trace/                            # APPEND-ONLY — the journey, never rewritten\n    exploration_tree.yaml           #   Research DAG: decisions, experiments, dead_ends, pivots, questions\n    pm_reasoning_log.yaml           #   Manager's own organizational decisions per turn\n    taste_log.yaml                  #   OPTIONAL — researcher's taste comments on trace nodes (pointer-only, never edits the node)\n    sessions/\n      session_index.yaml            #   Master session index (one entry per calendar day)\n      YYYY-MM-DD_NNN.yaml           #   Per-day session record, incl. logic_revisions\n  evidence/                         # APPEND-ONLY — raw proof\n    README.md\n    tables/\n    figures/\n  staging/                          # APPEND-ONLY — unclassified / awaiting closure\n    observations.yaml               #   The crystallization buffer\n```\n\n## Schemas\n\n### Exploration Tree Node (`trace/exploration_tree.yaml`)\n\nNested DAG. Each node may have `children:`. Use `also_depends_on: [N{XX}]` for cross-edges.\n\nThe tree's shape stays recoverable from a flat append log through two fields you already write: mark\neach level/phase **boundary** as a `pivot` (or `question`) node (it opens a new branch), and list what\na node builds on in `also_depends_on`. Only when a node resumes an **earlier** branch — rather than\ncontinuing the step right before it — add an explicit `parent: N{XX}` to point back; in the common\ncase its place is already implied and no extra field is needed.\n\n```yaml\ntree:\n  - id: N01\n    type: question | decision | experiment | dead_end | pivot\n    title: \"{short title}\"\n    provenance: user | ai-suggested | ai-executed | user-revised\n    timestamp: \"YYYY-MM-DDTHH:MM\"\n    # type-specific fields:\n    description: >    # question\n    choice: >         # decision\n    alternatives: []  # decision\n    evidence: []      # decision, experiment\n    result: >         # experiment\n    hypothesis: >     # dead_end\n    failure_mode: >   # dead_end\n    lesson: >         # dead_end\n    from: \"\"          # pivot\n    to: \"\"            # pivot\n    trigger: \"\"       # pivot\n    status: open | resolved | unresolved   # unresolved used for contradiction-decision nodes\n    also_depends_on: []  # cross-edges (ids) — what this node builds on\n    parent: N{XX}        # OPTIONAL — only to point back to an earlier branch; omit when implied\n    children:\n      - { ... }\n```\n\n### Claim (`logic/claims.md`) — crystallized only\n\n```markdown\n## C{XX}: {generalized title — the takeaway, not a recipe name}\n- **Statement**: {the generalized, mechanistic conclusion; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}\n- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}\n- **Sources**: [{one entry per load-bearing number in the claim (now in `Conditions`/`Proof`): `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see \"Number grounding\"; a bare path with no «quote» is invalid\n- **Status**: hypothesis | untested | testing | supported | weakened | refuted | withdrawn\n- **Provenance**: user | ai-suggested | user-revised\n- **Falsification**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. NOT a tautology or a re-run of the same gate (\"if the recipe fails the gate\")}\n- **Proof**: [{evidence refs (→ evidence/) or \"pending\"; run numbers/IDs/scores live HERE, not in Statement}]\n- **Dependencies**: [C{YY}, ...]\n- **Tags**: {comma-separated}\n- **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision\n- **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one\n  - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}\n```\n\n**The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,\nnot a restatement of run numbers.** What keeps it falsifiable and honest is `Conditions` (the regime\nit holds in + the untested boundary) plus a `Falsification`, not a narrowed sentence. Numbers (run\nIDs, n, scores, step counts) belong in `Proof` → `evidence/` (grounded per Number grounding), never\nin `Statement`. `Conditions` is mandatory: a generalized Statement with no Conditions is an unbounded\nslogan.\n\n**Calibrate the Statement to what the evidence actually separates.** Do not assert a distinction the\ndesign cannot disentangle (confounded factors — e.g. matrix \"shape\" vs \"role\" when they co-vary), or\na law from a single instance. When that's the case, hedge in the Statement itself — name the\nunseparated factors together, or say \"shown once here\" — rather than only burying it in `Conditions`.\n`Conditions` bounds *where* the claim applies; it is not a license for the Statement's verb to\nover-reach. The Statement/Conditions may be sharpened on a later turn (Stage 4 content revision) as\nthe mechanism becomes clearer — no new closure signal is needed.\n\nCurrent-state snapshot only — no prior statements, no `From staging`/`Crystallized via`\nnotes. Crystallization and every edit are recorded in the trace (`trace/sessions/…` under\n`logic_revisions:` with before/after; source observation stays in `staging/`; reasoning in\n`pm_reasoning_log.yaml`). `refuted`/`withdrawn` are terminal and `revised` is a transition\nmarker, not a resting state — see Stage 4.\n\n### Heuristic (`logic/solution/heuristics.md`) — crystallized only\n\n```markdown\n## H{XX}: {title}\n- **Rationale**: {current best explanation of why this works}\n- **Sources**: [{one entry per load-bearing number in `Rationale`/`Sensitivity`/`Bounds`, same format as claims — see \"Number grounding\"}]\n- **Status**: active | weakened | retired\n- **Provenance**: user | ai-suggested | user-revised\n- **Sensitivity**: low | medium | high | unknown   # \"unknown\" until the turn establishes it — never guess\n- **Code ref**: [{file paths, or \"pending\"}]\n- **Last revised**: YYYY-MM-DD (turn-id)   # absent until first revision\n- **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one\n  - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}\n```\n\nCurrent-state snapshot only (same as claims); history lives in the trace.\n\n### Observation (`staging/observations.yaml`) — staged\n\n```yaml\nobservations:\n  - id: O{XX}\n    timestamp: \"YYYY-MM-DDTHH:MM\"\n    provenance: user | ai-suggested | ai-executed | user-revised\n    content: \"{raw observation, factually distilled}\"\n    context: \"{what was happening this turn}\"\n    potential_type: claim | heuristic | concept | constraint | architecture | unknown\n    bound_to: [N{XX}, ...]    # exploration nodes this depends on\n    promoted: false\n    promoted_to: null         # e.g., \"logic/claims.md:C07\" once crystallized\n    crystallized_via: null    # which closure signal fired\n    stale: false\n```\n\n### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day\n\n```yaml\nsession:\n  id: \"YYYY-MM-DD_NNN\"\n  date: \"YYYY-MM-DD\"\n  started: \"YYYY-MM-DDTHH:MM\"\n  last_turn: \"YYYY-MM-DDTHH:MM\"\n  turn_count: 0\n  summary: \"{rolling one-line summary}\"\n\nevents_logged:\n  - turn: 1\n    type: decision | experiment | dead_end | pivot | observation | ...\n    id: \"{N/O}{XX}\"\n    routing: direct | staged | crystallized\n    provenance: user | ai-suggested | ai-executed | user-revised\n    summary: \"{telegraphic what}\"\n\nai_actions:\n  - turn: 1\n    action: \"{what AI did}\"\n    provenance: ai-executed\n    files_changed: [\"{paths}\"]\n\nclaims_touched:\n  - id: C{XX}\n    action: created | crystallized | advanced | weakened | confirmed | refuted | withdrawn | revised | split | merged\n    turn: 1\n\nlogic_revisions:                  # full before/after for every edit Stage 4 makes\n  - turn: 1\n    entry: C{XX}                  # or H{XX}, concept id, etc.\n    field: Statement | Status | Rationale | Dependencies | id | ...\n    before: \"{prior value, verbatim}\"\n    after: \"{new value, verbatim}\"\n    signal: empirical-resolution | verbal-declaration | dependency-change | artifact-commitment | terminology-drift | user-directive\n    provenance: user | ai-suggested | user-revised\n    note: \"{one-line why, optional}\"\n  # structural changes record both endpoints, e.g. for a split:\n  - turn: 1\n    entry: C07\n    field: split\n    before: \"C07 covered both training and inference\"\n    after: \"C07 = training-time claim; C12 = inference-time claim\"\n    signal: verbal-declaration\n    provenance: user-revised\n\nkey_context:\n  - turn: 1\n    excerpt: \"{quote or paraphrase capturing decisive exchange}\"\n\nopen_threads:\n  - \"{what needs follow-up}\"\n\nai_suggestions_pending:\n  - \"{unconfirmed AI suggestions still awaiting closure}\"\n```\n\n### Session Index (`trace/sessions/session_index.yaml`)\n\n```yaml\nsessions:\n  - id: \"YYYY-MM-DD_NNN\"\n    date: \"YYYY-MM-DD\"\n    summary: \"{main outcome}\"\n    turn_count: {N}\n    events_count: {N}\n    claims_touched: [C{XX}, ...]\n    open_threads: {N}\n```\n\n### Reasoning Log (`trace/pm_reasoning_log.yaml`) — self-continuity\n\nA few lines per turn explaining the manager's own organizational decisions. Cheap on\ntokens, prevents organizational drift.\n\n```yaml\nentries:\n  - turn: \"YYYY-MM-DD_NNN#3\"\n    notes:\n      - \"Staged O07 as potential_type: heuristic (not claim) — it's a how, not a what.\"\n      - \"Did NOT crystallize O05 despite affirmation-like language: user said 'maybe' not 'yes'.\"\n      - \"Routed N12 as dead_end rather than experiment — code was abandoned mid-run.\"\n```\n\n### Taste Log (`trace/taste_log.yaml`) — optional, append-only\n\nResearcher's taste comments on trace nodes. Never edits `exploration_tree.yaml` — points at\nit instead, the same way a promoted observation points at its logic-layer destination\nwithout rewriting itself. See `references/taste-comments.md` for trigger detection, target\nresolution, and the confirm-before-write procedure. File does not exist until the first entry.\n\n```yaml\nentries:\n  - id: T{XX}\n    timestamp: \"YYYY-MM-DDTHH:MM\"\n    target: N{XX}                         # trace node this comments on; never edited\n    tag: endorse | uncertain | reject\n    object: claim | evidence | framing | priority\n    comment: \"{free-text comment}\"\n```\n\n## Initialization (if `ara/` does not exist)\n\nCreate the structure on the first turn that contains research-significant activity. Do not\nask unprompted on a purely conversational opener.\n\n```\nmkdir -p ara/{logic/solution,src,trace/sessions,evidence/{tables,figures},staging}\n```\n\nSeed:\n1. `ara/PAPER.md` — root manifest (infer title, authors, venue from project context)\n2. `ara/trace/sessions/session_index.yaml` — `sessions: []`\n3. `ara/trace/exploration_tree.yaml` — `tree: []`\n4. `ara/trace/pm_reasoning_log.yaml` — `entries: []`\n5. `ara/staging/observations.yaml` — `observations: []`\n6. `ara/logic/claims.md` — `# Claims`\n7. `ara/logic/problem.md` — `# Problem`\n8. `ara/logic/solution/heuristics.md` — `# Heuristics`\n9. `ara/evidence/README.md` — `# Evidence Index`\n\nThen run the per-turn procedure normally.\n",
+          "after": "Load `references/schema-and-initialization.md` directly for the complete source directory\nstructure, every schema, and the unchanged initialization trigger/seed set. Read it before\nconstructing any record or first artifact; no fields or history instructions are omitted.\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_full_sessions",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 656,
+            "end_exclusive": 657
+          },
+          "variant_lines": {
+            "start": 422,
+            "end_exclusive": 423
+          },
+          "before": "8. **Read target files first** (correct IDs, no dupes); establish forensic bindings (claim→proof, heuristic→code, decision→evidence), `[pending]`+TODO if not yet bindable. Keep YAML valid; summary line terse.\n",
+          "after": "8. **Read target files first through ara** (no dupes; CLI assigns new IDs); establish forensic bindings (claim→proof, heuristic→code, decision→evidence), `[pending]`+TODO if not yet bindable. Keep YAML valid; summary line terse.\n",
+          "operation_ids": [
+            "pm.initialize",
+            "pm.read_state_ids",
+            "pm.read_briefing",
+            "pm.read_full_sessions",
+            "pm.read_observations",
+            "pm.read_reasoning",
+            "pm.append_cross_edge",
+            "pm.stage_observation",
+            "pm.promote_claim",
+            "pm.promote_heuristic",
+            "pm.promote_concept",
+            "pm.promote_constraint",
+            "pm.promote_architecture",
+            "pm.promote_dead_end",
+            "pm.mark_stale",
+            "pm.annotate_contradiction",
+            "pm.adjudicate_reader_report",
+            "pm.revise_claim",
+            "pm.revise_heuristic",
+            "pm.revise_concept",
+            "pm.status_transition",
+            "pm.split",
+            "pm.merge",
+            "pm.generalize",
+            "pm.rename_identity",
+            "pm.remove_current_entry",
+            "pm.repair_dependencies",
+            "pm.append_session_events_logged",
+            "pm.append_session_ai_actions",
+            "pm.append_session_claims_touched",
+            "pm.append_session_logic_revisions",
+            "pm.append_session_key_context",
+            "pm.update_session_open_threads",
+            "pm.update_session_ai_suggestions_pending",
+            "pm.create_session",
+            "pm.update_session_metadata",
+            "pm.update_session_index",
+            "pm.append_reasoning",
+            "pm.source_grounding",
+            "pm.source_body_grounding"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-manager/references/event-taxonomy.md",
+      "variant_path": "skills/research-manager-cli/references/event-taxonomy.md",
+      "source_sha256": "49a273dca8d05cbe27ad80f4e78907dea23d710db6ced635082204b5c040527b",
+      "variant_sha256": "253a6911708287d9bd31334475e93dd709fa37a777a5bdb10c872f0371a57e10",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "pm.add_question",
+            "pm.add_decision",
+            "pm.add_experiment",
+            "pm.add_dead_end",
+            "pm.add_pivot",
+            "pm.write_constraint_body",
+            "pm.write_architecture_body",
+            "pm.append_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 21,
+            "end_exclusive": 22
+          },
+          "variant_lines": {
+            "start": 34,
+            "end_exclusive": 35
+          },
+          "before": "Write to `trace/exploration_tree.yaml` immediately at end of turn.\n",
+          "after": "Append through `node.add` in `ara apply` to `trace/exploration_tree.yaml` immediately at end of turn.\n",
+          "operation_ids": [
+            "pm.add_question",
+            "pm.add_decision",
+            "pm.add_experiment",
+            "pm.add_dead_end",
+            "pm.add_pivot",
+            "pm.write_constraint_body",
+            "pm.write_architecture_body",
+            "pm.append_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 39,
+            "end_exclusive": 40
+          },
+          "variant_lines": {
+            "start": 52,
+            "end_exclusive": 53
+          },
+          "before": "Write to `staging/observations.yaml` first, with `potential_type` indicating where they\n",
+          "after": "Append through `observation.stage` in `ara apply` to `staging/observations.yaml` first, with `potential_type` indicating where they\n",
+          "operation_ids": [
+            "pm.add_question",
+            "pm.add_decision",
+            "pm.add_experiment",
+            "pm.add_dead_end",
+            "pm.add_pivot",
+            "pm.write_constraint_body",
+            "pm.write_architecture_body",
+            "pm.append_evidence"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 146,
+            "end_exclusive": 147
+          },
+          "variant_lines": {
+            "start": 159,
+            "end_exclusive": 160
+          },
+          "before": "Always read the target file to find the highest existing ID before assigning a new one.\n",
+          "after": "Always read the target through ara full source show before adding (no duplicates); let the CLI assign the new ID and use its result/bindings instead of scanning to allocate it.\n",
+          "operation_ids": [
+            "pm.add_question",
+            "pm.add_decision",
+            "pm.add_experiment",
+            "pm.add_dead_end",
+            "pm.add_pivot",
+            "pm.write_constraint_body",
+            "pm.write_architecture_body",
+            "pm.append_evidence"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-manager/references/taste-comments.md",
+      "variant_path": "skills/research-manager-cli/references/taste-comments.md",
+      "source_sha256": "b6382632024d61ad57aff83d22caaef6858a8d511ffe141bc76ce34c5f73ca93",
+      "variant_sha256": "079a73f889eaaaeb7dbb58633189fd12bbbb2ecd2a51a256e617369494df24dd",
+      "hunks": [
+        {
+          "source_lines": {
+            "start": 2,
+            "end_exclusive": 2
+          },
+          "variant_lines": {
+            "start": 2,
+            "end_exclusive": 15
+          },
+          "before": "",
+          "after": "\n## CLI-only access boundary\n\nEvery knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the\nwords read, open, search, write, append and edit retain their original procedural meaning,\nbut never authorize direct knowledge-file tools. For complete source use\n`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);\n`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.\nSource/evidence bodies and skill pages remain direct only within the baseline scope.\nNo direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.\nThe entrypoint loads `references/cli-access.md` directly for executable wire details.\nPending protocol review and binary proof remain visible in the variant lock.\n\n",
+          "operation_ids": [
+            "pm.taste_target_read",
+            "pm.append_logic_taste",
+            "pm.append_trace_taste"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 40,
+            "end_exclusive": 41
+          },
+          "variant_lines": {
+            "start": 53,
+            "end_exclusive": 54
+          },
+          "before": "1. Search `claims.md`, `heuristics.md` (by title/content match), and\n",
+          "after": "1. Search through `ara find` and verify complete bodies with `ara show --document ... --source --full --json`: `claims.md`, `heuristics.md` (by title/content match), and\n",
+          "operation_ids": [
+            "pm.taste_target_read"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 82,
+            "end_exclusive": 83
+          },
+          "variant_lines": {
+            "start": 95,
+            "end_exclusive": 96
+          },
+          "before": "- **Target is a claim or heuristic** (`logic/`, mutable) — append one bullet under that\n",
+          "after": "- **Target is a claim or heuristic** (`logic/`, mutable) — use `entry.taste_append` through ara to append one bullet under that\n",
+          "operation_ids": [
+            "pm.append_logic_taste",
+            "pm.append_trace_taste"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 87,
+            "end_exclusive": 88
+          },
+          "variant_lines": {
+            "start": 100,
+            "end_exclusive": 101
+          },
+          "before": "  Append a new entry to `trace/taste_log.yaml` with `target: N{XX}` pointing back to it.\n",
+          "after": "  Use `record.append` through ara to append a new entry to `trace/taste_log.yaml` with `target: N{XX}` pointing back to it.\n",
+          "operation_ids": [
+            "pm.append_logic_taste",
+            "pm.append_trace_taste"
+          ]
+        },
+        {
+          "source_lines": {
+            "start": 101,
+            "end_exclusive": 102
+          },
+          "variant_lines": {
+            "start": 114,
+            "end_exclusive": 115
+          },
+          "before": "that file). Read `trace/taste_log.yaml` first to find the highest existing `T` id.\n",
+          "after": "that file). Read `trace/taste_log.yaml` first through ara full source show; the CLI allocates the new `T` id.\n",
+          "operation_ids": [
+            "pm.append_trace_taste"
+          ]
+        }
+      ],
+      "review_status": "passed-independent-static-access-review"
+    },
+    {
+      "source_path": "skills/research-manager/templates/reader-report.md",
+      "variant_path": "skills/research-manager-cli/templates/reader-report.md",
+      "source_sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+      "variant_sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4",
+      "hunks": [],
+      "review_status": "passed-independent-static-access-review"
+    }
+  ],
+  "closure_additions": [
+    {
+      "source": "skills/research-manager/templates/reader-report.md",
+      "destination": "skills/research-foresight-cli/templates/reader-report.md",
+      "reason": "Reader transitive template bundled locally without modifying its shape",
+      "sha256": "dcbd8f19a2bec93c56f09d453339939ef2079f027f5ffb786d39e46d459995d4"
+    }
+  ],
+  "packaging_additions": [
+    {
+      "path": "skills/research-foresight-cli/references/cli-access.md",
+      "reason": "Executable access reference or unchanged baseline license"
+    },
+    {
+      "path": "skills/research-foresight-cli/LICENSE",
+      "reason": "Executable access reference or unchanged baseline license"
+    },
+    {
+      "path": "skills/research-manager-cli/references/cli-access.md",
+      "reason": "Executable access reference or unchanged baseline license"
+    },
+    {
+      "path": "skills/research-manager-cli/LICENSE",
+      "reason": "Executable access reference or unchanged baseline license"
+    },
+    {
+      "path": "skills/compiler-cli/references/cli-access.md",
+      "reason": "Executable access reference or unchanged baseline license"
+    },
+    {
+      "path": "skills/compiler-cli/LICENSE",
+      "reason": "Executable access reference or unchanged baseline license"
+    }
+  ],
+  "operation_mappings": [
+    {
+      "operation_id": "reader.discover",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 90,
+        "line_end": 113,
+        "quoted_clause": "### Step 2 — Search the ARA's native files directly"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR status --json",
+          "ara -C DIR ls --json",
+          "ara -C DIR show --document PAPER.md --source --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.search",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 90,
+        "line_end": 129,
+        "quoted_clause": "### Step 2 — Search the ARA's native files directly"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR find QUERY --json",
+          "ara -C DIR show --document PATH --source --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_manifest",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 109,
+        "line_end": 110,
+        "quoted_clause": "- **`related_work.md`, `PAPER.md`, `src/`** — context and the literal code/configs when the frame"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_problem",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 95,
+        "line_end": 96,
+        "quoted_clause": "- **`logic/problem.md`** — the framing and objective. A hit here tells the caller what the work was"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_solution",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 97,
+        "line_end": 98,
+        "quoted_clause": "- **`logic/solution/*`** — the actual method/mechanism. Often the strongest precedent for a"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_claim",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 99,
+        "line_end": 101,
+        "quoted_clause": "- **`logic/claims.md`** — distilled, grounded assertions; ref as `logic/claims.md#<Cxx>`. Note each"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_concept",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 102,
+        "line_end": 103,
+        "quoted_clause": "- **`logic/concepts.md`** — definitions/boundaries; ref as `logic/concepts.md#<name>`. Rarely the"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": [],
+        "native_access_contract": {
+          "invariants": [
+            "cite native exact concept names/path headings, never display IDs"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_plan",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 104,
+        "line_end": 107,
+        "quoted_clause": "- **`logic/experiments.md`** and **`trace/exploration_tree.yaml`** — the research DAG. Read **all**"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_trace",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 104,
+        "line_end": 107,
+        "quoted_clause": "- **`logic/experiments.md`** and **`trace/exploration_tree.yaml`** — the research DAG. Read **all**"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.read_related_work",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 109,
+        "line_end": 110,
+        "quoted_clause": "- **`related_work.md`, `PAPER.md`, `src/`** — context and the literal code/configs when the frame"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.graph",
+      "source_clause": {
+        "path": "skills/research-foresight/references/CONTRACT.md",
+        "line_start": 55,
+        "line_end": 60,
+        "quoted_clause": "  logic/                             # claims.md, concepts.md, problem.md, experiments.md,"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR path NODE --json",
+          "ara -C DIR refs SELECTOR --json",
+          "ara -C DIR show --document trace/exploration_tree.yaml --source --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.negatives",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 131,
+        "line_end": 142,
+        "quoted_clause": "### Step 4 — Surface relevant negatives (dedicated channel)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR ls --type dead_end --json",
+          "ara -C DIR ls --type claim --status refuted --json",
+          "ara -C DIR ls --type claim --status weakened --json",
+          "ara -C DIR show --document PATH --source --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.grounding",
+      "source_clause": {
+        "path": "skills/research-foresight/references/PREDICT.md",
+        "line_start": 96,
+        "line_end": 107,
+        "quoted_clause": "### Step 2 — Read the FULL ARA via RETRIEVE"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.source_evidence",
+      "source_clause": {
+        "path": "skills/research-foresight/references/RETRIEVE.md",
+        "line_start": 108,
+        "line_end": 110,
+        "quoted_clause": "- **`evidence/`** — figures, tables, grounded measurements; ref as `evidence/.../<file>.md`."
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.answer_report",
+      "source_clause": {
+        "path": "skills/research-foresight/references/PREDICT.md",
+        "line_start": 155,
+        "line_end": 196,
+        "quoted_clause": "## 3. Output schema"
+      },
+      "required": true,
+      "access_policy": "output-only",
+      "adapter": {
+        "kind": "output-only",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "output-only",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "reader.standalone_report_template",
+      "source_clause": {
+        "path": "skills/research-foresight/references/PREDICT.md",
+        "line_start": 281,
+        "line_end": 296,
+        "quoted_clause": "## 7. Contradiction reports (reader-side feedback — still read-only)"
+      },
+      "required": true,
+      "access_policy": "skill-reference-access",
+      "adapter": {
+        "kind": "skill-reference-access",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "skill-reference-access",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.initialize",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 596,
+        "line_end": 616,
+        "quoted_clause": "## Initialization (if `ara/` does not exist)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "artifact.init"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.read_state_ids",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 343,
+        "line_end": 351,
+        "quoted_clause": "## Per-Turn Procedure"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.read_briefing",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 618,
+        "line_end": 628,
+        "quoted_clause": "## Briefing (fresh conversation only)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.read_full_sessions",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 493,
+        "line_end": 563,
+        "quoted_clause": "### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.read_observations",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 103,
+        "line_end": 145,
+        "quoted_clause": "Walk `staging/observations.yaml` and decide which staged observations are mature. **Maturity"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.read_reasoning",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 565,
+        "line_end": 577,
+        "quoted_clause": "### Reasoning Log (`trace/pm_reasoning_log.yaml`) — self-continuity"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.add_question",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "question",
+          "required_fields": [
+            "description"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.add_decision",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "decision",
+          "required_fields": [
+            "choice",
+            "alternatives"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.add_experiment",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "experiment",
+          "required_fields": [
+            "result"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.add_dead_end",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "dead_end",
+          "required_fields": [
+            "hypothesis",
+            "failure_mode",
+            "lesson"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.add_pivot",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 23,
+        "line_end": 29,
+        "quoted_clause": "| Type | Signals | Required payload |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "pivot",
+          "required_fields": [
+            "from",
+            "to",
+            "trigger"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_cross_edge",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 384,
+        "line_end": 417,
+        "quoted_clause": "### Exploration Tree Node (`trace/exploration_tree.yaml`)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "edge.add"
+        ],
+        "native_access_contract": {
+          "fields": "evidence scalar-or-list preserves exact source string or explicit array",
+          "invariants": [
+            "DAG cycle checks remain enforced"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.stage_observation",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 476,
+        "line_end": 490,
+        "quoted_clause": "### Observation (`staging/observations.yaml`) — staged"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.stage"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.promote_claim",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.promote",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.promote_heuristic",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.promote",
+          "session.log",
+          "record.append"
+        ],
+        "native_access_contract": {
+          "fields": "Preserve native PM heuristic fields and scalar-or-list Code ref",
+          "invariants": [
+            "no comma-splitting of scalar Code ref"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.promote_concept",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.promote",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.promote_constraint",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.promote",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.promote_architecture",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.promote",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.promote_dead_end",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 108,
+        "line_end": 146,
+        "quoted_clause": "A staged observation crystallizes when **at least one** of these signals is present:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.promote",
+          "session.log",
+          "record.append"
+        ],
+        "native_access_contract": {
+          "required_fields": [
+            "hypothesis",
+            "failure_mode",
+            "lesson"
+          ],
+          "invariants": [
+            "immutable leaf; never parent"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.mark_stale",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 211,
+        "line_end": 215,
+        "quoted_clause": "#### Stale-flagging"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "observation.mark_stale",
+          "session.log"
+        ],
+        "native_access_contract": {
+          "required_keys": [
+            "observation",
+            "session_days",
+            "reason",
+            "audit"
+          ],
+          "audit": {
+            "required_keys": [
+              "session",
+              "turn",
+              "signal",
+              "provenance"
+            ],
+            "optional_keys": [
+              "note"
+            ]
+          },
+          "invariants": [
+            "at least three distinct actual logged session-days after last observation/bound-node reference",
+            "caller supplies explicit reason; adapter supplies factual idle evidence, not invented scientific rationale",
+            "new owning session.log turn in same batch; stale boolean and native Reasoning.notes commit atomically"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.annotate_contradiction",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 166,
+        "line_end": 174,
+        "quoted_clause": "#### Contradiction trigger"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "entry.annotate",
+          "node.add",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.adjudicate_reader_report",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 176,
+        "line_end": 209,
+        "quoted_clause": "#### Reader reports (cross-agent feedback)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "observation.stage",
+          "entry.annotate",
+          "node.add",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.revise_claim",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 223,
+        "line_end": 240,
+        "quoted_clause": "#### What Stage 4 may do"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.revise_heuristic",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 223,
+        "line_end": 240,
+        "quoted_clause": "#### What Stage 4 may do"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.revise_concept",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 223,
+        "line_end": 240,
+        "quoted_clause": "#### What Stage 4 may do"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.status_transition",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 242,
+        "line_end": 265,
+        "quoted_clause": "#### Allowed status transitions"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.split",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 303,
+        "line_end": 305,
+        "quoted_clause": "5. For structural changes:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "claim.add",
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.merge",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 306,
+        "line_end": 307,
+        "quoted_clause": "   - **Merge**: keep the lower id, mark the higher id as `withdrawn` with"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "entry.rename",
+          "session.log",
+          "record.append"
+        ],
+        "native_access_contract": {
+          "invariants": [
+            "retain lower claim identity; audited logic.revise marks higher withdrawn with Merged into and repairs references",
+            "no physical entry.remove for claims; canonical identity rename only when warranted"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.generalize",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 308,
+        "line_end": 309,
+        "quoted_clause": "   - **Generalize**: allocate a new id for the more general claim, set its `Dependencies`"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "claim.add",
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.rename_identity",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 232,
+        "line_end": 240,
+        "quoted_clause": "3. **Structural changes** — split a claim into two, merge duplicates, repair"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "entry.rename",
+          "session.log",
+          "record.append"
+        ],
+        "native_access_contract": {
+          "invariants": [
+            "canonical entry.rename retains aliases/history; concept references resolve exact existing named headings or authenticated aliases; no minted IDs"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.remove_current_entry",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 303,
+        "line_end": 312,
+        "quoted_clause": "5. For structural changes:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "entry.remove",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.repair_dependencies",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 232,
+        "line_end": 240,
+        "quoted_clause": "3. **Structural changes** — split a claim into two, merge duplicates, repair"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.write_constraint_body",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 43,
+        "line_end": 50,
+        "quoted_clause": "| Candidate Event | Signals | Crystallizes To | `potential_type` |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.write_architecture_body",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 43,
+        "line_end": 50,
+        "quoted_clause": "| Candidate Event | Signals | Crystallizes To | `potential_type` |"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log",
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_session_events_logged",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 504,
+        "line_end": 510,
+        "quoted_clause": "events_logged:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_session_ai_actions",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 512,
+        "line_end": 516,
+        "quoted_clause": "ai_actions:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_session_claims_touched",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 518,
+        "line_end": 521,
+        "quoted_clause": "claims_touched:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_session_logic_revisions",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 523,
+        "line_end": 539,
+        "quoted_clause": "logic_revisions:                  # full before/after for every edit Stage 4 makes"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_session_key_context",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 541,
+        "line_end": 544,
+        "quoted_clause": "key_context:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.update_session_open_threads",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 545,
+        "line_end": 547,
+        "quoted_clause": "open_threads:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.update_session_ai_suggestions_pending",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 548,
+        "line_end": 550,
+        "quoted_clause": "ai_suggestions_pending:"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.create_session",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 493,
+        "line_end": 502,
+        "quoted_clause": "### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.start"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.update_session_metadata",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 493,
+        "line_end": 502,
+        "quoted_clause": "### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.update_session_index",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 552,
+        "line_end": 563,
+        "quoted_clause": "### Session Index (`trace/sessions/session_index.yaml`)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_reasoning",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 565,
+        "line_end": 577,
+        "quoted_clause": "### Reasoning Log (`trace/pm_reasoning_log.yaml`) — self-continuity"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.taste_target_read",
+      "source_clause": {
+        "path": "skills/research-manager/references/taste-comments.md",
+        "line_start": 36,
+        "line_end": 48,
+        "quoted_clause": "## Target Resolution & Confirm-Before-Write"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_logic_taste",
+      "source_clause": {
+        "path": "skills/research-manager/references/taste-comments.md",
+        "line_start": 77,
+        "line_end": 95,
+        "quoted_clause": "## Write Procedure"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "entry.taste_append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_trace_taste",
+      "source_clause": {
+        "path": "skills/research-manager/references/taste-comments.md",
+        "line_start": 77,
+        "line_end": 101,
+        "quoted_clause": "## Write Procedure"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "record.append"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.source_grounding",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 148,
+        "line_end": 164,
+        "quoted_clause": "#### Number grounding (claims & heuristics)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.append_evidence",
+      "source_clause": {
+        "path": "skills/research-manager/references/event-taxonomy.md",
+        "line_start": 52,
+        "line_end": 53,
+        "quoted_clause": "Evidence artifacts (tables, figures, metrics) referenced by a direct-routed `experiment`"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.acquire_inputs",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 29,
+        "line_end": 74,
+        "quoted_clause": "## Input Philosophy"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.initialize",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 213,
+        "line_end": 233,
+        "quoted_clause": "### Step 3: Generate Files"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "artifact.init"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_paper",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 54,
+        "line_end": 105,
+        "quoted_clause": "## PAPER.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "artifact.init",
+          "paper.edit",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_problem",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 129,
+        "line_end": 157,
+        "quoted_clause": "## logic/problem.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_claims",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 161,
+        "line_end": 175,
+        "quoted_clause": "## logic/claims.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_concepts",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 214,
+        "line_end": 224,
+        "quoted_clause": "## logic/concepts.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ],
+        "native_access_contract": {
+          "invariants": [
+            "preserve native named headings; newly introduced concept references must resolve exact existing names or authenticated aliases; no minted IDs"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_experiments",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 228,
+        "line_end": 253,
+        "quoted_clause": "## logic/experiments.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_architecture",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 257,
+        "line_end": 259,
+        "quoted_clause": "## logic/solution/architecture.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_algorithm",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 261,
+        "line_end": 266,
+        "quoted_clause": "## logic/solution/algorithm.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_constraints",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 268,
+        "line_end": 272,
+        "quoted_clause": "## logic/solution/constraints.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_heuristics",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 274,
+        "line_end": 286,
+        "quoted_clause": "## logic/solution/heuristics.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ],
+        "native_access_contract": {
+          "fields": "Source singular scalar; preserve Bounds and complete source prose; Code ref scalar-or-list",
+          "invariants": [
+            "no invented PM Status/Provenance or fake metadata",
+            "CLI scalar stays exact unless explicit JSON array starts with ["
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_related_work",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 290,
+        "line_end": 306,
+        "quoted_clause": "## logic/related_work.md"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.arbitrary_solution",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 157,
+        "line_end": 166,
+        "quoted_clause": "- **solution/**: the method layer — `constraints.md` (limitations/assumptions) is always present;"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.additional_knowledge",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 612,
+        "line_end": 619,
+        "quoted_clause": "## Appendix-sourced content"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log",
+          "paper.edit"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.rubric",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 623,
+        "line_end": 640,
+        "quoted_clause": "## rubric/requirements.md (Only if rubric provided)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.add_question",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "question",
+          "required_fields": [
+            "description"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.add_decision",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "decision",
+          "required_fields": [
+            "choice",
+            "alternatives"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.add_experiment",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "experiment",
+          "required_fields": [
+            "result"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.add_dead_end",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "dead_end",
+          "required_fields": [
+            "hypothesis",
+            "failure_mode",
+            "lesson"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.add_pivot",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 63,
+        "line_end": 101,
+        "quoted_clause": "## Node Types"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "node.add"
+        ],
+        "native_access_contract": {
+          "type": "pivot",
+          "required_fields": [
+            "from",
+            "to",
+            "trigger"
+          ],
+          "invariants": [
+            "dead_end remains an immutable leaf; cannot be parent",
+            "source values/provenance/support retained; no new insight nodes"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.append_cross_edge",
+      "source_clause": {
+        "path": "skills/compiler/references/exploration-tree-spec.md",
+        "line_start": 93,
+        "line_end": 102,
+        "quoted_clause": "## Rules"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "edge.add"
+        ],
+        "native_access_contract": {
+          "fields": "evidence scalar-or-list preserves exact source string or explicit array",
+          "invariants": [
+            "DAG cycle checks remain enforced"
+          ]
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.read_coverage_state",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 239,
+        "line_end": 245,
+        "quoted_clause": "### Step 4: Coverage Check Loop (max 3 rounds)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR show --document PATH --source --full --json",
+          "ara -C DIR show SELECTOR --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.coverage_repair",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 239,
+        "line_end": 288,
+        "quoted_clause": "### Step 4: Coverage Check Loop (max 3 rounds)"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json",
+          "ara -C DIR merge resolve CONFLICT --take PERMITTED_MUTABLE_CHOICE --session SESSION --turn NEXT_TURN --signal ACTUAL_SIGNAL --provenance ACTUAL_PROVENANCE --json",
+          "ara -C DIR merge repair --conflict-file CAPTURED_CONFLICT.json --decision reject_incoming|restore_base --expected-current CAPTURED_CURRENT_FINGERPRINT --session SESSION --turn NEXT_TURN --signal ACTUAL_SIGNAL --provenance ACTUAL_PROVENANCE --reason EXPLICIT_REASON --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "paper.edit",
+          "node.add",
+          "edge.add",
+          "session.log"
+        ],
+        "repair_bounds": {
+          "mutable_resolution": "Only the explicit choices permitted by the ordinary mutable conflict; candidate presence alone is not permission.",
+          "protected_repair": "Dedicated captured protected corrective adapter only; reject_incoming or restore_base, exact captured current fingerprint, explicit actual signal/provenance/reason and next session turn.",
+          "history": "Retain full captured base/ours/theirs candidates, presence and fingerprints; append complete before/after plus decision/audit history; no generic immutable replacement."
+        }
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.validate_structure",
+      "source_clause": {
+        "path": "skills/compiler/references/validation-checklist.md",
+        "line_start": 5,
+        "line_end": 150,
+        "quoted_clause": "## 1. Directory Existence"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara check DIR --json",
+          "ara -C DIR show --document PATH --source --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.validate_bindings",
+      "source_clause": {
+        "path": "skills/compiler/references/validation-checklist.md",
+        "line_start": 152,
+        "line_end": 221,
+        "quoted_clause": "## 9. Cross-Layer Binding"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara check DIR --json",
+          "ara -C DIR refs SELECTOR --json",
+          "ara -C DIR show --document PATH --source --full --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_environment",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 403,
+        "line_end": 416,
+        "quoted_clause": "## src/environment.md  (mandatory core)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_code_index",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 370,
+        "line_end": 396,
+        "quoted_clause": "## src/artifacts.md  (the CODEBASE pointer index — code only, any language)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_code_capture",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 326,
+        "line_end": 368,
+        "quoted_clause": "## src/execution/{module}.py  (when the work warrants it — grounded or absent)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_data",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 398,
+        "line_end": 401,
+        "quoted_clause": "## data/  (when the work is data-driven)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_config",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 310,
+        "line_end": 324,
+        "quoted_clause": "## src/configs/{config}.md  (when the work warrants it)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_proof",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 418,
+        "line_end": 428,
+        "quoted_clause": "## evidence/proofs/{name}.md  (for theory/derivation work)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_run_records",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 432,
+        "line_end": 445,
+        "quoted_clause": "## evidence/results/{node-or-name}.md  (run records — the outputs of running the code)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_log_pointers",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 447,
+        "line_end": 456,
+        "quoted_clause": "## evidence/logs/log_pointers.md  (direct per-run log pointers)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_evidence_index",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 524,
+        "line_end": 538,
+        "quoted_clause": "## evidence/README.md"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_table",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 460,
+        "line_end": 496,
+        "quoted_clause": "## evidence/tables/{file}.md (+ screenshot)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.write_figure",
+      "source_clause": {
+        "path": "skills/compiler/references/ara-schema.md",
+        "line_start": 553,
+        "line_end": 608,
+        "quoted_clause": "## evidence/figures/{name}.md (+ screenshot)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.render_evidence",
+      "source_clause": {
+        "path": "skills/compiler/references/figure-extraction-guide.md",
+        "line_start": 40,
+        "line_end": 94,
+        "quoted_clause": "## 2. Rendering and cropping a figure (when needed)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.mirror_diagram",
+      "source_clause": {
+        "path": "skills/compiler/references/figure-extraction-guide.md",
+        "line_start": 149,
+        "line_end": 168,
+        "quoted_clause": "## 4. Reading a diagram"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR apply REQUEST.jsonl --json"
+        ],
+        "batch_operations": [
+          "document.create",
+          "logic.revise",
+          "session.log"
+        ]
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "pm.source_body_grounding",
+      "source_clause": {
+        "path": "skills/research-manager/SKILL.md",
+        "line_start": 148,
+        "line_end": 164,
+        "quoted_clause": "#### Number grounding (claims & heuristics)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.source_verification",
+      "source_clause": {
+        "path": "skills/compiler/references/validation-checklist.md",
+        "line_start": 182,
+        "line_end": 221,
+        "quoted_clause": "## 10. Citation Verification (Rule 15)"
+      },
+      "required": true,
+      "access_policy": "direct-access-allowed",
+      "adapter": {
+        "kind": "direct-access-allowed",
+        "commands": [],
+        "batch_operations": []
+      },
+      "coverage_status": "direct-access-allowed",
+      "proof_status": "not-observed"
+    },
+    {
+      "operation_id": "compiler.report_stats",
+      "source_clause": {
+        "path": "skills/compiler/SKILL.md",
+        "line_start": 290,
+        "line_end": 293,
+        "quoted_clause": "### Step 7: Report"
+      },
+      "required": true,
+      "access_policy": "cli-required",
+      "adapter": {
+        "kind": "cli-required",
+        "commands": [
+          "ara -C DIR status --json",
+          "ara -C DIR ls --json",
+          "ara check DIR --json"
+        ],
+        "batch_operations": []
+      },
+      "coverage_status": "proposed",
+      "proof_status": "not-observed"
+    }
+  ],
+  "review_requirement": {
+    "status": "passed-independent-static-access-review",
+    "scope": "Revised five-kind payload, immutable leaf, same_as chronology, exact named concept, retained claim, source-native heuristic/scalar fields and atomic audited stale access contract. Earlier scoped SkillAccessReview approval does not approve these bytes.",
+    "reviewer": "RevisedAccessReview",
+    "evidence": "access-review-2026-10-02.json",
+    "human_approvals": "F1–F7 unchanged; pending as recorded in protocol-decisions.json",
+    "runtime_proof": "delivery-proof/runtime-smoke.json; three actual installed-agent packaging tasks observed, not experiments",
+    "cli_revision": "8e32a83d5fed9ec0ba7611d536b737165323dfa4",
+    "cli_version": "0.1.23",
+    "final_binary_sha256": "674f0229e76c13819a343e370211006e89d160d62773b6611c6775342928cd3b"
+  },
+  "native_access_contract": {
+    "reference": "command-reference.md",
+    "node_types": {
+      "question": [
+        "description"
+      ],
+      "decision": [
+        "choice",
+        "alternatives"
+      ],
+      "experiment": [
+        "result"
+      ],
+      "dead_end": [
+        "hypothesis",
+        "failure_mode",
+        "lesson"
+      ],
+      "pivot": [
+        "from",
+        "to",
+        "trigger"
+      ]
+    },
+    "same_as": {
+      "operation": "node.link_same_as",
+      "direction": "later -> provably earlier existing target",
+      "proof": "timestamp or actual recorded node.add order; never numeric ID/DFS chronology",
+      "rejects": [
+        "self",
+        "missing target",
+        "unproved chronology",
+        "cycle"
+      ]
+    },
+    "concept_references": "Exact existing named native heading or authenticated alias; no minted IDs.",
+    "scalar_or_list": [
+      "evidence",
+      "Code ref"
+    ],
+    "cli_field_decoding": "Only explicit JSON beginning with [ becomes an array; otherwise exact scalar string or full @file content.",
+    "claims": "Retain audited withdrawal/merge states or canonical rename; never physically remove claims.",
+    "compiler_heuristic": "Singular scalar Source and full Bounds/source prose; no forced PM Status/Provenance or invented values.",
+    "stale": {
+      "required_keys": [
+        "observation",
+        "session_days",
+        "reason",
+        "audit"
+      ],
+      "audit": {
+        "required_keys": [
+          "session",
+          "turn",
+          "signal",
+          "provenance"
+        ],
+        "optional_keys": [
+          "note"
+        ]
+      },
+      "invariants": [
+        "at least three distinct actual logged session-days after last observation/bound-node reference",
+        "caller supplies explicit reason; adapter supplies factual idle evidence, not invented scientific rationale",
+        "new owning session.log turn in same batch; stale boolean and native Reasoning.notes commit atomically"
+      ]
+    }
+  }
+}

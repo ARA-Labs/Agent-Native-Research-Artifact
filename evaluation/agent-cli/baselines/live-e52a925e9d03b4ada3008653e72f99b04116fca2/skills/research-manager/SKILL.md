@@ -48,13 +48,6 @@ The artifact has two mutability regimes. Honor them strictly.
 This split lets `claims.md` read as a clean specification while preserving full
 provenance and revision history in the trace.
 
-The pending [CLI protocol proposal](../../docs/agent-cli-contracts.md) records the precise
-session-array, rolling-metadata, staleness, promotion, annotation, and protected-repair
-exceptions required by these source instructions. F1 through F7 remain under upstream
-PR review; approval of the implementation plan is not protocol approval. This note changes
-no research procedure. The [unchanged baseline](../../evaluation/agent-cli/baseline-contracts.md)
-retains this skill and its complete reference/template closure.
-
 ## When This Skill Runs
 
 - **NEVER mid-turn.** Do not read or write `ara/` while still working on the user's request.

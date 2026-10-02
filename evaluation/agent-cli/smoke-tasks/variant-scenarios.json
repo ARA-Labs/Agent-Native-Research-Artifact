@@ -1,0 +1,227 @@
+{
+  "format": "ara.skill-variant-smoke-tasks/v1",
+  "status": "proposed-not-executed",
+  "source_lock": "../source-lock.json",
+  "variant_lock": "../variant-lock.json",
+  "operation_inventory": "../operation-coverage.json",
+  "scope": "bounded deterministic artifact-fidelity smoke, no experiment/harness15 scoring",
+  "runner": {
+    "repository": "ARA-Labs/ara-cli",
+    "path": "scripts/agent-cli-acceptance.py",
+    "arguments": [
+      "--binary",
+      "<prebuilt actual ara>",
+      "--output",
+      "<external proof.json>"
+    ],
+    "required_output_format": "ara.agent-cli-acceptance/v1"
+  },
+  "tasks": [
+    {
+      "id": "reader-full-native-grounding",
+      "deliverable": "13a",
+      "skills": [
+        "research-foresight-cli"
+      ],
+      "required_operation_ids": [
+        "reader.discover",
+        "reader.search",
+        "reader.read_manifest",
+        "reader.read_problem",
+        "reader.read_solution",
+        "reader.read_claim",
+        "reader.read_concept",
+        "reader.read_plan",
+        "reader.read_trace",
+        "reader.read_related_work",
+        "reader.graph",
+        "reader.negatives",
+        "reader.grounding",
+        "reader.source_evidence",
+        "reader.answer_report",
+        "reader.standalone_report_template"
+      ],
+      "task": "Answer a mapped reader question about one disposable native artifact. Use ls/status/find for discovery, path/refs for relations, then show --document --source --full --json for every cited knowledge body; read only allowed in-artifact evidence/source directly. Preserve ranked/negative/coverage and Answer/contradiction_report source contracts.",
+      "assertions": [
+        "exact complete arbitrary method/equations/unknown fields and UTF-8 body digest recovered",
+        "all five source node types and relevant refuted/weakened negatives considered",
+        "native claim/concept/path/trace selectors honest and ambiguous selector rejected",
+        "reader writes no knowledge or outside artifact; report remains output",
+        "keyword excerpt never treated as assertion proof"
+      ],
+      "capture": [
+        "all actual command argv/exit/stdout/stderr",
+        "full-show bodies/digests/native refs",
+        "returned Answer and optional report",
+        "before/after knowledge byte comparison"
+      ]
+    },
+    {
+      "id": "pm-complete-two-turn-history",
+      "deliverable": "13b",
+      "skills": [
+        "research-manager-cli"
+      ],
+      "required_operation_ids": [
+        "pm.initialize",
+        "pm.read_state_ids",
+        "pm.read_briefing",
+        "pm.read_full_sessions",
+        "pm.read_observations",
+        "pm.read_reasoning",
+        "pm.add_question",
+        "pm.add_decision",
+        "pm.add_experiment",
+        "pm.add_dead_end",
+        "pm.add_pivot",
+        "pm.append_cross_edge",
+        "pm.stage_observation",
+        "pm.promote_claim",
+        "pm.promote_heuristic",
+        "pm.promote_concept",
+        "pm.promote_constraint",
+        "pm.promote_architecture",
+        "pm.promote_dead_end",
+        "pm.mark_stale",
+        "pm.annotate_contradiction",
+        "pm.adjudicate_reader_report",
+        "pm.revise_claim",
+        "pm.revise_heuristic",
+        "pm.revise_concept",
+        "pm.status_transition",
+        "pm.split",
+        "pm.merge",
+        "pm.generalize",
+        "pm.rename_identity",
+        "pm.remove_current_entry",
+        "pm.repair_dependencies",
+        "pm.write_constraint_body",
+        "pm.write_architecture_body",
+        "pm.append_session_events_logged",
+        "pm.append_session_ai_actions",
+        "pm.append_session_claims_touched",
+        "pm.append_session_logic_revisions",
+        "pm.append_session_key_context",
+        "pm.update_session_open_threads",
+        "pm.update_session_ai_suggestions_pending",
+        "pm.create_session",
+        "pm.update_session_metadata",
+        "pm.update_session_index",
+        "pm.append_reasoning",
+        "pm.taste_target_read",
+        "pm.append_logic_taste",
+        "pm.append_trace_taste",
+        "pm.source_grounding",
+        "pm.append_evidence",
+        "pm.source_body_grounding"
+      ],
+      "turn_inputs": [
+        {
+          "user": "Maybe a serialized owner preserves queue identities. This is a tentative interpretation, not an affirmation.",
+          "expectation": "Stage raw complete content/context with ai-suggested provenance; no promotion. Log rejected affirmation signal."
+        },
+        {
+          "user": "Yes, let us go with a serialized owner for the invariant. Revise its scope to explicitly exclude unrecorded deletion.",
+          "expectation": "Apply original explicit-affirmation closure then source-scoped revision in related atomic operations; original observation survives and full before/after points to same-day session/turn."
+        }
+      ],
+      "assertions": [
+        "CLI allocates new IDs/bindings, no file scanning",
+        "source closure/provenance rules unchanged, refuting result would promote dead_end not claim",
+        "all session ai_actions/claims_touched/logic_revisions/key_context/open_threads/ai_suggestions_pending and rolling metadata/index retain complete content/counts",
+        "reasoning chosen/rejected signals and near-misses retained",
+        "split/merge/generalize/rename/remove preserve original/new identities, full endpoints and historical references",
+        "taste target user-confirmed; independent attitude/object; trace node never edited",
+        "explicit missing_only bootstrap preserves existing exact defaults, rejects supplied conflict with no mutation",
+        "reader-report upheld/rejected/unverifiable source verdict remains PM-only"
+      ]
+    },
+    {
+      "id": "compiler-non-template-visual-and-appendix-repair",
+      "deliverable": "13b",
+      "skills": [
+        "compiler-cli"
+      ],
+      "required_operation_ids": [
+        "compiler.acquire_inputs",
+        "compiler.initialize",
+        "compiler.write_paper",
+        "compiler.write_problem",
+        "compiler.write_claims",
+        "compiler.write_concepts",
+        "compiler.write_experiments",
+        "compiler.write_architecture",
+        "compiler.write_algorithm",
+        "compiler.write_constraints",
+        "compiler.write_heuristics",
+        "compiler.write_related_work",
+        "compiler.arbitrary_solution",
+        "compiler.additional_knowledge",
+        "compiler.rubric",
+        "compiler.add_question",
+        "compiler.add_decision",
+        "compiler.add_experiment",
+        "compiler.add_dead_end",
+        "compiler.add_pivot",
+        "compiler.append_cross_edge",
+        "compiler.read_coverage_state",
+        "compiler.coverage_repair",
+        "compiler.validate_structure",
+        "compiler.validate_bindings",
+        "compiler.write_environment",
+        "compiler.write_code_index",
+        "compiler.write_code_capture",
+        "compiler.write_data",
+        "compiler.write_config",
+        "compiler.write_proof",
+        "compiler.write_run_records",
+        "compiler.write_log_pointers",
+        "compiler.write_evidence_index",
+        "compiler.write_table",
+        "compiler.write_figure",
+        "compiler.render_evidence",
+        "compiler.mirror_diagram",
+        "compiler.source_verification",
+        "compiler.report_stats"
+      ],
+      "source_files": [
+        "compiler-source/source.txt",
+        "compiler-source/figure1.svg"
+      ],
+      "task": "Compile the full controlled source, including raw Table1, original Figure1 visual plus screenshot/description, source-bounded question/decision, source-warranted formal invariant and complete AppendixA taxonomy. Generate no invented code/training files/measured experiment/dead_end. Introduce the specified appendix omission in the disposable initial candidate, then run the unchanged max3 coverage loop and repair through audited CLI knowledge transaction.",
+      "assertions": [
+        "complete source granularity and per-entry descriptive fields, equation/invariant and source quotes survive",
+        "non-template formal-invariant/method bodies and unknown fields retrieved exact",
+        "every numbered table/figure in order has full raw transcription and PNG screenshot; figure diagram stays structural not invented measurements",
+        "additional outside knowledge explicitly registered in PAPER knowledge_paths, rubric fixed allowlist, no direct fallback",
+        "existing body repair full before/after signal/provenance and owning session.log batch",
+        "initial emission has no invented prior history",
+        "all original Seal semantic/visual/citation/source-grounding passes run in addition to ara check; no success claim from structural check alone",
+        "artifact location/full file count/exact bytes from status and typed stats from ls; validation only actual observed"
+      ]
+    },
+    {
+      "id": "unsupported-operation-atomic-rejection",
+      "deliverable": "13a/13b",
+      "skills": [
+        "research-foresight-cli",
+        "research-manager-cli",
+        "compiler-cli"
+      ],
+      "request_lines": [
+        {
+          "op": "document.unreviewed_write",
+          "document": "PAPER.md",
+          "content": "not permitted"
+        }
+      ],
+      "assertions": [
+        "actual command exit1 and diagnostic identifies unsupported operation",
+        "every knowledge byte/redirect/merge/conflict/history unchanged",
+        "agent reports missing capability and follows original stop/repair contract",
+        "no Edit/Write/Python/shell fallback to knowledge"
+      ]
+    }
+  ],
+  "proof_policy": "Required_operation_ids name acceptance requirements, never claim coverage. Attach observed output and final CLI pin only after parent executes actual binary; protocol approval stays separately pending. No empirical equivalence/reproduction assertion."
+}

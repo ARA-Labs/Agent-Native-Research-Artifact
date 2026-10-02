@@ -5,12 +5,6 @@ demand at epilogue time. SKILL.md owns the pipeline orchestration, closure signa
 crystallization procedure, contradiction trigger, and schemas — this file does not
 duplicate those.
 
-The [CLI contract decision record](../../../docs/agent-cli-contracts.md) proposes bounded
-write permissions for every route below, including all promotion targets and complete
-session history. Its F1 through F7 decisions are pending upstream PR review, not merged
-approval. The [baseline inventory](../../../evaluation/agent-cli/operation-coverage.json)
-pins the original clauses; this note does not change routing, provenance, or closure rules.
-
 This document covers two axes:
 
 | Axis | Question | Outcome |

@@ -1,0 +1,28 @@
+{
+  "format": "ara.independent-access-review/v1",
+  "reviewer": "RevisedAccessReview",
+  "status": "passed-independent-static-access-review",
+  "scope": "Access-only procedures, source authority, collective separation, and closure of PM initialization/profile/hash metadata defect. Not human protocol approval or scientific reproduction.",
+  "source_procedure_pages": 13,
+  "other_primary_paths": 8,
+  "selected_consumer_implementation_paths": 9,
+  "reported_initial_blocker": "pm.initialize inventory and moved access substitution used obsolete pm profile; corrected to research-manager",
+  "closure": "Independent reviewer reread corrected inventory, access substitution, moved schema and writer consumer; no remaining concrete blocker identified in reviewed scope.",
+  "verification_attribution": "Reviewer performed static source comparison. Parent independently executed packaging verification against frozen Git source bytes, variant reconstruction/hash verification, and 16 community unit regressions.",
+  "parent_packaging": {
+    "archived_files": 14,
+    "skill_pins": 3,
+    "operations": 107,
+    "source_commit_bytes_checked": true
+  },
+  "parent_variants": {
+    "variant_files": 21,
+    "source_pages": 13,
+    "operations": 107,
+    "collective_files": 13
+  },
+  "source_pins_unchanged": true,
+  "collective_extension_included": false,
+  "human_protocol_approval": false,
+  "historical_reproduction": false
+}

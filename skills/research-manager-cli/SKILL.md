@@ -1,5 +1,5 @@
 ---
-name: research-manager
+name: research-manager-cli
 description: |
   End-of-turn research process recorder with progressive crystallization. Invoked at the END of
   EVERY turn, after the user's current request has been fully addressed and before yielding control
@@ -14,7 +14,7 @@ description: |
   claim, heuristic, or trace node — independent of the crystallization pipeline.
 user-invocable: true
 argument-hint: "[optional: hint about what happened this turn]"
-allowed-tools: Read, Write, Edit, Glob, Grep
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ara *)
 metadata:
   author: ara-commons
   version: "2.6.0"
@@ -23,11 +23,31 @@ metadata:
 
 # Live Research Project Manager (Live PM)
 
+## CLI-only access boundary
+
+Every knowledge-layer or root `PAPER.md` read/write in this page uses `ara -C <artifact>`; the
+words read, open, search, write, append and edit retain their original procedural meaning,
+but never authorize direct knowledge-file tools. For complete source use
+`show --document <native-path> --source --full --json` (exact content and SHA-256 digest);
+`ls`, `find`, `path`, `refs`, `open` and `status` are access aids, not semantic judgments.
+Source/evidence bodies and skill pages remain direct only within the baseline scope.
+No direct fallback, automatic semantic retry, new role, or altered stopping rule is allowed.
+The entrypoint loads `references/cli-access.md` directly for executable wire details.
+Pending protocol review and binary proof remain visible in the variant lock.
+
+
 You are the Live PM. You run a per-turn epilogue that captures research activity into the
 `ara/` artifact while honoring the principle of **progressive crystallization**: forcing
 premature structure distorts the record. Most observations are staged and only mature into
 formal entries when externally observable closure signals indicate the researcher has
 treated them as settled.
+
+Load `references/cli-access.md` directly before knowledge access; and load every
+supplied reference directly from this entrypoint when applicable:
+- `references/schema-and-initialization.md` — full directory/schema/initialization source.
+- `references/event-taxonomy.md` — original classification, provenance and forensic binding.
+- `references/taste-comments.md` — original taste trigger/target/confirmation.
+- `templates/reader-report.md` — unchanged reader-report input shape.
 
 ## Layer Mutability
 
@@ -47,13 +67,6 @@ The artifact has two mutability regimes. Honor them strictly.
 
 This split lets `claims.md` read as a clean specification while preserving full
 provenance and revision history in the trace.
-
-The pending [CLI protocol proposal](../../docs/agent-cli-contracts.md) records the precise
-session-array, rolling-metadata, staleness, promotion, annotation, and protected-repair
-exceptions required by these source instructions. F1 through F7 remain under upstream
-PR review; approval of the implementation plan is not protocol approval. This note changes
-no research procedure. The [unchanged baseline](../../evaluation/agent-cli/baseline-contracts.md)
-retains this skill and its complete reference/template closure.
 
 ## When This Skill Runs
 
@@ -140,7 +153,7 @@ crystallization is the failure mode this design exists to prevent.
 When a signal fires for `O{XX}`:
 
 1. Read O{XX}'s `content`, `context`, `potential_type`, `provenance`, `bound_to`.
-2. Allocate the next ID for the target layer (read the target file first).
+2. Read the target layer through ara first; let the corresponding add/promote operation allocate the next ID and consume its result/bindings.
 3. Construct a typed entry using the schema (see Schemas below). **Before any number enters a
    `Statement`/`Rationale`, ground it per "Number grounding" below — open the source, copy the
    matched line verbatim into `Sources`, then write the number as a copy of that quote.** Carry
@@ -301,7 +314,7 @@ For each crystallized entry in `logic/`, check this turn for:
 
 When a signal fires for entry `E` (claim, heuristic, or concept):
 
-1. Edit the affected fields in the logic file directly. **Overwrite the prior value** —
+1. Use `logic.revise` through `ara apply` for the affected fields in the logic file. **Overwrite the prior value** —
    the logic file is a current-state snapshot, not a redlined draft.
 2. Update `- **Last revised**: YYYY-MM-DD (turn-id)` on the entry.
 3. For status flips, also update `- **Status**:` to the new value.
@@ -350,277 +363,23 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
 ## Per-Turn Procedure
 
 ```
-1. Read existing ara/ files (current state, next IDs).
+1. Read existing ara/ knowledge with ara full source shows (current state); use CLI allocation/results for new IDs.
 2. Stage 1 — harvest this turn's candidate events.
 3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; interpretive events staged to staging/observations.yaml.
 4. Stage 3 — crystallize staged observations whose closure signal fired; flag contradictions; mark 3+-day-idle observations stale.
 5. Stage 4 — for each crystallized logic/ entry, apply status/content/structural edits when a signal fires; run the cross-ref consistency pass; record before/after in the session record; log near-misses.
-6. Append turn events to today's session record; update session_index.yaml; append a line to pm_reasoning_log.yaml.
+6. Use one ara apply batch: session.log appends complete turn arrays and audited rolling metadata/index; record.append appends the complete PM reasoning notes.
 7. Print one-line summary, e.g.:
      [PM] Turn captured: 1 decision (direct), 2 observations staged, 1 claim crystallized via affirmation, C03 testing→supported, C07 revised (scope narrowed).
    Or, for empty turns:
      [PM] Turn skipped: no research events.
 ```
 
-## ARA Directory Structure
+## Schemas and Initialization
 
-```
-ara/
-  PAPER.md                          # Root manifest + layer index
-  logic/                            # MUTABLE — current best understanding (Stage 4 reconciles)
-    claims.md  problem.md  concepts.md  experiments.md  related_work.md
-    solution/                       #   constraints.md + method files per the compiler's domain profile
-  src/                              # How (artifacts) — configs/code/data per domain profile; always environment.md
-  trace/                            # APPEND-ONLY — the journey, never rewritten
-    exploration_tree.yaml           #   Research DAG: decisions, experiments, dead_ends, pivots, questions
-    pm_reasoning_log.yaml           #   Manager's own organizational decisions per turn
-    taste_log.yaml                  #   OPTIONAL — researcher's taste comments on trace nodes (pointer-only, never edits the node)
-    sessions/
-      session_index.yaml            #   Master session index (one entry per calendar day)
-      YYYY-MM-DD_NNN.yaml           #   Per-day session record, incl. logic_revisions
-  evidence/                         # APPEND-ONLY — raw proof
-    README.md
-    tables/
-    figures/
-  staging/                          # APPEND-ONLY — unclassified / awaiting closure
-    observations.yaml               #   The crystallization buffer
-```
-
-## Schemas
-
-### Exploration Tree Node (`trace/exploration_tree.yaml`)
-
-Nested DAG. Each node may have `children:`. Use `also_depends_on: [N{XX}]` for cross-edges.
-
-The tree's shape stays recoverable from a flat append log through two fields you already write: mark
-each level/phase **boundary** as a `pivot` (or `question`) node (it opens a new branch), and list what
-a node builds on in `also_depends_on`. Only when a node resumes an **earlier** branch — rather than
-continuing the step right before it — add an explicit `parent: N{XX}` to point back; in the common
-case its place is already implied and no extra field is needed.
-
-```yaml
-tree:
-  - id: N01
-    type: question | decision | experiment | dead_end | pivot
-    title: "{short title}"
-    provenance: user | ai-suggested | ai-executed | user-revised
-    timestamp: "YYYY-MM-DDTHH:MM"
-    # type-specific fields:
-    description: >    # question
-    choice: >         # decision
-    alternatives: []  # decision
-    evidence: []      # decision, experiment
-    result: >         # experiment
-    hypothesis: >     # dead_end
-    failure_mode: >   # dead_end
-    lesson: >         # dead_end
-    from: ""          # pivot
-    to: ""            # pivot
-    trigger: ""       # pivot
-    status: open | resolved | unresolved   # unresolved used for contradiction-decision nodes
-    also_depends_on: []  # cross-edges (ids) — what this node builds on
-    parent: N{XX}        # OPTIONAL — only to point back to an earlier branch; omit when implied
-    children:
-      - { ... }
-```
-
-### Claim (`logic/claims.md`) — crystallized only
-
-```markdown
-## C{XX}: {generalized title — the takeaway, not a recipe name}
-- **Statement**: {the generalized, mechanistic conclusion; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
-- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
-- **Sources**: [{one entry per load-bearing number in the claim (now in `Conditions`/`Proof`): `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
-- **Status**: hypothesis | untested | testing | supported | weakened | refuted | withdrawn
-- **Provenance**: user | ai-suggested | user-revised
-- **Falsification**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. NOT a tautology or a re-run of the same gate ("if the recipe fails the gate")}
-- **Proof**: [{evidence refs (→ evidence/) or "pending"; run numbers/IDs/scores live HERE, not in Statement}]
-- **Dependencies**: [C{YY}, ...]
-- **Tags**: {comma-separated}
-- **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
-- **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one
-  - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}
-```
-
-**The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,
-not a restatement of run numbers.** What keeps it falsifiable and honest is `Conditions` (the regime
-it holds in + the untested boundary) plus a `Falsification`, not a narrowed sentence. Numbers (run
-IDs, n, scores, step counts) belong in `Proof` → `evidence/` (grounded per Number grounding), never
-in `Statement`. `Conditions` is mandatory: a generalized Statement with no Conditions is an unbounded
-slogan.
-
-**Calibrate the Statement to what the evidence actually separates.** Do not assert a distinction the
-design cannot disentangle (confounded factors — e.g. matrix "shape" vs "role" when they co-vary), or
-a law from a single instance. When that's the case, hedge in the Statement itself — name the
-unseparated factors together, or say "shown once here" — rather than only burying it in `Conditions`.
-`Conditions` bounds *where* the claim applies; it is not a license for the Statement's verb to
-over-reach. The Statement/Conditions may be sharpened on a later turn (Stage 4 content revision) as
-the mechanism becomes clearer — no new closure signal is needed.
-
-Current-state snapshot only — no prior statements, no `From staging`/`Crystallized via`
-notes. Crystallization and every edit are recorded in the trace (`trace/sessions/…` under
-`logic_revisions:` with before/after; source observation stays in `staging/`; reasoning in
-`pm_reasoning_log.yaml`). `refuted`/`withdrawn` are terminal and `revised` is a transition
-marker, not a resting state — see Stage 4.
-
-### Heuristic (`logic/solution/heuristics.md`) — crystallized only
-
-```markdown
-## H{XX}: {title}
-- **Rationale**: {current best explanation of why this works}
-- **Sources**: [{one entry per load-bearing number in `Rationale`/`Sensitivity`/`Bounds`, same format as claims — see "Number grounding"}]
-- **Status**: active | weakened | retired
-- **Provenance**: user | ai-suggested | user-revised
-- **Sensitivity**: low | medium | high | unknown   # "unknown" until the turn establishes it — never guess
-- **Code ref**: [{file paths, or "pending"}]
-- **Last revised**: YYYY-MM-DD (turn-id)   # absent until first revision
-- **Taste** (optional):   # researcher's own reactions; see references/taste-comments.md — absent until the first one
-  - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}
-```
-
-Current-state snapshot only (same as claims); history lives in the trace.
-
-### Observation (`staging/observations.yaml`) — staged
-
-```yaml
-observations:
-  - id: O{XX}
-    timestamp: "YYYY-MM-DDTHH:MM"
-    provenance: user | ai-suggested | ai-executed | user-revised
-    content: "{raw observation, factually distilled}"
-    context: "{what was happening this turn}"
-    potential_type: claim | heuristic | concept | constraint | architecture | unknown
-    bound_to: [N{XX}, ...]    # exploration nodes this depends on
-    promoted: false
-    promoted_to: null         # e.g., "logic/claims.md:C07" once crystallized
-    crystallized_via: null    # which closure signal fired
-    stale: false
-```
-
-### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day
-
-```yaml
-session:
-  id: "YYYY-MM-DD_NNN"
-  date: "YYYY-MM-DD"
-  started: "YYYY-MM-DDTHH:MM"
-  last_turn: "YYYY-MM-DDTHH:MM"
-  turn_count: 0
-  summary: "{rolling one-line summary}"
-
-events_logged:
-  - turn: 1
-    type: decision | experiment | dead_end | pivot | observation | ...
-    id: "{N/O}{XX}"
-    routing: direct | staged | crystallized
-    provenance: user | ai-suggested | ai-executed | user-revised
-    summary: "{telegraphic what}"
-
-ai_actions:
-  - turn: 1
-    action: "{what AI did}"
-    provenance: ai-executed
-    files_changed: ["{paths}"]
-
-claims_touched:
-  - id: C{XX}
-    action: created | crystallized | advanced | weakened | confirmed | refuted | withdrawn | revised | split | merged
-    turn: 1
-
-logic_revisions:                  # full before/after for every edit Stage 4 makes
-  - turn: 1
-    entry: C{XX}                  # or H{XX}, concept id, etc.
-    field: Statement | Status | Rationale | Dependencies | id | ...
-    before: "{prior value, verbatim}"
-    after: "{new value, verbatim}"
-    signal: empirical-resolution | verbal-declaration | dependency-change | artifact-commitment | terminology-drift | user-directive
-    provenance: user | ai-suggested | user-revised
-    note: "{one-line why, optional}"
-  # structural changes record both endpoints, e.g. for a split:
-  - turn: 1
-    entry: C07
-    field: split
-    before: "C07 covered both training and inference"
-    after: "C07 = training-time claim; C12 = inference-time claim"
-    signal: verbal-declaration
-    provenance: user-revised
-
-key_context:
-  - turn: 1
-    excerpt: "{quote or paraphrase capturing decisive exchange}"
-
-open_threads:
-  - "{what needs follow-up}"
-
-ai_suggestions_pending:
-  - "{unconfirmed AI suggestions still awaiting closure}"
-```
-
-### Session Index (`trace/sessions/session_index.yaml`)
-
-```yaml
-sessions:
-  - id: "YYYY-MM-DD_NNN"
-    date: "YYYY-MM-DD"
-    summary: "{main outcome}"
-    turn_count: {N}
-    events_count: {N}
-    claims_touched: [C{XX}, ...]
-    open_threads: {N}
-```
-
-### Reasoning Log (`trace/pm_reasoning_log.yaml`) — self-continuity
-
-A few lines per turn explaining the manager's own organizational decisions. Cheap on
-tokens, prevents organizational drift.
-
-```yaml
-entries:
-  - turn: "YYYY-MM-DD_NNN#3"
-    notes:
-      - "Staged O07 as potential_type: heuristic (not claim) — it's a how, not a what."
-      - "Did NOT crystallize O05 despite affirmation-like language: user said 'maybe' not 'yes'."
-      - "Routed N12 as dead_end rather than experiment — code was abandoned mid-run."
-```
-
-### Taste Log (`trace/taste_log.yaml`) — optional, append-only
-
-Researcher's taste comments on trace nodes. Never edits `exploration_tree.yaml` — points at
-it instead, the same way a promoted observation points at its logic-layer destination
-without rewriting itself. See `references/taste-comments.md` for trigger detection, target
-resolution, and the confirm-before-write procedure. File does not exist until the first entry.
-
-```yaml
-entries:
-  - id: T{XX}
-    timestamp: "YYYY-MM-DDTHH:MM"
-    target: N{XX}                         # trace node this comments on; never edited
-    tag: endorse | uncertain | reject
-    object: claim | evidence | framing | priority
-    comment: "{free-text comment}"
-```
-
-## Initialization (if `ara/` does not exist)
-
-Create the structure on the first turn that contains research-significant activity. Do not
-ask unprompted on a purely conversational opener.
-
-```
-mkdir -p ara/{logic/solution,src,trace/sessions,evidence/{tables,figures},staging}
-```
-
-Seed:
-1. `ara/PAPER.md` — root manifest (infer title, authors, venue from project context)
-2. `ara/trace/sessions/session_index.yaml` — `sessions: []`
-3. `ara/trace/exploration_tree.yaml` — `tree: []`
-4. `ara/trace/pm_reasoning_log.yaml` — `entries: []`
-5. `ara/staging/observations.yaml` — `observations: []`
-6. `ara/logic/claims.md` — `# Claims`
-7. `ara/logic/problem.md` — `# Problem`
-8. `ara/logic/solution/heuristics.md` — `# Heuristics`
-9. `ara/evidence/README.md` — `# Evidence Index`
-
-Then run the per-turn procedure normally.
+Load `references/schema-and-initialization.md` directly for the complete source directory
+structure, every schema, and the unchanged initialization trigger/seed set. Read it before
+constructing any record or first artifact; no fields or history instructions are omitted.
 
 ## Briefing (fresh conversation only)
 
@@ -660,5 +419,5 @@ not asked about on turns where it doesn't come up.
 5. **Stage 4 defaults to no change.** Edits require an explicit signal this turn; terminal states (`refuted`/`withdrawn`) need explicit triggers, never silence/staleness. Log near-misses.
 6. **Respect layer mutability** (see top): `logic/` overwrites in place; `trace/` and `staging/` are append-only except forward-reference pointers. Every logic edit gets a `logic_revisions:` before/after in the session record — the only place pre-edit content is kept.
 7. **Never silently overwrite contradictions** — flag both, append an `unresolved` decision node, defer.
-8. **Read target files first** (correct IDs, no dupes); establish forensic bindings (claim→proof, heuristic→code, decision→evidence), `[pending]`+TODO if not yet bindable. Keep YAML valid; summary line terse.
+8. **Read target files first through ara** (no dupes; CLI assigns new IDs); establish forensic bindings (claim→proof, heuristic→code, decision→evidence), `[pending]`+TODO if not yet bindable. Keep YAML valid; summary line terse.
 9. **Taste comments never guess.** Confirm the target before writing (see references/taste-comments.md); claim/heuristic taste is inline, trace-node taste goes to `taste_log.yaml` and never edits the node.
