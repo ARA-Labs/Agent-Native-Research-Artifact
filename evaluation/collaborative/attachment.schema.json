@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.attachment/v1",
+  "title": "Immutable record attached to one published contribution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "community", "publisher", "request", "target", "payload_digest", "inventory", "body", "record_id"],
+  "properties": {
+    "schema": {"const": "ara.attachment/v1"},
+    "kind": {"enum": ["verification", "correction", "review_attestation", "argument_check", "dispute", "superseding_verdict", "external_file_acknowledgment"]},
+    "community": {"$ref": "common.schema.json#/$defs/identity"},
+    "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+    "request": {"$ref": "common.schema.json#/$defs/request_id"},
+    "target": {"$ref": "common.schema.json#/$defs/digest"},
+    "payload_digest": {"$ref": "common.schema.json#/$defs/digest"},
+    "inventory": {"$ref": "common.schema.json#/$defs/inventory_pointer"},
+    "body": {"type": "object"},
+    "record_id": {"$ref": "common.schema.json#/$defs/digest"}
+  },
+  "allOf": [
+    {"if": {"properties": {"kind": {"const": "verification"}}},
+     "then": {"properties": {"body": {"allOf": [{"$ref": "verification.schema.json"}, {"properties": {"supersedes": {"type": "null"}}}]}}}},
+    {"if": {"properties": {"kind": {"const": "superseding_verdict"}}},
+     "then": {"properties": {"body": {"allOf": [{"$ref": "verification.schema.json"}, {"properties": {"supersedes": {"$ref": "common.schema.json#/$defs/digest"}}}]}}}},
+    {"if": {"properties": {"kind": {"const": "correction"}}},
+     "then": {"properties": {"body": {"$ref": "#/$defs/correction"}}}},
+    {"if": {"properties": {"kind": {"const": "dispute"}}},
+     "then": {"properties": {"body": {"$ref": "#/$defs/dispute"}}}},
+    {"if": {"properties": {"kind": {"const": "external_file_acknowledgment"}}},
+     "then": {"properties": {"body": {"$ref": "#/$defs/external_file_acknowledgment"}}}},
+    {"if": {"properties": {"kind": {"enum": ["review_attestation", "argument_check"]}}},
+     "then": {"properties": {"body": {"$ref": "#/$defs/deferred_body"}}}}
+  ],
+  "$defs": {
+    "selectors": {"type": "array", "maxItems": 1024, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/selector"}},
+    "correction": {
+      "type": "object", "additionalProperties": false, "required": ["schema", "statement", "selectors", "replacement"],
+      "properties": {
+        "schema": {"const": "ara.correction/v1"},
+        "statement": {"$ref": "common.schema.json#/$defs/text"},
+        "selectors": {"$ref": "#/$defs/selectors"},
+        "replacement": {"$ref": "common.schema.json#/$defs/nullable_digest"}
+      }
+    },
+    "dispute": {
+      "type": "object", "additionalProperties": false, "required": ["schema", "disputed_record", "selectors", "reason"],
+      "properties": {
+        "schema": {"const": "ara.dispute/v1"},
+        "disputed_record": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "selectors": {"$ref": "#/$defs/selectors"},
+        "reason": {"$ref": "common.schema.json#/$defs/text"}
+      }
+    },
+    "external_file_acknowledgment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "destination", "source_key", "native_revision", "path", "digest", "conflict", "audit_session", "disposition"],
+      "properties": {
+        "schema": {"const": "ara.external-file-acknowledgment/v1"},
+        "destination": {"$ref": "common.schema.json#/$defs/identity"},
+        "source_key": {"$ref": "common.schema.json#/$defs/identity"},
+        "native_revision": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "path": {"$ref": "common.schema.json#/$defs/path"},
+        "digest": {"$ref": "common.schema.json#/$defs/digest"},
+        "conflict": {"$ref": "common.schema.json#/$defs/text"},
+        "audit_session": {"$ref": "common.schema.json#/$defs/text"},
+        "disposition": {"const": "retained-in-contribution"}
+      }
+    },
+    "deferred_body": {
+      "type": "object", "additionalProperties": false, "required": ["schema", "document"],
+      "properties": {
+        "schema": {"type": "string", "pattern": "^ara\\.lara-[a-z0-9-]+/v[1-9][0-9]*$"},
+        "document": {"$ref": "common.schema.json#/$defs/file_ref"}
+      }
+    }
+  },
+  "x-identity": {
+    "record_id": "sha256(\"ara.attachment/v1\\0\" || JCS(attachment without record_id))",
+    "payload_digest": "sha256(\"ara.payload/v1\\0\" || JCS(the attachment's own ara.payload-inventory/v1, native null unless it carries a snapshot))"
+  },
+  "x-consumer-invariants": [
+    "target is a published contribution_id, never a payload digest; the original envelope and payload never change",
+    "request has the prefix '<publisher>:' and shares the (community, publisher) request namespace with contributions: one request binds one record_id",
+    "every body file_ref names an entry in the attachment's own inventory",
+    "verification bodies have supersedes null; superseding_verdict bodies name an earlier attachment record_id with the same verdict key; neither erases the earlier record",
+    "external_file_acknowledgment records the integration PM's 'merge resolve --take ours' on an external_read_only conflict and states that the incoming bytes remain in the target contribution; it neither approves the experiment nor copies the file",
+    "review_attestation and argument_check bodies point to a document whose schema is frozen by stage L1 (plan 03); the authorized-reviewer check and producer exclusion apply to review_attestation",
+    "corrections and disputes add records; the coordinator rebuild must reproduce the same contributions, corrections and verdicts"
+  ]
+}

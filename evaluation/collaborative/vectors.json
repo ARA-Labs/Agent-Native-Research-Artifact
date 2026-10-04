@@ -1,0 +1,794 @@
+{
+  "schema": "ara.collaborative-vectors/v1",
+  "note": "Expected values for identities computed by identity.py at freeze time, except snapshots[].capture_id/fingerprint/snapshot_json (produced by ara-cli) and jcs[] RFC 8785 examples (from the RFC). Tests recompute every value.",
+  "ara_cli": {
+    "revision": "da43bf642fca52ab201bc6d44d6b972ebf22b6f7",
+    "version": "ara 0.1.25",
+    "build": "cargo build -p ara-cli (debug)",
+    "fixture_source": "Agent-Native-Research-Artifact examples/minimal-artifact"
+  },
+  "jcs": [
+    {
+      "name": "rfc8785-3.2.3-sorting",
+      "input": {
+        "€": "Euro Sign",
+        "\r": "Carriage Return",
+        "דּ": "Hebrew Letter Dalet With Dagesh",
+        "1": "One",
+        "😀": "Emoji: Grinning Face",
+        "": "Control",
+        "ö": "Latin Small Letter O With Diaeresis"
+      },
+      "expected": "{\"\\r\":\"Carriage Return\",\"1\":\"One\",\"\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\",\"€\":\"Euro Sign\",\"😀\":\"Emoji: Grinning Face\",\"דּ\":\"Hebrew Letter Dalet With Dagesh\"}"
+    },
+    {
+      "name": "rfc8785-3.2.2.2-string",
+      "input": "€$\u000f\nA'B\"\\\\\"/",
+      "expected": "\"€$\\u000f\\nA'B\\\"\\\\\\\\\\\"/\""
+    },
+    {
+      "name": "literals-and-nesting",
+      "input": {
+        "b": [
+          true,
+          false,
+          null,
+          0,
+          -1,
+          9007199254740991
+        ],
+        "a": {
+          "z": [],
+          "y": {}
+        }
+      },
+      "expected": "{\"a\":{\"y\":{},\"z\":[]},\"b\":[true,false,null,0,-1,9007199254740991]}"
+    },
+    {
+      "name": "controls-and-separators",
+      "input": [
+        "\u0000\u001f \b\t\f"
+      ],
+      "expected": "[\"\\u0000\\u001f \\b\\t\\f\"]"
+    }
+  ],
+  "jcs_rejects": [
+    {
+      "name": "float",
+      "json": "{\"a\":1.5}"
+    },
+    {
+      "name": "exponent",
+      "json": "[1e3]"
+    },
+    {
+      "name": "negative-zero-float",
+      "json": "-0.0"
+    },
+    {
+      "name": "nan",
+      "json": "[NaN]"
+    },
+    {
+      "name": "duplicate-key",
+      "json": "{\"a\":1,\"a\":1}"
+    },
+    {
+      "name": "unsafe-integer",
+      "json": "[9007199254740992]"
+    },
+    {
+      "name": "lone-surrogate",
+      "json": "[\"\\ud800\"]"
+    }
+  ],
+  "snapshots": [
+    {
+      "name": "snap-a",
+      "description": "examples/minimal-artifact with every file at 0644",
+      "how": "cp -R examples/minimal-artifact F; chmod 0644 F/**; ara -C F snapshot --output snap-a --json",
+      "snapshot_json": "{\"capture_id\":\"sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf\",\"diagnostics\":{\"errors\":0,\"items\":[],\"warnings\":0},\"excluded\":[\".ara/\",\".git/\",\".ara-write-<pid>-<nonce>\"],\"files\":[{\"digest\":\"sha256:a6a293215fd7a5512d88ffc77bfc290109ac18ebc2787793d542c28f46ef5664\",\"mode\":\"0644\",\"path\":\"PAPER.md\",\"size\":1193},{\"digest\":\"sha256:77f8afda443939151fb7f22605f139fd0f4c622a4389d8cdd757579edf028e04\",\"mode\":\"0644\",\"path\":\"logic/claims.md\",\"size\":845},{\"digest\":\"sha256:cd5553d43b310c6a0b62eac1017cfcbf02c1010dbf675f2ff8d840e454e3ae7e\",\"mode\":\"0644\",\"path\":\"logic/problem.md\",\"size\":1506},{\"digest\":\"sha256:3b24bbd0a9aa1593c9fd200326018029eb0800d8575f57189b75b51d97e905c5\",\"mode\":\"0644\",\"path\":\"trace/exploration_tree.yaml\",\"size\":986}],\"fingerprint\":\"4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e\",\"fingerprint_scheme\":\"ara.artifact/v1\",\"format\":\"ara.snapshot/v1\",\"root\":\"ara\"}",
+      "snapshot_json_sha256": "sha256:11d4b03e9bc36919892f474f978ae8df8c630f71bf09eeecb8d04248c07f3414",
+      "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf",
+      "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e"
+    },
+    {
+      "name": "snap-b",
+      "description": "snap-a with only logic/claims.md changed to 0755 (mode-only change)",
+      "how": "chmod 0755 F/logic/claims.md; ara -C F snapshot --output snap-b --json",
+      "snapshot_json": "{\"capture_id\":\"sha256:16c6cede5f97fda32af3b52df720c67227a9613558b82c2b4a6df756e8e40a33\",\"diagnostics\":{\"errors\":0,\"items\":[],\"warnings\":0},\"excluded\":[\".ara/\",\".git/\",\".ara-write-<pid>-<nonce>\"],\"files\":[{\"digest\":\"sha256:a6a293215fd7a5512d88ffc77bfc290109ac18ebc2787793d542c28f46ef5664\",\"mode\":\"0644\",\"path\":\"PAPER.md\",\"size\":1193},{\"digest\":\"sha256:77f8afda443939151fb7f22605f139fd0f4c622a4389d8cdd757579edf028e04\",\"mode\":\"0755\",\"path\":\"logic/claims.md\",\"size\":845},{\"digest\":\"sha256:cd5553d43b310c6a0b62eac1017cfcbf02c1010dbf675f2ff8d840e454e3ae7e\",\"mode\":\"0644\",\"path\":\"logic/problem.md\",\"size\":1506},{\"digest\":\"sha256:3b24bbd0a9aa1593c9fd200326018029eb0800d8575f57189b75b51d97e905c5\",\"mode\":\"0644\",\"path\":\"trace/exploration_tree.yaml\",\"size\":986}],\"fingerprint\":\"4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e\",\"fingerprint_scheme\":\"ara.artifact/v1\",\"format\":\"ara.snapshot/v1\",\"root\":\"ara\"}",
+      "snapshot_json_sha256": "sha256:301e1c9e1b759d4e9524e517149b91c10c5ea6c333ccc99cf1ee03ea81e5ee1f",
+      "capture_id": "sha256:16c6cede5f97fda32af3b52df720c67227a9613558b82c2b4a6df756e8e40a33",
+      "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e"
+    },
+    {
+      "name": "snap-c",
+      "description": "snap-a plus an error diagnostic and an executable with a non-ASCII, quoted path",
+      "how": "append a duplicate '## C01' claim to logic/claims.md; add 0755 'src/naïve \"quoted\" run.py'; ara -C F snapshot --output snap-c --json",
+      "snapshot_json": "{\"capture_id\":\"sha256:519e0d2cffcb5f4bb962c2420bd091e7d9894c7c350a0dec78272cb8aca7e710\",\"diagnostics\":{\"errors\":1,\"items\":[{\"code\":\"ARA106\",\"message\":\"duplicate claim id\",\"path\":\"claims[C01]\",\"severity\":\"error\"}],\"warnings\":0},\"excluded\":[\".ara/\",\".git/\",\".ara-write-<pid>-<nonce>\"],\"files\":[{\"digest\":\"sha256:a6a293215fd7a5512d88ffc77bfc290109ac18ebc2787793d542c28f46ef5664\",\"mode\":\"0644\",\"path\":\"PAPER.md\",\"size\":1193},{\"digest\":\"sha256:b660d84062c7bbe12b7dc1945c44d5353ce556d7d17163237369061770c80f72\",\"mode\":\"0644\",\"path\":\"logic/claims.md\",\"size\":889},{\"digest\":\"sha256:cd5553d43b310c6a0b62eac1017cfcbf02c1010dbf675f2ff8d840e454e3ae7e\",\"mode\":\"0644\",\"path\":\"logic/problem.md\",\"size\":1506},{\"digest\":\"sha256:ae5ad4b412cabdb4ab3af35e64547a7d4249b40ecbec69b28f905e8176db39d0\",\"mode\":\"0755\",\"path\":\"src/naïve \\\"quoted\\\" run.py\",\"size\":23},{\"digest\":\"sha256:3b24bbd0a9aa1593c9fd200326018029eb0800d8575f57189b75b51d97e905c5\",\"mode\":\"0644\",\"path\":\"trace/exploration_tree.yaml\",\"size\":986}],\"fingerprint\":\"9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f\",\"fingerprint_scheme\":\"ara.artifact/v1\",\"format\":\"ara.snapshot/v1\",\"root\":\"ara\"}",
+      "snapshot_json_sha256": "sha256:a29cdbab1463b26efbef025cae30eec10dfc91af08cfdda44fbe99e04a80aa1c",
+      "capture_id": "sha256:519e0d2cffcb5f4bb962c2420bd091e7d9894c7c350a0dec78272cb8aca7e710",
+      "fingerprint": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f"
+    }
+  ],
+  "payload": {
+    "inventory": {
+      "schema": "ara.payload-inventory/v1",
+      "roots": [
+        {
+          "name": "code",
+          "kind": "code"
+        },
+        {
+          "name": "data",
+          "kind": "input"
+        },
+        {
+          "name": "native",
+          "kind": "ara-snapshot"
+        }
+      ],
+      "native": {
+        "root": "native",
+        "manifest": "snapshot.json",
+        "fingerprint_scheme": "ara.artifact/v1",
+        "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+        "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+      },
+      "entries": [
+        {
+          "root": "code",
+          "path": "conf/ablation.yaml",
+          "digest": "sha256:50d8bab9a34b71ac3f2f2e2192041d435660a699819ed19afd9f128e48b658aa",
+          "size": 6,
+          "mode": "0644"
+        },
+        {
+          "root": "code",
+          "path": "train.py",
+          "digest": "sha256:3dbc91161b03967f54c9dab94d9c10ad091f036e0ba692e8ebd353cb056eac4a",
+          "size": 27,
+          "mode": "0755"
+        },
+        {
+          "root": "native",
+          "path": "ara/PAPER.md",
+          "digest": "sha256:a6a293215fd7a5512d88ffc77bfc290109ac18ebc2787793d542c28f46ef5664",
+          "size": 1193,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "ara/logic/claims.md",
+          "digest": "sha256:77f8afda443939151fb7f22605f139fd0f4c622a4389d8cdd757579edf028e04",
+          "size": 845,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "ara/logic/problem.md",
+          "digest": "sha256:cd5553d43b310c6a0b62eac1017cfcbf02c1010dbf675f2ff8d840e454e3ae7e",
+          "size": 1506,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "ara/trace/exploration_tree.yaml",
+          "digest": "sha256:3b24bbd0a9aa1593c9fd200326018029eb0800d8575f57189b75b51d97e905c5",
+          "size": 986,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "snapshot.json",
+          "digest": "sha256:11d4b03e9bc36919892f474f978ae8df8c630f71bf09eeecb8d04248c07f3414",
+          "size": 913,
+          "mode": "0644"
+        }
+      ],
+      "external": [
+        {
+          "root": "data",
+          "path": "train.parquet",
+          "digest": "sha256:abababababababababababababababababababababababababababababababab",
+          "size": 1048576,
+          "mode": "0644",
+          "retrieval": {
+            "kind": "git",
+            "locator": "https://example.org/data.git#train.parquet",
+            "revision": "0123456789abcdef0123456789abcdef01234567"
+          }
+        }
+      ],
+      "execution": {
+        "entry": {
+          "root": "code",
+          "path": "train.py"
+        },
+        "config": {
+          "root": "code",
+          "path": "conf/ablation.yaml"
+        },
+        "environment": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+      }
+    },
+    "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+    "mode_only_inventory": {
+      "schema": "ara.payload-inventory/v1",
+      "roots": [
+        {
+          "name": "code",
+          "kind": "code"
+        },
+        {
+          "name": "data",
+          "kind": "input"
+        },
+        {
+          "name": "native",
+          "kind": "ara-snapshot"
+        }
+      ],
+      "native": {
+        "root": "native",
+        "manifest": "snapshot.json",
+        "fingerprint_scheme": "ara.artifact/v1",
+        "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+        "capture_id": "sha256:16c6cede5f97fda32af3b52df720c67227a9613558b82c2b4a6df756e8e40a33"
+      },
+      "entries": [
+        {
+          "root": "code",
+          "path": "conf/ablation.yaml",
+          "digest": "sha256:50d8bab9a34b71ac3f2f2e2192041d435660a699819ed19afd9f128e48b658aa",
+          "size": 6,
+          "mode": "0644"
+        },
+        {
+          "root": "code",
+          "path": "train.py",
+          "digest": "sha256:3dbc91161b03967f54c9dab94d9c10ad091f036e0ba692e8ebd353cb056eac4a",
+          "size": 27,
+          "mode": "0755"
+        },
+        {
+          "root": "native",
+          "path": "ara/PAPER.md",
+          "digest": "sha256:a6a293215fd7a5512d88ffc77bfc290109ac18ebc2787793d542c28f46ef5664",
+          "size": 1193,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "ara/logic/claims.md",
+          "digest": "sha256:77f8afda443939151fb7f22605f139fd0f4c622a4389d8cdd757579edf028e04",
+          "size": 845,
+          "mode": "0755"
+        },
+        {
+          "root": "native",
+          "path": "ara/logic/problem.md",
+          "digest": "sha256:cd5553d43b310c6a0b62eac1017cfcbf02c1010dbf675f2ff8d840e454e3ae7e",
+          "size": 1506,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "ara/trace/exploration_tree.yaml",
+          "digest": "sha256:3b24bbd0a9aa1593c9fd200326018029eb0800d8575f57189b75b51d97e905c5",
+          "size": 986,
+          "mode": "0644"
+        },
+        {
+          "root": "native",
+          "path": "snapshot.json",
+          "digest": "sha256:301e1c9e1b759d4e9524e517149b91c10c5ea6c333ccc99cf1ee03ea81e5ee1f",
+          "size": 913,
+          "mode": "0644"
+        }
+      ],
+      "external": [
+        {
+          "root": "data",
+          "path": "train.parquet",
+          "digest": "sha256:abababababababababababababababababababababababababababababababab",
+          "size": 1048576,
+          "mode": "0644",
+          "retrieval": {
+            "kind": "git",
+            "locator": "https://example.org/data.git#train.parquet",
+            "revision": "0123456789abcdef0123456789abcdef01234567"
+          }
+        }
+      ],
+      "execution": {
+        "entry": {
+          "root": "code",
+          "path": "train.py"
+        },
+        "config": {
+          "root": "code",
+          "path": "conf/ablation.yaml"
+        },
+        "environment": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+      }
+    },
+    "expected_mode_only_payload_digest": "sha256:6228263ad0460695f4bfc8b7e73e152340a5b6c509c2d220578bb6ca99c005e4",
+    "manifest_snapshot": "snap-a",
+    "mode_only_manifest_snapshot": "snap-b"
+  },
+  "contribution": {
+    "envelope": {
+      "schema": "ara.contribution/v1",
+      "community": "run-2026-10-a",
+      "publisher": "worker-a",
+      "request": "worker-a:req-0007",
+      "source_key": "fork-a",
+      "native": {
+        "snapshot": {
+          "root": "native",
+          "path": "snapshot.json"
+        },
+        "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+        "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+      },
+      "payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+      "lineage": {
+        "start_fingerprint": "0e77000000000000000000000000000000000000000000000000000000000000",
+        "parents": [
+          "sha256:5151515151515151515151515151515151515151515151515151515151515151"
+        ],
+        "uses": [
+          {
+            "source_key": "fork-a",
+            "native_revision": "0e77000000000000000000000000000000000000000000000000000000000000",
+            "selector": "N04"
+          }
+        ]
+      },
+      "payload": {
+        "experiment": "N12",
+        "question": "N04",
+        "observation": null,
+        "change": {
+          "selector": "N12",
+          "field": "description"
+        },
+        "prediction": {
+          "native_revision": "0e77000000000000000000000000000000000000000000000000000000000000",
+          "selector": "O03"
+        },
+        "outcome": {
+          "selector": "N12",
+          "field": "result"
+        },
+        "follow_up": null
+      },
+      "execution": {
+        "intention_receipt": "sha256:2424242424242424242424242424242424242424242424242424242424242424",
+        "input_inventory": "sha256:1616161616161616161616161616161616161616161616161616161616161616"
+      },
+      "inventory": {
+        "manifest": "payload-inventory.json"
+      },
+      "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b"
+    },
+    "expected_contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+    "variants": [
+      {
+        "name": "publisher",
+        "group": "attribution",
+        "changes": {
+          "publisher": "worker-b",
+          "request": "worker-b:req-0007"
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:aff604dcb5015df5ab489eb2dd3a8efee2102be1a27668a1adddbbd03719deb2"
+      },
+      {
+        "name": "community",
+        "group": "attribution",
+        "changes": {
+          "community": "run-2026-10-b"
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:8dd7ffbbef24d4bf73bc729b4294e130d2f94fd8b88c0ba0c427689280856a67"
+      },
+      {
+        "name": "source_key",
+        "group": "attribution",
+        "changes": {
+          "source_key": "fork-a2"
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:6631a58c0f597abc5fee7ad1a4d1b977da875379726dda12944a4736667d1379"
+      },
+      {
+        "name": "parents",
+        "group": "lineage",
+        "changes": {
+          "lineage.parents": [
+            "sha256:5151515151515151515151515151515151515151515151515151515151515151",
+            "sha256:5252525252525252525252525252525252525252525252525252525252525252"
+          ]
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:84bc6bacd8f6f274f9ff9566e335123c64087da146a7c2a20a33644997f6c22b"
+      },
+      {
+        "name": "uses",
+        "group": "lineage",
+        "changes": {
+          "lineage.uses": []
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:012513a9c5d994575ddf892f81c00bc8618231e5fde6c66272065b806f31ed7d"
+      },
+      {
+        "name": "experiment_pointer",
+        "group": "native pointer",
+        "changes": {
+          "payload.experiment": "N13"
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:53926a21639afb1fe193be133d964ee9a682749dc773147f1d4bb33ce939c679"
+      },
+      {
+        "name": "prediction_pointer",
+        "group": "native pointer",
+        "changes": {
+          "payload.prediction": {
+            "native_revision": "0e77000000000000000000000000000000000000000000000000000000000000",
+            "selector": "O04"
+          }
+        },
+        "inventory": "base",
+        "expected_payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45",
+        "expected_contribution_id": "sha256:5adea9fabc8ed0decf78bfa4355f52420a8b2b1d649995ec1bb41e230946230e"
+      },
+      {
+        "name": "mode_only_native",
+        "group": "payload (mode-only native change)",
+        "changes": {},
+        "inventory": "mode_only",
+        "expected_payload_digest": "sha256:6228263ad0460695f4bfc8b7e73e152340a5b6c509c2d220578bb6ca99c005e4",
+        "expected_contribution_id": "sha256:73e2718f033773b7a1eecb57506c58012591ded21e20bdf420ad3646fbe95df4"
+      }
+    ]
+  },
+  "records": {
+    "attachment_verification": {
+      "record": {
+        "schema": "ara.attachment/v1",
+        "kind": "verification",
+        "community": "run-2026-10-a",
+        "publisher": "verifier-c",
+        "request": "verifier-c:verify-0001",
+        "target": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "payload_digest": "sha256:6ea058b7b84c1a7d4467100b326ed5f78b8459e2e1acb0e8a97a89ed0bd790b6",
+        "inventory": {
+          "manifest": "payload-inventory.json"
+        },
+        "body": {
+          "schema": "ara.verification/v1",
+          "verification_kind": "score_reproduction",
+          "target": {
+            "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+            "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+            "selectors": [
+              "C01",
+              "N12"
+            ]
+          },
+          "scope": "Held-out split, three seeds, as declared by the target",
+          "conditions": {
+            "description": "Original config and environment",
+            "setting": null,
+            "environment": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+            "held_out_evaluator": true
+          },
+          "method": {
+            "description": "Re-run train.py with the frozen config",
+            "evaluator": {
+              "name": "ara-eval scorer",
+              "revision": "0123456"
+            },
+            "config": {
+              "root": "verify",
+              "path": "conf/ablation.yaml"
+            }
+          },
+          "execution": {
+            "intention_receipt": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+            "input_inventory": "sha256:7878787878787878787878787878787878787878787878787878787878787878",
+            "raw_outputs": [
+              {
+                "root": "verify",
+                "path": "outputs/scores.json"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "name": "accuracy",
+              "value": "0.8125",
+              "unit": null,
+              "evidence": {
+                "root": "verify",
+                "path": "outputs/scores.json"
+              }
+            }
+          ],
+          "outcome": "partial",
+          "rationale": "Two of three seeds reproduce within the declared tolerance.",
+          "supersedes": null
+        },
+        "record_id": "sha256:4d2b357665cb85fc5a0e9f24583e15bf608fe110358ba5f3dbd8fc9819c284ca"
+      },
+      "expected_id": "sha256:4d2b357665cb85fc5a0e9f24583e15bf608fe110358ba5f3dbd8fc9819c284ca"
+    },
+    "attachment_external_file_acknowledgment": {
+      "record": {
+        "schema": "ara.attachment/v1",
+        "kind": "external_file_acknowledgment",
+        "community": "run-2026-10-a",
+        "publisher": "pm",
+        "request": "pm:ack-0001",
+        "target": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "payload_digest": "sha256:786741bc1933b934c3c45b44c07b45114f5dec53e2f1b98e3794540dc6b6c35c",
+        "inventory": {
+          "manifest": "payload-inventory.json"
+        },
+        "body": {
+          "schema": "ara.external-file-acknowledgment/v1",
+          "destination": "canonical",
+          "source_key": "fork-a",
+          "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "path": "src/worker.py",
+          "digest": "sha256:3dbc91161b03967f54c9dab94d9c10ad091f036e0ba692e8ebd353cb056eac4a",
+          "conflict": "external_read_only:src/worker.py",
+          "audit_session": "S07",
+          "disposition": "retained-in-contribution"
+        },
+        "record_id": "sha256:384c17e3677205dcfcd77bd4d0acc16b34f2de3d874c9126b7d8326dae38c254"
+      },
+      "expected_id": "sha256:384c17e3677205dcfcd77bd4d0acc16b34f2de3d874c9126b7d8326dae38c254"
+    },
+    "integration_import": {
+      "record": {
+        "schema": "ara.integration-receipt/v1",
+        "kind": "import",
+        "community": "run-2026-10-a",
+        "integration_pm": "pm",
+        "request": "pm:import-0001",
+        "destination": "canonical",
+        "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "source_key": "fork-a",
+        "source_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+        "base": {
+          "revision": "0e77000000000000000000000000000000000000000000000000000000000000",
+          "contribution_id": null
+        },
+        "predecessor": null,
+        "identity_mapping": [
+          {
+            "source_key": "fork-a",
+            "original": "C77",
+            "target": "C03",
+            "layer": "claims",
+            "path": "logic/claims.md"
+          }
+        ],
+        "destination_before": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "destination_after": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "merge_report": {
+          "digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "exit_status": 1,
+          "committed": true,
+          "unresolved_count": 1
+        },
+        "audit_session": "S07",
+        "external_references": [
+          {
+            "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+            "source_key": "fork-a",
+            "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+            "path": "src/worker.py",
+            "digest": "sha256:3dbc91161b03967f54c9dab94d9c10ad091f036e0ba692e8ebd353cb056eac4a"
+          }
+        ],
+        "acknowledgments": [],
+        "state": "imported-with-conflicts",
+        "record_id": "sha256:57a7b7a01d5bfa51650522e79dcbdd3bc0af58ad15b5554cb1007515bafd9238"
+      },
+      "expected_id": "sha256:57a7b7a01d5bfa51650522e79dcbdd3bc0af58ad15b5554cb1007515bafd9238"
+    },
+    "integration_resolution": {
+      "record": {
+        "schema": "ara.integration-receipt/v1",
+        "kind": "resolution",
+        "community": "run-2026-10-a",
+        "integration_pm": "pm",
+        "request": "pm:resolve-0001",
+        "destination": "canonical",
+        "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "import_receipt": "sha256:57a7b7a01d5bfa51650522e79dcbdd3bc0af58ad15b5554cb1007515bafd9238",
+        "previous": "sha256:57a7b7a01d5bfa51650522e79dcbdd3bc0af58ad15b5554cb1007515bafd9238",
+        "destination_before": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "destination_after": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "resolved_conflicts": [
+          "external_read_only:src/worker.py"
+        ],
+        "review_decisions": [],
+        "unresolved_count": 0,
+        "audit_session": "S07",
+        "acknowledgments": [
+          "sha256:384c17e3677205dcfcd77bd4d0acc16b34f2de3d874c9126b7d8326dae38c254"
+        ],
+        "state": "integrated",
+        "record_id": "sha256:79b818add1425d8c5bb53bb486f2c6429377539e14f910daec81f814eb892b06"
+      },
+      "expected_id": "sha256:79b818add1425d8c5bb53bb486f2c6429377539e14f910daec81f814eb892b06"
+    },
+    "publication_request": {
+      "record": {
+        "schema": "ara.publication-request/v1",
+        "community": "run-2026-10-a",
+        "publisher": "worker-a",
+        "request": "worker-a:req-0007",
+        "record_kind": "contribution",
+        "record_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "payload_digest": "sha256:3920357601ccf9920852ac3acb773da64c892b7cafbc39322d59cc090e171c45"
+      },
+      "expected_id": "sha256:b42dff52052d78b443d966540026a652871dbee9c261cf1230dc5715a10618ca"
+    },
+    "publication_receipt": {
+      "record": {
+        "schema": "ara.publication-receipt/v1",
+        "community": "run-2026-10-a",
+        "publisher": "worker-a",
+        "request": "worker-a:req-0007",
+        "request_digest": "sha256:b42dff52052d78b443d966540026a652871dbee9c261cf1230dc5715a10618ca",
+        "record_kind": "contribution",
+        "record_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "sequence": 1,
+        "visibility_id": "sha256:6d56b2f99242ecfa089cc82f15401d09c6f65de34019aba9919d6376bc80b8a6",
+        "receipt_id": "sha256:da8f1c73bbb8ce15372f8a4031afc554e60e20db788e2d812318cee5fb402a56"
+      },
+      "expected_id": "sha256:da8f1c73bbb8ce15372f8a4031afc554e60e20db788e2d812318cee5fb402a56"
+    },
+    "visibility": {
+      "record": {
+        "schema": "ara.visibility/v1",
+        "community": "run-2026-10-a",
+        "sequence": 2,
+        "contributions": [
+          {
+            "sequence": 1,
+            "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+            "publisher": "worker-a",
+            "source_key": "fork-a"
+          }
+        ],
+        "attachments": [
+          {
+            "sequence": 2,
+            "record_id": "sha256:4d2b357665cb85fc5a0e9f24583e15bf608fe110358ba5f3dbd8fc9819c284ca",
+            "kind": "verification",
+            "target": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+            "publisher": "verifier-c"
+          }
+        ],
+        "intentions": {
+          "schema": "ara.community-transport/v1",
+          "sequence": 9,
+          "digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        "visibility_id": "sha256:6d56b2f99242ecfa089cc82f15401d09c6f65de34019aba9919d6376bc80b8a6"
+      },
+      "expected_id": "sha256:6d56b2f99242ecfa089cc82f15401d09c6f65de34019aba9919d6376bc80b8a6"
+    },
+    "role_policy": {
+      "record": {
+        "schema": "ara.role-policy/v1",
+        "community": "run-2026-10-a",
+        "integration_pm": "pm",
+        "actors": [
+          {
+            "actor_id": "pm",
+            "source_key": "canonical",
+            "roles": [
+              "continuity_writer",
+              "integration_pm"
+            ]
+          },
+          {
+            "actor_id": "verifier-c",
+            "source_key": null,
+            "roles": [
+              "verifier"
+            ]
+          },
+          {
+            "actor_id": "worker-a",
+            "source_key": "fork-a",
+            "roles": [
+              "argument_producer",
+              "continuity_writer",
+              "publisher"
+            ]
+          },
+          {
+            "actor_id": "worker-b",
+            "source_key": "fork-b",
+            "roles": [
+              "continuity_writer",
+              "publisher"
+            ]
+          }
+        ],
+        "independence": {
+          "statement": "All actors share one model family and provider; no independence is claimed.",
+          "shared_factors": [
+            {
+              "factor": "model",
+              "actors": [
+                "pm",
+                "verifier-c",
+                "worker-a",
+                "worker-b"
+              ],
+              "description": "Same model family and version."
+            }
+          ]
+        },
+        "policy_id": "sha256:804cf1797ba7d9c37ec61d6eb4dd67ce90bc9eac2965bcabaf6156dccf86e280"
+      },
+      "expected_id": "sha256:804cf1797ba7d9c37ec61d6eb4dd67ce90bc9eac2965bcabaf6156dccf86e280"
+    }
+  },
+  "attachment_inventory": {
+    "inventory": {
+      "schema": "ara.payload-inventory/v1",
+      "roots": [
+        {
+          "name": "verify",
+          "kind": "output"
+        }
+      ],
+      "native": null,
+      "entries": [
+        {
+          "root": "verify",
+          "path": "conf/ablation.yaml",
+          "digest": "sha256:50d8bab9a34b71ac3f2f2e2192041d435660a699819ed19afd9f128e48b658aa",
+          "size": 6,
+          "mode": "0644"
+        },
+        {
+          "root": "verify",
+          "path": "outputs/scores.json",
+          "digest": "sha256:925e49d1e34bbbf228805bbdad8ca781a4836d6d849a3c3c76a9587e2d0ec320",
+          "size": 22,
+          "mode": "0644"
+        }
+      ],
+      "external": [],
+      "execution": {
+        "entry": null,
+        "config": {
+          "root": "verify",
+          "path": "conf/ablation.yaml"
+        },
+        "environment": null
+      }
+    },
+    "expected_payload_digest": "sha256:6ea058b7b84c1a7d4467100b326ed5f78b8459e2e1acb0e8a97a89ed0bd790b6"
+  }
+}

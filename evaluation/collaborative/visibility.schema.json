@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.visibility/v1",
+  "title": "Community visibility snapshot of published records",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "sequence", "contributions", "attachments", "intentions", "visibility_id"],
+  "properties": {
+    "schema": {"const": "ara.visibility/v1"},
+    "community": {"$ref": "common.schema.json#/$defs/identity"},
+    "sequence": {"$ref": "common.schema.json#/$defs/sequence"},
+    "contributions": {
+      "type": "array", "maxItems": 1000000, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["sequence", "contribution_id", "publisher", "source_key"],
+        "properties": {
+          "sequence": {"$ref": "common.schema.json#/$defs/sequence"},
+          "contribution_id": {"$ref": "common.schema.json#/$defs/digest"},
+          "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+          "source_key": {"$ref": "common.schema.json#/$defs/identity"}
+        }
+      }
+    },
+    "attachments": {
+      "type": "array", "maxItems": 1000000, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["sequence", "record_id", "kind", "target", "publisher"],
+        "properties": {
+          "sequence": {"$ref": "common.schema.json#/$defs/sequence"},
+          "record_id": {"$ref": "common.schema.json#/$defs/digest"},
+          "kind": {"enum": ["verification", "correction", "review_attestation", "argument_check", "dispute", "superseding_verdict", "external_file_acknowledgment"]},
+          "target": {"$ref": "common.schema.json#/$defs/digest"},
+          "publisher": {"$ref": "common.schema.json#/$defs/identity"}
+        }
+      }
+    },
+    "intentions": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false, "required": ["schema", "sequence", "digest"],
+          "properties": {
+            "schema": {"enum": ["ara.community-transport/v1"]},
+            "sequence": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+            "digest": {"$ref": "common.schema.json#/$defs/digest"}
+          }
+        }
+      ]
+    },
+    "visibility_id": {"$ref": "common.schema.json#/$defs/digest"}
+  },
+  "x-identity": {
+    "visibility_id": "sha256(\"ara.visibility/v1\\0\" || JCS(snapshot without visibility_id))"
+  },
+  "x-consumer-invariants": [
+    "contributions and attachments are each sorted by sequence; publication sequences are unique across both lists and do not exceed sequence",
+    "each listed record has a durable publication receipt naming this or an earlier visibility_id; a later snapshot is a superset of an earlier one",
+    "intentions names the plan-14 intention snapshot read at the same point (its sequence and the SHA-256 of its exact snapshot.json bytes), or null when intentions are not installed",
+    "a missing or unreadable snapshot makes any derived briefing visibly incomplete; it never yields an empty frontier",
+    "absence from a snapshot is not proof that nobody attempted the work"
+  ]
+}

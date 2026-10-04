@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.verification/v1",
+  "title": "Scoped verification verdict about one exact contribution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "verification_kind", "target", "scope", "conditions", "method", "execution", "observations", "outcome", "rationale", "supersedes"],
+  "properties": {
+    "schema": {"const": "ara.verification/v1"},
+    "verification_kind": {"enum": ["certified_numeric_recheck", "score_reproduction", "directional_hypothesis", "argument_review"]},
+    "target": {
+      "type": "object", "additionalProperties": false, "required": ["contribution_id", "native_revision", "selectors"],
+      "properties": {
+        "contribution_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "native_revision": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "selectors": {"type": "array", "minItems": 1, "maxItems": 1024, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/selector"}}
+      }
+    },
+    "scope": {"$ref": "common.schema.json#/$defs/text"},
+    "conditions": {
+      "type": "object", "additionalProperties": false, "required": ["description", "setting", "environment", "held_out_evaluator"],
+      "properties": {
+        "description": {"$ref": "common.schema.json#/$defs/text"},
+        "setting": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "environment": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "held_out_evaluator": {"type": "boolean"}
+      }
+    },
+    "method": {
+      "type": "object", "additionalProperties": false, "required": ["description", "evaluator", "config"],
+      "properties": {
+        "description": {"$ref": "common.schema.json#/$defs/text"},
+        "evaluator": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "additionalProperties": false, "required": ["name", "revision"],
+             "properties": {"name": {"$ref": "common.schema.json#/$defs/text"}, "revision": {"$ref": "common.schema.json#/$defs/text"}}}
+          ]
+        },
+        "config": {"$ref": "common.schema.json#/$defs/nullable_file_ref"}
+      }
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false, "required": ["intention_receipt", "input_inventory", "raw_outputs"],
+      "properties": {
+        "intention_receipt": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "input_inventory": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "raw_outputs": {"type": "array", "maxItems": 4096, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/file_ref"}}
+      }
+    },
+    "observations": {
+      "type": "array", "maxItems": 4096,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["name", "value", "unit", "evidence"],
+        "properties": {
+          "name": {"$ref": "common.schema.json#/$defs/text"},
+          "value": {"$ref": "common.schema.json#/$defs/text"},
+          "unit": {"$ref": "common.schema.json#/$defs/nullable_text"},
+          "evidence": {"$ref": "common.schema.json#/$defs/nullable_file_ref"}
+        }
+      }
+    },
+    "outcome": {"enum": ["confirmed", "partial", "failed", "interrupted", "unassessable"]},
+    "rationale": {"$ref": "common.schema.json#/$defs/text"},
+    "supersedes": {"$ref": "common.schema.json#/$defs/nullable_digest"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"verification_kind": {"enum": ["score_reproduction", "certified_numeric_recheck"]}}},
+      "then": {"properties": {"execution": {"properties": {"raw_outputs": {"minItems": 1}}}}}
+    },
+    {
+      "if": {"properties": {"verification_kind": {"const": "score_reproduction"}}},
+      "then": {"properties": {"execution": {"properties": {"intention_receipt": {"$ref": "common.schema.json#/$defs/digest"}, "input_inventory": {"$ref": "common.schema.json#/$defs/digest"}}}}}
+    },
+    {
+      "if": {"properties": {"outcome": {"enum": ["confirmed", "partial", "failed"]}}},
+      "then": {"properties": {"observations": {"minItems": 1}}}
+    }
+  ],
+  "x-consumer-invariants": [
+    "target.contribution_id equals the enclosing attachment's target and target.native_revision equals that contribution's native fingerprint; target.selectors are sorted and unique",
+    "observation values are exact text (numbers as reported decimal strings) because floats are outside the canonical domain; raw_outputs, config and evidence name files in the attachment's own inventory",
+    "a reproduction binds the actual execution (acknowledged plan-14 request_digest and input signature) and its raw outputs; a held-out final evaluator stays outside worker access",
+    "confirmed, partial, failed, interrupted and unassessable outcomes are all retained with their observations; none changes native claim status",
+    "the current view keys verdicts by (verifier = attachment publisher, target.contribution_id, verification_kind, method, scope) and picks the latest by coordinator sequence; different targets or scopes coexist",
+    "supersedes names an earlier attachment record_id with the same key; it never erases that record",
+    "independence is asserted only by the registered role policy, never by account separation"
+  ]
+}

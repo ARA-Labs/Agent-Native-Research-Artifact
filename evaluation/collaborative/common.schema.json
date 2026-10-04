@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.collaborative-common/v1",
+  "title": "Shared value types for the collaborative-research contracts",
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "nullable_digest": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/digest"}]},
+    "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "identity": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$"},
+    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}:[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$"},
+    "text": {"type": "string", "minLength": 1, "maxLength": 16384},
+    "nullable_text": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/text"}]},
+    "selector": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"},
+    "nullable_selector": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/selector"}]},
+    "path": {
+      "type": "string", "minLength": 1, "maxLength": 4096,
+      "pattern": "^(?!/)(?!.*//)(?!.*/$)(?!(?:.*/)?\\.\\.?(?:/|$))(?!(?:.*/)?\\.(?:ara|git)(?:/|$))[^\\\\\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "file_ref": {
+      "type": "object", "additionalProperties": false, "required": ["root", "path"],
+      "properties": {"root": {"$ref": "#/$defs/identity"}, "path": {"$ref": "#/$defs/path"}}
+    },
+    "nullable_file_ref": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/file_ref"}]},
+    "mode": {"type": "string", "pattern": "^[0-7]{4}$"},
+    "size": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+    "sequence": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "contribution_ids": {
+      "type": "array", "maxItems": 1024, "uniqueItems": true,
+      "items": {"$ref": "#/$defs/digest"}
+    },
+    "record_ids": {
+      "type": "array", "maxItems": 4096, "uniqueItems": true,
+      "items": {"$ref": "#/$defs/digest"}
+    },
+    "native_ref": {
+      "type": "object", "additionalProperties": false, "required": ["source_key", "native_revision", "selector"],
+      "properties": {
+        "source_key": {"$ref": "#/$defs/identity"},
+        "native_revision": {"$ref": "#/$defs/fingerprint"},
+        "selector": {"$ref": "#/$defs/selector"}
+      }
+    },
+    "field_pointer": {
+      "type": "object", "additionalProperties": false, "required": ["selector", "field"],
+      "properties": {"selector": {"$ref": "#/$defs/selector"}, "field": {"$ref": "#/$defs/identity"}}
+    },
+    "nullable_field_pointer": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/field_pointer"}]},
+    "revision_pointer": {
+      "type": "object", "additionalProperties": false, "required": ["native_revision", "selector"],
+      "properties": {"native_revision": {"$ref": "#/$defs/fingerprint"}, "selector": {"$ref": "#/$defs/selector"}}
+    },
+    "inventory_pointer": {
+      "type": "object", "additionalProperties": false, "required": ["manifest"],
+      "properties": {"manifest": {"$ref": "#/$defs/path"}}
+    }
+  },
+  "x-consumer-invariants": [
+    "every document is RFC 8785 canonical JSON restricted to objects, arrays, strings, booleans, null and integers within +/-(2^53-1); floats and duplicate keys reject",
+    "strings are Unicode scalar values; arrays documented as sorted use code-point (equivalently UTF-8 byte) order of their sort key and reject duplicates",
+    "paths are relative, '/'-separated, without empty, '.', '..', '.ara' or '.git' components, backslashes or control characters",
+    "a fingerprint is the unprefixed ara.artifact/v1 native revision; every other digest is 'sha256:' plus 64 lowercase hex digits"
+  ]
+}
