@@ -1,0 +1,20 @@
+{
+  "schema": "ara.lara-checker-pin/v1",
+  "build": {
+    "source_repository": "https://github.com/ARA-Labs/Lara",
+    "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+    "executable_sha256": "sha256:dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645",
+    "platform": "aarch64-apple-darwin",
+    "provenance": "local-build"
+  },
+  "version_output": null,
+  "usage": "lara (check|deps|map-input) <file.sexp|file.lara|file.laramap>; lara check <file> --out <path> (write the accepted verdict to <path>)",
+  "registration_status": "provisional-local-build",
+  "notes": [
+    "The executable is a local cabal build (GHC 9.14.1, dist-newstyle/build/aarch64-osx/ghc-9.14.1/lara-0.1.0.0/x/lara/build/lara/lara) of the inspected source commit, not a release artifact.",
+    "The binary prints no version string: '--version' and '--help' both print the usage line above and exit 2, so the source commit and executable digest are the only identity.",
+    "Verdicts name lara-core@0.2 in their replay identity; backends and theories are selected per check and recorded in each ara.lara-argument-check/v1 record, not here.",
+    "Registration of a scored study must re-pin a release executable (its own digest and platform) built from a reviewed source commit; this local pin is valid only for contract tests and the L2 adapter smoke.",
+    "A runner refuses to run an executable whose SHA-256 differs from the pin and records the check as unavailable."
+  ]
+}

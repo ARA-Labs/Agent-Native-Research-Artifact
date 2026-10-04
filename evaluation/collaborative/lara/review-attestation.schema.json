@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-review-attestation/v1",
+  "title": "Authorized review of one Lara formalization and its source binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "reviewer", "role_policy", "target", "native", "covered", "reviewed", "disposition", "rationale", "linkage", "attestation_id"],
+  "properties": {
+    "schema": {"const": "ara.lara-review-attestation/v1"},
+    "community": {"$ref": "../common.schema.json#/$defs/identity"},
+    "reviewer": {"$ref": "../common.schema.json#/$defs/identity"},
+    "role_policy": {"$ref": "../common.schema.json#/$defs/digest"},
+    "target": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "contribution_id", "argument"],
+          "properties": {
+            "kind": {"const": "contribution"},
+            "contribution_id": {"$ref": "../common.schema.json#/$defs/digest"},
+            "argument": {"$ref": "lara-common.schema.json#/$defs/published_location"}
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": {"kind": {"const": "initial_payload"}}
+        }
+      ]
+    },
+    "native": {"$ref": "lara-common.schema.json#/$defs/native_snapshot"},
+    "covered": {
+      "type": "object", "additionalProperties": false, "required": ["argument_digest", "binding_id", "policy", "registry"],
+      "properties": {
+        "argument_digest": {"$ref": "../common.schema.json#/$defs/digest"},
+        "binding_id": {"$ref": "../common.schema.json#/$defs/digest"},
+        "policy": {"$ref": "lara-common.schema.json#/$defs/policy_ref"},
+        "registry": {"$ref": "../common.schema.json#/$defs/nullable_digest"}
+      }
+    },
+    "reviewed": {
+      "type": "array", "minItems": 1, "maxItems": 1024,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["lara_claim", "selector"],
+        "properties": {
+          "lara_claim": {"$ref": "lara-common.schema.json#/$defs/lara_id"},
+          "selector": {"$ref": "../common.schema.json#/$defs/selector"}
+        }
+      }
+    },
+    "disposition": {"enum": ["approved", "disputed", "rejected"]},
+    "rationale": {"$ref": "../common.schema.json#/$defs/text"},
+    "linkage": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false, "required": ["relation", "record", "affected_claims", "explanation"],
+          "properties": {
+            "relation": {"enum": ["supersedes", "disputes"]},
+            "record": {"$ref": "../common.schema.json#/$defs/digest"},
+            "affected_claims": {"type": "array", "minItems": 1, "maxItems": 1024, "uniqueItems": true, "items": {"$ref": "lara-common.schema.json#/$defs/lara_id"}},
+            "explanation": {"$ref": "../common.schema.json#/$defs/text"}
+          }
+        }
+      ]
+    },
+    "attestation_id": {"$ref": "../common.schema.json#/$defs/digest"}
+  },
+  "allOf": [
+    {"if": {"properties": {"linkage": {"type": "object", "properties": {"relation": {"const": "disputes"}}, "required": ["relation"]}}, "required": ["linkage"]},
+     "then": {"properties": {"disposition": {"enum": ["disputed", "rejected"]}}}}
+  ],
+  "x-identity": {
+    "attestation_id": "sha256(\"ara.lara-review-attestation/v1\\0\" || JCS(attestation without attestation_id))"
+  },
+  "x-consumer-invariants": [
+    "published as the document of an ara.attachment/v1 of kind review_attestation whose body.schema is ara.lara-review-attestation/v1; the attachment publisher equals reviewer and the attachment target equals target.contribution_id (an initial_payload attestation travels only inside the reviewed contribution's own payload)",
+    "reviewer holds authorized_reviewer in the ara.role-policy/v1 named by role_policy; otherwise the record is retained but supplies no review (unauthorized_reviewer)",
+    "reviewer differs from the binding producer and from the formalization author of every reviewed claim; otherwise the record is retained but supplies no review (self_review)",
+    "covered names the exact argument bytes, binding_id, policy file and registry_id reviewed, and native equals the binding's native snapshot; any change to a covered input makes the attestation inapplicable to the new version (stale_review); approval is never carried forward",
+    "reviewed is sorted by lara_claim and unique; each entry names a selected claim of the covered binding with its native selector",
+    "review covers whether the formal statement, numeric cells, assumptions and source references faithfully represent the selected evidence; it does not establish measurement correctness, reproduction, reviewer independence or ARA maturity",
+    "linkage 'supersedes' names the reviewer's own earlier attestation with the same target, native, covered inputs and reviewed claims; 'disputes' names another attestation and carries disposition disputed or rejected; both retain the earlier record and state the affected claims",
+    "a claim counts as audited only when a current approved attestation covers it and no current disputed or rejected attestation (and no open ara.dispute/v1 naming the approval) covers the same inputs"
+  ]
+}

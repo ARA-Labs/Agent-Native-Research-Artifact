@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-setting-registry/v1",
+  "title": "Versioned vocabulary mapping setting and system descriptors to Lara symbols",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "vocabulary", "previous", "policy", "settings", "systems", "registry_id"],
+  "properties": {
+    "schema": {"const": "ara.lara-setting-registry/v1"},
+    "community": {"$ref": "../common.schema.json#/$defs/identity"},
+    "vocabulary": {
+      "type": "object", "additionalProperties": false, "required": ["name", "revision"],
+      "properties": {
+        "name": {"$ref": "../common.schema.json#/$defs/identity"},
+        "revision": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      }
+    },
+    "previous": {"$ref": "../common.schema.json#/$defs/nullable_digest"},
+    "policy": {"$ref": "lara-common.schema.json#/$defs/policy_ref"},
+    "settings": {
+      "type": "array", "maxItems": 65536,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["measurand", "setting", "descriptor"],
+        "properties": {
+          "measurand": {"$ref": "lara-common.schema.json#/$defs/lara_symbol"},
+          "setting": {"$ref": "lara-common.schema.json#/$defs/lara_symbol"},
+          "descriptor": {"$ref": "setting-descriptor.schema.json"}
+        }
+      }
+    },
+    "systems": {
+      "type": "array", "maxItems": 65536,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["symbol", "descriptor"],
+        "properties": {
+          "symbol": {"$ref": "lara-common.schema.json#/$defs/lara_symbol"},
+          "descriptor": {"$ref": "setting-descriptor.schema.json#/$defs/system_descriptor"}
+        }
+      }
+    },
+    "registry_id": {"$ref": "../common.schema.json#/$defs/digest"}
+  },
+  "allOf": [
+    {"if": {"properties": {"vocabulary": {"properties": {"revision": {"const": 1}}}}},
+     "then": {"properties": {"previous": {"type": "null"}}},
+     "else": {"properties": {"previous": {"$ref": "../common.schema.json#/$defs/digest"}}}}
+  ],
+  "x-identity": {
+    "registry_id": "sha256(\"ara.lara-setting-registry/v1\\0\" || JCS(registry without registry_id))"
+  },
+  "x-consumer-invariants": [
+    "settings are sorted by descriptor.descriptor_id and systems by descriptor.system_id; every embedded descriptor's identity recomputes",
+    "each (measurand, setting) symbol pair names exactly one setting descriptor; descriptors sharing a measurand symbol share the same metric (name, definition_digest, polarity, unit); descriptors sharing a setting symbol agree on everything except the metric; each system symbol names exactly one system descriptor and no symbol is both a system and a setting or measurand symbol",
+    "measurand polarity must equal the 'measurand <symbol> : Num where <polarity>' declaration of the pinned policy file; Lara checks polarity, this registry only names it",
+    "a vocabulary extension is a new registry: revision increases by one, previous names the earlier registry_id, and every earlier symbol keeps its exact descriptor; rebinding or dropping a symbol requires a new vocabulary name",
+    "the argument producer uses registered symbols rather than local synonyms; authorized reviewers check that source bindings justify the descriptors; matching formal symbols alone never establishes comparable experiments",
+    "members are checked under one exact registry_id; a member bound to another registry is rechecked under the new one or excluded with reason vocabulary_mismatch; old verdicts stay with their original registry"
+  ]
+}

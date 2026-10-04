@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-map-revision/v1",
+  "title": "Immutable input scope of one composite Lara map",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "display_name", "manifest", "members", "policy", "registry", "checker", "population", "coverage", "exclusions", "map_revision_id"],
+  "properties": {
+    "schema": {"const": "ara.lara-map-revision/v1"},
+    "community": {"$ref": "../common.schema.json#/$defs/identity"},
+    "display_name": {"$ref": "../common.schema.json#/$defs/identity"},
+    "manifest": {
+      "type": "object", "additionalProperties": false, "required": ["file", "digest"],
+      "properties": {
+        "file": {"$ref": "../common.schema.json#/$defs/file_ref"},
+        "digest": {"$ref": "../common.schema.json#/$defs/digest"}
+      }
+    },
+    "members": {
+      "type": "array", "minItems": 1, "maxItems": 1024,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["alias", "contribution_id", "source_key", "native_revision", "argument", "binding_id"],
+        "properties": {
+          "alias": {"$ref": "lara-common.schema.json#/$defs/lara_id"},
+          "contribution_id": {"$ref": "../common.schema.json#/$defs/digest"},
+          "source_key": {"$ref": "../common.schema.json#/$defs/identity"},
+          "native_revision": {"$ref": "../common.schema.json#/$defs/fingerprint"},
+          "argument": {"$ref": "lara-common.schema.json#/$defs/argument_ref"},
+          "binding_id": {"$ref": "../common.schema.json#/$defs/digest"}
+        }
+      }
+    },
+    "policy": {"$ref": "lara-common.schema.json#/$defs/policy_ref"},
+    "registry": {"$ref": "../common.schema.json#/$defs/digest"},
+    "checker": {"$ref": "lara-common.schema.json#/$defs/checker"},
+    "population": {
+      "type": "object", "additionalProperties": false, "required": ["visibility_id", "sequence", "contributions", "description"],
+      "properties": {
+        "visibility_id": {"$ref": "../common.schema.json#/$defs/digest"},
+        "sequence": {"$ref": "../common.schema.json#/$defs/sequence"},
+        "contributions": {"type": "array", "minItems": 1, "maxItems": 1000000, "uniqueItems": true, "items": {"$ref": "../common.schema.json#/$defs/digest"}},
+        "description": {"$ref": "../common.schema.json#/$defs/text"}
+      }
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false, "required": ["scope", "policy"],
+      "properties": {
+        "scope": {"enum": ["audited", "exploratory"]},
+        "policy": {"$ref": "../common.schema.json#/$defs/text"}
+      }
+    },
+    "exclusions": {
+      "type": "array", "maxItems": 1000000,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["contribution_id", "reason", "detail"],
+        "properties": {
+          "contribution_id": {"$ref": "../common.schema.json#/$defs/digest"},
+          "reason": {"enum": ["absent_argument", "unreviewed_binding", "disputed_binding", "vocabulary_mismatch", "incompatible_policy", "unsupported_admission", "other"]},
+          "detail": {"$ref": "../common.schema.json#/$defs/text"}
+        }
+      }
+    },
+    "map_revision_id": {"$ref": "../common.schema.json#/$defs/digest"}
+  },
+  "x-identity": {
+    "map_revision_id": "sha256(\"ara.lara-map-revision/v1\\0\" || JCS(map revision without map_revision_id)); the record holds inputs only, so no exit status, verdict or status can change it"
+  },
+  "x-consumer-invariants": [
+    "members are in .laramap member order, which fixes Lara's node numbering, and aliases are unique; each member binds its alias to a full contribution_id, the argument record and bytes, the binding_id and the member's source identity; aliases and Lara's author-declared artifact digests never authenticate a publisher",
+    "manifest.digest is the SHA-256 of the exact .laramap bytes; Lara map v1 reads current local paths and does not verify member digests, so the runner materializes the member bytes named here before checking",
+    "every member binding names this policy's policy_digest and this registry; a member checked under another policy or registry is excluded (incompatible_policy or vocabulary_mismatch) or rechecked under this one, never silently reused",
+    "population.contributions is sorted and is the intended population at visibility sequence population.sequence; every intended contribution is either a member or listed in exclusions (sorted by contribution_id) with a reason, never both, and excluded contributions stay visible and never count toward coverage",
+    "coverage scope 'audited' admits only members whose every selected claim has a current authorized approval with matching inputs and no unresolved dispute; 'exploratory' may include other members, is labeled exploratory everywhere, and cannot supply an audited-community verdict",
+    "adding or removing a member, changing any argument, binding, policy, registry, checker or the intended population creates a new map_revision_id; earlier revisions and their verdicts, including contests, remain under their own scope",
+    "display_name may group revisions for people but never identifies a verdict's scope; no map claims whole-community coverage because all included members passed",
+    "map revisions and their checks are published through the same request idempotency, publication and recovery rules as attachments under their own hash domains; listing them in a visibility snapshot needs a later ara.visibility revision"
+  ]
+}

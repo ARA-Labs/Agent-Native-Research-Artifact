@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-argument-check/v1",
+  "title": "One pinned Lara check of an argument or a map revision, with its exact inputs and outcome",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "verifier", "target", "scope", "checker", "policy", "inputs", "invocation", "result", "outcome", "statuses", "admission_blocked", "rejection", "unavailable_reason", "supersedes", "check_id"],
+  "properties": {
+    "schema": {"const": "ara.lara-argument-check/v1"},
+    "community": {"$ref": "../common.schema.json#/$defs/identity"},
+    "verifier": {"$ref": "../common.schema.json#/$defs/identity"},
+    "target": {"$ref": "lara-common.schema.json#/$defs/check_target"},
+    "scope": {"enum": ["individual", "audited_map", "exploratory_map"]},
+    "checker": {"oneOf": [{"type": "null"}, {"$ref": "lara-common.schema.json#/$defs/checker"}]},
+    "policy": {"$ref": "lara-common.schema.json#/$defs/policy_ref"},
+    "inputs": {
+      "type": "object", "additionalProperties": false, "required": ["entry", "binding_ids", "registry"],
+      "properties": {
+        "entry": {
+          "type": "object", "additionalProperties": false, "required": ["kind", "digest"],
+          "properties": {
+            "kind": {"enum": ["argument", "map_manifest"]},
+            "digest": {"$ref": "../common.schema.json#/$defs/digest"}
+          }
+        },
+        "binding_ids": {"type": "array", "minItems": 1, "maxItems": 1024, "uniqueItems": true, "items": {"$ref": "../common.schema.json#/$defs/digest"}},
+        "registry": {"$ref": "../common.schema.json#/$defs/nullable_digest"}
+      }
+    },
+    "invocation": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false, "required": ["command", "entry", "output"],
+          "properties": {
+            "command": {"const": "check"},
+            "entry": {"$ref": "../common.schema.json#/$defs/file_ref"},
+            "output": {"enum": ["stdout", "out_file"]}
+          }
+        }
+      ]
+    },
+    "result": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/result"}]},
+    "outcome": {"enum": ["accepted", "rejected", "unavailable", "not-performed"]},
+    "statuses": {"type": "array", "maxItems": 65536, "items": {"$ref": "#/$defs/claim_status_row"}},
+    "admission_blocked": {"type": "array", "maxItems": 65536, "items": {"$ref": "#/$defs/admission_row"}},
+    "rejection": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false, "required": ["class", "boundary", "diagnostic_digest"],
+          "properties": {
+            "class": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"},
+            "boundary": {"type": "boolean"},
+            "diagnostic_digest": {"$ref": "../common.schema.json#/$defs/nullable_digest"}
+          }
+        }
+      ]
+    },
+    "unavailable_reason": {"$ref": "../common.schema.json#/$defs/nullable_text"},
+    "supersedes": {"$ref": "../common.schema.json#/$defs/nullable_digest"},
+    "check_id": {"$ref": "../common.schema.json#/$defs/digest"}
+  },
+  "allOf": [
+    {"if": {"properties": {"target": {"properties": {"kind": {"const": "map_revision"}}}}},
+     "then": {"properties": {"scope": {"enum": ["audited_map", "exploratory_map"]}, "inputs": {"properties": {"entry": {"properties": {"kind": {"const": "map_manifest"}}}}}, "admission_blocked": {"maxItems": 0}}},
+     "else": {"properties": {"scope": {"const": "individual"}, "inputs": {"properties": {"entry": {"properties": {"kind": {"const": "argument"}}}, "binding_ids": {"maxItems": 1}}}}}},
+    {"if": {"properties": {"outcome": {"const": "accepted"}}},
+     "then": {"properties": {"checker": {"type": "object"}, "invocation": {"type": "object"}, "result": {"type": "object", "properties": {"exit_status": {"const": 0}, "verdict_source": {"enum": ["stdout", "out_file"]}}}, "rejection": {"type": "null"}, "unavailable_reason": {"type": "null"}}}},
+    {"if": {"properties": {"outcome": {"const": "rejected"}}},
+     "then": {"properties": {"checker": {"type": "object"}, "invocation": {"type": "object"}, "result": {"type": "object", "properties": {"exit_status": {"enum": [1, 2]}, "verdict_source": {"enum": ["stdout", "none"]}}}, "statuses": {"maxItems": 0}, "admission_blocked": {"maxItems": 0}, "rejection": {"type": "object"}, "unavailable_reason": {"type": "null"}}}},
+    {"if": {"properties": {"outcome": {"const": "unavailable"}}},
+     "then": {"properties": {"checker": {"type": "object"}, "result": {"oneOf": [{"type": "null"}, {"type": "object", "properties": {"verdict_source": {"const": "none"}}}]}, "statuses": {"maxItems": 0}, "admission_blocked": {"maxItems": 0}, "rejection": {"type": "null"}, "unavailable_reason": {"$ref": "../common.schema.json#/$defs/text"}}}},
+    {"if": {"properties": {"outcome": {"const": "not-performed"}}},
+     "then": {"properties": {"checker": {"type": "null"}, "invocation": {"type": "null"}, "result": {"type": "null"}, "statuses": {"maxItems": 0}, "admission_blocked": {"maxItems": 0}, "rejection": {"type": "null"}, "unavailable_reason": {"type": "null"}}}}
+  ],
+  "$defs": {
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["exit_status", "exit_checked_before_output_read", "verdict_source", "verdict_digest", "stdout_digest", "stderr_digest"],
+      "properties": {
+        "exit_status": {"oneOf": [{"type": "null"}, {"type": "integer", "minimum": 0, "maximum": 255}]},
+        "exit_checked_before_output_read": {"const": true},
+        "verdict_source": {"enum": ["stdout", "out_file", "none"]},
+        "verdict_digest": {"$ref": "../common.schema.json#/$defs/nullable_digest"},
+        "stdout_digest": {"$ref": "../common.schema.json#/$defs/nullable_digest"},
+        "stderr_digest": {"$ref": "../common.schema.json#/$defs/nullable_digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"verdict_source": {"const": "out_file"}}}, "then": {"properties": {"exit_status": {"const": 0}}}},
+        {"if": {"properties": {"verdict_source": {"const": "none"}}}, "then": {"properties": {"verdict_digest": {"type": "null"}}},
+         "else": {"properties": {"verdict_digest": {"$ref": "../common.schema.json#/$defs/digest"}}}}
+      ]
+    },
+    "claim_status_row": {
+      "type": "object", "additionalProperties": false, "required": ["member", "claim", "proposition", "status"],
+      "properties": {
+        "member": {"oneOf": [{"type": "null"}, {"$ref": "lara-common.schema.json#/$defs/lara_id"}]},
+        "claim": {"$ref": "lara-common.schema.json#/$defs/lara_id"},
+        "proposition": {"$ref": "../common.schema.json#/$defs/text"},
+        "status": {"$ref": "lara-common.schema.json#/$defs/claim_status"}
+      }
+    },
+    "admission_row": {
+      "type": "object", "additionalProperties": false, "required": ["member", "claim", "proposition", "conditional_status"],
+      "properties": {
+        "member": {"oneOf": [{"type": "null"}, {"$ref": "lara-common.schema.json#/$defs/lara_id"}]},
+        "claim": {"$ref": "lara-common.schema.json#/$defs/lara_id"},
+        "proposition": {"$ref": "../common.schema.json#/$defs/text"},
+        "conditional_status": {"$ref": "lara-common.schema.json#/$defs/claim_status"}
+      }
+    }
+  },
+  "x-identity": {
+    "check_id": "sha256(\"ara.lara-argument-check/v1\\0\" || JCS(check without check_id))"
+  },
+  "x-consumer-invariants": [
+    "a contribution-target check is the document of an ara.attachment/v1 of kind argument_check whose body.schema is ara.lara-argument-check/v1, published by an argument_producer; the attachment target equals target.contribution_id; an initial_payload check travels inside the payload it checks; a map_revision check is a standalone record bound to that map revision",
+    "the exit status is read before any output: verdict_source is out_file only when exit_status is 0, so the bytes a failed run leaves at its --out path (an older verdict) are never read; exit_checked_before_output_read records that rule and is always true",
+    "outcome follows the exit status of the pinned checker: 0 accepted (verdict bytes read), 1 rejected (solo reject verdict on stdout, or an R8 or map refusal line on stderr), 2 rejected with rejection.boundary true (ill-formed input), any other termination, a missing executable or an executable digest that differs from checker.build is unavailable; not-performed means no checker ran and supplies no status",
+    "an accepted check can still report gap, defeated or contested; statuses hold only Lara core statuses, sorted by (member or '', claim) and unique; claims Lara reports as evidence-blocked appear only in admission_blocked with their conditional status; map checks never have admission-blocked rows because Lara map v1 refuses members that need admission pruning",
+    "rejected or unavailable outcomes keep the raw contribution, bindings and diagnostics; they never imply that the experiment failed, and a prior verdict is never reused as the current result",
+    "inputs names every checker input by digest: the argument (individual) or the exact .laramap bytes (map), every binding_id, and the registry; policy names the exact policy file; individual checks have exactly one binding_id, map checks list the map revision's binding_ids in sorted order",
+    "for a map_revision target the scope equals the map revision's coverage scope, and checker, policy, manifest digest, binding_ids and registry equal the map revision's; an exploratory_map check never supplies an audited-community verdict",
+    "supersedes names an earlier check with the same verifier, target, checker, policy, inputs and scope; the current view selects by coordinator sequence and never erases the earlier record or a verdict about a different scope",
+    "a check verdict is Lara argument status only: it is not a formalization review, not a reproduction receipt and never changes ARA claim status or research maturity"
+  ]
+}

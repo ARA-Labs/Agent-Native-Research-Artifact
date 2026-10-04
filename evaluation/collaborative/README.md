@@ -25,6 +25,7 @@ This directory fixes the formats and the hash rules for those records, so that t
 | `schema_check.py` | A small JSON Schema checker for exactly the keywords these schemas use, so tests need no new dependency. |
 | `vectors.json` | Test vectors: inputs and expected digests, including three real `ara snapshot` manifests. |
 | `test_identity.py`, `test_schemas.py` | Tests. |
+| `lara/` | Stage L1 (plan 03): the contracts that attach Lara arguments, reviews and checks to contributions. See [Lara contracts (stage L1)](#lara-contracts-stage-l1). |
 
 The directory sits beside `evaluation/agent-cli/` and follows its pattern: a short name for the plan series, JSON Schema files, a standard-library Python consumer, and `unittest` tests. It is separate from `agent-cli/` because these contracts do not change the archived interface-only skill variants or the plan-14 files.
 
@@ -110,7 +111,7 @@ A later ara-cli contract revision needs a new pin here; it does not silently rep
 
 - Running anything. Capture, publication, the coordinator, announcements, the briefing, recovery and rebuilds belong to the runner (`ara-eval`). This directory has no coordinator.
 - Authentication. Publisher identity comes from the runner's registered actors, not from any hash.
-- Lara argument and review documents. `review_attestation` and `argument_check` attachments point to a document whose schema stage L1 (plan 03) will freeze; only the pointer shape is fixed here.
+- Running Lara. Stage L1 (`lara/`, below) freezes the Lara documents that `review_attestation` and `argument_check` attachments point to; invoking the checker and building views is stage L2 runner work.
 - Scientific judgment. No field here changes claim status, ranks work, or turns a reuse count into evidence.
 - Transport across hosts and Git publication of packages.
 
@@ -125,6 +126,73 @@ From the repository root, with Python 3.9 or later and no extra packages:
 ```sh
 python3 -m unittest discover -s evaluation/collaborative -p 'test_*.py' -v
 ARA_BIN=/path/to/ara python3 -m unittest discover -s evaluation/collaborative -p 'test_identity.py' -v
+LARA_BIN=/path/to/lara python3 -m unittest discover -s evaluation/collaborative -p 'test_lara_checker.py' -v
 ```
 
-The second command adds the live ara cross-check, which needs ara 0.1.24 or later. The expected values in `vectors.json` come from three sources: ara-cli produced the snapshot manifests and their capture IDs, RFC 8785 provides two of the encoding examples, and `identity.py` computed the rest when these contracts were frozen. The tests recompute every value.
+The second command adds the live ara cross-check, which needs ara 0.1.24 or later. The third runs the Lara smoke test (see below). The expected values in `vectors.json` come from three sources: ara-cli produced the snapshot manifests and their capture IDs, RFC 8785 provides two of the encoding examples, and `identity.py` computed the rest when these contracts were frozen. The tests recompute every value.
+
+## Lara contracts (stage L1)
+
+Status: proposed for review in stage L1 ("Lara contracts") of plan 03. Nothing here runs Lara; stage L2 does.
+
+[Lara](https://github.com/ARA-Labs/Lara) is a separate checker for structured arguments. For a few selected claims, an argument producer can write a Lara argument (a `.lara` file) that states the claim formally and cites the measured cells it rests on. `lara check` then rechecks the arithmetic (for example, that 0.71 < 0.74), applies the declared policy, and reports each claim as `justified`, `gap`, `defeated` or `contested`. Several members' arguments can also be checked together through a `.laramap` manifest, which is how two contributions that contradict each other under the same setting become `contested`.
+
+The files in `lara/` say exactly which inputs such a check used, who reviewed the formalization, and which contributions a combined map covers.
+
+### What each record binds
+
+| File | Record (hash domain) | Binds |
+|---|---|---|
+| `lara-binding.schema.json` | `ara.lara-binding/v1` | One argument file to the native ARA it was written against: the snapshot (fingerprint and capture ID), the argument bytes and their `artifact … at sha256:<fingerprint>` header, the policy file, the setting registry, and, for each selected claim, every Lara claim, leaf, argument and attack mapped to a source key, native revision, selector and evidence digest. Also the formalization author, rationale, assumptions and the author's own audit label, which is kept but never trusted. |
+| `review-attestation.schema.json` | `ara.lara-review-attestation/v1` | One reviewer's judgment of one binding: reviewer, role policy, target contribution (or the initial payload), native snapshot, the exact argument, binding, policy and registry reviewed, the reviewed claims and selectors, `approved`, `disputed` or `rejected`, a rationale, and an optional link that supersedes the reviewer's own earlier record or disputes another one. |
+| `setting-descriptor.schema.json` | `ara.lara-setting-descriptor/v1`, `ara.lara-system-descriptor/v1` | What makes two measurements comparable: dataset and split digests, evaluator revision and configuration digest, metric definition and polarity (`higher_is_better` or `lower_is_better`), controls, and how seeds and other replication variables are treated. Systems and baselines are separate descriptors bound to code and configuration digests. Outcomes never enter a descriptor. |
+| `setting-registry.schema.json` | `ara.lara-setting-registry/v1` | A versioned vocabulary: which Lara symbols (`accuracy`, `imagenet_val`, `sys_new`) stand for which descriptors, under which policy. Each symbol has one meaning. An extension is a new registry revision that keeps every old symbol. |
+| `argument-check.schema.json` | `ara.lara-argument-check/v1` | One run of the pinned checker: the checker build, backends and theories, the policy, every input digest, the target (a contribution or a map revision), the exit status, the digest of the verdict bytes, the outcome (`accepted`, `rejected`, `unavailable`, `not-performed`), per-claim statuses, and admission-blocked claims kept in their own list. |
+| `map-revision.schema.json` | `ara.lara-map-revision/v1` | The input scope of one composite map: the exact `.laramap` bytes, members in manifest order (alias → contribution, argument, binding, source identity), policy, registry, checker, the intended population at a visibility sequence, the coverage scope (`audited` or `exploratory`), and every excluded contribution with its reason. It holds no outputs, so its identity never depends on a verdict. |
+| `lara-common.schema.json` | none | Shared value types. |
+| `checker-pin.json` | `ara.lara-checker-pin/v1` (data) | The checker used to freeze these contracts (see below). |
+
+Identities follow the rules above: `"sha256:" + hex(SHA-256(schema || 0x00 || JCS(record without its own ID field)))`. Lara documents stored in an attachment are stored as their exact JCS bytes. An argument's location is either the target contribution's initial payload, a named `argument_check` attachment, or (for a check only) the attachment that also holds the check, since that attachment cannot name its own record ID.
+
+`lara_identity.py` computes the identities and checks bindings, descriptors, registries, check records and Lara attachments. `lara_audit.py` holds the review and map-scope rules. Both use only the Python standard library and reuse `identity.py`.
+
+### Rules beyond field shapes
+
+- **Arguments target one snapshot.** The argument's header must name `sha256:<native fingerprint>`. Otherwise the package is rejected (`snapshot_mismatch`) and a new argument must be written against the new snapshot.
+- **No self-review.** A review counts only if the reviewer holds `authorized_reviewer` in the pinned role policy and is neither the producer nor the formalization author of any reviewed claim. Self-reviews and unauthorized reviews are kept and shown, but supply no coverage. Lara's own `audit-status = reviewed` label never counts.
+- **Changed inputs void a review.** If the argument, binding, policy, registry or snapshot changes, earlier approvals do not apply to the new version.
+- **Disputes win until withdrawn.** A claim is audited only when a current approval covers it and no current `disputed` or `rejected` attestation (or open `ara.dispute/v1` naming the approval) covers the same inputs. A reviewer withdraws a dispute by superseding their own record.
+- **Supersession is narrow.** A record can supersede only an earlier one from the same verifier or reviewer with the same target, method/configuration, inputs and scope. Nothing is erased.
+- **Exit status first.** `lara check --out <path>` replaces the file only on success, so a failed run leaves an older verdict behind. A check record may say `verdict_source: out_file` only when the exit status is 0; `exit_checked_before_output_read` is always `true`. Exit 0 is `accepted`, exit 1 is `rejected`, exit 2 is a `rejected` boundary error (ill-formed input), and anything else, including an executable whose digest differs from the pin, is `unavailable`.
+- **Maps cover a stated population.** Members plus exclusions must equal the intended population. Audited maps admit only members whose every selected claim is audited; the rest stay listed with a reason (`absent_argument`, `unreviewed_binding`, `disputed_binding`, `vocabulary_mismatch`, `incompatible_policy`, `unsupported_admission`, `other`). Any change to the roster, population, visibility point, policy, registry, checker or manifest is a new map revision, and earlier verdicts, including contests, stay attached to their own revision.
+- **Settings are not names.** Two replications of one setting with different outcomes share one descriptor ID. Two evaluator configurations on the same dataset name do not.
+
+### Trust boundary
+
+These are four different facts, recorded separately:
+
+| Fact | Established by | Does not establish |
+|---|---|---|
+| Lara argument status | an `ara.lara-argument-check/v1` record | that the formal statement matches the evidence, that the experiment was run correctly, or anything about ARA maturity |
+| Formalization review | an authorized `ara.lara-review-attestation/v1` | measurement correctness, reproduction, or reviewer independence |
+| Reproduction | an `ara.verification/v1` record with raw outputs | argument status or review |
+| ARA research maturity | the native ARA closure procedure | anything above; no Lara record changes a claim's status |
+
+A `justified` claim can still rest on a wrong formalization or an unsuitable policy. A `rejected` check says the argument failed, not that the experiment failed.
+
+### Pins
+
+- Lara source: `ARA-Labs/Lara` commit `a31299feafb484404b62bc3b4fd313d987cdda44`, the revision plan 03 inspected. Verdicts there name `lara-core@0.2`.
+- Executable: SHA-256 `dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645`, a local `aarch64-apple-darwin` cabal build (GHC 9.14.1) of that commit. It is **not** a release artifact and prints no version string (`--version` prints usage and exits 2). Registering a scored study must re-pin a release executable.
+- Policy used by the vectors: Lara's `examples/S4/ord-setting-v1.policy.lara` at that commit, SHA-256 `17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5`. The vocabulary `imagenet-cls` in `lara/vectors.json` is a test fixture, not a registered study vocabulary.
+- `ara.attachment/v1` is unchanged. Its `deferred_body` pattern already admits `ara.lara-review-attestation/v1` and `ara.lara-argument-check/v1`; `lara_identity.check_lara_attachment` enforces which kind carries which document.
+
+### What stage L2 (the runner adapter in `ara-eval`) must do
+
+1. Run Lara only under an explicitly selected runner policy. Ordinary CLI reads, writes, validation and merges must not look for the checker.
+2. Verify the executable's SHA-256 against the pin before running it, and record `unavailable` on a mismatch or a missing checker. A policy that requires Lara then fails explicitly.
+3. Materialize the exact argument, binding, policy, registry and member bytes named by the records (Lara maps read local paths and do not check digests), run `lara check`, read the exit status first, and archive stdout, stderr and the verdict bytes.
+4. Build `ara.lara-argument-check/v1` records from that run, publish contribution checks and reviews as attachments with the matching kind, and publish map revisions and map checks under their own hash domains with the same request and recovery rules.
+5. Compute audited coverage with the rules above, build audited maps only from audited members, and label exploratory maps as exploratory.
+6. Show checker status, audit state, reproduction and maturity side by side, never merged. Add map revisions and map checks to a later visibility snapshot revision.
+7. Re-pin a release executable before any scored registration.

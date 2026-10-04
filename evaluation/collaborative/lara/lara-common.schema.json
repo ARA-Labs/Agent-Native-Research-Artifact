@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-common/v1",
+  "title": "Shared value types for the ARA-to-Lara contracts (stage L1)",
+  "$defs": {
+    "lara_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,127}$"},
+    "lara_symbol": {"type": "string", "pattern": "^[a-z][A-Za-z0-9_]{0,127}$"},
+    "lara_policy_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.@-]{0,127}$"},
+    "element_ref": {
+      "type": "string", "maxLength": 1024,
+      "pattern": "^(?:[A-Za-z][A-Za-z0-9_]{0,127}|(?:rebut|undercut|undermine) [A-Za-z][A-Za-z0-9_]{0,127} [A-Za-z][A-Za-z0-9_./]{0,1023})$"
+    },
+    "theory": {"type": "string", "pattern": "^sha256:[A-Za-z0-9._-]{1,128}$"},
+    "backend": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$"},
+        "version": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      }
+    },
+    "polarity": {"enum": ["higher_is_better", "lower_is_better"]},
+    "claim_status": {"enum": ["justified", "gap", "defeated", "contested"]},
+    "audit_status": {"enum": ["unreviewed", "reviewed", "disputed"]},
+    "native_snapshot": {
+      "type": "object", "additionalProperties": false, "required": ["source_key", "fingerprint", "capture_id"],
+      "properties": {
+        "source_key": {"$ref": "../common.schema.json#/$defs/identity"},
+        "fingerprint": {"$ref": "../common.schema.json#/$defs/fingerprint"},
+        "capture_id": {"$ref": "../common.schema.json#/$defs/digest"}
+      }
+    },
+    "policy_ref": {
+      "type": "object", "additionalProperties": false, "required": ["lara_policy", "policy_digest"],
+      "properties": {
+        "lara_policy": {"$ref": "#/$defs/lara_policy_name"},
+        "policy_digest": {"$ref": "../common.schema.json#/$defs/digest"}
+      }
+    },
+    "published_location": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"const": "initial_payload"}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "record_id"],
+         "properties": {"kind": {"const": "attachment"}, "record_id": {"$ref": "../common.schema.json#/$defs/digest"}}}
+      ]
+    },
+    "argument_location": {
+      "oneOf": [
+        {"$ref": "#/$defs/published_location"},
+        {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"const": "enclosing_attachment"}}}
+      ]
+    },
+    "argument_ref": {
+      "type": "object", "additionalProperties": false, "required": ["location", "file", "digest"],
+      "properties": {
+        "location": {"$ref": "#/$defs/published_location"},
+        "file": {"$ref": "../common.schema.json#/$defs/file_ref"},
+        "digest": {"$ref": "../common.schema.json#/$defs/digest"}
+      }
+    },
+    "checker_build": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_repository", "source_commit", "executable_sha256", "platform", "provenance"],
+      "properties": {
+        "source_repository": {"$ref": "../common.schema.json#/$defs/text"},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "executable_sha256": {"$ref": "../common.schema.json#/$defs/digest"},
+        "platform": {"type": "string", "pattern": "^[a-z0-9_]+-[a-z0-9_]+-[a-z0-9_]+$"},
+        "provenance": {"enum": ["local-build", "release"]}
+      }
+    },
+    "checker": {
+      "type": "object", "additionalProperties": false, "required": ["build", "backends", "theories"],
+      "properties": {
+        "build": {"$ref": "#/$defs/checker_build"},
+        "backends": {"type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/backend"}},
+        "theories": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"$ref": "#/$defs/theory"}}
+      }
+    },
+    "checker_pin_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "build", "version_output", "usage", "registration_status", "notes"],
+      "properties": {
+        "schema": {"const": "ara.lara-checker-pin/v1"},
+        "build": {"$ref": "#/$defs/checker_build"},
+        "version_output": {"$ref": "../common.schema.json#/$defs/nullable_text"},
+        "usage": {"$ref": "../common.schema.json#/$defs/text"},
+        "registration_status": {"enum": ["provisional-local-build", "registered-release"]},
+        "notes": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "../common.schema.json#/$defs/text"}}
+      }
+    },
+    "check_target": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "contribution_id", "argument"],
+          "properties": {
+            "kind": {"const": "contribution"},
+            "contribution_id": {"$ref": "../common.schema.json#/$defs/digest"},
+            "argument": {"$ref": "#/$defs/argument_location"}
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": {"kind": {"const": "initial_payload"}}
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "map_revision_id"],
+          "properties": {
+            "kind": {"const": "map_revision"},
+            "map_revision_id": {"$ref": "../common.schema.json#/$defs/digest"}
+          }
+        }
+      ]
+    }
+  },
+  "x-consumer-invariants": [
+    "lara_id, lara_symbol and element_ref follow the Lara surface identifiers at Lara a31299f; an attack element is spelled exactly as its Lara declaration ('undermine x1 a2.binding.leaf')",
+    "polarity higher_is_better / lower_is_better is the ARA spelling of Lara's 'measurand ... where higher-is-better | lower-is-better' declaration and must agree with the pinned policy",
+    "claim_status is Lara's four-state core status; evidence-blocked never appears here and is reported only as an admission-blocked diagnostic",
+    "audit_status mirrors Lara's binding annotation and is always untrusted: it never counts as review",
+    "policy_digest is the SHA-256 of the exact policy file bytes, which carry the proposition signature (sorts, constants, predicates), rules, theories and measurand polarity",
+    "an argument location is 'initial_payload' (the argument is in the target contribution's own payload), 'attachment' (it is in the inventory of the argument_check attachment with that record_id) or, for a check document only, 'enclosing_attachment' (it is in the same attachment as the check, whose record_id cannot be named from inside it); argument_ref.file names a path in that inventory and digest is the SHA-256 of its bytes",
+    "backends are sorted by (name, version) and theories by value; both are the checker selection named in Lara's replay identity",
+    "check_target 'contribution' names a published contribution_id; 'initial_payload' is used only by documents that travel inside the payload of the contribution they describe, which cannot yet name its own contribution_id; 'map_revision' names an ara.lara-map-revision/v1 identity"
+  ]
+}

@@ -1,0 +1,1588 @@
+{
+  "schema": "ara.lara-contract-vectors/v1",
+  "note": "Stage L1 vectors. contributions.a is the phase-1c vector contribution (fork-a, snap-a); the other contribution IDs, evidence digests and verdict digests are synthetic; the policy digest is the SHA-256 of Lara examples/S4/ord-setting-v1.policy.lara at a31299f; native identities reuse snap-a and snap-c from ../vectors.json. Expected IDs were computed by lara_identity.py when the contracts were frozen.",
+  "lara": {
+    "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+    "policy_file": "examples/S4/ord-setting-v1.policy.lara",
+    "policy_sha256": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5",
+    "policy_size": 6868
+  },
+  "files": {
+    "argument_a": "# Contract-vector argument (fork-a). Header and claims follow Lara examples/S2 and S4;\n# the body is abbreviated and is not a checked program.\nartifact ord_setting_demo at sha256:4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e\npolicy ord-setting-v1\nuse backends [ord@1]\n\nclaim c1\n  nl      = \"sys_new outperforms sys_base on ImageNet-val accuracy (0.74 vs 0.71)\"\n  formal  = better(sys_new, sys_base, accuracy, imagenet_val)\n  binding = { author = alice, rationale = \"Ordered comparison of two reported accuracy cells.\", audit-status = reviewed }\n",
+    "argument_c": "# Contract-vector argument (fork-c); abbreviated, not a checked program.\nartifact ord_setting_demo_c at sha256:9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f\npolicy ord-setting-v1\nuse backends [ord@1]\n\nclaim c_neg\n  formal  = not_better(sys_new, sys_base, accuracy, imagenet_val)\n  binding = { author = carol, audit-status = unreviewed }\n",
+    "map_manifest": "(lara-map@1\n  (policy ord-setting-v1 ord-setting-v1.policy.lara)\n  (backends (backend ord 1))\n  (members\n    (member paper_a paper-a/argument.lara)\n    (member paper_c paper-c/argument.lara)))\n"
+  },
+  "contributions": {
+    "a": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+    "c": "sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+    "d": "sha256:d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4"
+  },
+  "replications": [
+    {
+      "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+      "seed": "0",
+      "value": "0.74",
+      "setting": {
+        "schema": "ara.lara-setting-descriptor/v1",
+        "dataset": {
+          "name": "ImageNet",
+          "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+          "split": {
+            "name": "val",
+            "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+          }
+        },
+        "evaluator": {
+          "name": "timm-validate",
+          "revision": "0123456789abcdef0123456789abcdef01234567",
+          "config_digest": "sha256:4bbe6e30507e83e8d2d1305b1281839f6bf48db6df5a95dcacb3376f6a75741f"
+        },
+        "metric": {
+          "name": "top-1 accuracy",
+          "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+          "polarity": "higher_is_better",
+          "unit": null
+        },
+        "controls": [
+          {
+            "name": "image_size",
+            "value": "224"
+          },
+          {
+            "name": "precision",
+            "value": "fp32"
+          }
+        ],
+        "replication": [
+          {
+            "variable": "data_order",
+            "treatment": "fixed",
+            "value": "sorted"
+          },
+          {
+            "variable": "seed",
+            "treatment": "free",
+            "value": null
+          }
+        ],
+        "descriptor_id": "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+      }
+    },
+    {
+      "contribution_id": "sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+      "seed": "7",
+      "value": "0.71",
+      "setting": {
+        "schema": "ara.lara-setting-descriptor/v1",
+        "dataset": {
+          "name": "ImageNet",
+          "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+          "split": {
+            "name": "val",
+            "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+          }
+        },
+        "evaluator": {
+          "name": "timm-validate",
+          "revision": "0123456789abcdef0123456789abcdef01234567",
+          "config_digest": "sha256:4bbe6e30507e83e8d2d1305b1281839f6bf48db6df5a95dcacb3376f6a75741f"
+        },
+        "metric": {
+          "name": "top-1 accuracy",
+          "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+          "polarity": "higher_is_better",
+          "unit": null
+        },
+        "controls": [
+          {
+            "name": "image_size",
+            "value": "224"
+          },
+          {
+            "name": "precision",
+            "value": "fp32"
+          }
+        ],
+        "replication": [
+          {
+            "variable": "data_order",
+            "treatment": "fixed",
+            "value": "sorted"
+          },
+          {
+            "variable": "seed",
+            "treatment": "free",
+            "value": null
+          }
+        ],
+        "descriptor_id": "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+      }
+    }
+  ],
+  "records": {
+    "role_policy": {
+      "record": {
+        "schema": "ara.role-policy/v1",
+        "community": "run-2026-10-a",
+        "integration_pm": "pm",
+        "actors": [
+          {
+            "actor_id": "alice",
+            "source_key": "fork-a",
+            "roles": [
+              "argument_producer",
+              "continuity_writer",
+              "publisher"
+            ]
+          },
+          {
+            "actor_id": "bob",
+            "source_key": null,
+            "roles": [
+              "authorized_reviewer"
+            ]
+          },
+          {
+            "actor_id": "carol",
+            "source_key": "fork-c",
+            "roles": [
+              "argument_producer",
+              "authorized_reviewer",
+              "continuity_writer",
+              "publisher"
+            ]
+          },
+          {
+            "actor_id": "dave",
+            "source_key": "fork-d",
+            "roles": [
+              "continuity_writer",
+              "publisher"
+            ]
+          },
+          {
+            "actor_id": "pm",
+            "source_key": "canonical",
+            "roles": [
+              "continuity_writer",
+              "integration_pm"
+            ]
+          },
+          {
+            "actor_id": "runner",
+            "source_key": null,
+            "roles": [
+              "verifier"
+            ]
+          }
+        ],
+        "independence": {
+          "statement": "All actors share one model family; no independence is claimed.",
+          "shared_factors": []
+        },
+        "policy_id": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e"
+      },
+      "expected_id": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e"
+    },
+    "setting_a": {
+      "record": {
+        "schema": "ara.lara-setting-descriptor/v1",
+        "dataset": {
+          "name": "ImageNet",
+          "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+          "split": {
+            "name": "val",
+            "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+          }
+        },
+        "evaluator": {
+          "name": "timm-validate",
+          "revision": "0123456789abcdef0123456789abcdef01234567",
+          "config_digest": "sha256:4bbe6e30507e83e8d2d1305b1281839f6bf48db6df5a95dcacb3376f6a75741f"
+        },
+        "metric": {
+          "name": "top-1 accuracy",
+          "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+          "polarity": "higher_is_better",
+          "unit": null
+        },
+        "controls": [
+          {
+            "name": "image_size",
+            "value": "224"
+          },
+          {
+            "name": "precision",
+            "value": "fp32"
+          }
+        ],
+        "replication": [
+          {
+            "variable": "data_order",
+            "treatment": "fixed",
+            "value": "sorted"
+          },
+          {
+            "variable": "seed",
+            "treatment": "free",
+            "value": null
+          }
+        ],
+        "descriptor_id": "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+      },
+      "expected_id": "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+    },
+    "setting_b": {
+      "record": {
+        "schema": "ara.lara-setting-descriptor/v1",
+        "dataset": {
+          "name": "ImageNet",
+          "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+          "split": {
+            "name": "val",
+            "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+          }
+        },
+        "evaluator": {
+          "name": "timm-validate",
+          "revision": "0123456789abcdef0123456789abcdef01234567",
+          "config_digest": "sha256:cae324c4395c871807004b0cceaf22843ceb2aa6b263d097145126fd3de5e5b9"
+        },
+        "metric": {
+          "name": "top-1 accuracy",
+          "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+          "polarity": "higher_is_better",
+          "unit": null
+        },
+        "controls": [
+          {
+            "name": "image_size",
+            "value": "224"
+          },
+          {
+            "name": "precision",
+            "value": "fp32"
+          }
+        ],
+        "replication": [
+          {
+            "variable": "data_order",
+            "treatment": "fixed",
+            "value": "sorted"
+          },
+          {
+            "variable": "seed",
+            "treatment": "free",
+            "value": null
+          }
+        ],
+        "descriptor_id": "sha256:fe7bcf962fee1c271208cccd67e8d05c9e3d949982b1cbfa081f9bcc1dfaf9f2"
+      },
+      "expected_id": "sha256:fe7bcf962fee1c271208cccd67e8d05c9e3d949982b1cbfa081f9bcc1dfaf9f2"
+    },
+    "system_new": {
+      "record": {
+        "schema": "ara.lara-system-descriptor/v1",
+        "code_digest": "sha256:c10c2489ff0ee7f8e4d4df06fc9c151ea1cfa24c9108f6d3365949436ffab9a2",
+        "config_digest": "sha256:bf58364af88e084b8992fea109e17d9f56184cf22c986eeb591674281150486f",
+        "system_id": "sha256:5bafe3a7fb15ab75a17310cd48f56ba0d64d2f8474f7e15acb896a65d1cb3de8"
+      },
+      "expected_id": "sha256:5bafe3a7fb15ab75a17310cd48f56ba0d64d2f8474f7e15acb896a65d1cb3de8"
+    },
+    "system_base": {
+      "record": {
+        "schema": "ara.lara-system-descriptor/v1",
+        "code_digest": "sha256:591dae102229c3efae3eac08614bf4e75fa44a7a2e41924de1e77f3542c0bca8",
+        "config_digest": "sha256:c3443fa77c652913246011652f42932e529bcfbd4547b8462e9fdfc7cd83ee3e",
+        "system_id": "sha256:219e4e9014b4942912d5031f8b5b559fd0f64b5161a0bc5c98d178cb6dcf7022"
+      },
+      "expected_id": "sha256:219e4e9014b4942912d5031f8b5b559fd0f64b5161a0bc5c98d178cb6dcf7022"
+    },
+    "registry_r1": {
+      "record": {
+        "schema": "ara.lara-setting-registry/v1",
+        "community": "run-2026-10-a",
+        "vocabulary": {
+          "name": "imagenet-cls",
+          "revision": 1
+        },
+        "previous": null,
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "settings": [
+          {
+            "measurand": "accuracy",
+            "setting": "imagenet_val",
+            "descriptor": {
+              "schema": "ara.lara-setting-descriptor/v1",
+              "dataset": {
+                "name": "ImageNet",
+                "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+                "split": {
+                  "name": "val",
+                  "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+                }
+              },
+              "evaluator": {
+                "name": "timm-validate",
+                "revision": "0123456789abcdef0123456789abcdef01234567",
+                "config_digest": "sha256:4bbe6e30507e83e8d2d1305b1281839f6bf48db6df5a95dcacb3376f6a75741f"
+              },
+              "metric": {
+                "name": "top-1 accuracy",
+                "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+                "polarity": "higher_is_better",
+                "unit": null
+              },
+              "controls": [
+                {
+                  "name": "image_size",
+                  "value": "224"
+                },
+                {
+                  "name": "precision",
+                  "value": "fp32"
+                }
+              ],
+              "replication": [
+                {
+                  "variable": "data_order",
+                  "treatment": "fixed",
+                  "value": "sorted"
+                },
+                {
+                  "variable": "seed",
+                  "treatment": "free",
+                  "value": null
+                }
+              ],
+              "descriptor_id": "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+            }
+          }
+        ],
+        "systems": [
+          {
+            "symbol": "sys_base",
+            "descriptor": {
+              "schema": "ara.lara-system-descriptor/v1",
+              "code_digest": "sha256:591dae102229c3efae3eac08614bf4e75fa44a7a2e41924de1e77f3542c0bca8",
+              "config_digest": "sha256:c3443fa77c652913246011652f42932e529bcfbd4547b8462e9fdfc7cd83ee3e",
+              "system_id": "sha256:219e4e9014b4942912d5031f8b5b559fd0f64b5161a0bc5c98d178cb6dcf7022"
+            }
+          },
+          {
+            "symbol": "sys_new",
+            "descriptor": {
+              "schema": "ara.lara-system-descriptor/v1",
+              "code_digest": "sha256:c10c2489ff0ee7f8e4d4df06fc9c151ea1cfa24c9108f6d3365949436ffab9a2",
+              "config_digest": "sha256:bf58364af88e084b8992fea109e17d9f56184cf22c986eeb591674281150486f",
+              "system_id": "sha256:5bafe3a7fb15ab75a17310cd48f56ba0d64d2f8474f7e15acb896a65d1cb3de8"
+            }
+          }
+        ],
+        "registry_id": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+      },
+      "expected_id": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+    },
+    "registry_r2": {
+      "record": {
+        "schema": "ara.lara-setting-registry/v1",
+        "community": "run-2026-10-a",
+        "vocabulary": {
+          "name": "imagenet-cls",
+          "revision": 2
+        },
+        "previous": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084",
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "settings": [
+          {
+            "measurand": "accuracy",
+            "setting": "imagenet_val",
+            "descriptor": {
+              "schema": "ara.lara-setting-descriptor/v1",
+              "dataset": {
+                "name": "ImageNet",
+                "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+                "split": {
+                  "name": "val",
+                  "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+                }
+              },
+              "evaluator": {
+                "name": "timm-validate",
+                "revision": "0123456789abcdef0123456789abcdef01234567",
+                "config_digest": "sha256:4bbe6e30507e83e8d2d1305b1281839f6bf48db6df5a95dcacb3376f6a75741f"
+              },
+              "metric": {
+                "name": "top-1 accuracy",
+                "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+                "polarity": "higher_is_better",
+                "unit": null
+              },
+              "controls": [
+                {
+                  "name": "image_size",
+                  "value": "224"
+                },
+                {
+                  "name": "precision",
+                  "value": "fp32"
+                }
+              ],
+              "replication": [
+                {
+                  "variable": "data_order",
+                  "treatment": "fixed",
+                  "value": "sorted"
+                },
+                {
+                  "variable": "seed",
+                  "treatment": "free",
+                  "value": null
+                }
+              ],
+              "descriptor_id": "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+            }
+          },
+          {
+            "measurand": "accuracy",
+            "setting": "imagenet_val_crop95",
+            "descriptor": {
+              "schema": "ara.lara-setting-descriptor/v1",
+              "dataset": {
+                "name": "ImageNet",
+                "digest": "sha256:d9c104e69ed47e16be40956bb366c870ab62c37ba6b2ea64f787fd57490ba35d",
+                "split": {
+                  "name": "val",
+                  "digest": "sha256:7cdf30c35813b20e34cbb16f8ed2b2dbcad73b2781f678e8d93c41bd6059f2b7"
+                }
+              },
+              "evaluator": {
+                "name": "timm-validate",
+                "revision": "0123456789abcdef0123456789abcdef01234567",
+                "config_digest": "sha256:cae324c4395c871807004b0cceaf22843ceb2aa6b263d097145126fd3de5e5b9"
+              },
+              "metric": {
+                "name": "top-1 accuracy",
+                "definition_digest": "sha256:aadc97c44bb02b2356c1cb79b6391f26833163b5d76d8443b02aae965cee9caf",
+                "polarity": "higher_is_better",
+                "unit": null
+              },
+              "controls": [
+                {
+                  "name": "image_size",
+                  "value": "224"
+                },
+                {
+                  "name": "precision",
+                  "value": "fp32"
+                }
+              ],
+              "replication": [
+                {
+                  "variable": "data_order",
+                  "treatment": "fixed",
+                  "value": "sorted"
+                },
+                {
+                  "variable": "seed",
+                  "treatment": "free",
+                  "value": null
+                }
+              ],
+              "descriptor_id": "sha256:fe7bcf962fee1c271208cccd67e8d05c9e3d949982b1cbfa081f9bcc1dfaf9f2"
+            }
+          }
+        ],
+        "systems": [
+          {
+            "symbol": "sys_base",
+            "descriptor": {
+              "schema": "ara.lara-system-descriptor/v1",
+              "code_digest": "sha256:591dae102229c3efae3eac08614bf4e75fa44a7a2e41924de1e77f3542c0bca8",
+              "config_digest": "sha256:c3443fa77c652913246011652f42932e529bcfbd4547b8462e9fdfc7cd83ee3e",
+              "system_id": "sha256:219e4e9014b4942912d5031f8b5b559fd0f64b5161a0bc5c98d178cb6dcf7022"
+            }
+          },
+          {
+            "symbol": "sys_new",
+            "descriptor": {
+              "schema": "ara.lara-system-descriptor/v1",
+              "code_digest": "sha256:c10c2489ff0ee7f8e4d4df06fc9c151ea1cfa24c9108f6d3365949436ffab9a2",
+              "config_digest": "sha256:bf58364af88e084b8992fea109e17d9f56184cf22c986eeb591674281150486f",
+              "system_id": "sha256:5bafe3a7fb15ab75a17310cd48f56ba0d64d2f8474f7e15acb896a65d1cb3de8"
+            }
+          }
+        ],
+        "registry_id": "sha256:9ec4b60d94980aef8e245728b31955b1f061b7b3bbab86c4ed6714112267cd06"
+      },
+      "expected_id": "sha256:9ec4b60d94980aef8e245728b31955b1f061b7b3bbab86c4ed6714112267cd06"
+    },
+    "binding_a": {
+      "record": {
+        "schema": "ara.lara-binding/v1",
+        "community": "run-2026-10-a",
+        "producer": "alice",
+        "native": {
+          "source_key": "fork-a",
+          "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+        },
+        "argument": {
+          "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "artifact": {
+            "name": "ord_setting_demo",
+            "digest": "sha256:4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e"
+          }
+        },
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084",
+        "claims": [
+          {
+            "lara_id": "c1",
+            "source": {
+              "source_key": "fork-a",
+              "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+              "selector": "C01"
+            },
+            "proposition": "better(sys_new, sys_base, accuracy, imagenet_val)",
+            "settings": [
+              "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+            ],
+            "systems": [
+              "sha256:219e4e9014b4942912d5031f8b5b559fd0f64b5161a0bc5c98d178cb6dcf7022",
+              "sha256:5bafe3a7fb15ab75a17310cd48f56ba0d64d2f8474f7e15acb896a65d1cb3de8"
+            ],
+            "formalization": {
+              "author": "alice",
+              "rationale": "Ordered comparison of two reported accuracy cells.",
+              "assumptions": [
+                "Both cells were produced by the registered evaluator configuration."
+              ],
+              "declared_audit_status": "reviewed"
+            },
+            "elements": [
+              "a1",
+              "a2",
+              "c2",
+              "e1",
+              "e2",
+              "e3"
+            ]
+          }
+        ],
+        "elements": [
+          {
+            "ref": "a1",
+            "kind": "argument",
+            "sources": [
+              {
+                "source_key": "fork-a",
+                "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+                "selector": "C01",
+                "evidence_digest": null
+              }
+            ]
+          },
+          {
+            "ref": "a2",
+            "kind": "argument",
+            "sources": [
+              {
+                "source_key": "fork-a",
+                "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+                "selector": "C01",
+                "evidence_digest": null
+              }
+            ]
+          },
+          {
+            "ref": "c2",
+            "kind": "claim",
+            "sources": [
+              {
+                "source_key": "fork-a",
+                "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+                "selector": "C01",
+                "evidence_digest": null
+              }
+            ]
+          },
+          {
+            "ref": "e1",
+            "kind": "leaf",
+            "sources": [
+              {
+                "source_key": "fork-a",
+                "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+                "selector": "evidence/tables/accuracy.md#row=sys_base",
+                "evidence_digest": "sha256:7f91edeb827c23ef13b8d6b320271496b1dcc02aa6fbf85dc14db5a4f8ab9fc1"
+              }
+            ]
+          },
+          {
+            "ref": "e2",
+            "kind": "leaf",
+            "sources": [
+              {
+                "source_key": "fork-a",
+                "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+                "selector": "evidence/tables/accuracy.md#row=sys_new",
+                "evidence_digest": "sha256:7f91edeb827c23ef13b8d6b320271496b1dcc02aa6fbf85dc14db5a4f8ab9fc1"
+              }
+            ]
+          },
+          {
+            "ref": "e3",
+            "kind": "leaf",
+            "sources": [
+              {
+                "source_key": "fork-a",
+                "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+                "selector": "evidence/tables/accuracy.md#caption",
+                "evidence_digest": "sha256:7f91edeb827c23ef13b8d6b320271496b1dcc02aa6fbf85dc14db5a4f8ab9fc1"
+              }
+            ]
+          }
+        ],
+        "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+      },
+      "expected_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+    },
+    "binding_c": {
+      "record": {
+        "schema": "ara.lara-binding/v1",
+        "community": "run-2026-10-a",
+        "producer": "carol",
+        "native": {
+          "source_key": "fork-c",
+          "fingerprint": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+          "capture_id": "sha256:519e0d2cffcb5f4bb962c2420bd091e7d9894c7c350a0dec78272cb8aca7e710"
+        },
+        "argument": {
+          "digest": "sha256:901fcfd5d3702d074fa827f2e527d04744c171f1c50ab11a5dddec4e1ecf6442",
+          "artifact": {
+            "name": "ord_setting_demo_c",
+            "digest": "sha256:9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f"
+          }
+        },
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084",
+        "claims": [
+          {
+            "lara_id": "c_neg",
+            "source": {
+              "source_key": "fork-c",
+              "native_revision": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+              "selector": "C02"
+            },
+            "proposition": "not_better(sys_new, sys_base, accuracy, imagenet_val)",
+            "settings": [
+              "sha256:4c6a6a355a505065bff94369a17958a331c0d8359e407df6e47f8e0753814a8b"
+            ],
+            "systems": [
+              "sha256:219e4e9014b4942912d5031f8b5b559fd0f64b5161a0bc5c98d178cb6dcf7022",
+              "sha256:5bafe3a7fb15ab75a17310cd48f56ba0d64d2f8474f7e15acb896a65d1cb3de8"
+            ],
+            "formalization": {
+              "author": "carol",
+              "rationale": "Replication under the same registered setting found no improvement.",
+              "assumptions": [],
+              "declared_audit_status": "unreviewed"
+            },
+            "elements": [
+              "b1",
+              "f1",
+              "rebut b1 a2"
+            ]
+          }
+        ],
+        "elements": [
+          {
+            "ref": "b1",
+            "kind": "argument",
+            "sources": [
+              {
+                "source_key": "fork-c",
+                "native_revision": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+                "selector": "C02",
+                "evidence_digest": null
+              }
+            ]
+          },
+          {
+            "ref": "f1",
+            "kind": "leaf",
+            "sources": [
+              {
+                "source_key": "fork-c",
+                "native_revision": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+                "selector": "evidence/replication.csv#row=3",
+                "evidence_digest": "sha256:322b40543e54646b4f0b0f66e702470bd13df6b662426d69cff0f059a25d1d33"
+              }
+            ]
+          },
+          {
+            "ref": "rebut b1 a2",
+            "kind": "attack",
+            "sources": [
+              {
+                "source_key": "fork-c",
+                "native_revision": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+                "selector": "C02",
+                "evidence_digest": null
+              }
+            ]
+          }
+        ],
+        "binding_id": "sha256:3f96e28327c20f837da70934c31ced36cd6e38b6ff62d92756cd68914ba2b2a0"
+      },
+      "expected_id": "sha256:3f96e28327c20f837da70934c31ced36cd6e38b6ff62d92756cd68914ba2b2a0"
+    },
+    "check_a": {
+      "record": {
+        "schema": "ara.lara-argument-check/v1",
+        "community": "run-2026-10-a",
+        "verifier": "alice",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "enclosing_attachment"
+          }
+        },
+        "scope": "individual",
+        "checker": {
+          "build": {
+            "source_repository": "https://github.com/ARA-Labs/Lara",
+            "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+            "executable_sha256": "sha256:dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645",
+            "platform": "aarch64-apple-darwin",
+            "provenance": "local-build"
+          },
+          "backends": [
+            {
+              "name": "ord",
+              "version": 1
+            }
+          ],
+          "theories": [
+            "sha256:ord-setting-v1-theory-0"
+          ]
+        },
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "inputs": {
+          "entry": {
+            "kind": "argument",
+            "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3"
+          },
+          "binding_ids": [
+            "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+          ],
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "invocation": {
+          "command": "check",
+          "entry": {
+            "root": "lara",
+            "path": "argument.lara"
+          },
+          "output": "stdout"
+        },
+        "result": {
+          "exit_status": 0,
+          "exit_checked_before_output_read": true,
+          "verdict_source": "stdout",
+          "verdict_digest": "sha256:acec31bdb0d36fb8d6e1935454c319eea8cf18fe4db6b854469ccc7912f4ca6c",
+          "stdout_digest": "sha256:acec31bdb0d36fb8d6e1935454c319eea8cf18fe4db6b854469ccc7912f4ca6c",
+          "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "outcome": "accepted",
+        "statuses": [
+          {
+            "member": null,
+            "claim": "c1",
+            "proposition": "better(sys_new, sys_base, accuracy, imagenet_val)",
+            "status": "justified"
+          },
+          {
+            "member": null,
+            "claim": "c2",
+            "proposition": "num_lt(0.71, 0.74)",
+            "status": "justified"
+          }
+        ],
+        "admission_blocked": [],
+        "rejection": null,
+        "unavailable_reason": null,
+        "supersedes": null,
+        "check_id": "sha256:b438b3abf8a6c7a55be2ff151f4b311128894be72bf27d2a90cd31f2960a065e"
+      },
+      "expected_id": "sha256:b438b3abf8a6c7a55be2ff151f4b311128894be72bf27d2a90cd31f2960a065e"
+    },
+    "check_map": {
+      "record": {
+        "schema": "ara.lara-argument-check/v1",
+        "community": "run-2026-10-a",
+        "verifier": "runner",
+        "target": {
+          "kind": "map_revision",
+          "map_revision_id": "sha256:4153ceb463d119c69cddb556f129bfe35f4f0d8a86d418b38d52ba98661e579d"
+        },
+        "scope": "audited_map",
+        "checker": {
+          "build": {
+            "source_repository": "https://github.com/ARA-Labs/Lara",
+            "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+            "executable_sha256": "sha256:dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645",
+            "platform": "aarch64-apple-darwin",
+            "provenance": "local-build"
+          },
+          "backends": [
+            {
+              "name": "ord",
+              "version": 1
+            }
+          ],
+          "theories": [
+            "sha256:ord-setting-v1-theory-0"
+          ]
+        },
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "inputs": {
+          "entry": {
+            "kind": "map_manifest",
+            "digest": "sha256:fa18772b8983f551410df1dd3ea1c13a967b0ac8f78e099bdb815ef91d077dd8"
+          },
+          "binding_ids": [
+            "sha256:3f96e28327c20f837da70934c31ced36cd6e38b6ff62d92756cd68914ba2b2a0",
+            "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+          ],
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "invocation": {
+          "command": "check",
+          "entry": {
+            "root": "map",
+            "path": "map.laramap"
+          },
+          "output": "out_file"
+        },
+        "result": {
+          "exit_status": 0,
+          "exit_checked_before_output_read": true,
+          "verdict_source": "out_file",
+          "verdict_digest": "sha256:2cb71c51b884e7e107e9a20adae8a9da0dbe4421f3cda01cf57c8663a29d3d93",
+          "stdout_digest": null,
+          "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "outcome": "accepted",
+        "statuses": [
+          {
+            "member": "paper_a",
+            "claim": "c1",
+            "proposition": "better(sys_new, sys_base, accuracy, imagenet_val)",
+            "status": "contested"
+          },
+          {
+            "member": "paper_c",
+            "claim": "c_neg",
+            "proposition": "not_better(sys_new, sys_base, accuracy, imagenet_val)",
+            "status": "contested"
+          }
+        ],
+        "admission_blocked": [],
+        "rejection": null,
+        "unavailable_reason": null,
+        "supersedes": null,
+        "check_id": "sha256:6848523cef005bce6ed18903d0677730ba22a579fbec102df7b4f5c5e917ec6b"
+      },
+      "expected_id": "sha256:6848523cef005bce6ed18903d0677730ba22a579fbec102df7b4f5c5e917ec6b"
+    },
+    "check_rejected": {
+      "record": {
+        "schema": "ara.lara-argument-check/v1",
+        "community": "run-2026-10-a",
+        "verifier": "alice",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "enclosing_attachment"
+          }
+        },
+        "scope": "individual",
+        "checker": {
+          "build": {
+            "source_repository": "https://github.com/ARA-Labs/Lara",
+            "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+            "executable_sha256": "sha256:dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645",
+            "platform": "aarch64-apple-darwin",
+            "provenance": "local-build"
+          },
+          "backends": [
+            {
+              "name": "ord",
+              "version": 1
+            }
+          ],
+          "theories": [
+            "sha256:ord-setting-v1-theory-0"
+          ]
+        },
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "inputs": {
+          "entry": {
+            "kind": "argument",
+            "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3"
+          },
+          "binding_ids": [
+            "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+          ],
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "invocation": {
+          "command": "check",
+          "entry": {
+            "root": "lara",
+            "path": "argument.lara"
+          },
+          "output": "out_file"
+        },
+        "result": {
+          "exit_status": 1,
+          "exit_checked_before_output_read": true,
+          "verdict_source": "stdout",
+          "verdict_digest": "sha256:9d2dae7d003ee4be9c8a0f25fbcf754acdd6e3c774fc8ff48a381660e299ebf8",
+          "stdout_digest": "sha256:9d2dae7d003ee4be9c8a0f25fbcf754acdd6e3c774fc8ff48a381660e299ebf8",
+          "stderr_digest": "sha256:18abd3c85cb87c1df1f48847fb1e3b7fbbc318d48c12f92205dbce1f53234d5b"
+        },
+        "outcome": "rejected",
+        "statuses": [],
+        "admission_blocked": [],
+        "rejection": {
+          "class": "R13",
+          "boundary": false,
+          "diagnostic_digest": "sha256:18abd3c85cb87c1df1f48847fb1e3b7fbbc318d48c12f92205dbce1f53234d5b"
+        },
+        "unavailable_reason": null,
+        "supersedes": null,
+        "check_id": "sha256:cc3dba4e54c10aae2e66aedb1793ee3642782354c4a615392991e8a1fd923168"
+      },
+      "expected_id": "sha256:cc3dba4e54c10aae2e66aedb1793ee3642782354c4a615392991e8a1fd923168"
+    },
+    "check_unavailable": {
+      "record": {
+        "schema": "ara.lara-argument-check/v1",
+        "community": "run-2026-10-a",
+        "verifier": "alice",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "enclosing_attachment"
+          }
+        },
+        "scope": "individual",
+        "checker": {
+          "build": {
+            "source_repository": "https://github.com/ARA-Labs/Lara",
+            "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+            "executable_sha256": "sha256:dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645",
+            "platform": "aarch64-apple-darwin",
+            "provenance": "local-build"
+          },
+          "backends": [
+            {
+              "name": "ord",
+              "version": 1
+            }
+          ],
+          "theories": [
+            "sha256:ord-setting-v1-theory-0"
+          ]
+        },
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "inputs": {
+          "entry": {
+            "kind": "argument",
+            "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3"
+          },
+          "binding_ids": [
+            "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+          ],
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "invocation": {
+          "command": "check",
+          "entry": {
+            "root": "lara",
+            "path": "argument.lara"
+          },
+          "output": "stdout"
+        },
+        "result": null,
+        "outcome": "unavailable",
+        "statuses": [],
+        "admission_blocked": [],
+        "rejection": null,
+        "unavailable_reason": "The executable SHA-256 differs from the pinned checker; it was not run.",
+        "supersedes": null,
+        "check_id": "sha256:9295bc7f36e6edc7c17fbfbad78a9c7043b47a2add73fe9899c5c887aa57b8c2"
+      },
+      "expected_id": "sha256:9295bc7f36e6edc7c17fbfbad78a9c7043b47a2add73fe9899c5c887aa57b8c2"
+    },
+    "check_not_performed": {
+      "record": {
+        "schema": "ara.lara-argument-check/v1",
+        "community": "run-2026-10-a",
+        "verifier": "alice",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "enclosing_attachment"
+          }
+        },
+        "scope": "individual",
+        "checker": null,
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "inputs": {
+          "entry": {
+            "kind": "argument",
+            "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3"
+          },
+          "binding_ids": [
+            "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+          ],
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "invocation": null,
+        "result": null,
+        "outcome": "not-performed",
+        "statuses": [],
+        "admission_blocked": [],
+        "rejection": null,
+        "unavailable_reason": null,
+        "supersedes": null,
+        "check_id": "sha256:ccba5cf820109172a1f4818385eebb8411ac2736477287c412e83d4bd0b0be01"
+      },
+      "expected_id": "sha256:ccba5cf820109172a1f4818385eebb8411ac2736477287c412e83d4bd0b0be01"
+    },
+    "attestation_bob_a": {
+      "record": {
+        "schema": "ara.lara-review-attestation/v1",
+        "community": "run-2026-10-a",
+        "reviewer": "bob",
+        "role_policy": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "attachment",
+            "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+          }
+        },
+        "native": {
+          "source_key": "fork-a",
+          "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+        },
+        "covered": {
+          "argument_digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59",
+          "policy": {
+            "lara_policy": "ord-setting-v1",
+            "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+          },
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "reviewed": [
+          {
+            "lara_claim": "c1",
+            "selector": "C01"
+          }
+        ],
+        "disposition": "approved",
+        "rationale": "Cells e1 and e2 match rows sys_base and sys_new of evidence/tables/accuracy.md; the setting descriptor matches the caption.",
+        "linkage": null,
+        "attestation_id": "sha256:207b50ad0c1e06603b681485c0d881e595698659b5422c9b8efa7b55ea5b45f8"
+      },
+      "expected_id": "sha256:207b50ad0c1e06603b681485c0d881e595698659b5422c9b8efa7b55ea5b45f8"
+    },
+    "attestation_bob_c": {
+      "record": {
+        "schema": "ara.lara-review-attestation/v1",
+        "community": "run-2026-10-a",
+        "reviewer": "bob",
+        "role_policy": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+          "argument": {
+            "kind": "initial_payload"
+          }
+        },
+        "native": {
+          "source_key": "fork-c",
+          "fingerprint": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+          "capture_id": "sha256:519e0d2cffcb5f4bb962c2420bd091e7d9894c7c350a0dec78272cb8aca7e710"
+        },
+        "covered": {
+          "argument_digest": "sha256:901fcfd5d3702d074fa827f2e527d04744c171f1c50ab11a5dddec4e1ecf6442",
+          "binding_id": "sha256:3f96e28327c20f837da70934c31ced36cd6e38b6ff62d92756cd68914ba2b2a0",
+          "policy": {
+            "lara_policy": "ord-setting-v1",
+            "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+          },
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "reviewed": [
+          {
+            "lara_claim": "c_neg",
+            "selector": "C02"
+          }
+        ],
+        "disposition": "approved",
+        "rationale": "Row 3 of evidence/replication.csv is the reported replication under the registered setting.",
+        "linkage": null,
+        "attestation_id": "sha256:25daefdac30f7d63b92c4f1722881bb3812a7c12c7cf472c77f6872d51b043df"
+      },
+      "expected_id": "sha256:25daefdac30f7d63b92c4f1722881bb3812a7c12c7cf472c77f6872d51b043df"
+    },
+    "attestation_alice_a": {
+      "record": {
+        "schema": "ara.lara-review-attestation/v1",
+        "community": "run-2026-10-a",
+        "reviewer": "alice",
+        "role_policy": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "attachment",
+            "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+          }
+        },
+        "native": {
+          "source_key": "fork-a",
+          "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+        },
+        "covered": {
+          "argument_digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59",
+          "policy": {
+            "lara_policy": "ord-setting-v1",
+            "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+          },
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "reviewed": [
+          {
+            "lara_claim": "c1",
+            "selector": "C01"
+          }
+        ],
+        "disposition": "approved",
+        "rationale": "I checked my own formalization.",
+        "linkage": null,
+        "attestation_id": "sha256:dd5abb2fd052439ccb1554942183ee03a793582a84daa586d66954b2b609946b"
+      },
+      "expected_id": "sha256:dd5abb2fd052439ccb1554942183ee03a793582a84daa586d66954b2b609946b"
+    },
+    "attestation_dave_a": {
+      "record": {
+        "schema": "ara.lara-review-attestation/v1",
+        "community": "run-2026-10-a",
+        "reviewer": "dave",
+        "role_policy": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "attachment",
+            "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+          }
+        },
+        "native": {
+          "source_key": "fork-a",
+          "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+        },
+        "covered": {
+          "argument_digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59",
+          "policy": {
+            "lara_policy": "ord-setting-v1",
+            "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+          },
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "reviewed": [
+          {
+            "lara_claim": "c1",
+            "selector": "C01"
+          }
+        ],
+        "disposition": "approved",
+        "rationale": "Looks right.",
+        "linkage": null,
+        "attestation_id": "sha256:585bb3f143c870c85f4ddb5ada22b713ddfc5b1f1fe719d98f929cc9ab761875"
+      },
+      "expected_id": "sha256:585bb3f143c870c85f4ddb5ada22b713ddfc5b1f1fe719d98f929cc9ab761875"
+    },
+    "attestation_carol_dispute_a": {
+      "record": {
+        "schema": "ara.lara-review-attestation/v1",
+        "community": "run-2026-10-a",
+        "reviewer": "carol",
+        "role_policy": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "attachment",
+            "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+          }
+        },
+        "native": {
+          "source_key": "fork-a",
+          "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+        },
+        "covered": {
+          "argument_digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59",
+          "policy": {
+            "lara_policy": "ord-setting-v1",
+            "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+          },
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "reviewed": [
+          {
+            "lara_claim": "c1",
+            "selector": "C01"
+          }
+        ],
+        "disposition": "disputed",
+        "rationale": "e3 cites the caption, which does not state the crop ratio.",
+        "linkage": {
+          "relation": "disputes",
+          "record": "sha256:207b50ad0c1e06603b681485c0d881e595698659b5422c9b8efa7b55ea5b45f8",
+          "affected_claims": [
+            "c1"
+          ],
+          "explanation": "The comparison-setup leaf does not justify the registered evaluator configuration."
+        },
+        "attestation_id": "sha256:4cc4b03a81b0c69db14ec045824f0963db1a62787416d30a580d789984b576d5"
+      },
+      "expected_id": "sha256:4cc4b03a81b0c69db14ec045824f0963db1a62787416d30a580d789984b576d5"
+    },
+    "attestation_carol_resolve_a": {
+      "record": {
+        "schema": "ara.lara-review-attestation/v1",
+        "community": "run-2026-10-a",
+        "reviewer": "carol",
+        "role_policy": "sha256:0c83f9ec2dd161ddd1cbe00bb11ddc6cf81f19551aeb535059c46bb6de93b37e",
+        "target": {
+          "kind": "contribution",
+          "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+          "argument": {
+            "kind": "attachment",
+            "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+          }
+        },
+        "native": {
+          "source_key": "fork-a",
+          "fingerprint": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+          "capture_id": "sha256:f0c65195564ab6ac865731a8832818b51bf48c761a277b19d9b8724828c6f7bf"
+        },
+        "covered": {
+          "argument_digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59",
+          "policy": {
+            "lara_policy": "ord-setting-v1",
+            "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+          },
+          "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084"
+        },
+        "reviewed": [
+          {
+            "lara_claim": "c1",
+            "selector": "C01"
+          }
+        ],
+        "disposition": "approved",
+        "rationale": "The appendix states the crop ratio; the binding is justified.",
+        "linkage": {
+          "relation": "supersedes",
+          "record": "sha256:4cc4b03a81b0c69db14ec045824f0963db1a62787416d30a580d789984b576d5",
+          "affected_claims": [
+            "c1"
+          ],
+          "explanation": "Withdraws the dispute after reading appendix B."
+        },
+        "attestation_id": "sha256:098dca59fed4be8cd4a9e8653cd3ff8c5cf4456033addcdd70a217e68f6e2c87"
+      },
+      "expected_id": "sha256:098dca59fed4be8cd4a9e8653cd3ff8c5cf4456033addcdd70a217e68f6e2c87"
+    },
+    "map_revision": {
+      "record": {
+        "schema": "ara.lara-map-revision/v1",
+        "community": "run-2026-10-a",
+        "display_name": "imagenet-accuracy",
+        "manifest": {
+          "file": {
+            "root": "map",
+            "path": "map.laramap"
+          },
+          "digest": "sha256:fa18772b8983f551410df1dd3ea1c13a967b0ac8f78e099bdb815ef91d077dd8"
+        },
+        "members": [
+          {
+            "alias": "paper_a",
+            "contribution_id": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+            "source_key": "fork-a",
+            "native_revision": "4e76e27e5716d33f20dd68387a2e7576aaf6d6bce82156b69d7abed0e804f28e",
+            "argument": {
+              "location": {
+                "kind": "attachment",
+                "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+              },
+              "file": {
+                "root": "lara",
+                "path": "argument.lara"
+              },
+              "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3"
+            },
+            "binding_id": "sha256:c539129ecffc52ebf2d9856b644b066340b5c1af6d5728176a05b50cb5896f59"
+          },
+          {
+            "alias": "paper_c",
+            "contribution_id": "sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+            "source_key": "fork-c",
+            "native_revision": "9f0933fdeafd0d802723560bf09bd24b5ee7d229ac07ad9a8b063f96e18e262f",
+            "argument": {
+              "location": {
+                "kind": "initial_payload"
+              },
+              "file": {
+                "root": "lara",
+                "path": "argument.lara"
+              },
+              "digest": "sha256:901fcfd5d3702d074fa827f2e527d04744c171f1c50ab11a5dddec4e1ecf6442"
+            },
+            "binding_id": "sha256:3f96e28327c20f837da70934c31ced36cd6e38b6ff62d92756cd68914ba2b2a0"
+          }
+        ],
+        "policy": {
+          "lara_policy": "ord-setting-v1",
+          "policy_digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5"
+        },
+        "registry": "sha256:9a98e65c7839596dd9eb67d3e8c0d59938d32e9eec30ca773093483cb52cb084",
+        "checker": {
+          "build": {
+            "source_repository": "https://github.com/ARA-Labs/Lara",
+            "source_commit": "a31299feafb484404b62bc3b4fd313d987cdda44",
+            "executable_sha256": "sha256:dfbc5966941a4be55524073ca375787b8e5b2ed05c916e14232773e7ba28d645",
+            "platform": "aarch64-apple-darwin",
+            "provenance": "local-build"
+          },
+          "backends": [
+            {
+              "name": "ord",
+              "version": 1
+            }
+          ],
+          "theories": [
+            "sha256:ord-setting-v1-theory-0"
+          ]
+        },
+        "population": {
+          "visibility_id": "sha256:17aca71697b9cd35fd58f499dd4c88db6a3dce3218a94fcdf6cb001a0ca77eda",
+          "sequence": 12,
+          "contributions": [
+            "sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+            "sha256:d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4",
+            "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b"
+          ],
+          "description": "Every contribution visible at sequence 12 that reports ImageNet-val accuracy."
+        },
+        "coverage": {
+          "scope": "audited",
+          "policy": "Members need a current authorized approval of every selected claim and no open dispute."
+        },
+        "exclusions": [
+          {
+            "contribution_id": "sha256:d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4",
+            "reason": "absent_argument",
+            "detail": "Raw finding published without a Lara argument."
+          }
+        ],
+        "map_revision_id": "sha256:4153ceb463d119c69cddb556f129bfe35f4f0d8a86d418b38d52ba98661e579d"
+      },
+      "expected_id": "sha256:4153ceb463d119c69cddb556f129bfe35f4f0d8a86d418b38d52ba98661e579d"
+    },
+    "attachment_check": {
+      "record": {
+        "schema": "ara.attachment/v1",
+        "kind": "argument_check",
+        "community": "run-2026-10-a",
+        "publisher": "alice",
+        "request": "alice:argument-0001",
+        "target": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "payload_digest": "sha256:767918896a347a89acce2899046b639f2ef5a1922ffe5e4ba21ff40bd4fbe04b",
+        "inventory": {
+          "manifest": "payload-inventory.json"
+        },
+        "body": {
+          "schema": "ara.lara-argument-check/v1",
+          "document": {
+            "root": "lara",
+            "path": "check.json"
+          }
+        },
+        "record_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+      },
+      "expected_id": "sha256:566e796b49feed990c0aeecb9cf81e5483059a6cedd92e64c0283c090b349877"
+    },
+    "attachment_review": {
+      "record": {
+        "schema": "ara.attachment/v1",
+        "kind": "review_attestation",
+        "community": "run-2026-10-a",
+        "publisher": "bob",
+        "request": "bob:review-0001",
+        "target": "sha256:f0c326db49a40bceb0e838da4ca7fef498b598cded3dd6e70044f1b00dbd7f3b",
+        "payload_digest": "sha256:9188319e8b5115bb46d49468b94e3e39ed907a078392c2677de2f4909826c231",
+        "inventory": {
+          "manifest": "payload-inventory.json"
+        },
+        "body": {
+          "schema": "ara.lara-review-attestation/v1",
+          "document": {
+            "root": "lara",
+            "path": "review.json"
+          }
+        },
+        "record_id": "sha256:57f176053beb99911b9868d3d87fa1f108f26b5dcc64532ca38233aa6c31f597"
+      },
+      "expected_id": "sha256:57f176053beb99911b9868d3d87fa1f108f26b5dcc64532ca38233aa6c31f597"
+    }
+  },
+  "inventories": {
+    "attachment_check": {
+      "schema": "ara.payload-inventory/v1",
+      "roots": [
+        {
+          "name": "lara",
+          "kind": "argument"
+        }
+      ],
+      "native": null,
+      "entries": [
+        {
+          "root": "lara",
+          "path": "argument.lara",
+          "digest": "sha256:052ec7a29f07d5b9f05d1e0ef9f2a19761af3a36f2a1c3b4827b5f75f957c8b3",
+          "size": 564,
+          "mode": "0644"
+        },
+        {
+          "root": "lara",
+          "path": "binding.json",
+          "digest": "sha256:881d9024f93e82d3718a21c9ae8b83f1a6bd1eec5d61794d2f1dfaff77dafafb",
+          "size": 3004,
+          "mode": "0644"
+        },
+        {
+          "root": "lara",
+          "path": "check.json",
+          "digest": "sha256:57070067338bf8750af0615faf92ae3bc69929889922fd67b68ac65895300091",
+          "size": 1946,
+          "mode": "0644"
+        },
+        {
+          "root": "lara",
+          "path": "ord-setting-v1.policy.lara",
+          "digest": "sha256:17d383fa0205f4303eda1cd1bc4f895abd30d91dfe7caee962fe6ceeb6eb85e5",
+          "size": 6868,
+          "mode": "0644"
+        },
+        {
+          "root": "lara",
+          "path": "registry.json",
+          "digest": "sha256:9ae06342ece37398970453ede09ebb578156d57524d049fab9ca7b53eee2011e",
+          "size": 2047,
+          "mode": "0644"
+        },
+        {
+          "root": "lara",
+          "path": "verdict.sexp",
+          "digest": "sha256:acec31bdb0d36fb8d6e1935454c319eea8cf18fe4db6b854469ccc7912f4ca6c",
+          "size": 9,
+          "mode": "0644"
+        }
+      ],
+      "external": [],
+      "execution": {
+        "entry": null,
+        "config": null,
+        "environment": null
+      }
+    },
+    "attachment_review": {
+      "schema": "ara.payload-inventory/v1",
+      "roots": [
+        {
+          "name": "lara",
+          "kind": "argument"
+        }
+      ],
+      "native": null,
+      "entries": [
+        {
+          "root": "lara",
+          "path": "review.json",
+          "digest": "sha256:b00fb944fa022312b72881d302942b6b766497c4ffd6e6a3205f82bf02f5db1c",
+          "size": 1348,
+          "mode": "0644"
+        }
+      ],
+      "external": [],
+      "execution": {
+        "entry": null,
+        "config": null,
+        "environment": null
+      }
+    }
+  }
+}
