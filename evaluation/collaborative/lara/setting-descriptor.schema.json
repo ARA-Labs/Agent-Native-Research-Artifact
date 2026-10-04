@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-setting-descriptor/v1",
+  "title": "Canonical experimental setting descriptor (system descriptors in $defs)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "dataset", "evaluator", "metric", "controls", "replication", "descriptor_id"],
+  "properties": {
+    "schema": {"const": "ara.lara-setting-descriptor/v1"},
+    "dataset": {
+      "type": "object", "additionalProperties": false, "required": ["name", "digest", "split"],
+      "properties": {
+        "name": {"$ref": "../common.schema.json#/$defs/text"},
+        "digest": {"$ref": "../common.schema.json#/$defs/digest"},
+        "split": {
+          "type": "object", "additionalProperties": false, "required": ["name", "digest"],
+          "properties": {
+            "name": {"$ref": "../common.schema.json#/$defs/text"},
+            "digest": {"$ref": "../common.schema.json#/$defs/digest"}
+          }
+        }
+      }
+    },
+    "evaluator": {
+      "type": "object", "additionalProperties": false, "required": ["name", "revision", "config_digest"],
+      "properties": {
+        "name": {"$ref": "../common.schema.json#/$defs/text"},
+        "revision": {"$ref": "../common.schema.json#/$defs/text"},
+        "config_digest": {"$ref": "../common.schema.json#/$defs/digest"}
+      }
+    },
+    "metric": {
+      "type": "object", "additionalProperties": false, "required": ["name", "definition_digest", "polarity", "unit"],
+      "properties": {
+        "name": {"$ref": "../common.schema.json#/$defs/text"},
+        "definition_digest": {"$ref": "../common.schema.json#/$defs/digest"},
+        "polarity": {"$ref": "lara-common.schema.json#/$defs/polarity"},
+        "unit": {"$ref": "../common.schema.json#/$defs/nullable_text"}
+      }
+    },
+    "controls": {
+      "type": "array", "maxItems": 256,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["name", "value"],
+        "properties": {
+          "name": {"$ref": "../common.schema.json#/$defs/identity"},
+          "value": {"$ref": "../common.schema.json#/$defs/text"}
+        }
+      }
+    },
+    "replication": {
+      "type": "array", "maxItems": 256,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["variable", "treatment", "value"],
+        "properties": {
+          "variable": {"$ref": "../common.schema.json#/$defs/identity"},
+          "treatment": {"enum": ["fixed", "free", "aggregated"]},
+          "value": {"$ref": "../common.schema.json#/$defs/nullable_text"}
+        },
+        "allOf": [
+          {"if": {"properties": {"treatment": {"const": "free"}}}, "then": {"properties": {"value": {"type": "null"}}}},
+          {"if": {"properties": {"treatment": {"enum": ["fixed", "aggregated"]}}}, "then": {"properties": {"value": {"$ref": "../common.schema.json#/$defs/text"}}}}
+        ]
+      }
+    },
+    "descriptor_id": {"$ref": "../common.schema.json#/$defs/digest"}
+  },
+  "$defs": {
+    "system_descriptor": {
+      "type": "object", "additionalProperties": false, "required": ["schema", "code_digest", "config_digest", "system_id"],
+      "properties": {
+        "schema": {"const": "ara.lara-system-descriptor/v1"},
+        "code_digest": {"$ref": "../common.schema.json#/$defs/digest"},
+        "config_digest": {"$ref": "../common.schema.json#/$defs/digest"},
+        "system_id": {"$ref": "../common.schema.json#/$defs/digest"}
+      }
+    }
+  },
+  "x-identity": {
+    "descriptor_id": "sha256(\"ara.lara-setting-descriptor/v1\\0\" || JCS(descriptor without descriptor_id))",
+    "system_id": "sha256(\"ara.lara-system-descriptor/v1\\0\" || JCS(system descriptor without system_id))"
+  },
+  "x-consumer-invariants": [
+    "a setting descriptor binds what makes two measurements comparable: dataset and split bytes, evaluator revision and configuration bytes, metric definition and polarity, experimental controls and the registered treatment of replication variables",
+    "no evidence value, outcome, contribution ID, publisher or prose description enters a descriptor, so replications of one setting with different outcomes share one descriptor_id",
+    "a shared dataset name never establishes a shared setting: any change to a digest, the evaluator revision or configuration, the metric, a control or a replication treatment yields a different descriptor_id",
+    "controls are sorted by name and unique; replication entries are sorted by variable and unique",
+    "replication treatment 'free' (value null) declares a variable such as a seed that may differ between replications of the same setting; 'fixed' pins its value; 'aggregated' names the declared aggregation (for example 'mean over seeds 0-4')",
+    "system and baseline identifiers are separate ara.lara-system-descriptor/v1 values binding the actual code and configuration digests; they never enter a setting descriptor",
+    "descriptor changes create new identifiers; old verdicts stay attached to the identifiers they used"
+  ]
+}

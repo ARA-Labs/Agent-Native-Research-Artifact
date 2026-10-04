@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.lara-binding/v1",
+  "title": "Binding from one Lara argument file to exact native ARA sources",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "producer", "native", "argument", "policy", "registry", "claims", "elements", "binding_id"],
+  "properties": {
+    "schema": {"const": "ara.lara-binding/v1"},
+    "community": {"$ref": "../common.schema.json#/$defs/identity"},
+    "producer": {"$ref": "../common.schema.json#/$defs/identity"},
+    "native": {"$ref": "lara-common.schema.json#/$defs/native_snapshot"},
+    "argument": {
+      "type": "object", "additionalProperties": false, "required": ["digest", "artifact"],
+      "properties": {
+        "digest": {"$ref": "../common.schema.json#/$defs/digest"},
+        "artifact": {
+          "type": "object", "additionalProperties": false, "required": ["name", "digest"],
+          "properties": {
+            "name": {"$ref": "lara-common.schema.json#/$defs/lara_symbol"},
+            "digest": {"$ref": "../common.schema.json#/$defs/digest"}
+          }
+        }
+      }
+    },
+    "policy": {"$ref": "lara-common.schema.json#/$defs/policy_ref"},
+    "registry": {"$ref": "../common.schema.json#/$defs/nullable_digest"},
+    "claims": {
+      "type": "array", "minItems": 1, "maxItems": 1024,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["lara_id", "source", "proposition", "settings", "systems", "formalization", "elements"],
+        "properties": {
+          "lara_id": {"$ref": "lara-common.schema.json#/$defs/lara_id"},
+          "source": {"$ref": "../common.schema.json#/$defs/native_ref"},
+          "proposition": {"$ref": "../common.schema.json#/$defs/text"},
+          "settings": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"$ref": "../common.schema.json#/$defs/digest"}},
+          "systems": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"$ref": "../common.schema.json#/$defs/digest"}},
+          "formalization": {
+            "type": "object", "additionalProperties": false,
+            "required": ["author", "rationale", "assumptions", "declared_audit_status"],
+            "properties": {
+              "author": {"$ref": "../common.schema.json#/$defs/identity"},
+              "rationale": {"$ref": "../common.schema.json#/$defs/text"},
+              "assumptions": {"type": "array", "maxItems": 256, "items": {"$ref": "../common.schema.json#/$defs/text"}},
+              "declared_audit_status": {"$ref": "lara-common.schema.json#/$defs/audit_status"}
+            }
+          },
+          "elements": {"type": "array", "minItems": 1, "maxItems": 4096, "uniqueItems": true, "items": {"$ref": "lara-common.schema.json#/$defs/element_ref"}}
+        }
+      }
+    },
+    "elements": {
+      "type": "array", "minItems": 1, "maxItems": 16384,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["ref", "kind", "sources"],
+        "properties": {
+          "ref": {"$ref": "lara-common.schema.json#/$defs/element_ref"},
+          "kind": {"enum": ["claim", "leaf", "argument", "attack"]},
+          "sources": {
+            "type": "array", "minItems": 1, "maxItems": 256,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["source_key", "native_revision", "selector", "evidence_digest"],
+              "properties": {
+                "source_key": {"$ref": "../common.schema.json#/$defs/identity"},
+                "native_revision": {"$ref": "../common.schema.json#/$defs/fingerprint"},
+                "selector": {"$ref": "../common.schema.json#/$defs/selector"},
+                "evidence_digest": {"$ref": "../common.schema.json#/$defs/nullable_digest"}
+              }
+            }
+          }
+        },
+        "allOf": [
+          {"if": {"properties": {"kind": {"const": "leaf"}}},
+           "then": {"properties": {"sources": {"items": {"properties": {"evidence_digest": {"$ref": "../common.schema.json#/$defs/digest"}}}}}}}
+        ]
+      }
+    },
+    "binding_id": {"$ref": "../common.schema.json#/$defs/digest"}
+  },
+  "x-identity": {
+    "binding_id": "sha256(\"ara.lara-binding/v1\\0\" || JCS(binding without binding_id))"
+  },
+  "x-consumer-invariants": [
+    "argument.digest is the SHA-256 of the exact .lara bytes; argument.artifact is that file's 'artifact <name> at <digest>' header and its digest equals 'sha256:' + native.fingerprint; a mismatch rejects the argument package (snapshot_mismatch) and requires a new argument against the new snapshot",
+    "the binding and the argument file live outside the native snapshot root; native names the snapshot (fingerprint and capture_id) both files were written against",
+    "claims are sorted by lara_id and are the selected claims; each claim's elements are sorted and every one names an entry of elements; every element is reachable from some selected claim",
+    "elements are sorted by ref and unique; a leaf element binds at least one evidence object digest; sources are sorted by (source_key, native_revision, selector) and unique; evidence carried from a peer keeps its original source_key and native_revision",
+    "settings and systems are sorted descriptor_id and system_id values that must exist in the registry named by registry; a claim with no registered setting cannot enter an audited map that requires one",
+    "formalization.declared_audit_status copies the argument's Lara 'audit-status' annotation; it is untrusted and never establishes review (plan 03 failure 'producer labels its own binding reviewed')",
+    "producer is the actor that publishes the argument; authorized review comes only from ara.lara-review-attestation/v1 records by a different authorized reviewer"
+  ]
+}
