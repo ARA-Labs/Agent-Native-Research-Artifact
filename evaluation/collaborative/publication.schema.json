@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.publication/v1",
+  "title": "Publication requests, receipts and external workflow-state events",
+  "$defs": {
+    "request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "community", "publisher", "request", "record_kind", "record_id", "payload_digest"],
+      "properties": {
+        "schema": {"const": "ara.publication-request/v1"},
+        "community": {"$ref": "common.schema.json#/$defs/identity"},
+        "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+        "request": {"$ref": "common.schema.json#/$defs/request_id"},
+        "record_kind": {"enum": ["contribution", "attachment"]},
+        "record_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "payload_digest": {"$ref": "common.schema.json#/$defs/digest"}
+      }
+    },
+    "receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "community", "publisher", "request", "request_digest", "record_kind", "record_id", "sequence", "visibility_id", "receipt_id"],
+      "properties": {
+        "schema": {"const": "ara.publication-receipt/v1"},
+        "community": {"$ref": "common.schema.json#/$defs/identity"},
+        "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+        "request": {"$ref": "common.schema.json#/$defs/request_id"},
+        "request_digest": {"$ref": "common.schema.json#/$defs/digest"},
+        "record_kind": {"enum": ["contribution", "attachment"]},
+        "record_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "sequence": {"$ref": "common.schema.json#/$defs/sequence"},
+        "visibility_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "receipt_id": {"$ref": "common.schema.json#/$defs/digest"}
+      }
+    },
+    "rejection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "community", "publisher", "request", "request_digest", "code", "message", "receipt_id"],
+      "properties": {
+        "schema": {"const": "ara.publication-rejection/v1"},
+        "community": {"$ref": "common.schema.json#/$defs/identity"},
+        "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+        "request": {"$ref": "common.schema.json#/$defs/request_id"},
+        "request_digest": {"$ref": "common.schema.json#/$defs/digest"},
+        "code": {"enum": ["request_conflict", "invalid_record", "identity_mismatch", "inventory_mismatch", "stale_input", "isolation_lost", "unsafe_path", "missing_object", "unauthorized_actor", "policy_diagnostics"]},
+        "message": {"$ref": "common.schema.json#/$defs/text"},
+        "receipt_id": {"$ref": "common.schema.json#/$defs/digest"}
+      }
+    },
+    "state_event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "community", "publisher", "request", "contribution_id", "track", "state", "previous", "sequence", "evidence"],
+      "properties": {
+        "schema": {"const": "ara.workflow-state/v1"},
+        "community": {"$ref": "common.schema.json#/$defs/identity"},
+        "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+        "request": {"$ref": "common.schema.json#/$defs/request_id"},
+        "contribution_id": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "track": {"enum": ["publication", "integration"]},
+        "state": {"enum": ["draft", "frozen", "published", "pending", "imported-with-conflicts", "integrated", "rejected-for-integration"]},
+        "previous": {"oneOf": [{"type": "null"}, {"enum": ["draft", "frozen", "published", "pending", "imported-with-conflicts", "integrated", "rejected-for-integration"]}]},
+        "sequence": {"$ref": "common.schema.json#/$defs/sequence"},
+        "evidence": {"$ref": "common.schema.json#/$defs/nullable_digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"track": {"const": "publication"}}},
+          "then": {"properties": {"state": {"enum": ["draft", "frozen", "published"]}, "previous": {"enum": [null, "draft", "frozen"]}}},
+          "else": {"properties": {"contribution_id": {"$ref": "common.schema.json#/$defs/digest"}, "state": {"enum": ["pending", "imported-with-conflicts", "integrated", "rejected-for-integration"]}, "previous": {"enum": [null, "pending", "imported-with-conflicts", "integrated", "rejected-for-integration"]}}}
+        },
+        {
+          "if": {"properties": {"state": {"const": "draft"}}},
+          "then": {"properties": {"contribution_id": {"type": "null"}}},
+          "else": {"properties": {"contribution_id": {"$ref": "common.schema.json#/$defs/digest"}}}
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/request"}, {"$ref": "#/$defs/receipt"}, {"$ref": "#/$defs/rejection"}, {"$ref": "#/$defs/state_event"}
+  ],
+  "x-identity": {
+    "request_digest": "sha256(\"ara.publication-request/v1\\0\" || JCS(request))",
+    "receipt_id": "sha256(\"<schema>\\0\" || JCS(receipt or rejection without receipt_id))"
+  },
+  "x-transitions": {
+    "publication": [[null, "draft"], ["draft", "frozen"], ["frozen", "published"]],
+    "integration": [[null, "pending"], ["pending", "imported-with-conflicts"], ["pending", "integrated"], ["pending", "rejected-for-integration"], ["imported-with-conflicts", "imported-with-conflicts"], ["imported-with-conflicts", "integrated"], ["imported-with-conflicts", "rejected-for-integration"]]
+  },
+  "x-consumer-invariants": [
+    "publication and integration states are external workflow states recorded as append-only events; they never rewrite a contribution and are not native claim statuses",
+    "the coordinator returns a receipt only after it durably recorded the immutable record and request binding, assigned sequence, and reconciled the visibility snapshot named by visibility_id; a durable but not yet visible record stays 'published' without a receipt until reconciliation",
+    "an exact retry of (community, publisher, request) with the same request_digest returns the original receipt or rejection; a different request_digest under the same request rejects with request_conflict and creates no record",
+    "request.record_id is the contribution_id (record_kind contribution) or the attachment record_id; payload_digest repeats the record's payload digest so the coordinator can verify the inventory before reading the envelope",
+    "a rejection retains the failed request and creates no contribution; integration events require a published contribution; evidence names the receipt or record that justified the transition",
+    "publication certifies durable availability and the pinned structural policy only, never scientific correctness"
+  ]
+}

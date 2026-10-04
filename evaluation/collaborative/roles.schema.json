@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.role-policy/v1",
+  "title": "Immutable collaborative role policy pinned by one run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "integration_pm", "actors", "independence", "policy_id"],
+  "properties": {
+    "schema": {"const": "ara.role-policy/v1"},
+    "community": {"$ref": "common.schema.json#/$defs/identity"},
+    "integration_pm": {"$ref": "common.schema.json#/$defs/identity"},
+    "actors": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["actor_id", "source_key", "roles"],
+        "properties": {
+          "actor_id": {"$ref": "common.schema.json#/$defs/identity"},
+          "source_key": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/identity"}]},
+          "roles": {
+            "type": "array", "minItems": 1, "maxItems": 6, "uniqueItems": true,
+            "items": {"enum": ["argument_producer", "authorized_reviewer", "continuity_writer", "integration_pm", "publisher", "verifier"]}
+          }
+        }
+      }
+    },
+    "independence": {
+      "type": "object", "additionalProperties": false, "required": ["statement", "shared_factors"],
+      "properties": {
+        "statement": {"$ref": "common.schema.json#/$defs/text"},
+        "shared_factors": {
+          "type": "array", "maxItems": 1024, "uniqueItems": true,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["factor", "actors", "description"],
+            "properties": {
+              "factor": {"enum": ["data-access", "model", "operator", "prompt", "provider", "tooling", "other"]},
+              "actors": {"type": "array", "minItems": 2, "maxItems": 64, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/identity"}},
+              "description": {"$ref": "common.schema.json#/$defs/text"}
+            }
+          }
+        }
+      }
+    },
+    "policy_id": {"$ref": "common.schema.json#/$defs/digest"}
+  },
+  "x-identity": {
+    "policy_id": "sha256(\"ara.role-policy/v1\\0\" || JCS(policy without policy_id))"
+  },
+  "x-consumer-invariants": [
+    "actors are sorted by actor_id and unique; each actor's roles are sorted; actor_id values match admitted ara.community-run/v1 actors",
+    "exactly one actor holds integration_pm and it equals the integration_pm field; it alone changes canonical logic/",
+    "every actor with publisher or continuity_writer has a non-null source_key; each source_key has exactly one continuity_writer, which writes only its own fork",
+    "publisher, verifier, argument_producer and authorized_reviewer authorize publication of contributions, verification attachments, argument_check attachments and review_attestation attachments respectively; integration_pm authorizes integration receipts and external_file_acknowledgment attachments",
+    "an argument producer's attestation of its own formalization never counts as authorized review",
+    "independence lists known shared factors; separate accounts never imply independent priors and the absence of a listed factor is not proof of independence",
+    "the policy is immutable within a run; a role change requires a new run configuration and a new policy_id",
+    "the plan-14 run-config roles (reader, contributor, fork-pm, integration-pm) stay unchanged; this policy is pinned beside that run configuration by policy_id"
+  ]
+}

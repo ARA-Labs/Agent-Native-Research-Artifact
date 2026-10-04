@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.contribution/v1",
+  "title": "Immutable contribution envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "community", "publisher", "request", "source_key", "native", "payload_digest", "contribution_id", "lineage", "payload", "execution", "inventory"],
+  "properties": {
+    "schema": {"const": "ara.contribution/v1"},
+    "community": {"$ref": "common.schema.json#/$defs/identity"},
+    "publisher": {"$ref": "common.schema.json#/$defs/identity"},
+    "request": {"$ref": "common.schema.json#/$defs/request_id"},
+    "source_key": {"$ref": "common.schema.json#/$defs/identity"},
+    "native": {
+      "type": "object", "additionalProperties": false, "required": ["snapshot", "fingerprint", "capture_id"],
+      "properties": {
+        "snapshot": {"$ref": "common.schema.json#/$defs/file_ref"},
+        "fingerprint": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "capture_id": {"$ref": "common.schema.json#/$defs/digest"}
+      }
+    },
+    "payload_digest": {"$ref": "common.schema.json#/$defs/digest"},
+    "contribution_id": {"$ref": "common.schema.json#/$defs/digest"},
+    "lineage": {
+      "type": "object", "additionalProperties": false, "required": ["start_fingerprint", "parents", "uses"],
+      "properties": {
+        "start_fingerprint": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "parents": {"$ref": "common.schema.json#/$defs/contribution_ids"},
+        "uses": {"type": "array", "maxItems": 4096, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/native_ref"}}
+      }
+    },
+    "payload": {
+      "type": "object", "additionalProperties": false,
+      "required": ["experiment", "question", "observation", "change", "prediction", "outcome", "follow_up"],
+      "properties": {
+        "experiment": {"$ref": "common.schema.json#/$defs/nullable_selector"},
+        "question": {"$ref": "common.schema.json#/$defs/nullable_selector"},
+        "observation": {"$ref": "common.schema.json#/$defs/nullable_selector"},
+        "change": {"$ref": "common.schema.json#/$defs/nullable_field_pointer"},
+        "prediction": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/revision_pointer"}]},
+        "outcome": {"$ref": "common.schema.json#/$defs/nullable_field_pointer"},
+        "follow_up": {"$ref": "common.schema.json#/$defs/nullable_selector"}
+      }
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false, "required": ["intention_receipt", "input_inventory"],
+      "properties": {
+        "intention_receipt": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "input_inventory": {"$ref": "common.schema.json#/$defs/nullable_digest"}
+      }
+    },
+    "inventory": {"$ref": "common.schema.json#/$defs/inventory_pointer"}
+  },
+  "if": {"properties": {"payload": {"properties": {"prediction": {"type": "object"}}}}},
+  "then": {
+    "properties": {
+      "execution": {
+        "properties": {
+          "intention_receipt": {"$ref": "common.schema.json#/$defs/digest"},
+          "input_inventory": {"$ref": "common.schema.json#/$defs/digest"}
+        }
+      }
+    }
+  },
+  "x-identity": {
+    "contribution_id": "sha256(\"ara.contribution/v1\\0\" || JCS(envelope without contribution_id))",
+    "payload_digest": "sha256(\"ara.payload/v1\\0\" || JCS(payload inventory)); see payload-inventory.schema.json"
+  },
+  "x-consumer-invariants": [
+    "request has the prefix '<publisher>:'; an accepted (community, publisher, request) binds exactly one contribution_id, an exact retry returns the original receipt and any other content under it rejects",
+    "lineage.parents is sorted and unique; lineage.uses is sorted by (source_key, native_revision, selector) and unique",
+    "native.fingerprint and native.capture_id equal the manifest named by native.snapshot and the payload inventory's native block; the manifest's recomputed capture_id matches",
+    "payload pointers are selectors resolved in this contribution's own native snapshot (native.fingerprint) except prediction, which names the pre-execution native revision it was recorded at",
+    "a non-null prediction requires execution.intention_receipt (the acknowledged plan-14 request_digest that authorized execution) and execution.input_inventory (the acknowledged input signature); a prediction first recorded after execution is not a pre-execution prediction",
+    "no envelope field or payload file may depend on contribution_id; publication receipts, visibility, attachments and integration receipts live outside the contribution",
+    "unknown fields reject; a new field or meaning requires ara.contribution/v2"
+  ]
+}

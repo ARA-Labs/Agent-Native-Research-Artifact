@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.integration-receipt/v1",
+  "title": "Append-only import and resolution receipts for canonical integration",
+  "$defs": {
+    "mapping": {
+      "type": "object", "additionalProperties": false, "required": ["source_key", "original", "target", "layer", "path"],
+      "properties": {
+        "source_key": {"$ref": "common.schema.json#/$defs/identity"},
+        "original": {"$ref": "common.schema.json#/$defs/selector"},
+        "target": {"$ref": "common.schema.json#/$defs/selector"},
+        "layer": {"$ref": "common.schema.json#/$defs/identity"},
+        "path": {"$ref": "common.schema.json#/$defs/path"}
+      }
+    },
+    "external_reference": {
+      "type": "object", "additionalProperties": false, "required": ["contribution_id", "source_key", "native_revision", "path", "digest"],
+      "properties": {
+        "contribution_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "source_key": {"$ref": "common.schema.json#/$defs/identity"},
+        "native_revision": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "path": {"$ref": "common.schema.json#/$defs/path"},
+        "digest": {"$ref": "common.schema.json#/$defs/digest"}
+      }
+    },
+    "import": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "kind", "community", "integration_pm", "request", "destination", "contribution_id", "source_key", "source_revision", "base", "predecessor", "identity_mapping", "destination_before", "destination_after", "merge_report", "audit_session", "external_references", "acknowledgments", "state", "record_id"],
+      "properties": {
+        "schema": {"const": "ara.integration-receipt/v1"},
+        "kind": {"const": "import"},
+        "community": {"$ref": "common.schema.json#/$defs/identity"},
+        "integration_pm": {"$ref": "common.schema.json#/$defs/identity"},
+        "request": {"$ref": "common.schema.json#/$defs/request_id"},
+        "destination": {"$ref": "common.schema.json#/$defs/identity"},
+        "contribution_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "source_key": {"$ref": "common.schema.json#/$defs/identity"},
+        "source_revision": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "base": {
+          "type": "object", "additionalProperties": false, "required": ["revision", "contribution_id"],
+          "properties": {
+            "revision": {"$ref": "common.schema.json#/$defs/fingerprint"},
+            "contribution_id": {"$ref": "common.schema.json#/$defs/nullable_digest"}
+          }
+        },
+        "predecessor": {"$ref": "common.schema.json#/$defs/nullable_digest"},
+        "identity_mapping": {"type": "array", "maxItems": 1000000, "uniqueItems": true, "items": {"$ref": "#/$defs/mapping"}},
+        "destination_before": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "destination_after": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "merge_report": {
+          "type": "object", "additionalProperties": false, "required": ["digest", "exit_status", "committed", "unresolved_count"],
+          "properties": {
+            "digest": {"$ref": "common.schema.json#/$defs/digest"},
+            "exit_status": {"type": "integer", "minimum": 0, "maximum": 255},
+            "committed": {"type": "boolean"},
+            "unresolved_count": {"type": "integer", "minimum": 0, "maximum": 9007199254740991}
+          }
+        },
+        "audit_session": {"$ref": "common.schema.json#/$defs/text"},
+        "external_references": {"type": "array", "maxItems": 1000000, "uniqueItems": true, "items": {"$ref": "#/$defs/external_reference"}},
+        "acknowledgments": {"$ref": "common.schema.json#/$defs/record_ids"},
+        "state": {"enum": ["imported-with-conflicts", "integrated", "rejected-for-integration"]},
+        "record_id": {"$ref": "common.schema.json#/$defs/digest"}
+      },
+      "if": {"properties": {"state": {"const": "integrated"}}},
+      "then": {"properties": {"merge_report": {"properties": {"unresolved_count": {"const": 0}, "committed": {"const": true}}}}}
+    },
+    "resolution": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "kind", "community", "integration_pm", "request", "destination", "contribution_id", "import_receipt", "previous", "destination_before", "destination_after", "resolved_conflicts", "review_decisions", "unresolved_count", "audit_session", "acknowledgments", "state", "record_id"],
+      "properties": {
+        "schema": {"const": "ara.integration-receipt/v1"},
+        "kind": {"const": "resolution"},
+        "community": {"$ref": "common.schema.json#/$defs/identity"},
+        "integration_pm": {"$ref": "common.schema.json#/$defs/identity"},
+        "request": {"$ref": "common.schema.json#/$defs/request_id"},
+        "destination": {"$ref": "common.schema.json#/$defs/identity"},
+        "contribution_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "import_receipt": {"$ref": "common.schema.json#/$defs/digest"},
+        "previous": {"$ref": "common.schema.json#/$defs/digest"},
+        "destination_before": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "destination_after": {"$ref": "common.schema.json#/$defs/fingerprint"},
+        "resolved_conflicts": {"type": "array", "minItems": 1, "maxItems": 1000000, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/text"}},
+        "review_decisions": {"$ref": "common.schema.json#/$defs/record_ids"},
+        "unresolved_count": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "audit_session": {"$ref": "common.schema.json#/$defs/text"},
+        "acknowledgments": {"$ref": "common.schema.json#/$defs/record_ids"},
+        "state": {"enum": ["imported-with-conflicts", "integrated", "rejected-for-integration"]},
+        "record_id": {"$ref": "common.schema.json#/$defs/digest"}
+      },
+      "if": {"properties": {"state": {"const": "integrated"}}},
+      "then": {"properties": {"unresolved_count": {"const": 0}}}
+    }
+  },
+  "oneOf": [{"$ref": "#/$defs/import"}, {"$ref": "#/$defs/resolution"}],
+  "x-identity": {
+    "record_id": "sha256(\"ara.integration-receipt/v1\\0\" || JCS(receipt without record_id))"
+  },
+  "x-consumer-invariants": [
+    "request has the prefix '<integration_pm>:' and binds one record_id under the request-idempotency rule",
+    "integration_pm equals the single integration PM of the pinned role policy",
+    "source_revision equals the contribution's native fingerprint; base.revision is the shared seed, the declared starting snapshot, or the last revision imported under the same source_key (predecessor names that import receipt)",
+    "identity_mapping is sorted by (source_key, original, layer, path, target) and copies the merge report's mappings; it does not prove a file exists in the destination",
+    "external_references are sorted by (contribution_id, source_key, native_revision, path) and unique; reads use the retained contribution's original path and verify digest; an absent alias is never redirected to an unrelated local file",
+    "acknowledgments and review_decisions are sorted attachment record_ids (external_file_acknowledgment and review records)",
+    "resolution receipts chain through previous to the import receipt and never modify it; the latest receipt in the chain carries the current state",
+    "state integrated requires no unresolved native conflicts, every required review decision recorded and every external reference resolvable to a retained package; inherited imported_unresolved conflicts keep integration incomplete",
+    "replaying an already integrated older contribution returns its retained receipt instead of a new import"
+  ]
+}

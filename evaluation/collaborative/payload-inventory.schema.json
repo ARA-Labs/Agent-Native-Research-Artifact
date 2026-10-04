@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ara.payload-inventory/v1",
+  "title": "Frozen payload inventory bound by the payload digest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "roots", "native", "entries", "external", "execution"],
+  "properties": {
+    "schema": {"const": "ara.payload-inventory/v1"},
+    "roots": {
+      "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["name", "kind"],
+        "properties": {
+          "name": {"$ref": "common.schema.json#/$defs/identity"},
+          "kind": {"enum": ["ara-snapshot", "code", "evidence", "input", "output", "argument"]}
+        }
+      }
+    },
+    "native": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["root", "manifest", "fingerprint_scheme", "fingerprint", "capture_id"],
+          "properties": {
+            "root": {"$ref": "common.schema.json#/$defs/identity"},
+            "manifest": {"const": "snapshot.json"},
+            "fingerprint_scheme": {"const": "ara.artifact/v1"},
+            "fingerprint": {"$ref": "common.schema.json#/$defs/fingerprint"},
+            "capture_id": {"$ref": "common.schema.json#/$defs/digest"}
+          }
+        }
+      ]
+    },
+    "entries": {
+      "type": "array", "maxItems": 1000000,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["root", "path", "digest", "size", "mode"],
+        "properties": {
+          "root": {"$ref": "common.schema.json#/$defs/identity"},
+          "path": {"$ref": "common.schema.json#/$defs/path"},
+          "digest": {"$ref": "common.schema.json#/$defs/digest"},
+          "size": {"$ref": "common.schema.json#/$defs/size"},
+          "mode": {"$ref": "common.schema.json#/$defs/mode"}
+        }
+      }
+    },
+    "external": {
+      "type": "array", "maxItems": 65536,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["root", "path", "digest", "size", "mode", "retrieval"],
+        "properties": {
+          "root": {"$ref": "common.schema.json#/$defs/identity"},
+          "path": {"$ref": "common.schema.json#/$defs/path"},
+          "digest": {"$ref": "common.schema.json#/$defs/digest"},
+          "size": {"$ref": "common.schema.json#/$defs/size"},
+          "mode": {"$ref": "common.schema.json#/$defs/mode"},
+          "retrieval": {
+            "type": "object", "additionalProperties": false, "required": ["kind", "locator", "revision"],
+            "properties": {
+              "kind": {"enum": ["git", "url", "content-store"]},
+              "locator": {"$ref": "common.schema.json#/$defs/text"},
+              "revision": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"}]}
+            },
+            "if": {"properties": {"kind": {"const": "git"}}},
+            "then": {"properties": {"revision": {"type": "string"}}},
+            "else": {"properties": {"revision": {"type": "null"}}}
+          }
+        }
+      }
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false, "required": ["entry", "config", "environment"],
+      "properties": {
+        "entry": {"$ref": "common.schema.json#/$defs/nullable_file_ref"},
+        "config": {"$ref": "common.schema.json#/$defs/nullable_file_ref"},
+        "environment": {"$ref": "common.schema.json#/$defs/nullable_digest"}
+      }
+    }
+  },
+  "x-identity": {
+    "payload_digest": "sha256(\"ara.payload/v1\\0\" || JCS(inventory)); the inventory has no self-identity field and excludes the envelope"
+  },
+  "x-consumer-invariants": [
+    "roots are sorted by name with unique names; every entry/external root is declared; exactly one ara-snapshot root exists when native is non-null and none when it is null (attachments)",
+    "entries and external objects are each sorted by (root, path); the union of their (root, path) pairs is unique",
+    "the native root holds exactly snapshot.json plus one entry 'ara/<path>' per manifest file with the same digest, size and mode; the manifest's recomputed capture_id equals native.capture_id and its fingerprint equals native.fingerprint",
+    "execution.entry and execution.config name inventory entries or external objects",
+    "external objects are fetched by retrieval descriptor and accepted only if digest and size match; git retrieval names an exact commit; an unfetchable required object blocks publication",
+    "the publisher verifies every entry's bytes, size and mode before publication; private .ara/transactions and lock files never enter a payload",
+    "unknown fields reject; a new root kind or retrieval kind requires ara.payload-inventory/v2"
+  ]
+}
