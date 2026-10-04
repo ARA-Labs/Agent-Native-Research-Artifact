@@ -107,6 +107,23 @@ These contracts build on two contracts frozen in `ara-cli` and adopt them by exa
 
 A later ara-cli contract revision needs a new pin here; it does not silently replace this one.
 
+### Current pin: ara-cli `afd96b4` (ara 0.1.26)
+
+ara-cli amended the provenance contract after the first pin. Phase 4 review (ARA-Labs/ara-cli#104) and the plan-04b fixes (ARA-Labs/ara-cli#112) changed four rules:
+- a peer-supplied self fact proves identity only, never a content base;
+- `merge.unshared_origin_revision`;
+- external code and evidence never prove an origin, and a retired ID proves only its retired identity;
+- protected YAML history compares exact relocated bytes.
+
+The snapshot contract is unchanged. The current adoption is commit `afd96b4957dd4acca2213be0941533a89608d2c2` on ara-cli `feat/collaborative-ara`:
+
+| ara-cli file | SHA-256 at `afd96b4` | Bytes | Status |
+|---|---|---|---|
+| `docs/collaborative-research/snapshot-contract.md` | `013abf0c9614eae7d19eb2c8145de2d815b24b972c8f396385daf54a0801b1d1` | 7265 | Unchanged from the first pin. |
+| `docs/collaborative-research/provenance-contract.md` | `b00fe527f231b1978a3e739f152b67597c3173239d4ace3d99fce794a701970d` | 20331 | Supersedes `6b5898ef…557c` (17454 bytes) at `da43bf6`. |
+
+The runner (`ara-eval` `vendor/ara-cli`) pins the same commit.
+
 ## What these contracts do not cover
 
 - Running anything. Capture, publication, the coordinator, announcements, the briefing, recovery and rebuilds belong to the runner (`ara-eval`). This directory has no coordinator.
