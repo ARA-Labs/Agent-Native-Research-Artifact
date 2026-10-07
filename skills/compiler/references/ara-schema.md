@@ -7,6 +7,10 @@ The implementation plan is approved, but this link does not amend the research
 procedures below. The unchanged source/reference baseline and its operation inventory
 are locked under [`evaluation/agent-cli/`](../../../evaluation/agent-cli/baseline-contracts.md).
 
+Load the local [property-authoring contract](property-authoring.md) before claim capture,
+revision, staging, or declaration authoring. It governs source fidelity, unsupported obligations,
+neutral ARA-only views, and versioned check identity without adding core ARA fields.
+
 ## Directory Structure
 
 `✓` = mandatory core (always present). Everything else is created **only when the paper's content
@@ -167,61 +171,55 @@ Rule: if a filename includes a source label such as `table3` or `figure4`, it sh
 
 ## logic/claims.md
 
-Each claim MUST have ALL fields:
+Use the existing fields below. An unavailable value is an attributed unknown, not a reason to
+invent support or crystallize a staged obligation:
 ```markdown
-## C{NN}: {generalized title — the takeaway, not a recipe/result name}
-- **Statement**: {the generalized, mechanistic conclusion the evidence supports; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
-- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
-- **Sources**: [{one entry per load-bearing number in the claim, empty if it carries none: `<value> ← <source ref> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]` — a bare path with no «quote» is invalid}]
-- **Status**: {hypothesis|supported|refuted}
-- **Falsification criteria**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. Not a tautology or a re-run of the same gate}
-- **Proof**: [{experiment IDs: E01, E02}]
-- **Evidence basis**: {what the cited evidence shows — point to it; do NOT restate run numbers in the Statement}
-- **Dependencies**: {claim IDs this one rests on — the narrower claims a more general claim draws on, or a claim it corrects/refines; not mere shared setup; omit if it rests only on its own evidence}
+## C{NN}: {source-faithful title; a named method or bounded result is allowed}
+- **Statement**: {verbatim source assertion, including exact variants, metrics, quantitative assertions, and every conjunct; identify a separately authored synthesis as interpretation}
+- **Conditions**: {source scope, units, quantifier, aggregation, statistical unit, uncertainty commitment, and untested boundaries; attribute missing details}
+- **Sources**: [{source revision/anchor and verbatim assertion; for each load-bearing number: `<value> ← <source ref> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`; no unverified bare path}]
+- **Status**: {hypothesis|supported|refuted; reflect actual support, not whether an executable declaration holds}
+- **Falsification criteria**: {a concrete observation contradicting this assertion within its stated scope; for a bounded empirical comparison, reversal of a required ordering is meaningful; if undecidable from inputs, say why}
+- **Proof**: [{real relevant experiment IDs: E01, E02; if none exist, use `pending` and state the missing-support reason in Evidence basis}]
+- **Evidence basis**: {neutral evidence references and what they actually show, including conflicts, missing evidence, and unresolved meaning; candidates and check/repair answers belong in separately linked authoring records}
+- **Dependencies**: {claim IDs a separate synthesis rests on, or claims this claim corrects/refines; not mere shared setup; omit when absent}
 - **Tags**: {comma-separated keywords}
 ```
 
-Proof MUST reference experiment IDs from experiments.md.
-Each proofed experiment should in turn be backed by evidence files whose rows or measurements actually match the claim being asserted.
-`Statement` is the **generalized conclusion the evidence supports** — a mechanism or relationship,
-not a restatement of run numbers. The claim is kept falsifiable and honest by `Conditions` (the
-regime it holds in + the untested boundary) and a `Falsification criteria`, not by narrowing the
-sentence to a single measured value. Numbers (n, scores, step counts, run IDs) live in the evidence
-layer and are reached via `Proof`/`Evidence basis`, never pasted into `Statement`. `Conditions` is
-mandatory: a generalized Statement with no Conditions is an unbounded slogan.
+`Proof` IDs must resolve to real experiments in `experiments.md`; linked measurements must match
+the assertion's exact methods, metrics, and scope. Missing proof is explicit. Do not create an
+experiment just to populate `Proof`, or treat an absent variance estimate as zero.
 
-**Distill the mechanism; bound the reach.** Before writing a `Statement`, ask what the result
-*reveals* — the mechanism or relationship a reader would reuse — and state that; the recipe and its
-numbers are the evidence for it, not the claim, and never its subject. A single instance still
-licenses a mechanism `Statement`; what is forbidden is extrapolating it into a universal law beyond
-its regime, or asserting a distinction the design cannot disentangle. Put that boundary in
-`Conditions` — it bounds *where* the claim holds and is not a license for the verb to over-reach.
-`Conditions` carries the limits so the `Statement` can carry the mechanism.
+Follow [What must survive](property-authoring.md#what-must-survive) and
+[Author in this order](property-authoring.md#author-in-this-order). A quantitative source assertion
+remains a first-class Statement. Keep any broader explanation in a separate synthesis with its own
+identity and links to the preserved assertions. Neither a single result nor a component ranking
+requires a mechanism inference. `Conditions` cannot repair an overclaim or replace missing conjuncts.
 
-**A claim's evidence may be one result or several read together.** Most claims distill what a single
-result reveals; but where several experiments together reveal a relationship none shows alone —
-whether they agree on it, or differ in a way that itself reveals what bounds or explains the
-difference — that relationship is the claim. Write it as an ordinary `## C` block whose `Proof` lists
-every experiment it draws on and whose `Dependencies` names the narrower claims it rests on; the same
-distill-the-mechanism, bound-the-reach discipline applies. State the most general relationship the
-evidence supports — bounded by `Conditions`, never asserted past what those experiments jointly show —
-rather than settling for one claim per experiment. A claim need not be about the object under study:
-a reusable relationship the work itself exposes, including in how it was run, is worth a claim.
+For example, the constructed source assertion "Fixed-A beats Base in average accuracy on both
+Task-1 and Task-2, and uses less memory on both tasks." is an allowed Statement. Preserve
+Fixed-A, Base, average accuracy, both tasks, and the memory conjunct even if the supplied evidence
+contradicts part of it. Final accuracy or an adaptive variant is not a substitute. A separate
+assertion of significant latency improvement retains that commitment; absent latency evidence or
+variance is an explicit unsupported reason, not permission to invent a significance test.
 
-**The attribution trap (the most common miss).** An ablation / leave-one-out that shows *which*
-components dominate is the *evidence*, not the claim. A Statement that merely names the load-bearing
-vs decorative components passes the no-numbers gate but is still a league table of *this* system.
-Apply the **name-deletion test**: strike your system's component names from the Statement — if
-nothing a stranger working on a different stack could reuse survives, you wrote attribution. State
-instead what the ranking reveals about the *class* of system; the named components and their deltas
-live in `Evidence basis`, reached via `Proof`.
+An assertion with no faithful catalog mapping or no evidence stays in the contract's
+all-selected-assertions ledger, even if absent from `aratest/spec.yaml`. Before crystallization,
+use existing staged observation `content`/`context` and neutral evidence links. Compilation need
+not turn every obligation into a settled claim or an empty executable property.
+
+Keep neutral quotations, headers, and evidence semantics separate from authoring answers so the
+contract's [isolated ARA-only view](property-authoring.md#isolated-ara-only-extraction) can retain
+the full assertion without leaking candidates, selected operands, review feedback, or check history.
+Apply [revisions and check identity](property-authoring.md#revisions-and-check-identity) to changed
+obligations and declarations; old checks remain tied to old inputs, not the new snapshot.
 
 ---
 
 ## logic/concepts.md
 
-Target ≥5 concepts, but capture the paper's *genuine* technical terms — don't pad with trivial or
-borrowed terms to reach 5 (Rule 14). One section per concept:
+Target ≥5 concepts, but capture only the paper's genuine technical terms. If fewer exist, record
+the shortfall; never pad with trivial or borrowed terms (Rule 15). One section per concept:
 ```markdown
 ## {Term Name}
 - **Notation**: {LaTeX or symbolic notation, or "—" if none}
@@ -234,9 +232,11 @@ borrowed terms to reach 5 (Rule 14). One section per concept:
 
 ## logic/experiments.md
 
-≥3 experiments. Declarative plans, NOT scripts. NO exact numerical results. Experiments and claims
-are **many-to-many**: one experiment may verify several claims, and a claim that generalises across
-runs lists every experiment it draws on in its `Proof` — do not force a 1:1 claim↔experiment ledger.
+Aim for ≥3 experiments only when the source actually describes them; record fewer or none with a
+reason rather than inventing proof. These are declarative plans, NOT scripts or numerical result
+tables. Source-grounded quantitative assertions remain in claims; measured results live in evidence.
+Experiments and claims are **many-to-many**: list every real relevant experiment in `Proof`, without
+forcing a 1:1 claim↔experiment ledger.
 
 ```markdown
 ## E{NN}: {Short title}
@@ -253,8 +253,8 @@ runs lists every experiment it draws on in its `Proof` — do not force a 1:1 cl
   2. {Step 2}
 - **Metrics**: {what to measure, with units}
 - **Expected outcome**:
-  - {directional/relative ONLY, e.g., "A outperforms B on metric X"}
-  - NEVER exact numbers (those go in evidence/)
+  - {source-faithful expectation; preserve any quantitative assertion or target in the linked claim}
+  - {link measured results in evidence/ rather than copying a result table here}
 - **Baselines**: {methods to compare against}
 - **Dependencies**: {other experiment IDs, or "none"}
 ```
@@ -501,6 +501,9 @@ Rules:
 - Raw source-table files should reproduce the original row set relevant to that table, not a claim-specific slice
 - If you drop rows, rename the file as a derived subset and declare the parent source
 - Do not combine rows from multiple source tables while retaining a single original table number in the filename
+- Preserve original headers and axis order, exact method variants, metric identities, units,
+  aggregation, uncertainty annotations, and approximation markers under the shared contract.
+  Conflicting headers or aliases remain unresolved; normalizing a spelling must not merge variants.
 
 ---
 
@@ -588,6 +591,8 @@ Read values off the axes. Record axis scale — misreading a log axis corrupts e
 {Directional reading that survives estimation error: monotonic/plateau/crossover at x≈..., variance bands, A vs B ordering.}
 ```
 - Use exact values only when shown as data labels or stated in text; otherwise mark readings approximate with `≈` and set extraction method to `digitized_estimate`.
+- Preserve source series identities, panel/task scope, axis order, and uncertainty annotations.
+  Absent variance is missing information, never a zero-valued uncertainty estimate.
 - A `quantitative_plot` file MUST contain a data table OR an explicit statement that points were unreadable (with `reading confidence: low`) plus a usable trend summary.
 
 ### diagram (architecture / pipeline / schematic)

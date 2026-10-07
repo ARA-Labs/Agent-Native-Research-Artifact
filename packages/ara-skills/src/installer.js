@@ -15,14 +15,7 @@ function copyDir(src, dst) {
     const s = path.join(src, entry.name);
     const d = path.join(dst, entry.name);
     if (entry.isDirectory()) copyDir(s, d);
-    else if (entry.isSymbolicLink()) {
-      const link = fs.readlinkSync(s);
-      try {
-        fs.symlinkSync(link, d);
-      } catch {
-        fs.copyFileSync(s, d);
-      }
-    } else fs.copyFileSync(s, d);
+    else fs.copyFileSync(s, d);
   }
 }
 

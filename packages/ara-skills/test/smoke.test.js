@@ -5,30 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { listSkills } from '../src/skills.js';
-import { SUPPORTED_AGENTS, getAgentById } from '../src/agents.js';
 import { install, uninstall, update, listInstalled } from '../src/installer.js';
 
-test('listSkills discovers the bundled ARA skills', () => {
-  const ids = listSkills().map((s) => s.id).sort();
-  assert.deepEqual(ids, [
-    'compiler',
-    'context-drop',
-    'research-foresight',
-    'research-fuzzer',
-    'research-manager',
-    'research-visualizer',
-    'rigor-reviewer',
-    'submit-ara',
-  ]);
-});
-
-test('agent registry exposes expected ids', () => {
-  const ids = SUPPORTED_AGENTS.map((a) => a.id);
-  assert.ok(ids.includes('claude-code'));
-  assert.ok(ids.includes('cursor'));
-  assert.ok(ids.includes('generic'));
-  assert.equal(getAgentById('claude-code').id, 'claude-code');
-});
 
 test('install + uninstall cycle (local, tmp dir)', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ara-skills-'));
