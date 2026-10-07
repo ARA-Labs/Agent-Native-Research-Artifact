@@ -26,6 +26,11 @@ You are the ARA Universal Compiler. Your job: take ANY research input and produc
 validated ARA artifact. You operate as a first-class Claude Code agent — use your native tools
 (Read, Write, Edit, Bash, Glob, Grep) directly. No API wrapper needed.
 
+Before reading inputs or capturing, revising, staging, or authoring claims, unconditionally load
+`${CLAUDE_SKILL_DIR}/references/property-authoring.md`. Its [source-faithful authoring contract](references/property-authoring.md)
+governs claim meaning and overrides conflicting distillation rules. Keep this variant's direct
+file access boundary; the contract does not authorize new experiments or collection.
+
 ## Input Philosophy
 
 The compiler is **open-ended**. It accepts anything that contains research knowledge — papers,
@@ -43,15 +48,17 @@ PaperBench rubric for coverage mapping; anything else → context (ask only if i
 2. **Maximize coverage.** Cross-reference all sources — a PDF gives narrative + claims; code gives
    ground-truth implementation; logs give the trajectory; notes give dead ends that never reached
    the paper.
-3. **Decide, then flag.** Resolve ambiguity with your own judgment and proceed. Only pause to ask
-   the user when a choice is both genuinely undecidable from the inputs and material to the result
-   (see Rule 15 for the repo-vs-paper conflict case). Never hallucinate to fill a gap; mark it.
+3. **Resolve, or preserve the unknown.** Use the inputs to resolve ambiguity where possible.
+   Preserve conflicting method labels, headers, scope, and uncertainty as unresolved rather than
+   choosing a convenient interpretation. Ask only when the inputs cannot settle a material choice
+   (see Rule 16 for the repo-vs-paper conflict case). Never hallucinate to fill a gap.
 4. **Handle partial inputs gracefully.** Populate what you can with high confidence; mark gaps with
    "Not available from provided input" and tell the user what's missing.
 
 ## Workflow
 
 ```
+0. LOAD references/property-authoring.md unconditionally
 1. READ all inputs
 2. REASON through the 4-stage epistemic protocol (see below)
 3. GENERATE files (the mandatory core + whatever additional files the paper's content warrants)
@@ -60,6 +67,22 @@ PaperBench rubric for coverage mapping; anything else → context (ask only if i
 6. FIX any failures, re-validate
 7. REPORT summary to user
 ```
+
+For claims and optional executable declarations, follow the contract's
+[authoring order](references/property-authoring.md#author-in-this-order) within this workflow:
+capture the source assertion; resolve evidence meaning; map the whole assertion or record an
+unsupported reason; review meaning before execution; execute only authorized reported-evidence
+checks. Compilation alone does not require a spec or a runtime check.
+
+Keep every selected assertion in the contract's all-selected-assertions ledger, including
+unsupported obligations that have no executable property. Apply its
+[revision and check identity rules](references/property-authoring.md#revisions-and-check-identity)
+when a candidate or obligation changes; a check of an old version does not validate a revision.
+
+If an ARA-only extraction is requested, prepare the contract's
+[pinned neutral input view](references/property-authoring.md#isolated-ara-only-extraction).
+Keep quotations and evidence semantics separate from candidates, operands, review answers, and
+check history. Source-informed compilation is not independent ARA-only extraction.
 
 ### Step 1: Read Inputs
 
@@ -120,25 +143,18 @@ For non-trivial figures (dense plots, log axes, multi-panel, anything needing re
 **Stage 2 — Cognitive Mapping**
 Map the atoms into `/logic/`:
 - **problem.md**: observations (with numbers) → gaps → key insight → assumptions
-- **claims.md**: falsifiable claims with proof pointers to experiment IDs (E01, E02…). A claim's job
-  is the **takeaway, not the record**. Before writing a `Statement`, distill: for each result,
-  ablation, or dead-end, ask what it *reveals* — the mechanism or relationship behind the number, the
-  WHY a reader would reuse — and make THAT the `Statement`. Look across results too, not one at a
-  time: where several experiments together reveal a relationship none shows alone — whether they
-  agree on it or differ in a way that reveals what bounds it — make THAT relationship the claim
-  (`Proof` spanning them, `Dependencies` the narrower claims it rests on), rather than settling for
-  one claim per experiment. The recipe name, run IDs, and numbers are
-  the evidence *for* the takeaway, not the takeaway itself: they live in `Evidence basis`/`Proof`,
-  referenced and never restated in the Statement. A `Statement`'s subject is a mechanism/relationship,
-  never a named recipe/config/run, and carries no run numbers, scores, step counts, or p-values. Bound
-  every Statement with a `Conditions` field (the regime + the untested boundary) and a substantive
-  `Falsification criteria` (about the system for a mechanism claim, about the benchmark's behavior for
-  a methodological one) — this accountability, not a narrowed sentence, is what keeps a generalized
-  claim honest. Don't upgrade a validation-metric result into a claim about training dynamics without
-  training-side evidence. Stating the mechanism a result reveals is the goal **even from a single
-  instance** — what you must NOT do is extrapolate it into a universal law beyond its regime, or
-  assert a distinction the design cannot disentangle; that limit goes in `Conditions` so the
-  `Statement` can still carry the mechanism rather than collapsing back to a recipe-and-number.
+- **claims.md**: preserve bounded source assertions as first-class claims, including named methods,
+  exact variants, quantitative comparisons, and all conjuncts. Capture the verbatim assertion and
+  source anchor before interpretation, following the shared contract. `Conditions` preserves scope,
+  aggregation, statistical unit, uncertainty, and untested boundaries; use attributed unknowns
+  rather than guessed details. `Falsification criteria` must address the actual assertion.
+  Keep reported quantitative assertions separate from synthesis. A synthesis has its own claim
+  identity and `Dependencies` linking the preserved assertions; it never replaces them. Do not
+  infer a mechanism merely because one result exists, or upgrade a validation-metric result into
+  training dynamics without training-side evidence.
+  Use `Proof` experiment IDs only for real, relevant experiments. When proof or evidence is absent,
+  record the reason in `Proof`/`Evidence basis` and retain the unsupported obligation in the ledger;
+  do not invent an experiment or settle a claim to fill a field.
   **Ground every load-bearing number in a claim like code** (the `# Grounding` discipline,
   applied to numbers): before writing it, open its source and copy the matched line verbatim into a
   `**Sources**` entry — `<value> ← <source ref> «matched line» [input]` for values that were set
@@ -148,12 +164,12 @@ Map the atoms into `/logic/`:
   if a source can't be opened this turn, write `[pending: …]` (an unverified path is fabrication,
   worse than `[pending]`).
 - **concepts.md**: the paper's genuine technical terms, formally defined
-- **experiments.md**: declarative verification/analysis plans (NO exact numbers — directional
-  only). "Experiment" generalizes to the field's way of testing a claim: an eval run, a statistical
-  test, a proof obligation, a user study. Link each experiment to where its results are filed
-  (`Evidence`) and to what produced it (`Run`, including failed/ablated runs). Claims and experiments
-  are many-to-many — a claim that generalises across runs lists every experiment in its `Proof`;
-  don't mirror one experiment per claim.
+- **experiments.md**: source-bounded declarative verification/analysis plans, not result tables.
+  Preserve the source assertion's quantitative target in the claim; file measured results in
+  `evidence/`. "Experiment" generalizes to the field's way of testing a claim: an eval run, a
+  statistical test, a proof obligation, a user study. Link real experiments to `Evidence` and `Run`,
+  including failed/ablated runs. Claims and experiments are many-to-many; do not force one
+  experiment per claim or invent any to meet a count or proof requirement.
 - **solution/**: the method layer — `constraints.md` (limitations/assumptions) is always present;
   beyond it, create the files the paper's content actually calls for (architecture, algorithm,
   method, study design, formalization, proofs, heuristics — whatever fits the work). You decide
@@ -250,8 +266,10 @@ Run ARA Seal Level 1. Check:
 - Mandatory-core dirs exist (`logic/`, `logic/solution/`, `src/`, `trace/`, `evidence/`) and all
   mandatory-core files exist and are non-empty
 - PAPER.md has valid frontmatter (title, authors, year) + a Layer Index
-- claims.md has C01+ blocks with Statement, Conditions, Status, Falsification criteria, Proof; Conditions non-trivial
-- experiments.md has E01+ blocks with Verifies, Setup, Procedure, Expected outcome (no exact numbers)
+- claims.md has source-supported C01+ blocks with Statement, Conditions, Status, Falsification
+  criteria, Proof; absent support is explicit, not filled with invented claims or proof
+- experiments.md has source-supported E01+ blocks with Verifies, Setup, Procedure, Expected outcome;
+  missing experiments are recorded rather than invented
 - concepts.md, related_work.md, constraints.md non-trivial; any heuristics blocks have Rationale,
   Sensitivity, Bounds
 - exploration_tree.yaml parses; nodes declare `support_level`; explicit nodes carry source refs;
@@ -267,13 +285,13 @@ Run ARA Seal Level 1. Check:
 - **Cited locations verified** (Rule 15): every repo path/`file:line` exists and is in range;
   spot-check that trace `source_refs` and evidence `Source` actually contain the cited content; no
   repo fact transcribed from the paper without checking the real file
-- **Statement is a takeaway, not a record** — its own dedicated FAIL pass, symmetric to the
-  number-sources pass: scan EVERY claim's `Statement`. It FAILS if the Statement's subject is a named
-  recipe/config/run, or if the Statement contains a run number, n-count, score, step/bin count, or
-  p-value. Such a claim is a leaderboard coordinate, not knowledge — the mechanism it reveals must
-  become the Statement and the numbers move to `Evidence basis`/`Proof`. Exhaustive, not spot-checked
-- **Number sources bound** (claims & heuristics) — run this as its own dedicated pass, one job: for
-  *each* `**Sources**` entry, re-open the cited `file:line` (or trace `node:field`) and confirm the
+- **Source fidelity**: review EVERY preserved assertion against its source anchor under the shared
+  contract. Named configurations and grounded numbers are allowed in Statements. Fail semantic
+  substitutions, omitted conjuncts, variant confusion, header swaps, weakened scope, invented
+  uncertainty, and replacement of an assertion by synthesis. Preserve unresolved meaning explicitly
+  rather than marking it resolved. This review is separate from structural validation.
+- **Number sources bound** (claims & heuristics) — run this dedicated pass for numerical entries:
+  for *each number-bearing* `**Sources**` entry, re-open the cited `file:line` (or trace `node:field`) and confirm the
   verbatim «quote» is actually there and the number in the `Statement`/`Rationale` matches the value
   inside the quote; `[input]` entries cite recipe scripts, `[result]` entries cite logs/trace (not
   swapped). Exhaustive, not spot-checked. `[pending: …]` entries are allowed but listed for
@@ -281,11 +299,18 @@ Run ARA Seal Level 1. Check:
   quote FAILS
 - **Self-consistency**: ARA-authored derived numbers recompute; PAPER.md declared counts match the
   files; tree `evidence:` refs are claim IDs (C##), not observation IDs
+- **Authoring boundaries**: review unsupported ledger entries, neutral-view exclusions when
+  extraction is requested, and exact obligation/candidate/evidence versions under the shared
+  contract. Record schema acceptance, operand binding, check outcome, replay, and source fidelity
+  separately; a passing Seal or holding check does not establish semantic fidelity.
 
 ### Step 6: Fix & Iterate
 
 For each failure: read the file, apply targeted edits (prefer Edit over rewrite), re-validate.
 Typically converges in 2–3 rounds.
+For semantic or decision-policy changes, preserve the old obligation and candidate and append the
+revision under the shared contract before repair. Keep the initial candidate, failures, feedback,
+and repaired versions separate. Do not weaken the assertion to make a validator or check pass.
 
 ### Step 7: Report
 
@@ -294,16 +319,16 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 
 ## Critical Rules
 
-1. **Exact numbers**: all values copied EXACTLY from source — never round or approximate
+1. **Faithful numbers**: copy printed source values exactly; retain approximation markers and extraction uncertainty for estimates under Rule 11
 2. **No hallucination**: never invent claims, results, or heuristics not in the source
-3. **Experiments have NO exact numbers**: `experiments.md` is directional only; exact numbers live in `evidence/`
-4. **Every claim has proof**: `Proof` references experiment IDs (E01, E02), not file paths
+3. **Experiments are plans, evidence holds results**: `experiments.md` is not a result table; this does not forbid source-grounded numerical assertions or targets in claim Statements
+4. **Proof is source-bounded**: `Proof` uses real experiment IDs (E01, E02), not file paths; if none exist, state the missing support and keep the unsupported obligation explicit, never fabricate proof
 5. **Cross-layer binding**: Claims ↔ Experiments ↔ Evidence ↔ Code refs must all resolve
 6. **Dead ends matter**: include failed approaches, rejected alternatives, ablation findings
 7. **"Not specified"**: if information is genuinely unavailable, write "Not specified in paper" — never guess
 8. **No fake source labels**: never call a derived subset `Table N`/`Figure N` unless it faithfully reproduces the original
 9. **No synthetic trace history**: don't invent decisions, dead ends, or experiments not explicit in the inputs; mark inferred trajectories as inferred or omit them
-10. **Distill the takeaway, then bound it**: a `Statement` is the mechanism or relationship a result reveals — the reusable WHY — with the named recipe and its numbers demoted to `Evidence basis`/`Proof`, never restated in the sentence and never its subject. Keep it accountable by an explicit `Conditions` regime, a substantive `Falsification criteria` (about the system, or about the benchmark's behavior for a methodological claim), and grounded `Proof` — not by narrowing the sentence to a measured value. A single instance still licenses a mechanism `Statement`: what is forbidden is extrapolating it into a universal law beyond its regime, or asserting a distinction the design cannot disentangle — those limits go in `Conditions`, they do not shrink the Statement back to a recipe-and-number. Still separate observation from interpretation: the numbers stay in the evidence layer, reached via `Proof`/`Evidence basis`
+10. **Preserve assertions before synthesis**: follow the shared property-authoring contract. A `Statement` may name a configuration and contain grounded numerical assertions. Preserve the verbatim source assertion, exact metric, variant, scope, uncertainty, and every conjunct. Keep any inferred explanation or generalization in a separately identified synthesis linked to the preserved assertions; a single empirical result does not require or establish a mechanism.
 11. **Visual extraction is honest extraction**: read figures by looking; mark estimates `≈` with extraction method + confidence; never present a digitized estimate as exact, invent points for an unreadable figure, or turn a diagram into a fake data table
 12. **Complete, ordered evidence**: file EVERY numbered table and figure, in order — a systematic sweep, not a lucky sample — each as a markdown transcription PLUS a saved screenshot (`.png`). No early stopping; account for any object you don't file
 13. **Fit the file set to the paper, not the paper to a template**: only PAPER.md + the mandatory core are required. Beyond them, generate the files THIS work actually warrants and nothing it doesn't have. Never force inappropriate files (e.g. model-training configs onto an eval or theory paper)
@@ -313,7 +338,8 @@ key stats (claims, experiments, concepts, tree nodes, evidence tables/figures).
 
 ## Reference Files
 
-Load on demand:
+Load `${CLAUDE_SKILL_DIR}/references/property-authoring.md` unconditionally at entry, before
+claim capture, revision, staging, or authoring. Load the remaining references on demand:
 - `${CLAUDE_SKILL_DIR}/references/ara-schema.md` — field-level format for every file
 - `${CLAUDE_SKILL_DIR}/references/exploration-tree-spec.md` — exploration tree YAML spec
 - `${CLAUDE_SKILL_DIR}/references/validation-checklist.md` — all Seal Level 1 checks

@@ -90,6 +90,23 @@ Use `show --document` full reads for current logic, staged observations, today's
 
 Append journey events with `node.add`, interpretation with `observation.stage`, rejected/accepted signal rationale with `record.append`. Promote through `observation.promote` only after the original closure signal; targets are `claim`, `heuristic`, `concept`, `constraint`, `architecture`, or `dead_end` on empirical refutation. Concept/constraint/architecture use native document heading selector plus complete `content`; `unknown` stays staged. The original observation survives including original provenance. CLI capability never grants an AI new authority to affirm, settle a contradiction or judge maturity.
 
+Load local `references/property-authoring.md` directly and unconditionally before
+capture, staging, semantic revision, or declaration authoring. Use `observation.stage`
+for the verbatim obligation and put source/version identity, complete meaning,
+evidence timing, unknowns, and authoring-record links in existing `context`.
+Missing evidence or unsupported relations retain a reason and the source assertion
+ID in the all-selected-assertions ledger. Recording or spec/check creation alone
+never authorizes `observation.promote` or a status/provenance upgrade.
+
+For scope, variant, conjunct, tolerance, or decision-policy changes, retain full
+immutable before/after obligation and candidate versions in existing
+`session.log.logic_revisions` and linked authoring receipts, including digests and
+version correspondence. Stage a revised prospective obligation as a new linked
+observation, never an edit of the old one. Record exact check-input identities;
+old checks do not certify the new version. Executable specs, evidence interpretation,
+authorized check/replay, and isolated ARA-only allowlisting follow the shared contract.
+These instructions add no apply operation or direct knowledge-file fallback.
+
 Stage 4 uses `logic.revise` for complete verbatim before/after plus signal/session/turn/provenance, and one batch with owning `session.log` for coupled changes. Native concept/constraint/architecture/arbitrary prose revisions use `set: {"Body":"<complete exact selected body>"}` on the native document/heading target; initial source-grounded document creation has no invented prior revision. Split keeps the primary ID and creates the spin-off; merge retains lower ID and withdraws higher with Merged into plus reference redirects; generalization adds a new claim depending on narrower retained claims. Claim withdrawal/merge never uses physical `entry.remove`; canonical `entry.rename` uses guarded endpoints and redirects, retains all prior values and identities, and never deletes historical layers. Record the original source's full structural before/after in session history, chosen/rejected signals and near misses in reasoning. `logic/experiments.md` remains compiler-owned; PM cannot edit it or attach taste.
 
 Taste still confirms the target first. `entry.taste_append` appends one full user record to a claim/heuristic; trace taste uses `record.append` and CLI T-ID allocation, never editing the trace node and never targeting a question. Attitude/object remain independent axes.

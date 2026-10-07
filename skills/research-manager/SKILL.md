@@ -29,6 +29,28 @@ premature structure distorts the record. Most observations are staged and only m
 formal entries when externally observable closure signals indicate the researcher has
 treated them as settled.
 
+## Required source-faithful authoring contract
+
+Load local `references/property-authoring.md` unconditionally before harvesting claims,
+staging obligations, revising their meaning, or authoring executable declarations.
+It governs source identity, evidence meaning, executable specs, check identities, and
+isolated ARA-only extraction. It does not change end-of-turn cadence, closure signals,
+file access, or experiment authorization.
+
+At the first epilogue opportunity, stage each selected assertion verbatim in an
+observation's `content`. Use `context` for its source revision/anchor, immutable version
+or digest, exact method variant/baseline, metric, units, scope, quantifier, aggregation,
+uncertainty commitment, and all conjuncts. Preserve unknowns explicitly. Stage before
+evidence is available when possible; if evidence already existed, record that timing
+and its references. Same-turn or retrospective capture is not preregistration.
+
+Keep the complete obligation even if evidence is absent or no catalog relation fits.
+Record the specific unsupported reason in linked session/authoring records and retain
+its source assertion ID in the all-selected-assertions denominator. Keep candidate
+relations, operand selections, checks, and repairs in separate linked authoring records.
+Never replace the preserved assertion with a synthesis, inferred explanation, or
+narrowed subclaim; each needs its own identity and links to the original.
+
 ## Layer Mutability
 
 The artifact has two mutability regimes. Honor them strictly.
@@ -103,7 +125,8 @@ routing dichotomy is: **journey facts go direct; interpretive claims go staged.*
 decision tree, the skip filter, provenance assignment, ID conventions, and forensic
 binding requirements.
 
-Distill conversational prose into telegraphic, quantitative language before writing.
+Distill event summaries into telegraphic language, but never distill away a selected
+assertion's wording or meaning. Preserve its verbatim content separately from summaries.
 
 ### Stage 3 — Maturity Tracker
 
@@ -135,6 +158,12 @@ A staged observation crystallizes when **at least one** of these signals is pres
 **Default to non-promotion.** If no signal is clearly present, leave it staged. Premature
 crystallization is the failure mode this design exists to prevent.
 
+A request to record or preserve an assertion is not verbal affirmation of its truth.
+Creating an observation or executable spec is not artifact commitment. A holding
+reported-evidence check alone is not empirical resolution or researcher endorsement.
+Apply the closure signals above unchanged; a prospective executable candidate may stay
+staged. Log these near-misses without upgrading provenance or status.
+
 #### Crystallization procedure
 
 When a signal fires for `O{XX}`:
@@ -146,7 +175,7 @@ When a signal fires for `O{XX}`:
    matched line verbatim into `Sources`, then write the number as a copy of that quote.** Carry
    forward `provenance`. Verbal-affirmation upgrades `ai-suggested` → `user-revised` (or `user` if
    reproduced verbatim). The other three signals do **not** upgrade provenance.
-4. Add fields: `Crystallized via: <signal>`, `From staging: O{XX}`.
+4. Record the source observation ID and closure signal in its staging forward pointers and session/trace history, not as `From staging` or `Crystallized via` fields in the current claim snapshot.
 5. Establish forensic bindings (claim→proof, heuristic→code, decision→evidence). Use
    `[pending]` + TODO if a binding cannot be made now.
 6. Update O{XX}: `promoted: true`, `promoted_to: <layer>:<id>`, `crystallized_via: <signal>`.
@@ -230,12 +259,13 @@ entries — staged observations belong to Stage 3. (History lives in the trace; 
 #### What Stage 4 may do
 
 1. **Status updates** — flip a claim's `Status` field when evidence warrants.
-2. **Content revisions** — rewrite a `Statement`, `Rationale`, or definition when new
-   evidence narrows scope, terminology changed, or wording no longer matches what's
-   actually supported. Keep `Statement` a generalized mechanism/relationship and sharpen
-   `Conditions` as the regime becomes clearer; new run numbers update `Proof`/`evidence`,
-   never the Statement. A rewrite re-grounds every number it now contains (Number grounding);
-   any changed value gets its own fresh `Sources` «quote», never a carried-over one.
+2. **Content revisions** — revise an already-crystallized entry only on a Stage 4 signal.
+   Preserve bounded empirical and named-method assertions as first-class Statements;
+   do not generalize them away or silently narrow them to fit new evidence.
+   `Conditions` records scope and unresolved boundaries. New run data belongs in
+   `Proof`/`evidence` unless it is part of an explicitly revised assertion.
+   Re-ground every load-bearing number in the revised entry (Number grounding).
+   Synthesis and narrowed subclaims have separate identities linked to the full obligation.
 3. **Structural changes** — split a claim into two, merge duplicates, repair
    dependencies, rename ids when concepts are renamed. Also **generalize**: when several
    crystallized claims are together evidence for a more general relationship none states
@@ -278,8 +308,8 @@ For each crystallized entry in `logic/`, check this turn for:
 1. **Empirical resolution** — an experiment in the entry's `Proof` refs or `bound_to`
    nodes produced a result this turn AND the researcher commented on it.
    - Result confirms → `supported` (or one step toward it)
-   - Result partial / narrower than claim → `weakened`, and consider rewriting the
-     `Statement` to match the actual scope supported
+   - Result partial / narrower than claim → `weakened`; retain the full obligation
+     and identify any supported narrower subclaim separately
    - Result disproves → `refuted` AND append a `dead_end` node referencing the claim
 2. **Verbal declaration** — first-person, explicit, naming the claim or unambiguously
    referring to its content. Covers status ("C07 confirmed" / "drop C07"), revisions
@@ -301,6 +331,17 @@ For each crystallized entry in `logic/`, check this turn for:
 
 When a signal fires for entry `E` (claim, heuristic, or concept):
 
+Before changing scope, method variant, metric, units, quantifier, aggregation,
+uncertainty, conjuncts, tolerance, or decision policy, preserve immutable full
+before/after obligation and candidate versions under the session's `logic_revisions:`.
+Record source revision, content digests, and split/merge correspondence in its `note`
+or linked authoring receipt. For staged revisions, append a new observation with the
+new full content and a link to the old one; never edit the old `content` or `context`.
+Every check belongs to the exact obligation, declaration, evidence, catalog, and
+decision-policy versions it checked. Old checks remain historical and do not certify
+the new version. Follow the shared contract for separate authorized checks and replay;
+unsupported or unperformed revisions remain explicitly unchecked.
+
 1. Edit the affected fields in the logic file directly. **Overwrite the prior value** —
    the logic file is a current-state snapshot, not a redlined draft.
 2. Update `- **Last revised**: YYYY-MM-DD (turn-id)` on the entry.
@@ -314,9 +355,9 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
      `Merged into: C{XX}`, redirect cross-references.
    - **Generalize**: allocate a new id for the more general claim, set its `Dependencies`
      to the narrower claims, and leave those claims in place (they remain its grounding).
-6. **Record full before/after in today's session record** under `logic_revisions:`
-   (see schema below). This is the ONLY place the prior wording is preserved — the
-   logic file does not keep it.
+6. **Ensure full before/after is retained in today's session record** under
+   `logic_revisions:` (see schema below), including complete version content for
+   semantic revisions. The current logic file does not keep prior versions.
 7. Add a one-line note to `pm_reasoning_log.yaml` explaining which signal fired AND any
    signal you considered but rejected (near-misses are the most useful continuity record).
 
@@ -350,9 +391,10 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
 ## Per-Turn Procedure
 
 ```
+0. Load local references/property-authoring.md unconditionally before capture, staging, revision, or declaration authoring.
 1. Read existing ara/ files (current state, next IDs).
 2. Stage 1 — harvest this turn's candidate events.
-3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; interpretive events staged to staging/observations.yaml.
+3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; selected assertions verbatim and interpretive events staged to staging/observations.yaml at the first epilogue opportunity, with evidence timing recorded.
 4. Stage 3 — crystallize staged observations whose closure signal fired; flag contradictions; mark 3+-day-idle observations stale.
 5. Stage 4 — for each crystallized logic/ entry, apply status/content/structural edits when a signal fires; run the cross-ref consistency pass; record before/after in the session record; log near-misses.
 6. Append turn events to today's session record; update session_index.yaml; append a line to pm_reasoning_log.yaml.
@@ -427,14 +469,14 @@ tree:
 ### Claim (`logic/claims.md`) — crystallized only
 
 ```markdown
-## C{XX}: {generalized title — the takeaway, not a recipe name}
-- **Statement**: {the generalized, mechanistic conclusion; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
-- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
-- **Sources**: [{one entry per load-bearing number in the claim (now in `Conditions`/`Proof`): `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
+## C{XX}: {title identifying the bounded assertion or separately authored synthesis}
+- **Statement**: {verbatim source assertion, including named methods, quantitative commitments, and every conjunct; a separately identified synthesis may instead state a bounded interpretation}
+- **Conditions**: {exact method variant/baseline, metric, units, task scope, quantifier, aggregation, uncertainty, unresolved meaning, and known untested boundaries}
+- **Sources**: [{source revision/anchor and assertion identity; one entry per load-bearing number anywhere in the claim: `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
 - **Status**: hypothesis | untested | testing | supported | weakened | refuted | withdrawn
 - **Provenance**: user | ai-suggested | user-revised
-- **Falsification**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. NOT a tautology or a re-run of the same gate ("if the recipe fails the gate")}
-- **Proof**: [{evidence refs (→ evidence/) or "pending"; run numbers/IDs/scores live HERE, not in Statement}]
+- **Falsification**: {a concrete observation that would disprove this exact assertion, including its metric, scope, variant, and conjuncts; not a tautology}
+- **Proof**: [{evidence refs (→ evidence/) or "pending"; preserve raw headers, axes, method identities, uncertainty, and provenance in linked evidence}]
 - **Dependencies**: [C{YY}, ...]
 - **Tags**: {comma-separated}
 - **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
@@ -442,20 +484,19 @@ tree:
   - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}
 ```
 
-**The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,
-not a restatement of run numbers.** What keeps it falsifiable and honest is `Conditions` (the regime
-it holds in + the untested boundary) plus a `Falsification`, not a narrowed sentence. Numbers (run
-IDs, n, scores, step counts) belong in `Proof` → `evidence/` (grounded per Number grounding), never
-in `Statement`. `Conditions` is mandatory: a generalized Statement with no Conditions is an unbounded
-slogan.
+**A Statement may be a bounded empirical comparison, hypothesis, or mechanism claim.**
+Named configurations, values, and statistical commitments belong in the Statement
+when they are part of the source assertion. Preserve the verbatim assertion and its
+source identity; `Conditions` makes its scope explicit and never licenses changing it.
+Ground load-bearing numbers per Number grounding. Do not insert new evidence numbers
+into a preserved quotation or copy them into executable operands.
 
-**Calibrate the Statement to what the evidence actually separates.** Do not assert a distinction the
-design cannot disentangle (confounded factors — e.g. matrix "shape" vs "role" when they co-vary), or
-a law from a single instance. When that's the case, hedge in the Statement itself — name the
-unseparated factors together, or say "shown once here" — rather than only burying it in `Conditions`.
-`Conditions` bounds *where* the claim applies; it is not a license for the Statement's verb to
-over-reach. The Statement/Conditions may be sharpened on a later turn (Stage 4 content revision) as
-the mechanism becomes clearer — no new closure signal is needed.
+**Separate reporting from interpretation.** A source assertion is recorded faithfully
+even when unsupported, contradicted, or confounded. Mark those limitations in
+`Conditions`/`Proof` and status under the existing signals. A synthesized explanation
+must be a separate claim linked to the preserved assertions; calibrate that synthesis
+to what the evidence separates, rather than asserting a law from a single instance.
+Later revisions follow Stage 4 signals and retain immutable full before/after versions.
 
 Current-state snapshot only — no prior statements, no `From staging`/`Crystallized via`
 notes. Crystallization and every edit are recorded in the trace (`trace/sessions/…` under
@@ -487,8 +528,8 @@ observations:
   - id: O{XX}
     timestamp: "YYYY-MM-DDTHH:MM"
     provenance: user | ai-suggested | ai-executed | user-revised
-    content: "{raw observation, factually distilled}"
-    context: "{what was happening this turn}"
+    content: "{verbatim selected assertion with all conjuncts; otherwise raw observation}"
+    context: "{source revision/anchor, immutable version/digest, full meaning/scope, evidence refs and before/after-evidence timing, unknowns and linked authoring/unsupported-reason records}"
     potential_type: claim | heuristic | concept | constraint | architecture | unknown
     bound_to: [N{XX}, ...]    # exploration nodes this depends on
     promoted: false
@@ -496,6 +537,11 @@ observations:
     crystallized_via: null    # which closure signal fired
     stale: false
 ```
+
+For selected assertions, this append-only buffer is also the obligation ledger before
+crystallization. No relation fit or missing evidence does not remove the observation.
+Retain its original source assertion ID in coverage counts; generated subclaims do
+not enlarge that denominator. Append semantic revisions as new linked observations.
 
 ### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day
 
@@ -527,21 +573,21 @@ claims_touched:
     action: created | crystallized | advanced | weakened | confirmed | refuted | withdrawn | revised | split | merged
     turn: 1
 
-logic_revisions:                  # full before/after for every edit Stage 4 makes
+logic_revisions:                  # full before/after for every edit and obligation/candidate version change
   - turn: 1
-    entry: C{XX}                  # or H{XX}, concept id, etc.
-    field: Statement | Status | Rationale | Dependencies | id | ...
-    before: "{prior value, verbatim}"
-    after: "{new value, verbatim}"
+    entry: C{XX}                  # or O{XX}, linked candidate, H{XX}, concept id, etc.
+    field: Statement | Conditions | Status | Rationale | Dependencies | content | context | id | ...
+    before: "{prior value verbatim; full immutable obligation/candidate content for semantic revisions}"
+    after: "{new value verbatim; full immutable obligation/candidate content for semantic revisions}"
     signal: empirical-resolution | verbal-declaration | dependency-change | artifact-commitment | terminology-drift | user-directive
     provenance: user | ai-suggested | user-revised
-    note: "{one-line why, optional}"
-  # structural changes record both endpoints, e.g. for a split:
+    note: "{why; source revision, before/after digests, version correspondence and linked authoring/check receipt when applicable}"
+  # structural changes retain complete endpoints, not just a summary:
   - turn: 1
     entry: C07
     field: split
-    before: "C07 covered both training and inference"
-    after: "C07 = training-time claim; C12 = inference-time claim"
+    before: "{complete verbatim C07 entry before split, including both obligations}"
+    after: "{complete C07 and C12 entries after split, with correspondence to the retained source obligation}"
     signal: verbal-declaration
     provenance: user-revised
 

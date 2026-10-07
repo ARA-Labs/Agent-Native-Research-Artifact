@@ -1,6 +1,9 @@
 # ARA Seal Level 1 — Validation Checklist
 
-These are all checks the Seal validator runs. Fix ALL failures before reporting success.
+Load the local [property-authoring contract](property-authoring.md) before reviewing claims.
+This checklist covers structural checks and source-faithful authoring review. Record the actual
+Seal validator's output separately; structural acceptance does not certify source fidelity or
+an executable check. Fix failures without inventing support or weakening an assertion.
 
 ## 1. Directory Existence
 
@@ -34,16 +37,22 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 ## 4. Field-Level Checks (regex patterns)
 
 ### logic/claims.md
-- Has `## C\d+` blocks (at least one claim)
-- Contains `**Statement**` (the mechanism/takeaway a result reveals — subject is a mechanism/relationship, never a named recipe; no run numbers)
-- Contains `**Conditions**` (non-trivial: the regime + the untested boundary)
-- Contains `**Sources**`; every load-bearing number in a claim has a `Sources` entry carrying
-  a verbatim «quote» plus an `[input]`/`[result]` tag — no bare-path entries, no memory-filled numbers
-- Contains `**Status**`
-- Contains `**Falsification criteria**` (a substantive observation — about the system, or about the benchmark's behavior for a methodological claim — not a tautology or a re-run of a metric gate)
-- `Statement` is the mechanism/takeaway a result reveals, not a record: a single instance may state the mechanism it reveals, but must not be extrapolated into a universal law beyond its regime, nor assert a distinction the design cannot disentangle — those limits live in `Conditions`
-- Contains `**Proof**`
-- Contains `**Evidence basis**`
+- Has source-supported `## C\d+` blocks; if none are warranted, state why and retain staged
+  obligations in the all-selected-assertions ledger rather than inventing a claim
+- Contains `**Statement**` preserving the verbatim source assertion; named configurations,
+  bounded empirical comparisons, and source-grounded numerical assertions are allowed
+- Contains `**Conditions**` preserving scope, units, quantifier, aggregation, statistical unit,
+  uncertainty, and untested boundaries; missing details are attributed unknowns
+- Contains `**Sources**`; the assertion has its source revision/anchor and verbatim quote, and
+  every load-bearing number has a quoted `[input]`/`[result]` entry, or an explicit pending reason
+- Contains `**Status**` reflecting actual support, not spec acceptance or a holding check
+- Contains `**Falsification criteria**` addressing the actual assertion; a contradicted required
+  ordering is meaningful for a bounded comparison; unavailable criteria are explicit
+- Keeps synthesis in a separately identified claim linked to the preserved assertions; no
+  forced mechanism inference from one result or component ranking
+- Contains `**Proof**` with only real relevant experiment IDs, or `pending` plus a missing-support reason
+- Contains `**Evidence basis**` with neutral evidence references, conflicts, and gaps, not authored
+  candidate relations, selected operands, check results, or review/repair answers
 
 ### logic/problem.md
 - Has `### O\d+` blocks (observations)
@@ -51,7 +60,8 @@ where present, they are non-trivial — there is no fixed list. Model-training f
 - Has Key Insight section (`## Key Insight` or `**Insight**`)
 
 ### logic/experiments.md
-- Has `## E\d+` blocks (at least 3)
+- Has source-supported `## E\d+` blocks (aim for 3 only when warranted); record fewer or none
+  with a reason, never invent an experiment to fill a count or a claim's Proof
 - Contains `**Verifies**`
 - Contains `**Evidence**` (link to where the run's results are filed, or "pending")
 - Contains `**Run**` (what produced the run — a `src/execution/` file or a link/ref into the source repo/DB; failed/ablated runs are linked too, not omitted)
@@ -78,14 +88,14 @@ where present, they are non-trivial — there is no fixed list. Model-training f
   citation footprint
 
 ### logic/concepts.md
-- Has `## ` sections (at least 5)
+- Has genuine concept `## ` sections (aim for 5 only when warranted); record the shortfall
 - Contains `**Definition**`
 
 ## 5. Count Checks
 
-Counts are **source-bounded targets, not quotas** (Rule 14): they must be met from genuine source
-content, never by padding with trivial, borrowed, or invented items. A paper that honestly supports
-fewer passes with fewer; what fails is fabricated filler.
+Counts are **source-bounded targets, not quotas** (Rule 15). Fewer or no supported items require
+a stated reason, not fabricated filler. A missing proof remains missing; unsupported selected
+assertions stay in the ledger whether or not they have claim blocks or executable declarations.
 
 - `logic/concepts.md`: aim ≥5 concept sections (`## ` headers) — but only genuine technical terms
 - `logic/experiments.md`: aim ≥3 experiment/analysis blocks (`## E\d+`) — only experiments the paper actually describes
@@ -124,6 +134,9 @@ For each file in `evidence/figures/*.md` specifically:
 - `quantitative_plot` figures must contain either a Markdown data table OR an explicit unreadable statement with `Reading confidence: low` plus a `Trend summary`; their `**Axes**` field must state the scale (linear/log)
 - `diagram` and `qualitative_sample` figures must contain a `Visual description` section and must NOT present a fabricated numeric data table
 - Any estimated numeric reading should be marked approximate (`≈`) and the file's extraction method should be `digitized_estimate` (not `exact_from_labels`)
+- Preserve original headers, axis order, exact method variants, metric identities, units, task
+  scope, aggregation, and uncertainty annotations. Unresolved headers and aliases stay unresolved;
+  an alias must not merge fixed and adaptive variants. Absent variance is not zero.
 
 ## 7. evidence/README.md
 
@@ -152,9 +165,12 @@ For each file in `evidence/figures/*.md` specifically:
 ## 9. Cross-Layer Binding
 
 ### Claim Proof → Experiment Resolution
-- Every `E\d+` in a claim's `**Proof**: [...]` must exist in experiments.md
-- Proof-linked experiments should have evidence files whose labels and row contents actually match the compared systems or measurements
-- Claim `Statement` is a generalized mechanism/relationship auditable against `Evidence basis`; its reach is bounded by `Conditions` and its run numbers live in the evidence layer (not pasted into the Statement)
+- Every `E\d+` in a claim's `**Proof**: [...]` must exist in experiments.md; `pending`
+  with an explicit missing-support reason is preferable to invented experiments
+- Proof-linked evidence must match the assertion's exact method variants, metrics, units,
+  headers, task scope, aggregation, and every conjunct; mismatches remain explicit
+- Audit the preserved Statement against its source anchor under the shared contract. Numerical
+  assertions stay first-class; a separately linked synthesis must not replace the original.
 
 ### Experiment Verifies → Claim Resolution
 - Every `C\d+` in an experiment's `**Verifies**` must exist in claims.md
@@ -185,20 +201,16 @@ For each file in `evidence/figures/*.md` specifically:
 - No fact ABOUT a repo artifact (line count, path, internal structure) is transcribed from the paper without checking the real file — when paper and repo disagree, the discrepancy is flagged, not silently resolved to the paper's number
 - Spot-check trace `source_refs` and evidence `**Source**` labels: the cited section/table/appendix actually contains the claimed content
 - A statistic carries its scope/denominator (N, population) in its `Source` — subset figures (e.g. "5 papers / 3,050 reqs") are not juxtaposed with full-corpus figures as if same-denominator
-- **Claim Statements are takeaways** (exhaustive, not spot-checked — symmetric to the number-sources
-  pass): each `## C\d+` Statement FAILS if its subject is a named recipe/config/run, or if it
-  contains a run number, n-count, score, step/bin count, or p-value. The mechanism a result reveals
-  must be the subject; the numbers must live in `Evidence basis`/`Proof`
-- **Attribution is not insight** (exhaustive, applied to each Statement that already passed the
-  takeaways gate above): a Statement also FAILS if it only identifies *which* named components of
-  this one system rank highest/lowest (load-bearing / dominant / decorative / inert / "largest
-  contributor") without stating what that ranking *reveals* — a relationship or mechanism a reader
-  could carry to a different system. **Operational tell: delete this system's component names from
-  the Statement; if no transferable relationship survives, it is attribution, not a mechanism — it
-  FAILS.** The fix is to state the generalization the ranking licenses; the named components and
-  their deltas stay in `Evidence basis`. This is the most common way a numerically-clean Statement
-  still fails the insight bar.
-- **Claim/heuristic number sources** (exhaustive, not spot-checked): each `**Sources**` entry's cited
+- **Source-faithful Statements** (exhaustive, not spot-checked): compare each assertion with its
+  source revision/anchor using [What must survive](property-authoring.md#what-must-survive).
+  Fail omitted conjuncts, changed variants or metric headers, weakened all-tasks scope, invented
+  uncertainty, or replacement of the assertion with a generalized explanation. Named methods,
+  numbers, p-values, and component comparisons are not failures merely for appearing in a Statement.
+  An unresolved field is recorded as unresolved, not silently selected to make a check hold.
+- **Separate synthesis**: check that inferred explanations have their own identity and links to
+  preserved assertions. Do not delete system names, demote quantitative assertions, or demand a
+  transferable mechanism merely because a reported result or ablation is available.
+- **Claim/heuristic number sources** (exhaustive, not spot-checked): each number-bearing `**Sources**` entry's cited
   `file:line` (or trace `node:field`) exists, the verbatim «quote» is actually present there, and the
   number in the `Statement`/`Rationale` matches the value inside that quote; `[input]` entries cite
   recipe scripts and `[result]` entries cite run logs/trace (not swapped). A bare path with no «quote»,
@@ -209,7 +221,8 @@ For each file in `evidence/figures/*.md` specifically:
 
 - **Every numbered `Table N` and `Figure N` in the source is filed** — a complete, in-order sweep,
   not a sample. Each filed object has BOTH a markdown file and a screenshot `.png`.
-- Every value a claim quotes traces to a filed table/figure.
+- Every value a claim quotes traces to its filed source table, figure, log, or other allowed input;
+  preserve approximation markers and uncertainty rather than inventing exactness
 - Any numbered object deliberately not filed (e.g. an exact duplicate) is listed in
   `evidence/README.md` with a reason — no silent omissions. A run that quietly filed only some of
   the source's tables/figures FAILS.
@@ -219,3 +232,25 @@ For each file in `evidence/figures/*.md` specifically:
 - Any ARA-authored derived number (a delta, percentage, or comparison the ARA computes itself) recomputes correctly from its cited cells
 - `PAPER.md` frontmatter/Layer-Index declared counts (claims, concepts, experiments, …) match the actual files
 - Tree `evidence:` references are claim IDs (`C\d+`), not observation IDs (`O\d+`) or other layers
+
+## 13. Property Authoring Boundaries
+
+Apply the shared contract's [authoring order](property-authoring.md#author-in-this-order),
+[revisions and check identity](property-authoring.md#revisions-and-check-identity), and
+[isolated ARA-only extraction](property-authoring.md#isolated-ara-only-extraction) rules.
+
+- The all-selected-assertions ledger retains the full source obligation and each unsupported
+  reason. Distinguish no relation fit from no evidence; narrowed subclaims do not replace it.
+- Review meaning against the captured assertion before any authorized execution. Record semantic
+  review separately from schema acceptance, operand binding, execution outcome, and replay.
+- Checks link the exact obligation version, declaration and evidence digests, catalog version,
+  decision policy, and saved check record. After a semantic or policy revision, the prior check is
+  historical only; retain initial and repaired candidates and their separate outcomes.
+- When ARA-only extraction is requested, audit a pinned, allowlisted neutral view and its manifest.
+  Keep preserved quotations, headers, scope, uncertainty, and unsupported obligations. Exclude the
+  original packet and authoring/review answers, including transitive linked content, before giving
+  a fresh extractor access. Merely asking it not to read excluded files does not isolate the view.
+- Executable candidates use the contract's versioned `aratest/spec.yaml` format and production
+  load/bind/check/save/replay APIs only when authorized and available. Missing runtime or unresolved
+  obligations are explicit unperformed checks. This review authorizes no paid collection, fresh
+  scientific run, catalog family campaign, or automatic retry loop.

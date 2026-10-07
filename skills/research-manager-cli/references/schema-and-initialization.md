@@ -12,6 +12,13 @@ No direct fallback, automatic semantic retry, new role, or altered stopping rule
 The entrypoint loads `references/cli-access.md` directly for executable wire details.
 Pending protocol review and binary proof remain visible in the variant lock.
 
+Load local `references/property-authoring.md` directly and unconditionally before
+claim capture, staging, semantic revision, or executable authoring. The existing
+fields below preserve source assertions and obligation versions; no new core ARA
+schema is required. The shared contract governs evidence meaning, executable specs,
+check identities, and isolated ARA-only extraction without relaxing CLI-only access
+or the manager's closure signals.
+
 ## ARA Directory Structure
 
 ```
@@ -77,14 +84,14 @@ tree:
 ### Claim (`logic/claims.md`) — crystallized only
 
 ```markdown
-## C{XX}: {generalized title — the takeaway, not a recipe name}
-- **Statement**: {the generalized, mechanistic conclusion; subject = a mechanism/relationship, never a named recipe; carries NO run numbers}
-- **Conditions**: {under what conditions it holds; the regime; the known untested boundary}
-- **Sources**: [{one entry per load-bearing number in the claim (now in `Conditions`/`Proof`): `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
+## C{XX}: {title identifying the bounded assertion or separately authored synthesis}
+- **Statement**: {verbatim source assertion, including named methods, quantitative commitments, and every conjunct; a separately identified synthesis may instead state a bounded interpretation}
+- **Conditions**: {exact method variant/baseline, metric, units, task scope, quantifier, aggregation, uncertainty, unresolved meaning, and known untested boundaries}
+- **Sources**: [{source revision/anchor and assertion identity; one entry per load-bearing number anywhere in the claim: `<value> ← <file:line | trace-node:field> «verbatim line copied from source» [input|result]`, or `<value> ← [pending: reason]`}]   # see "Number grounding"; a bare path with no «quote» is invalid
 - **Status**: hypothesis | untested | testing | supported | weakened | refuted | withdrawn
 - **Provenance**: user | ai-suggested | user-revised
-- **Falsification**: {a concrete observation that would disprove it — for a mechanism claim, about the system/world; for a methodological/regime claim, about the benchmark's behavior. NOT a tautology or a re-run of the same gate ("if the recipe fails the gate")}
-- **Proof**: [{evidence refs (→ evidence/) or "pending"; run numbers/IDs/scores live HERE, not in Statement}]
+- **Falsification**: {a concrete observation that would disprove this exact assertion, including its metric, scope, variant, and conjuncts; not a tautology}
+- **Proof**: [{evidence refs (→ evidence/) or "pending"; preserve raw headers, axes, method identities, uncertainty, and provenance in linked evidence}]
 - **Dependencies**: [C{YY}, ...]
 - **Tags**: {comma-separated}
 - **Last revised**: YYYY-MM-DD (turn-id)   # pointer back to the trace; absent until first revision
@@ -92,20 +99,19 @@ tree:
   - [YYYY-MM-DD] `endorse | uncertain | reject` on `claim | evidence | framing | priority` — {free-text comment}
 ```
 
-**The Statement is the generalized conclusion the evidence supports — a mechanism or relationship,
-not a restatement of run numbers.** What keeps it falsifiable and honest is `Conditions` (the regime
-it holds in + the untested boundary) plus a `Falsification`, not a narrowed sentence. Numbers (run
-IDs, n, scores, step counts) belong in `Proof` → `evidence/` (grounded per Number grounding), never
-in `Statement`. `Conditions` is mandatory: a generalized Statement with no Conditions is an unbounded
-slogan.
+**A Statement may be a bounded empirical comparison, hypothesis, or mechanism claim.**
+Named configurations, values, and statistical commitments belong in the Statement
+when they are part of the source assertion. Preserve the verbatim assertion and its
+source identity; `Conditions` makes its scope explicit and never licenses changing it.
+Ground load-bearing numbers per Number grounding in SKILL.md. Do not insert new
+evidence numbers into a preserved quotation or copy them into executable operands.
 
-**Calibrate the Statement to what the evidence actually separates.** Do not assert a distinction the
-design cannot disentangle (confounded factors — e.g. matrix "shape" vs "role" when they co-vary), or
-a law from a single instance. When that's the case, hedge in the Statement itself — name the
-unseparated factors together, or say "shown once here" — rather than only burying it in `Conditions`.
-`Conditions` bounds *where* the claim applies; it is not a license for the Statement's verb to
-over-reach. The Statement/Conditions may be sharpened on a later turn (Stage 4 content revision) as
-the mechanism becomes clearer — no new closure signal is needed.
+**Separate reporting from interpretation.** A source assertion is recorded faithfully
+even when unsupported, contradicted, or confounded. Mark those limitations in
+`Conditions`/`Proof` and status under the existing signals. A synthesized explanation
+must be a separate claim linked to the preserved assertions; calibrate that synthesis
+to what the evidence separates, rather than asserting a law from a single instance.
+Later revisions follow Stage 4 signals and retain immutable full before/after versions.
 
 Current-state snapshot only — no prior statements, no `From staging`/`Crystallized via`
 notes. Crystallization and every edit are recorded in the trace (`trace/sessions/…` under
@@ -137,8 +143,8 @@ observations:
   - id: O{XX}
     timestamp: "YYYY-MM-DDTHH:MM"
     provenance: user | ai-suggested | ai-executed | user-revised
-    content: "{raw observation, factually distilled}"
-    context: "{what was happening this turn}"
+    content: "{verbatim selected assertion with all conjuncts; otherwise raw observation}"
+    context: "{source revision/anchor, immutable version/digest, full meaning/scope, evidence refs and before/after-evidence timing, unknowns and linked authoring/unsupported-reason records}"
     potential_type: claim | heuristic | concept | constraint | architecture | unknown
     bound_to: [N{XX}, ...]    # exploration nodes this depends on
     promoted: false
@@ -146,6 +152,26 @@ observations:
     crystallized_via: null    # which closure signal fired
     stale: false
 ```
+
+Stage selected assertions through `observation.stage` at the first epilogue opportunity,
+before evidence when possible. Record when evidence already existed; same-turn or
+retrospective recording is not preregistration. This append-only buffer is also the
+obligation ledger before crystallization. Missing evidence or no supported relation
+retains the full obligation and its specific reason in linked session/authoring records.
+It remains staged unless an existing closure signal fires; execution capability
+neither grants nor vetoes crystallization. Retain its source assertion ID in the
+all-selected-assertions denominator; generated subclaims do not enlarge it.
+
+Recording, spec creation, and a holding reported-evidence check alone do not satisfy a
+closure signal or affirm truth. Keep prospective candidates staged until an actual
+existing signal fires. Append semantic revisions as new linked observations rather
+than editing old `content`/`context`. Before changing meaning or decision policy, retain
+full immutable before/after obligation and candidate versions in `logic_revisions:`
+and linked authoring receipts. Preserve source revisions, digests, and split/merge
+correspondence. Historical checks apply only to the exact versions they checked; a new
+version needs its own separately authorized check and replay or an explicit unchecked
+reason. Use the shared contract for complete evidence/spec/check semantics and the
+allowlisted input view required for isolated ARA-only extraction.
 
 ### Session Record (`trace/sessions/YYYY-MM-DD_NNN.yaml`) — turns append within the day
 
@@ -177,21 +203,21 @@ claims_touched:
     action: created | crystallized | advanced | weakened | confirmed | refuted | withdrawn | revised | split | merged
     turn: 1
 
-logic_revisions:                  # full before/after for every edit Stage 4 makes
+logic_revisions:                  # full before/after for every edit and obligation/candidate version change
   - turn: 1
-    entry: C{XX}                  # or H{XX}, concept id, etc.
-    field: Statement | Status | Rationale | Dependencies | id | ...
-    before: "{prior value, verbatim}"
-    after: "{new value, verbatim}"
+    entry: C{XX}                  # or O{XX}, linked candidate, H{XX}, concept id, etc.
+    field: Statement | Conditions | Status | Rationale | Dependencies | content | context | id | ...
+    before: "{prior value verbatim; full immutable obligation/candidate content for semantic revisions}"
+    after: "{new value verbatim; full immutable obligation/candidate content for semantic revisions}"
     signal: empirical-resolution | verbal-declaration | dependency-change | artifact-commitment | terminology-drift | user-directive
     provenance: user | ai-suggested | user-revised
-    note: "{one-line why, optional}"
-  # structural changes record both endpoints, e.g. for a split:
+    note: "{why; source revision, before/after digests, version correspondence and linked authoring/check receipt when applicable}"
+  # structural changes retain complete endpoints, not just a summary:
   - turn: 1
     entry: C07
     field: split
-    before: "C07 covered both training and inference"
-    after: "C07 = training-time claim; C12 = inference-time claim"
+    before: "{complete verbatim C07 entry before split, including both obligations}"
+    after: "{complete C07 and C12 entries after split, with correspondence to the retained source obligation}"
     signal: verbal-declaration
     provenance: user-revised
 

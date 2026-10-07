@@ -25,9 +25,11 @@ This document covers two axes:
 | **Kind** | What kind of event is this? | Picks the schema and target layer. |
 | **Routing** | Is this a journey fact or interpretation? | Picks **direct** vs **staged**. |
 
-A journey fact records *what occurred* (a choice, a run, an abandonment). It is immutable
-and goes direct. An interpretive claim records *what something means or what is generally
-true*. It is revisable, goes staged, and only crystallizes on a closure signal.
+A journey fact records *what occurred* (a choice, a run, an abandonment) and goes
+direct. An assertion about what is true, including a bounded empirical comparison
+with named methods or numbers, goes staged and crystallizes only on a closure signal.
+Load local `references/property-authoring.md` directly before capturing or revising
+assertions; preserve their verbatim content and identity independently of interpretation.
 
 ## Direct-Routed Events (Journey Layer)
 
@@ -41,8 +43,9 @@ Append through `node.add` in `ara apply` to `trace/exploration_tree.yaml` immedi
 | `dead_end` | Approach abandoned, hypothesis falsified, "doesn't work", reverted | `hypothesis`, `failure_mode`, `lesson` |
 | `pivot` | Major direction change triggered by evidence | `from`, `to`, `trigger` |
 
-A `decision` node MAY reference a staged observation as evidence — this counts as
-**artifact-commitment** for that observation (closure signal; see SKILL.md Stage 3).
+A real downstream `decision` MAY cite a staged observation as its premise; this counts
+as **artifact-commitment** under SKILL.md Stage 3. A decision merely to record an
+assertion or create/check its spec does not make it a settled premise.
 
 `ai-action` events (AI wrote code, ran a command) go to the session record's `ai_actions`
 list, **not** to the exploration tree.
@@ -52,6 +55,15 @@ list, **not** to the exploration tree.
 Append through `observation.stage` in `ara apply` to `staging/observations.yaml` first, with `potential_type` indicating where they
 would crystallize. They do **not** enter `logic/` until a closure signal fires (see
 SKILL.md Stage 3).
+
+Record each selected assertion through `observation.stage` at the first epilogue
+opportunity. Keep the exact method variant, metric, scope, quantifier, uncertainty,
+and every conjunct in `content`/`context`, with source anchor/version and evidence
+timing. If evidence already existed, say so; recording is not retroactive
+preregistration. Missing evidence or no relation fit retains the full obligation,
+its linked reason, and original source assertion ID in the denominator. Keep it
+staged unless an existing closure signal fires; execution capability neither grants
+nor vetoes crystallization.
 
 | Candidate Event | Signals | Crystallizes To | `potential_type` |
 |-----------------|---------|-----------------|------------------|
@@ -84,8 +96,8 @@ What KIND of event is this?
     Did the AI perform an action (write code, run command)?
       → ai-action  [session record only]
 
-  Interpretation (something asserted to be true / general)?
-    Generalizable falsifiable assertion (a mechanism/relationship, bounded by conditions)?
+  Assertion or interpretation (something asserted to be true)?
+    Falsifiable assertion (bounded empirical comparison, hypothesis, or mechanism)?
       → STAGE as potential_type: claim
     Implementation rule with rationale?
       → STAGE as potential_type: heuristic
@@ -107,7 +119,8 @@ Do not write any record for these:
 - Git status checks, dependency installs, environment setup
 - Greetings, acknowledgments, "thanks"
 - Clarifying questions whose answer added no new content
-- Pure restatement of the user's request
+- Pure restatement of the user's request, unless it captures a new research assertion
+  or an explicit request to preserve one not yet in the obligation ledger
 
 If a turn contains only skip-filter activity, print
 `[PM] Turn skipped: no research events.` (or stay silent) and exit the epilogue.

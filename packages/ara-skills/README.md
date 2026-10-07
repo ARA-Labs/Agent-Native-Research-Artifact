@@ -57,6 +57,8 @@ All `--skill` and `--agent` flags are repeatable.
 
 After install, each skill lives at `<target>/<skill-id>/SKILL.md`. A small `.ara-skills.json` lock file records what was installed so `update` and `uninstall --all` work.
 
+Compiler and research-manager, including their CLI variants, load the same [source-faithful property-authoring contract](../../skills/shared/property-authoring.md). The source tree links each local reference to that one maintained file. Packing and installation materialize referenced files, so installing only one workflow still provides the complete contract. Do not copy a bare skill directory while preserving its relative symlinks: use this installer or dereference them.
+
 ## Development
 
 ```bash

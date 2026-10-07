@@ -42,6 +42,29 @@ premature structure distorts the record. Most observations are staged and only m
 formal entries when externally observable closure signals indicate the researcher has
 treated them as settled.
 
+## Required source-faithful authoring contract
+
+Load local `references/property-authoring.md` directly and unconditionally before
+harvesting claims, staging obligations, revising their meaning, or authoring executable
+declarations. It governs source identity, evidence meaning, executable specs, check
+identities, and isolated ARA-only extraction. It does not change end-of-turn cadence,
+closure signals, CLI-only knowledge access, or experiment authorization.
+
+At the first epilogue opportunity, stage each selected assertion verbatim through
+`observation.stage` in its `content`. Use `context` for its source revision/anchor,
+immutable version or digest, exact method variant/baseline, metric, units, scope,
+quantifier, aggregation, uncertainty commitment, and all conjuncts. Preserve unknowns
+explicitly. Stage before evidence is available when possible; if evidence already
+existed, record that timing and its references. Same-turn or retrospective capture
+is not preregistration.
+
+Keep the complete obligation even if evidence is absent or no catalog relation fits.
+Record the specific unsupported reason in linked session/authoring records and retain
+its source assertion ID in the all-selected-assertions denominator. Keep candidate
+relations, operand selections, checks, and repairs in separate linked authoring records.
+Never replace the preserved assertion with a synthesis, inferred explanation, or
+narrowed subclaim; each needs its own identity and links to the original.
+
 Load `references/cli-access.md` directly before knowledge access; and load every
 supplied reference directly from this entrypoint when applicable:
 - `references/schema-and-initialization.md` — full directory/schema/initialization source.
@@ -116,7 +139,8 @@ routing dichotomy is: **journey facts go direct; interpretive claims go staged.*
 decision tree, the skip filter, provenance assignment, ID conventions, and forensic
 binding requirements.
 
-Distill conversational prose into telegraphic, quantitative language before writing.
+Distill event summaries into telegraphic language, but never distill away a selected
+assertion's wording or meaning. Preserve its verbatim content separately from summaries.
 
 ### Stage 3 — Maturity Tracker
 
@@ -148,6 +172,12 @@ A staged observation crystallizes when **at least one** of these signals is pres
 **Default to non-promotion.** If no signal is clearly present, leave it staged. Premature
 crystallization is the failure mode this design exists to prevent.
 
+A request to record or preserve an assertion is not verbal affirmation of its truth.
+Creating an observation or executable spec is not artifact commitment. A holding
+reported-evidence check alone is not empirical resolution or researcher endorsement.
+Apply the closure signals above unchanged; a prospective executable candidate may stay
+staged. Log these near-misses without upgrading provenance or status.
+
 #### Crystallization procedure
 
 When a signal fires for `O{XX}`:
@@ -159,7 +189,7 @@ When a signal fires for `O{XX}`:
    matched line verbatim into `Sources`, then write the number as a copy of that quote.** Carry
    forward `provenance`. Verbal-affirmation upgrades `ai-suggested` → `user-revised` (or `user` if
    reproduced verbatim). The other three signals do **not** upgrade provenance.
-4. Add fields: `Crystallized via: <signal>`, `From staging: O{XX}`.
+4. Record the source observation ID and closure signal through promotion's staging forward pointers and session/trace history, not as `From staging` or `Crystallized via` fields in the current claim snapshot.
 5. Establish forensic bindings (claim→proof, heuristic→code, decision→evidence). Use
    `[pending]` + TODO if a binding cannot be made now.
 6. Update O{XX}: `promoted: true`, `promoted_to: <layer>:<id>`, `crystallized_via: <signal>`.
@@ -243,12 +273,13 @@ entries — staged observations belong to Stage 3. (History lives in the trace; 
 #### What Stage 4 may do
 
 1. **Status updates** — flip a claim's `Status` field when evidence warrants.
-2. **Content revisions** — rewrite a `Statement`, `Rationale`, or definition when new
-   evidence narrows scope, terminology changed, or wording no longer matches what's
-   actually supported. Keep `Statement` a generalized mechanism/relationship and sharpen
-   `Conditions` as the regime becomes clearer; new run numbers update `Proof`/`evidence`,
-   never the Statement. A rewrite re-grounds every number it now contains (Number grounding);
-   any changed value gets its own fresh `Sources` «quote», never a carried-over one.
+2. **Content revisions** — revise an already-crystallized entry only on a Stage 4 signal.
+   Preserve bounded empirical and named-method assertions as first-class Statements;
+   do not generalize them away or silently narrow them to fit new evidence.
+   `Conditions` records scope and unresolved boundaries. New run data belongs in
+   `Proof`/`evidence` unless it is part of an explicitly revised assertion.
+   Re-ground every load-bearing number in the revised entry (Number grounding).
+   Synthesis and narrowed subclaims have separate identities linked to the full obligation.
 3. **Structural changes** — split a claim into two, merge duplicates, repair
    dependencies, rename ids when concepts are renamed. Also **generalize**: when several
    crystallized claims are together evidence for a more general relationship none states
@@ -291,8 +322,8 @@ For each crystallized entry in `logic/`, check this turn for:
 1. **Empirical resolution** — an experiment in the entry's `Proof` refs or `bound_to`
    nodes produced a result this turn AND the researcher commented on it.
    - Result confirms → `supported` (or one step toward it)
-   - Result partial / narrower than claim → `weakened`, and consider rewriting the
-     `Statement` to match the actual scope supported
+   - Result partial / narrower than claim → `weakened`; retain the full obligation
+     and identify any supported narrower subclaim separately
    - Result disproves → `refuted` AND append a `dead_end` node referencing the claim
 2. **Verbal declaration** — first-person, explicit, naming the claim or unambiguously
    referring to its content. Covers status ("C07 confirmed" / "drop C07"), revisions
@@ -314,6 +345,19 @@ For each crystallized entry in `logic/`, check this turn for:
 
 When a signal fires for entry `E` (claim, heuristic, or concept):
 
+Before changing scope, method variant, metric, units, quantifier, aggregation,
+uncertainty, conjuncts, tolerance, or decision policy, preserve immutable full
+before/after obligation and candidate versions under the session's `logic_revisions:`
+in the same audited `ara apply` batch. Record source revision, content digests, and
+split/merge correspondence in its `note` or linked authoring receipt. For staged
+revisions, use `observation.stage` to append a new observation with the new full
+content and a link to the old one; never edit the old `content` or `context`.
+Every check belongs to the exact obligation, declaration, evidence, catalog, and
+decision-policy versions it checked. Old checks remain historical and do not certify
+the new version. Follow the shared contract for separate authorized checks and replay;
+unsupported or unperformed revisions remain explicitly unchecked. None of these
+records permits direct knowledge-file access.
+
 1. Use `logic.revise` through `ara apply` for the affected fields in the logic file. **Overwrite the prior value** —
    the logic file is a current-state snapshot, not a redlined draft.
 2. Update `- **Last revised**: YYYY-MM-DD (turn-id)` on the entry.
@@ -327,9 +371,9 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
      `Merged into: C{XX}`, redirect cross-references.
    - **Generalize**: allocate a new id for the more general claim, set its `Dependencies`
      to the narrower claims, and leave those claims in place (they remain its grounding).
-6. **Record full before/after in today's session record** under `logic_revisions:`
-   (see schema below). This is the ONLY place the prior wording is preserved — the
-   logic file does not keep it.
+6. **Ensure full before/after is retained in today's session record** under
+   `logic_revisions:` (see schema below), including complete version content for
+   semantic revisions. The current logic file does not keep prior versions.
 7. Add a one-line note to `pm_reasoning_log.yaml` explaining which signal fired AND any
    signal you considered but rejected (near-misses are the most useful continuity record).
 
@@ -363,9 +407,10 @@ When a signal fires for entry `E` (claim, heuristic, or concept):
 ## Per-Turn Procedure
 
 ```
+0. Load local references/property-authoring.md directly and unconditionally before capture, staging, revision, or declaration authoring.
 1. Read existing ara/ knowledge with ara full source shows (current state); use CLI allocation/results for new IDs.
 2. Stage 1 — harvest this turn's candidate events.
-3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; interpretive events staged to staging/observations.yaml.
+3. Stage 2 — classify/route each (per event-taxonomy.md): journey facts direct to trace/; selected assertions verbatim and interpretive events staged through observation.stage at the first epilogue opportunity, with evidence timing recorded.
 4. Stage 3 — crystallize staged observations whose closure signal fired; flag contradictions; mark 3+-day-idle observations stale.
 5. Stage 4 — for each crystallized logic/ entry, apply status/content/structural edits when a signal fires; run the cross-ref consistency pass; record before/after in the session record; log near-misses.
 6. Use one ara apply batch: session.log appends complete turn arrays and audited rolling metadata/index; record.append appends the complete PM reasoning notes.
