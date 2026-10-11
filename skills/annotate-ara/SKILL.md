@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 
 # Annotate an existing ARA
 
-Read `../shared/property-authoring.md` before authoring. Preserve its source-fidelity, uncertainty, and candidate-identity rules. This entrypoint does not compile or revise an ARA. The supplied claims and evidence are fixed inputs. For this workflow, the rules below narrow the shared contract: validate without verdicts, keep all existing ARA files, and prefer one aggregating property over redundant properties for individual conditions.
+Read `references/property-authoring.md` before authoring. Preserve its source-fidelity, uncertainty, and candidate-identity rules. This entrypoint does not compile or revise an ARA. The supplied claims and evidence are fixed inputs. For this workflow, the rules below narrow the shared contract: validate without verdicts, keep all existing ARA files, and prefer one aggregating property over redundant properties for individual conditions.
 
 ## Inputs and boundaries
 
