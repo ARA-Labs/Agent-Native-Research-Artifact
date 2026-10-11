@@ -1,0 +1,1 @@
+../../shared/property-authoring.md
